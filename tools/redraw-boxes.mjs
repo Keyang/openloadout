@@ -4,13 +4,14 @@
 // redraw to). Before a code sprite's file is deleted, record what it draws; the allowances are what its data redraw
 // reaches now, so they can only be tightened later.
 //
-//   node tools/redraw-boxes.mjs record <id> --from <file.js> [--hashes]
-//       draws the code sprite <file.js> (the old sprites/<id>.js, in a copy of the project whose engine it imports) and
-//       the library sprite <id> at every case, and writes tests/fixtures/redraw-boxes/<id>.json in THIS project: the
-//       old boxes, with --hashes the old frame hashes too, and the allowances the redraw meets now.
-//   node tools/redraw-boxes.mjs check <id>
+//   node tools/redraw-boxes.mjs record <id> --from <file.js> [--hashes] [--out <dir>]
+//       draws the code sprite <file.js>, a frozen copy tests/fixtures/code-sprites/<id>.js (the only code sprites left:
+//       sprites/ holds data only), and the library sprite <id> at every case, and writes
+//       tests/fixtures/redraw-boxes/<id>.json in THIS project (--out <dir>: there instead, to try a record without
+//       touching the pinned ones): the old boxes, with --hashes the old frame hashes too, and the allowances the redraw meets now.
+//   node tools/redraw-boxes.mjs check <id> [--out <dir>]
 //       draws the library sprite <id> against its record and says how far it is from it. Exit code 1 when it is
-//       further than the record allows.
+//       further than the record allows (--out <dir>: the record is read from there, the folder `record --out` wrote to).
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL, fileURLToPath } from 'node:url';
@@ -22,7 +23,7 @@ const DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'tests
 const [mode, id, ...rest] = process.argv.slice(2);
 const flag = (name) => { const i = rest.indexOf(name); return i < 0 ? undefined : rest[i + 1]; };
 if (!['record', 'check'].includes(mode) || !id) {
-  console.error('usage: node tools/redraw-boxes.mjs record <id> --from <file.js> [--hashes] | check <id>');
+  console.error('usage: node tools/redraw-boxes.mjs record <id> --from tests/fixtures/code-sprites/<id>.js [--hashes] [--out <dir>] | check <id> [--out <dir>]');
   process.exit(2);
 }
 
@@ -47,7 +48,8 @@ function measure(oldBoxes, oldHashes) {
 
 if (mode === 'record') {
   const from = flag('--from');
-  if (!from) { console.error('record needs --from <the old code sprite file>'); process.exit(2); }
+  if (!from) { console.error('record needs --from <a frozen copy of the old code sprite: tests/fixtures/code-sprites/<id>.js>'); process.exit(2); }
+  if (!fs.existsSync(path.resolve(from))) { console.error(`${from} does not exist. --from takes a frozen copy of the old code sprite, tests/fixtures/code-sprites/<id>.js (sprites/ holds data only).`); process.exit(2); }
   const old = (await import(pathToFileURL(path.resolve(from)).href)).default;
   if (old.id !== id) { console.error(`${from} is sprite ${old.id}, not ${id}`); process.exit(2); }
   const oldCases = redrawCases(old);
@@ -56,13 +58,17 @@ if (mode === 'record') {
   const boxes = drawn.map((d) => d.box), hashes = rest.includes('--hashes') ? drawn.map((d) => d.hash) : null;
   const m = measure(boxes, hashes);
   if (m.clipped) { console.error(`${id}: the redraw touches the frame's edge in ${m.clipped} cases where the code sprite did not; fix it before recording`); process.exit(1); }
-  const rec = { id, recorded: new Date().toISOString().slice(0, 10), from: `sprites/${id}.js (the code sprite before its redraw)`, cases: cases.length, casesKey: casesKey(cases),
+  const rec = { id, recorded: new Date().toISOString().slice(0, 10), from: `${path.relative(ROOT, path.resolve(from))} (the code sprite before its redraw)`, cases: cases.length, casesKey: casesKey(cases),
     allow: { shift: m.shift, moved: m.moved, ...(hashes ? { exact: m.exact } : {}) }, boxes: packBoxes(boxes), ...(hashes ? { frames: hashes.join(' ') } : {}) };
-  fs.mkdirSync(DIR, { recursive: true });
-  fs.writeFileSync(path.join(DIR, `${id}.json`), JSON.stringify(rec, null, 1) + '\n');
+  const out = flag('--out') ? path.resolve(flag('--out')) : DIR;
+  fs.mkdirSync(out, { recursive: true });
+  fs.writeFileSync(path.join(out, `${id}.json`), JSON.stringify(rec, null, 1) + '\n');
   console.log(`${id}: ${cases.length} frames recorded; boxes within ${m.shift} px, ${m.moved} moved${hashes ? `, ${m.exact} exact` : ''}`);
 } else {
-  const rec = JSON.parse(fs.readFileSync(path.join(DIR, `${id}.json`), 'utf8'));
+  const dir = flag('--out') ? path.resolve(flag('--out')) : DIR;
+  const recFile = path.join(dir, `${id}.json`);
+  if (!fs.existsSync(recFile)) { console.error(`no record of ${id} in ${path.relative(ROOT, dir) || dir}: record one first with "record ${id} --from tests/fixtures/code-sprites/${id}.js"${dir === DIR ? '' : ' --out <this folder>'}.`); process.exit(2); }
+  const rec = JSON.parse(fs.readFileSync(recFile, 'utf8'));
   if (casesKey(cases) !== rec.casesKey) { console.error(`${id}: its controls, clips or versions no longer give the recorded cases (${cases.length} against ${rec.cases})`); process.exit(1); }
   const m = measure(readBoxes(rec.boxes), rec.frames?.split(' '));
   const bad = m.clipped > 0 || m.shift > rec.allow.shift || m.moved > rec.allow.moved || (rec.frames && m.exact < rec.allow.exact);

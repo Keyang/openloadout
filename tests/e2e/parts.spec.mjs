@@ -151,33 +151,9 @@ test.describe('phone width', () => {
 
 // ---- controls and sounds that only apply sometimes (`when`) ---------------------------------------
 
-// A small code sprite served under an id no library sprite uses (tests/helpers/code-standin.mjs: the library's own code
-// sprites are all being redrawn as data), so these tests do not depend on what any real sprite declares.
-const WHEN_SPRITE = `
-import { defineSprite, range, choice, color, toggle } from '../engine/sprite.js';
-export default defineSprite({
-  id: '${CODE_STANDIN}', name: 'Test badge', kind: 'Item', blurb: 'A badge for tests.',
-  size: [24, 24], pivot: [12, 22],
-  params: {
-    size: range('Size', 0.5, { lo: 'Small', hi: 'Big' }),
-    emblem: choice('Emblem', 'plain', ['plain', 'star', 'heart']),
-    inlay: color('Emblem colour', '#c9423a', ['#c9423a', '#3f6fd1', '#4f9d57'], { when: { emblem: ['star', 'heart'] } }),
-    glow: toggle('Glow', false),
-    glowSize: range('Glow size', 0.5, { lo: 'Thin', hi: 'Wide', when: { glow: [true] } }),
-    metal: color('Metal', '#e6c545', ['#e6c545', '#c2c9d6', '#c98a4a'], { when: { glow: [true] } }),
-    rim: toggle('Rim', false, { when: { emblem: ['star'] } }),
-    rimWidth: range('Rim width', 0.5, { lo: 'Thin', hi: 'Thick', when: { rim: [true] } }),
-  },
-  clips: { idle: { frames: 4, fps: 6 }, flip: { frames: 4, fps: 8 } },
-  render(g, { clip, t, p }) {
-    const r = 5 + p.size * 3 + (clip === 'flip' ? Math.sin(t * 6.283) : 0);
-    if (p.glow) g.ellipse(12, 12 + Math.sin(t * 6.283), r + 1 + p.glowSize * 2, r + 1 + p.glowSize * 2, p.metal);
-    g.ellipse(12, 12 + Math.sin(t * 6.283), r, r, '#8f97a8');
-    if (p.emblem === 'star') g.rect(10, 10, 4, 4, p.inlay);
-    if (p.emblem === 'star' && p.rim) g.rect(8, 8 - Math.round(p.rimWidth * 2), 8, 1 + Math.round(p.rimWidth * 2), '#ffffff');
-    if (p.emblem === 'heart') g.rect(9, 11, 6, 2, p.inlay);
-  },
-});`;
+// A small data sprite served under an id no library sprite uses (tests/helpers/code-standin.mjs standInDef: the site loads no code
+// sprites any more), so these tests do not depend on what any real sprite declares. Its controls: Size; Emblem (plain, star,
+// heart); Emblem colour (with an emblem); Glow, Glow size and Metal (with a glow); Rim (on a star) and Rim width (with a rim).
 const WHEN_ROW = codeStandInRow({ clips: [{ name: 'idle', frames: 4, fps: 6 }, { name: 'flip', frames: 4, fps: 8 }], controls: 8 });
 const field = control;
 /** Is the control offered at all, whichever tab is open? (A control that is not in effect is `hidden`.) */
@@ -186,7 +162,7 @@ const coloursTab = (page) => page.getByRole('tab', { name: 'Colours' });
 
 test.describe('controls that only matter sometimes', () => {
   test.beforeEach(async ({ page }) => {
-    await serveCodeStandIn(page, WHEN_SPRITE, WHEN_ROW);
+    await serveCodeStandIn(page, undefined, WHEN_ROW);
     await openRoute(page, `/sprite/${CODE_STANDIN}`);
     await expect(page.getByRole('heading', { name: 'Test badge' })).toBeVisible();
   });
@@ -302,7 +278,7 @@ test.describe('sounds that only play sometimes', () => {
 
 test.describe('a control that depends on a hidden control', () => {
   test('is hidden too, even while the hidden one is still switched on', async ({ page }) => {
-    await serveCodeStandIn(page, WHEN_SPRITE, WHEN_ROW);
+    await serveCodeStandIn(page, undefined, WHEN_ROW);
     await openRoute(page, `/sprite/${CODE_STANDIN}`);
     await expect(field(page, 'rim')).toBeHidden();
     await expect(field(page, 'emblem')).toBeVisible();

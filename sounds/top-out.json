@@ -17,7 +17,7 @@
     { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 300, "max": 1200, "default": 659, "scale": "log" },
     { "id": "length", "label": "Length", "unit": "s", "min": 0.8, "max": 1.5, "default": 1.0, "scale": "log" },
     { "id": "pieces", "label": "Pieces", "min": 6, "max": 16, "default": 10, "step": 1 },
-    { "id": "drop", "label": "Drop", "unit": "semitones", "min": 6, "max": 24, "default": 19, "step": 1 },
+    { "id": "drop", "label": "Drop", "unit": "semitones", "min": 6, "max": 24, "default": 19 },
     { "id": "grit", "label": "Grit", "min": 0, "max": 1, "default": 0.3 }
   ],
   "nodes": [

@@ -9,11 +9,16 @@
 // only (docs/data-sprites.md section 5), and a data sprite is drawn in the pixel style alone until a draw-list renderer
 // for another style exists (section 2.8, "Styles"). So the test serves the two fixtures as library sprites instead:
 // two rows added to generated/catalog.json, built by the site's own catalogue builder (tools/lib/catalog.mjs), and each
-// fixture served as sprites/<id>.js. Everything the tests check (the page, the link, the bag, the download, the API)
-// treats them as it treats any library sprite with several styles.
+// fixture served as sprites/<id>.js. The page, the link, the bag and the download treat them as any library sprite with
+// several styles; the API does not (see below).
 // A sprite made on the page is data now (make.sprite, build items B11, B11b): the last test makes one and takes it through
 // the same seam (its page, render, its bag item, its link, the single download and a bag package next to a fixture in
 // another style). A data sprite lists the pixel style only, so the validator refuses one that lists another.
+// The two fixtures are code, and the api takes data only (Keyang: the code way is gone): loadout.check and loadout.render refuse
+// them with the data-only message, and the test 'the api takes data only' below asserts that. So the fixtures serve the
+// page tests only (the page, the style switcher, the catalogue row styles, the bag, the link, the download). What the api says
+// about a style a sprite cannot be drawn in is tested on a library data sprite. Multi-style drawing through the api needs a
+// second (draw-list) renderer; until then no data sprite lists a style other than pixel.
 // Needs a built site. Run with: npx playwright test tests/e2e/styles.spec.mjs
 import fs from 'node:fs';
 import path from 'node:path';
@@ -35,9 +40,23 @@ const text = (bytes) => new TextDecoder().decode(bytes);
 
 /**
  * Serve the two fixture sprites as library sprites (see the top), on this page and in its workers, from now on and
- * across reloads; then check both pass the quality bar in every style they list. Call it before the page opens.
+ * across reloads. (The quality bar on the fixtures is held by tests/unit/styles-quality.test.mjs.) Call it before the page opens.
  */
 async function serveFixtures(page) {
+  // The site loads no code sprite any more (app/catalog.js, build item Z1), and a data sprite is drawn in the pixel style alone until a draw-list
+  // renderer for another style exists (docs/data-sprites.md 2.8), so the only multi-style sprites are these two code fixtures. The page is served
+  // a copy of app/catalog.js that imports a code file for a row that names one: this test's own seam, in the served text only. The product has none.
+  await page.context().route(/\/app\/catalog\.js(\?.*)?$/, async (route) => {
+    const res = await route.fetch();
+    const from = [
+      "if (typeof src !== 'string' || !src.endsWith('.json')) return Promise.reject(",
+      'const p = loadDataFile(src).then(',
+    ];
+    let body = await res.text();
+    for (const line of from) if (!body.includes(line)) throw new Error(`styles.spec: app/catalog.js no longer has "${line}": update the test's copy of the loader`);
+    body = body.replace(from[0], "if (false) return Promise.reject(").replace(from[1], 'const p = (src.endsWith(\'.json\') ? loadDataFile(src) : import(`../sprites/${id}.js`).then((m) => m.default)).then(');
+    await route.fulfill({ response: res, body });
+  });
   await page.context().route(/\/generated\/catalog\.json(\?.*)?$/, async (route) => {
     const res = await route.fetch();
     const catalog = await res.json();
@@ -49,10 +68,13 @@ async function serveFixtures(page) {
     return route.fulfill({ status: 200, contentType: 'text/javascript', body: SOURCES[id] });
   });
 }
-/** The quality bar, on the page, for both fixtures (loadout.check on a library sprite checks every style it lists). */
-async function checkFixtures(page) {
-  const got = await page.evaluate(async () => [await window.loadout.check('style-blob'), await window.loadout.check('style-sparkle')]);
-  for (const c of got) expect(c, JSON.stringify(c.errors)).toMatchObject({ ok: true, errors: [] });
+/** What the api does with the two code fixtures: loadout.check and loadout.render refuse both, in the data-only words. */
+async function askApiAboutFixtures(page) {
+  return page.evaluate(async () => {
+    const L = window.loadout, out = {};
+    for (const id of ['style-blob', 'style-sparkle']) out[id] = { check: await L.check(id), render: await L.render(id, { frame: 0 }), styled: await L.render(id, { frame: 0, artStyle: 'silhouette' }) };
+    return out;
+  });
 }
 // the Style choice is in the editing panel's Look tab (app/panel.js)
 const pressed = (page) => page.locator('.style-choice .chip[aria-pressed="true"]');
@@ -155,7 +177,6 @@ test('the shipped site knows one style, and says so on window.loadout', async ({
 test('a sprite with three styles: the Style choice has a tab of its own, in plain words, and the pictures follow it', async ({ page }) => {
   await serveFixtures(page);
   await openRoute(page, '/');
-  await checkFixtures(page);
   await page.evaluate(() => window.loadout.go('/sprite/style-blob'));
   await waitForDrawn(page);
   const choice = page.locator('.style-choice');
@@ -360,27 +381,57 @@ test('a sprite of single pixels lists two styles: the shape style is never offer
     return {
       rows: await Promise.all(['style-blob', 'style-sparkle'].map(async (id) => [id, (await L.assets.get(id)).asset.styles])),
       get: (await L.assets.get('style-sparkle')).asset.styles,
-      refused: await L.render('style-sparkle', { artStyle: 'outline-svg' }),
-      unknown: await L.render('style-sparkle', { artStyle: 'watercolour' }),
-      pixel: await L.render('style-sparkle', { frame: 0 }),
-      flat: await L.render('style-sparkle', { frame: 0, artStyle: 'silhouette' }),
-      shapes: await L.render('style-blob', { frame: 0, artStyle: 'outline-svg', scale: 2 }),
-      themed: await L.render('style-blob', { frame: 0, artStyle: 'outline-svg', scale: 2, look: { colour: { palette: 'Frost' } } }),
-      viaCall: await L.call('render', { id: 'style-blob', options: { artStyle: 'silhouette', frame: 0 } }),
     };
   });
   expect(got.rows).toEqual([['style-blob', ['pixel', 'silhouette', 'outline-svg']], ['style-sparkle', ['pixel', 'silhouette']]]);
   expect(got.get).toEqual(['pixel', 'silhouette']);
-  expect(got.refused.ok).toBe(false);
-  expect(got.refused.errors[0]).toMatch(/"style-sparkle" cannot be drawn in the style "outline-svg"\. Its styles are: pixel, silhouette\./);
+});
+
+test('the api takes data only: check and render refuse the two code fixtures in the data-only words, never drawing them', async ({ page }) => {
+  await serveFixtures(page);
+  await openRoute(page, '/');
+  const got = await askApiAboutFixtures(page);
+  for (const id of ['style-blob', 'style-sparkle']) {
+    for (const [what, r] of Object.entries(got[id])) {
+      expect(r.ok, `${id} ${what}`).toBe(false);
+      expect(r.errors[0], `${id} ${what}`).toMatch(new RegExp(`^"${id}" is not a data sprite \\(its catalogue row names "sprites/${id}\\.js"\\)\\. Loadout sprites are data: `));
+      expect(r.png, `${id} ${what}`).toBeUndefined();
+    }
+  }
+});
+
+test('a library data sprite lists the pixel style only: another style, or an unknown one, is refused by name and never swapped', async ({ page }) => {
+  // This is the api-level form of "a style a sprite cannot be drawn in gives the 'cannot be drawn in the style <name>' message".
+  // A data sprite is drawn in the pixel style alone (engine/draw-list.js; other styles come with their renderer), so every
+  // library sprite lists ['pixel'], and any other style is refused. Drawing in several styles through the api needs a second
+  // renderer; until then the two code fixtures stay for the page tests above only.
+  await openRoute(page, '/');
+  const got = await page.evaluate(async () => {
+    const L = window.loadout;
+    return {
+      styles: (await L.assets.get('coin')).asset.styles,
+      outline: await L.render('coin', { frame: 0, artStyle: 'outline-svg' }),
+      flat: await L.render('coin', { frame: 0, artStyle: 'silhouette' }),
+      unknown: await L.render('coin', { frame: 0, artStyle: 'watercolour' }),
+      notText: await L.render('coin', { frame: 0, artStyle: 7 }),
+      pixel: await L.render('coin', { frame: 0, artStyle: 'pixel' }),
+      plain: await L.render('coin', { frame: 0 }),
+      viaCall: await L.call('render', { id: 'coin', options: { artStyle: 'outline-svg', frame: 0 } }),
+    };
+  });
+  expect(got.styles).toEqual(['pixel']);
+  expect(got.outline.ok).toBe(false);
+  expect(got.outline.errors[0]).toMatch(/"coin" cannot be drawn in the style "outline-svg"\. Its styles are: pixel\./);
+  expect(got.flat.ok).toBe(false);
+  expect(got.flat.errors[0]).toMatch(/"coin" cannot be drawn in the style "silhouette"\. Its styles are: pixel\./);
   expect(got.unknown.ok).toBe(false);
+  expect(got.unknown.errors[0]).toMatch(/"coin" cannot be drawn in the style "watercolour"\. Its styles are: pixel\./);
+  expect(got.notText.ok).toBe(false);
+  expect(got.notText.errors[0]).toMatch(/"coin" cannot be drawn in the style the number 7\. Its styles are: pixel\./);
   expect(got.pixel).toMatchObject({ ok: true, artStyle: 'pixel' });
-  expect(got.flat).toMatchObject({ ok: true, artStyle: 'silhouette', opaque: got.pixel.opaque });
-  expect(got.flat.png).not.toBe(got.pixel.png);
-  expect(got.shapes).toMatchObject({ ok: true, artStyle: 'outline-svg', width: 64, height: 64 });
-  expect(got.shapes.opaque).toBeGreaterThan(0);
-  expect(got.themed.png).not.toBe(got.shapes.png);
-  expect(got.viaCall).toMatchObject({ ok: true, artStyle: 'silhouette' });
+  expect(got.pixel.png).toBe(got.plain.png);
+  expect(got.viaCall.ok).toBe(false);
+  expect(got.viaCall.errors[0]).toMatch(/"coin" cannot be drawn in the style "outline-svg"/);
 });
 
 // (Retired in B11: "a sprite made on the page whose own code reads pixels back gets the warning". make.sprite takes
@@ -440,7 +491,6 @@ test('the bag page and the playground draw a bag item in its art style; its "Ope
 test('a sprite made on the page as data goes through the style seam in its one style, and a style it cannot be drawn in is refused', async ({ page }) => {
   await serveFixtures(page);
   await openRoute(page, '/');
-  await checkFixtures(page);      // (the fixtures' extra styles are known to the page from here on)
   const made = await page.evaluate(async ([data, other]) => {
     const L = window.loadout;
     const listed = await L.make.sprite(other);      // a data sprite that lists a style a data sprite cannot be drawn in

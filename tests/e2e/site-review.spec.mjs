@@ -108,9 +108,10 @@ test('every bundle page: each sprite sits under exactly one heading', async ({ p
   test.setTimeout(120_000);
   for (const b of C.catalog.bundles.filter((x) => x.sprites.length)) {
     await openRoute(page, `/bundle/${b.id}`);
-    const inGroups = await page.locator('.bundle-group .bundle-sprite').count();
-    expect(inGroups, b.id).toBe(await page.locator('.bundle-sprite').count());
-    expect(inGroups, b.id).toBe(b.sprites.filter((id) => C.byId[id]).length);
+    // (the sprites of a bundle page come in as they load, so on a busy machine a count taken at once is a partial one: the two counts are polled until they are the bundle's)
+    const grouped = page.locator('.bundle-group .bundle-sprite'), every = page.locator('.bundle-sprite');
+    const want = b.sprites.filter((id) => C.byId[id]).length;
+    await expect.poll(async () => `${await grouped.count()} under headings, ${await every.count()} in all`, { message: b.id, timeout: 20_000 }).toBe(`${want} under headings, ${want} in all`);
   }
 });
 
@@ -132,7 +133,12 @@ test('the bundle page groups are listed at the top and a press there moves to th
 
 async function spriteWithColour(page) {
   for (const a of C.sprites.slice(0, 40)) {
-    const has = await page.evaluate(async (src) => Object.values((await import('/' + src)).default.params ?? {}).some((d) => d.kind === 'color'), a.src).catch(() => false);
+    // (a sprite is a data file: its colour controls and the palette's swatches are read from it, not from a module; one that is always offered, with swatches to choose from)
+    const has = await page.evaluate(async (src) => {
+      const def = await (await fetch('/' + src)).json();
+      const swatched = new Set((def.palette ?? []).filter((s) => (s.swatches ?? []).length > 1).map((s) => s.id));
+      return (def.controls ?? []).some((d) => d.kind === 'colour' && !d.when && swatched.has(d.key));
+    }, a.src).catch(() => false);
     if (has) return a;
   }
   return null;

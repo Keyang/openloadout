@@ -67,7 +67,7 @@ After that, with no other edit, the new function is `loadout.framework.<module>.
 `app/api.js` puts it on the window when the site loads. That file is small (about 5 KB) and loads nothing else. The first call of any action, or the first look at `framework` or `api`, brings the rest (`app/api-core.js`), which brings what that action needs.
 
 ```js
-const fw = await loadout.framework;            // the framework: fw.sprite.defineSprite, fw.fx.ring, fw.sfx.renderPatch, ...
+const fw = await loadout.framework;            // the framework: fw.sprite.renderFrame, fw.dataSprite.makeDataSprite, fw.sfx.renderPatch, ...
 const api = await loadout.api;                 // generated/api.json
 ```
 
@@ -95,7 +95,7 @@ await loadout.assets.remove('my-star');                             // forget an
 
 await loadout.make.sprite(definition);     // { id, kind, ok, errors, warnings, kept, replaced }; a loadout-sprite version 2 object or its JSON text
 await loadout.make.sound(patchObject);     // { id, kind, ok, errors, warnings, notes, kept, replaced }
-await loadout.check('knight');             // { id, kind, ok, errors, warnings, metrics }; also takes a sprite definition or a patch
+await loadout.check('knight');             // { id, kind, ok, errors, warnings, metrics }; also takes a sprite definition (data; code is refused) or a patch
 await loadout.render('coin', { clip: 'spin', scale: 4 });           // { ok, png, artStyle, width, height, frames, opaque, ... }; { artStyle } picks one of the sprite's art styles
 await loadout.render('coin-pickup', { style: 'Gem' });              // { ok, wav, seconds, sampleRate, peak, ... }
 
@@ -114,7 +114,7 @@ The settings of a bag item and the parts of a look are spelled out in each actio
 
 ### A sprite, start to finish
 
-`make.sprite(definition)` takes one sprite definition: a JSON object of `"format": "loadout-sprite"`, `"version": 2` (or its JSON text). It is the same form as the site's own data files (`sprites/<id>.json`, e.g. `sprites/coin.json`), and **it is data, never code**: shapes, pixel stamps, and the framework's generators and pieces named by id and version with their arguments. Nothing in it runs. Sprite source text (an ES module with `defineSprite` and `render`) is no longer taken anywhere: `make.sprite` and `check` refuse it and say what to hand over instead.
+`make.sprite(definition)` takes one sprite definition: a JSON object of `"format": "loadout-sprite"`, `"version": 2` (or its JSON text). It is the same form as the site's own data files (`sprites/<id>.json`, e.g. `sprites/coin.json`), and **it is data, never code**: shapes, pixel stamps, and the framework's generators and pieces named by id and version with their arguments. Nothing in it runs. Sprite source text (an ES module with `defineSprite` and `render`) is no longer taken anywhere: `make.sprite` and `check` refuse it and say what to hand over instead. **Nothing that is not a data sprite is ever loaded or run** (R4c, 2026-11-21): `check`, `render`, `make.sprite` and the background worker take definitions (or a catalogue sprite's `sprites/<id>.json`) only. A sprite object built in the page (an object with a `render()` function, as `loadout.framework.sprite.defineSprite` makes), sprite source text, and a catalogue row whose file is code all get the same answer. `check` gives it in its own answer shape, `{ id, kind: "sprite", ok: false, errors: ["Loadout sprites are data: ..."], warnings: [] }` (`id` is the one the request named, else `null`), so a caller reading `.kind` or `.warnings` finds them; `render` and `make.sprite` give `{ ok: false, errors: [...] }` as for any refusal. A row that names a code file starts `"<id>" is not a data sprite (...)`; a catalogue row is judged by its path, so `sprites/x.js?a.json` is code. `app/api-worker.js` refuses a `checkSprite` job with a `def`, and one whose `url` is not a `.json` file of the site, with the same words.
 
 The quickest start is a sprite that is data already. `assets.get(id)` gives its `definition`; change the id, the name, the words and whatever else, and make it:
 
@@ -203,7 +203,7 @@ Whoever calls `make.sprite` may not have written the definition, and it can also
 - **The plain-data wall comes first.** Text over 128 KB or nested more than 20 levels is refused before it is parsed; `__proto__`, `constructor` and `prototype` keys are dropped wherever they are (`plainSpriteData` in `catalog/sprite-schema.js`). Only then is anything else read.
 - **The validator checks every field** (`catalog/sprite-schema.js`): every field typed, every name looked up (palette slots, controls, nodes, stamps, generators and pieces with their versions), every count capped, the cost of a frame under a budget. A definition that does not pass is refused with the validator's words, and nothing of it is kept.
 - **The framework draws it on the page** (`engine/data-sprite.js`), with the pieces it names loaded from the site (`engine/pieces.js`). Pages, cards, the bag, the playground and the exporter use it as they use a catalogue sprite.
-- **The quality bar runs in the background** (`app/api-worker.js`), so the page keeps answering. It is handed the definition and draws it there with the same framework code. A sprite made on a visit is drawn in the pixel style only (a data sprite lists no other style yet).
+- **The quality bar runs in the background** (`app/api-worker.js`), so the page keeps answering. It is handed the definition (or, for a catalogue sprite, the URL of its `sprites/<id>.json`) and draws it there with the same framework code. It never imports a module. A sprite made on a visit is drawn in the pixel style only (a data sprite lists no other style yet).
 - **A download looks again at what it writes.** A bag item's settings are usually ones the bar never drew, so before a made sprite is written the bar runs on exactly the frames about to be written (every frame of every clip at the item's settings). A setting that fails is left out of the package and named with the reason (`refused` in `manifest.json` and in what `bag.download()` returns).
 - **The site's content policy** (the `Content-Security-Policy` in `index.html`) allows scripts, workers, connections, images, fonts and styles from the site itself only, and WebAssembly (the search library). No `eval`, no inline script, no script or worker made in memory (`blob:`), no other site.
 - **Sound patches are data** and are checked and rendered as before.
@@ -312,7 +312,7 @@ A sprite is a data file (`sprites/<id>.json`; a code sprite with a `render()` fu
 
 - **The quality bar runs once per listed style**, on that style's pixel picture, and the sprite must pass in each. Its messages name the style: `style "flat": hop frame 2 / all-high: drawing touches the frame edge`. The checking time is multiplied by the number of styles.
 - **Every control must change the picture in every listed style.** A colour control does nothing in a one-colour finish, and that is an error for that style. There is no way yet to declare a control for some styles only, so such a sprite cannot list such a style.
-- **Read-backs lock a sprite to the pixel grid.** A sprite, or a rig it uses, that reads pixels back (`g.get`, `g.bounds`, `g.data`) or pastes its own pixel layer (`new Surface`, `blit`, `tilt`, `lean`) cannot be drawn on a surface that keeps shapes. The bar warns when the sprite's own code reads back from the surface it is handed ("draws outside the surface's calls", with the file and line); it does not see reads from a layer the sprite made itself. `rigs/humanoid.js` reads pixels back too, so today no sprite on that rig can take such a style.
+- **Read-backs stay in the framework.** A data sprite names shapes, stamps and generators, so it cannot read pixels back (`g.get`, `g.bounds`, `g.data`) or paste its own pixel layer; a framework helper or rig that does can be drawn only on the pixel grid, and a style that keeps shapes cannot take its drawing. The quality bar no longer traces drawing code for this (removed in build item R4b).
 - **The exports differ.** A pixel sheet's JSON has no `artStyle` (a file without it is pixel, so nothing made before styles changed); any other style's JSON, and its entry in a package's `manifest.json`, says `artStyle`.
 
 On the page: `loadout.render(id, { artStyle })` draws in an art style, `loadout.bag.add(id, { artStyle })` stores it, `(await loadout.api).styles` lists what is registered, and `(await loadout.assets.get(id)).asset.styles` is what one sprite offers.

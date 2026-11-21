@@ -171,7 +171,10 @@ test('a bag row says in plain words what was changed, at most three things and h
   await openRoute(page, '/bag');
   await expect(rows(page)).toHaveCount(7);
   const note = (i) => rows(page).nth(i).locator('.bag-text .hint');
-  await expect(note(0)).toHaveText('Height: taller, no weapon, blue cape and trim and 2 more, pixel size 2×');
+  // (the three it names come in the order of the sprite's own controls: a data sprite's parameters list its palette colours before its controls; the words,
+  // the cut at three and the "and 2 more, pixel size 2×" tail are what is checked, not which control comes first)
+  await expect(note(0)).toHaveText(/^(?=.*\bheight: taller\b)(?=.*\bno weapon\b)(?=.*\bblue cape and trim\b)(?!.*\bfaster\b).* and 2 more, pixel size 2×$/i);
+  expect((await note(0).innerText()).split(' and 2 more')[0].split(', ').length, 'three things named').toBe(3);
   await expect(note(1)).toHaveText('Height: shorter');
   await expect(note(2)).toHaveText('No changes yet');
   // (J4 words: the version it came with is not named; a chosen version is, as "<name> version")

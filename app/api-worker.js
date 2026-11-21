@@ -1,16 +1,20 @@
 // Long work for window.loadout: the quality bar on sprites and on sound patches, and rendering sounds. It runs in a
 // background worker (this file is the worker's script) so that a check that takes seconds does not freeze the page;
 // app/api-core.js also calls runJob directly where a browser has no module workers. Only framework code is ever loaded
-// here: a sprite file of the site itself, or a sprite that is data (a `loadout-sprite` definition, docs/data-sprites.md;
-// Contract 15), which comes as plain data, is checked by catalog/sprite-schema.js and drawn by engine/data-sprite.js.
-// Since build item B11 nothing made on a visit is code, so there is no other worker and no made source to keep away
-// from the bar: the bar runs on the data sprite itself, as the build runs it on a library file.
+// here: a sprite that is data (a `loadout-sprite` definition, docs/data-sprites.md; Contract 15), handed over as plain data
+// or fetched from the site's own `sprites/<id>.json`, is checked by catalog/sprite-schema.js and drawn by engine/data-sprite.js.
+// Sprites are data and nothing else: since build item B11 nothing made on a visit is code, and since R4c this worker no
+// longer imports a `.js` sprite module or takes a sprite object built in the page (a `{ render() }` object): such a job is
+// refused with DATA_ONLY. The bar runs on the data sprite itself, as the build runs it on a library file.
 
 const list = (v) => (Array.isArray(v) ? v : []);
 const messageOf = (e) => String((e && e.message) || e);
 const plain = (v) => (v === undefined ? null : JSON.parse(JSON.stringify(v, (k, x) => (typeof x === 'number' && !Number.isFinite(x) ? null : ArrayBuffer.isView(x) ? undefined : x))));
 
 let soundLibrary = null;        // id -> patch, from generated/sounds.json; read once by whoever runs the jobs
+
+/** What a request that names code, not a data sprite, is told: the one text app/api-core.js (check, render, make.sprite) and this worker both start their refusal with. */
+export const DATA_ONLY = 'Loadout sprites are data: a sprite is one JSON definition { "format": "loadout-sprite", "version": 2, "id", "name", "meta", "size", "palette", "controls", "body", "clips", ... } (or its JSON text, or the site\'s sprites/<id>.json file) that names shapes, pixel stamps and framework generators; code (an ES module, a sprite object with a render() function) is never taken, loaded or run.';
 
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 /**
@@ -33,8 +37,8 @@ async function dataSpriteOf(input) {
 }
 
 /**
- * One job, by its type: { type: 'checkSprite', data | url | def, soundsUrl, sounds } (data: a sprite definition, object or
- * JSON text; url: a sprite file of this site, .js or a data file .json; def: a sprite object, on the page only),
+ * One job, by its type: { type: 'checkSprite', data | url, soundsUrl, sounds } (data: a sprite definition, object or
+ * JSON text; url: a data file of this site, sprites/<id>.json; anything else is refused with DATA_ONLY),
  * { type: 'checkSound', patch } or { type: 'renderSound', patch, params, style, seed, maxSeconds, look }. Resolves to the
  * job's plain result; rejects with an Error whose message is written for the caller.
  */
@@ -42,15 +46,19 @@ export async function runJob(m) {
   const t0 = performance.now();
   if (m.type === 'checkSprite') {
     const [{ checkSprite }, { validateMeta }] = await Promise.all([import('../quality/sprite.js'), import('../catalog/schema.js')]);
-    let def = m.def;
+    // sprites are data: a sprite object built in the page (a render function) is never taken
+    if (m.def !== undefined && m.def !== null) throw new Error(DATA_ONLY);
+    let def;
     // a definition (a sprite made on a visit is data, build item B11): read and drawn by framework code
-    if (!def && m.data !== undefined && m.data !== null) def = await dataSpriteOf(m.data);
-    else if (!def) {
-      // only a file of the site itself is ever loaded here
-      if (typeof m.url !== 'string' || !/^https?:$/.test(new URL(m.url).protocol) || new URL(m.url).origin !== new URL(import.meta.url).origin) throw new Error('Only a sprite file of this site can be checked here.');
-      // a data file (sprites/<id>.json; docs/data-sprites.md, build item B9c) is fetched and drawn by framework code, never imported
-      const data = new URL(m.url).pathname.endsWith('.json');
-      try { def = data ? await (await import('./catalog.js')).loadDataFile(m.url) : (await import(m.url)).default; } catch (e) { throw new Error(`The sprite could not be loaded for checking: ${messageOf(e)}`); }
+    if (m.data !== undefined && m.data !== null) def = await dataSpriteOf(m.data);
+    else {
+      // a data file of the site itself (sprites/<id>.json; docs/data-sprites.md, build item B9c) is fetched and drawn by framework code; no other file is ever loaded
+      if (typeof m.url !== 'string') throw new Error(DATA_ONLY);
+      let u;
+      try { u = new URL(m.url); } catch { throw new Error(DATA_ONLY); }
+      if (!u.pathname.toLowerCase().endsWith('.json')) throw new Error(`${DATA_ONLY} Got ${u.pathname}.`);
+      if (!/^https?:$/.test(u.protocol) || u.origin !== new URL(import.meta.url).origin) throw new Error('Only a sprite file of this site can be checked here.');
+      try { def = await (await import('./catalog.js')).loadDataFile(m.url); } catch (e) { throw new Error(`The sprite could not be loaded for checking: ${messageOf(e)}`); }
     }
     let soundIndex;
     if (m.soundsUrl) {

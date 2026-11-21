@@ -9,7 +9,7 @@
   "duration": "length + 0.008",
   "params": [
     { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 400, "max": 1600, "default": 659, "scale": "log" },
-    { "id": "rise", "label": "Turn", "unit": "semitones", "min": -7, "max": 7, "default": 5, "step": 1, "hint": "Above the middle the slide goes up; below it the slide goes down, for turning the other way." },
+    { "id": "rise", "label": "Turn", "unit": "semitones", "min": -7, "max": 7, "default": 5, "hint": "Above the middle the slide goes up; below it the slide goes down, for turning the other way." },
     { "id": "length", "label": "Length", "unit": "s", "min": 0.05, "max": 0.16, "default": 0.09, "scale": "log" },
     { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
     { "id": "swish", "label": "Swish", "min": 0, "max": 1, "default": 0.4 }

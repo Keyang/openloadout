@@ -1,7 +1,7 @@
 // window.loadout: the framework and the site's high-level actions, for an agent that drives the live page
 // (docs/architecture.md, Contract 11; the guide is docs/framework-api.md).
 //
-//   const fw = await loadout.framework;                 // every framework module: fw.sprite.defineSprite, fw.fx.ring, ...
+//   const fw = await loadout.framework;                 // every framework module: fw.sprite.renderFrame, fw.fx.ring, ...
 //   const api = await loadout.api;                      // generated/api.json: what exists, with descriptions
 //   await loadout.assets.search('money', { kind: 'sprite' })
 //   await loadout.make.sprite(definition)               // a loadout-sprite v2 definition (data) -> { id, ok, errors, warnings }

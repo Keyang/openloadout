@@ -8,9 +8,13 @@
 // is the line engine/fx.js rock draws and the data file's accent.dark).
 // tests/unit/projectile-writers.test.mjs holds each data file to the code's counts recorded here.
 //
-//   node tools/projectiles/counts.mjs record --from <dir>   draws <dir>/<id>.js or <dir>/_was-<id>.js (the old code
-//        file, beside a copy of the engine it imports: tests/fixtures/code-sprites holds scatter-pellet and boulder-chunk)
-//        at every case and writes tests/fixtures/redraw-counts/projectiles.json
+//   node tools/projectiles/counts.mjs record --from <dir> [<id> ...] [--out <file>]
+//        draws <dir>/<id>.js, a frozen copy of the old code sprite (tests/fixtures/code-sprites holds boulder-chunk only;
+//        sprites/ holds data only) for each id named, or for each projectile the folder has a file for, at every case, and
+//        merges them into tests/fixtures/redraw-counts/projectiles.json (--out <file>: that file instead; the record's own
+//        `recorded` and `from` stay as they were, and each id recorded now is listed under `rerecorded`). An id that is
+//        not named and has no file keeps the record it has; an id that is named and has no file is refused. The other
+//        records (scatter-pellet and the rest) are pinned: tests/unit/projectile-writers.test.mjs holds them.
 //   node tools/projectiles/counts.mjs show <id>              the data file's counts beside the record, per clip
 import fs from 'node:fs';
 import path from 'node:path';
@@ -79,18 +83,29 @@ export function countsOf(sprite, id) {
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const [mode, ...rest] = process.argv.slice(2);
   if (mode === 'record') {
-    const i = rest.indexOf('--from'), dir = i >= 0 ? path.resolve(rest[i + 1]) : null;
-    if (!dir) { console.error('usage: node tools/projectiles/counts.mjs record --from <dir with <id>.js or _was-<id>.js>'); process.exit(2); }
-    const rec = { recorded: new Date().toISOString().slice(0, 10), from: 'the code sprites before their redraw (sprites/<id>.js)', fields: ['stray', 'uninked', 'ink', 'moss', 'mossLine'], sprites: {} };
-    for (const id of PROJECTILE_IDS) {
-      const file = [`${id}.js`, `_was-${id}.js`].map((f) => path.join(dir, f)).find((f) => fs.existsSync(f));
-      if (!file) { console.error(`no ${id}.js or _was-${id}.js in ${dir}`); process.exit(2); }
-      const s = (await import(pathToFileURL(file).href)).default;
-      rec.sprites[id] = countsOf(s, id);
+    const take = (flag) => { const i = rest.indexOf(flag); return i >= 0 ? path.resolve(rest[i + 1]) : null; };
+    const dir = take('--from'), out = take('--out') ?? COUNTS_FILE;
+    const named = rest.filter((x, i) => !x.startsWith('--') && !['--from', '--out'].includes(rest[i - 1]));
+    if (!dir) { console.error('usage: node tools/projectiles/counts.mjs record --from <dir with a frozen copy <id>.js: tests/fixtures/code-sprites> [<id> ...] [--out <file>]'); process.exit(2); }
+    for (const id of named) if (!PROJECTILE_IDS.includes(id)) { console.error(`${id} is not a projectile of tools/projectiles (${PROJECTILE_IDS.join(', ')})`); process.exit(2); }
+    const have = (id) => path.join(dir, `${id}.js`);
+    const ids = named.length ? named : PROJECTILE_IDS.filter((id) => fs.existsSync(have(id)));
+    for (const id of ids) if (!fs.existsSync(have(id))) { console.error(`no frozen copy ${id}.js in ${dir} (tests/fixtures/code-sprites holds boulder-chunk only)`); process.exit(2); }
+    if (!ids.length) { console.error(`no projectile code file in ${dir}`); process.exit(2); }
+    let rec = { sprites: {} };
+    try { rec = JSON.parse(fs.readFileSync(out, 'utf8')); } catch { /* a new record */ }
+    // provenance stays true: a new file gets the date and source at its top; a record that exists keeps its own (the entries it was
+    // first made from), and each id recorded now is listed under `rerecorded` with today's date and the folder it came from
+    const today = new Date().toISOString().slice(0, 10), fromText = `the code sprites before their redraw (frozen copies, ${path.relative(ROOT, dir)})`;
+    const fresh = !rec.recorded;
+    rec = { ...(fresh ? { recorded: today, from: fromText } : {}), ...rec, fields: ['stray', 'uninked', 'ink', 'moss', 'mossLine'], sprites: { ...rec.sprites } };
+    for (const id of ids) {
+      rec.sprites[id] = countsOf((await import(pathToFileURL(have(id)).href)).default, id);
+      if (!fresh) rec.rerecorded = { ...rec.rerecorded, [id]: { recorded: today, from: fromText } };
     }
-    fs.mkdirSync(path.dirname(COUNTS_FILE), { recursive: true });
-    fs.writeFileSync(COUNTS_FILE, JSON.stringify(rec) + '\n');
-    console.log(`wrote ${path.relative(ROOT, COUNTS_FILE)}`);
+    fs.mkdirSync(path.dirname(out), { recursive: true });
+    fs.writeFileSync(out, JSON.stringify(rec) + '\n');
+    console.log(`wrote ${path.relative(ROOT, out)}: ${ids.join(', ')}`);
   } else if (mode === 'show') {
     const { loadDataSprite } = await import('../lib/assets.mjs');
     const rec = JSON.parse(fs.readFileSync(COUNTS_FILE, 'utf8'));
@@ -102,5 +117,5 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
         console.log(`${id} ${cs} ${clip}: ` + rec.fields.map((f, k) => `${f} ${sum(old, k)}->${sum(fr, k)}`).join('  '));
       }
     }
-  } else { console.error('usage: node tools/projectiles/counts.mjs record --from <dir> | show [<id> ...]'); process.exit(2); }
+  } else { console.error('usage: node tools/projectiles/counts.mjs record --from <dir> [<id> ...] [--out <file>] | show [<id> ...]'); process.exit(2); }
 }

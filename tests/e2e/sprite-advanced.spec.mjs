@@ -11,7 +11,8 @@
 //   - A sprite made on this visit has no Advanced button (only the library's data sprites do); nothing scrolls sideways
 //     at phone width.
 // Chromium; the shared test server (http://localhost:5199, playwright.config.mjs).
-import { test, expect, openRoute, downloadFrom, hasHorizontalScroll, canvasStats, setRange, showControl } from '../helpers/test.mjs';
+import { test as plain } from '@playwright/test';      // (for the one test that expects the page to log an error)
+import { test, expect, openRoute, downloadFrom, hasHorizontalScroll, canvasStats, setRange, showControl, quietNetwork } from '../helpers/test.mjs';
 
 /** A sprite page with no studio drafts and an empty bag. */
 async function fresh(page, id, query = '') {
@@ -203,24 +204,28 @@ test('a sprite made on this visit has no Advanced button', async ({ page }) => {
   await expect(advancedBtn(page)).toHaveCount(0);
 });
 
-test('a sprite whose file is still code (sprites/<id>.js) has no Advanced button', async ({ page }) => {
-  // (every library sprite is data now: the catalogue is served naming coin.js, and coin.js hands over the data sprite)
+// (A code sprite cannot be on the site any more: the build refuses sprites/<id>.js and app/catalog.js imports no code file, build item Z1. So there is no
+// code sprite page to have no Advanced button; what is checked is that a catalogue row naming a code file is refused, never imported.)
+plain('a catalogue row that names a code file (sprites/<id>.js) is refused: the page is "not here", the file is never asked for, and there is no Advanced button', async ({ page }) => {
+  await quietNetwork(page);
+  const logged = [], asked = [];
+  page.on('console', (m) => { if (m.type() === 'error') logged.push(m.text()); });
+  page.on('request', (r) => { if (/\/sprites\/coin\.js(\?|$)/.test(r.url())) asked.push(r.url()); });
   await page.route('**/generated/catalog.json', async (route) => {
     const res = await route.fetch();
     const cat = await res.json();
     cat.assets.find((a) => a.id === 'coin').src = 'sprites/coin.js';
     await route.fulfill({ response: res, json: cat });
   });
-  await page.route('**/sprites/coin.js', (route) => route.fulfill({ contentType: 'text/javascript',
-    body: "import { loadDataFile } from '/app/catalog.js';\nexport default await loadDataFile('sprites/coin.json');\n" }));
-  await fresh(page, 'coin');
+  await page.goto('/index.html#/sprite/coin', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('main h1')).toContainText(/not here/i);
   expect(await page.evaluate(async () => (await import('/app/catalog.js')).assetById('coin').src)).toBe('sprites/coin.js');
-  await expect(page.locator('.rx-panel [role="tab"]').first()).toBeVisible();
-  await expect(page.locator('main.rx-sprite .stage-card .stage')).toBeVisible();
   await expect(advancedBtn(page)).toHaveCount(0);
+  expect(logged.some((t) => /"coin" has no data file/.test(t)), `the page says why: ${logged.join(' | ')}`).toBe(true);
+  expect(asked, 'the code file is never asked for').toEqual([]);
   // an address asking for Advanced opens nothing either
-  await openRoute(page, '/sprite/coin?edit=advanced');
-  await expect(page.locator('.rx-panel [role="tab"]').first()).toBeVisible();
+  await page.goto('/index.html#/sprite/coin?edit=advanced', { waitUntil: 'domcontentloaded' });
+  await expect(page.locator('main h1')).toContainText(/not here/i);
   await expect(page.locator('main.is-advanced')).toHaveCount(0);
 });
 

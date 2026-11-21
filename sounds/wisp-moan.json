@@ -16,7 +16,7 @@
   "params": [
     { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 220, "max": 880, "default": 440, "scale": "log" },
     { "id": "length", "label": "Length", "unit": "s", "min": 0.3, "max": 1.2, "default": 0.6, "scale": "log" },
-    { "id": "drop", "label": "Drop", "unit": "semitones", "min": -7, "max": 12, "default": 4, "step": 1, "hint": "Below the middle the voice rises instead" },
+    { "id": "drop", "label": "Drop", "unit": "semitones", "min": -7, "max": 12, "default": 4, "hint": "Below the middle the voice rises instead" },
     { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.4 },
     { "id": "waver", "label": "Waver", "min": 0, "max": 1, "default": 0.5 },
     { "id": "space", "label": "Room", "min": 0, "max": 0.3, "default": 0.2 }

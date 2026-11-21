@@ -275,9 +275,9 @@ test('no test scans sprites/ for code files only: a scan takes data files too', 
 });
 
 // A unit test that fakes the built catalogue (globalThis.fetch) and then loads one of its sprites through
-// app/catalog.js: a row with no src, or a src that is not a .json file, makes loadSprite import sprites/<id>.js. For a
-// real library id that breaks when the id is redrawn (B9c review round 2, issue 1: catalog-studio-shadow and knight).
-// Give such a row an id no library sprite uses and serve it with tests/helpers/code-standin.mjs (useCodeStandIn).
+// app/catalog.js: a row with no src, or a src that is not a .json file, is refused by loadSprite (since Z1; it used to import
+// sprites/<id>.js). For a real library id such a row is a mistake in the test (B9c review round 2, issue 1: catalog-studio-shadow and knight).
+// Give the row an id no library sprite uses and serve its data file with tests/helpers/code-standin.mjs (standInFetch).
 const LIBRARY_IDS = new Set([...ids, ...FROZEN]);   // every id that is, or was, a library sprite
 /** The catalogue rows `{ id: '<x>', kind: 'sprite', ... }` (either key first) inside an `assets: [...]` list in a test file's text: [{ id, text }]. */
 function spriteRows(text) {
@@ -333,7 +333,7 @@ test('no test loads a library id through a fake catalogue row that sends the sit
     if (HELPERS.has(f)) continue;
     for (const n of fakeRowLoads(fs.readFileSync(path.join(ROOT, f), 'utf8'))) bad.push(`${f}:${n}`);
   }
-  assert.deepEqual(bad, [], 'give the row an id no library sprite uses: tests/helpers/code-standin.mjs (CODE_STANDIN, useCodeStandIn)');
+  assert.deepEqual(bad, [], 'give the row an id no library sprite uses: tests/helpers/code-standin.mjs (CODE_STANDIN, standInFetch)');
 });
 
 test('every unit test that scans librarySprites() says what it covered (libraryCoverage) or fails on an unloadable file', () => {

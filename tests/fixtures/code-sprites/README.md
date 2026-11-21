@@ -61,8 +61,8 @@ Rules:
 - a listing of the real `sprites/` folder kept to code files (`.js` only, or `.json` dropped);
 - a fake catalogue (an `assets: [...]` list handed to `globalThis.fetch`) whose row for a library id has no `.json`
   src, in a file that then calls `loadSprite`/`loadSprites` with that id as a quoted literal: `app/catalog.js` would
-  import `sprites/<id>.js`. Give such a row an id no library sprite uses and serve it with
-  `tests/helpers/code-standin.mjs` (`CODE_STANDIN`, `useCodeStandIn`), as `catalog-studio-shadow` and `catalog-load` do;
+  refuse it (it imported `sprites/<id>.js` until build item Z1). Give such a row an id no library sprite uses and serve its
+  data file with `tests/helpers/code-standin.mjs` (`CODE_STANDIN`, `standInFetch`), as `catalog-studio-shadow` and `catalog-load` do;
 - a unit test that scans `librarySprites()` without printing `libraryCoverage()` or failing on an unloadable file.
 
 It reads text, line by line, so it does not see: a path or id built across several lines or in a helper function; an

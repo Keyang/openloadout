@@ -6,6 +6,9 @@ import { goodData, GOOD_ID, noWords, deadControl, OLD_SOURCE, GOOD_SOUND } from 
 
 const GOOD = goodData();
 
+// The browser keeps only the first 250 resources it loaded (performance.getEntriesByType): a page that loads the home page's whole
+// line-up of sprites fills that, and a file asked for later is missing from the list though it was loaded. A bigger buffer, from the start.
+test.beforeEach(({ page }) => page.addInitScript(() => performance.setResourceTimingBufferSize(5000)));
 const loaded = (page) => page.evaluate(() => performance.getEntriesByType('resource').map((r) => new URL(r.name).pathname));
 /** Decode a PNG data address in the page and count its pixels that are not see-through. */
 const pngStats = (page, png) => page.evaluate(async (src) => {
@@ -125,25 +128,24 @@ test('(b) a framework function called directly draws pixels', async ({ page }) =
   expect(r.bounds.x1).toBeGreaterThan(r.bounds.x0);
 });
 
-test('check takes a sound patch or a sprite definition made in the page, and keeps nothing', async ({ page }) => {
+test('check takes a sound patch and a sprite definition, refuses a sprite object with a render function in check\'s own answer shape, and keeps nothing', async ({ page }) => {
   await openRoute(page, '/');
-  const r = await page.evaluate(async (patch) => {
+  const r = await page.evaluate(async ([patch, data]) => {
     const L = window.loadout;
-    const { sprite, color } = await L.framework;
-    const def = sprite.defineSprite({
-      id: 'api-test-inline', name: 'Inline', size: [16, 16], pivot: [8, 14],
-      params: { size: sprite.range('Size', 0.5) },
-      clips: { idle: { frames: 2, fps: 4 } },
-      render(g, { p }) { g.ellipse(8, 8, 3 + p.size * 3, 3 + p.size * 3, color.ramp('#c9423a')); g.outline(color.INK); },
-    });
-    return { patch: await L.check(patch), def: await L.check(def), kept: (await L.assets.list({ runtime: true })).total };
-  }, GOOD_SOUND);
+    // a sprite object built in the page, with a render function: code, never run
+    const code = { id: 'api-test-inline', name: 'Inline', size: [16, 16], pivot: [8, 14], clips: { idle: { frames: 2, fps: 4 } }, render(g) { g.rect(0, 0, 4, 4, '#c9423a'); } };
+    return { patch: await L.check(patch), code: await L.check(code), data: await L.check(data), kept: (await L.assets.list({ runtime: true })).total };
+  }, [GOOD_SOUND, GOOD]);
   expect(r.patch).toMatchObject({ id: GOOD_SOUND.id, kind: 'sound', ok: true, errors: [] });
   expect(r.patch.metrics.valid).toBe(true);
-  expect(r.def.kind).toBe('sprite');
-  expect(r.def.ok).toBe(false);                                    // no metadata, for one
-  expect(r.def.errors.join('\n')).toMatch(/meta/i);
-  expect(r.def.warnings.join('\n')).toMatch(/on the page itself/);
+  // the refusal has the shape of every other check answer: id, kind, ok, errors, warnings
+  expect(r.code).toMatchObject({ id: 'api-test-inline', kind: 'sprite', ok: false, warnings: [] });
+  expect(r.code.errors).toHaveLength(1);
+  expect(r.code.errors[0]).toMatch(/^Loadout sprites are data:/);
+  expect(r.code.errors[0]).toMatch(/render\(\)/);
+  // a definition (data) is judged
+  expect(r.data).toMatchObject({ id: GOOD_ID, kind: 'sprite' });
+  expect(Array.isArray(r.data.errors) && Array.isArray(r.data.warnings)).toBe(true);
   expect(r.kept).toBe(0);
 });
 
@@ -332,7 +334,7 @@ test('(f) junk never throws: every action answers { ok: false, errors }', async 
   expect(r['call unknown']).toMatch(/make_sprite/);
   expect(r['download empty']).toMatch(/empty/);
   expect(r.source.ok).toBe(false);
-  expect(r.source.errors[0]).toMatch(/no longer.*"loadout-sprite"/);
+  expect(r.source.errors[0]).toMatch(/Loadout sprites are data:.*"loadout-sprite".*no longer taken/);
   expect(r.broken.ok).toBe(false);
   expect(r.broken.errors[0]).toMatch(/JSON/);
   expect(r.checkBroken.ok).toBe(false);

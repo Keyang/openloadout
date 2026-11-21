@@ -10,7 +10,7 @@
   "params": [
     { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 150, "max": 600, "default": 262, "scale": "log" },
     { "id": "length", "label": "Length", "unit": "s", "min": 0.04, "max": 0.14, "default": 0.07, "scale": "log" },
-    { "id": "drop", "label": "Drop", "unit": "semitones", "min": 0, "max": 12, "default": 5, "step": 1 },
+    { "id": "drop", "label": "Drop", "unit": "semitones", "min": 0, "max": 12, "default": 5 },
     { "id": "grit", "label": "Grit", "min": 0, "max": 1, "default": 0.2 }
   ],
   "nodes": [

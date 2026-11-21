@@ -178,6 +178,8 @@ test('both are counted on the home page and listed in the library, each with its
 });
 
 test('each is found by the word only it has', async ({ page }) => {
+  // (the browser lists only the first 250 resources a page loaded, and the home page's line-up of sprites fills that: a bigger buffer)
+  await page.addInitScript(() => performance.setResourceTimingBufferSize(5000));
   await open(page, '/');
   await search(page, NEW_SPRITE.word);      // from the home page, into the library; then the library's own box
   for (const it of [NEW_SPRITE, NEW_SOUND]) {

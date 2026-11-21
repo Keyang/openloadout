@@ -1,6 +1,6 @@
 // app/catalog.js loads a library data sprite (sprites/<id>.json; docs/data-sprites.md, build item B9) when the
 // catalogue row's src says so: the definition is fetched (never imported), the pieces it uses are loaded into the site's
-// piece store, and engine/data-sprite.js draws it. A code sprite is still imported. Runs in Node with a stand-in fetch
+// piece store, and engine/data-sprite.js draws it. A row with no .json src is refused (build item Z1). Runs in Node with a stand-in fetch
 // (as tests/unit/catalog-load.test.mjs does); the site's piece store reads a scratch project's pieces/ from the disk.
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -10,16 +10,13 @@ import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { sitePieces } from '../../engine/pieces.js';
 import { nodePieceReader } from '../../tools/lib/pieces-index.mjs';
 import { dataProject, badgeDef, tuftDef, asFile } from '../helpers/data-sprites.mjs';
-import { CODE_STANDIN, useCodeStandIn } from '../helpers/code-standin.mjs';
-
-// a code sprite under an id no library sprite uses (the library's own are all being redrawn as data)
-useCodeStandIn();
+import { CODE_STANDIN } from '../helpers/code-standin.mjs';
 
 const project = dataProject({ data: { badge: badgeDef(), 'tuft-pot': tuftDef() }, pieces: true });
 sitePieces().useReader(nodePieceReader(project));
 
 const row = (id, src) => ({ id, kind: 'sprite', name: id, bundles: [], src, tech: { soundIds: [] } });
-const CATALOG = { version: 1, assets: [row('badge', 'sprites/badge.json'), row('tuft-pot', 'sprites/tuft-pot.json'), row(CODE_STANDIN, `sprites/${CODE_STANDIN}.js`), row('gone', 'sprites/gone.json')], bundles: [] };
+const CATALOG = { version: 1, assets: [row('badge', 'sprites/badge.json'), row('tuft-pot', 'sprites/tuft-pot.json'), row(CODE_STANDIN, `sprites/${CODE_STANDIN}.js`), row('no-src', null), row('gone', 'sprites/gone.json')], bundles: [] };
 
 let copy = 0;
 const real = globalThis.fetch;
@@ -61,12 +58,11 @@ test('the pieces a data sprite uses are loaded before it is drawn', async () => 
   assert.ok(renderFrame(s, 'idle', 0, defaultParams(s)).data.some((v) => v >>> 24));
 });
 
-test('a code sprite is still imported, and a data file that is missing rejects (and may be tried again)', async () => {
+test('a row that names a code file or no file is refused, and a data file that is missing rejects (and may be tried again)', async () => {
   const { m, asked } = await fresh();
-  const code = await m.loadSprite(CODE_STANDIN);      // a code file (tests/helpers/code-standin.mjs)
-  assert.equal(code.id, CODE_STANDIN);
-  assert.equal(typeof code.render, 'function');
-  assert.ok(!asked.some((u) => u.includes(CODE_STANDIN)), 'a code sprite is imported, not fetched');
+  await assert.rejects(m.loadSprite(CODE_STANDIN), /has no data file/);      // src sprites/<id>.js: never imported, never fetched
+  await assert.rejects(m.loadSprite('no-src'), /has no data file/);
+  assert.ok(!asked.some((u) => u.includes(CODE_STANDIN) || u.includes('no-src')), 'no file is asked for');
   await assert.rejects(m.loadSprite('gone'), /sprites\/gone\.json/);
   fs.writeFileSync(path.join(project, 'sprites', 'gone.json'), asFile(badgeDef('gone')));
   assert.equal((await m.loadSprite('gone')).id, 'gone', 'a failed load is not kept');

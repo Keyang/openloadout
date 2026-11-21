@@ -23,7 +23,6 @@ import { blockJoins, classifyTiles } from '../engine/tiles.js';
 import { THEME_PRESETS, applyColour, themedParams, spriteMaterials, lookColours, randomTheme, toneNeed } from '../engine/theme.js';
 import { outsideMaterial, colourGap, materialById, unsaidMaterial, MATERIAL_IDS } from '../engine/materials.js';
 import { stylesOf, styleById, styleIds } from '../engine/styles.js';
-import { Surface } from '../engine/surface.js';
 import { cleanVersions } from '../engine/versions.js';
 import { dataChecks } from './data-checks.js';
 
@@ -358,8 +357,7 @@ export function lookFaults(table, looks = checkedLooks(), recolour = lookColours
  * soundIndex: Map or object of sound id -> patch (left out: sound cues are not checked);
  * validateMeta: (meta, kind) -> { ok, errors } from catalog/schema.js (left out: metadata is not checked).
  * The bar runs once per style the sprite lists. metrics are the first style's, with `ms` the whole check; a sprite
- * with more than one style also gets metrics.styles: { id: that style's metrics }. metrics.outsideCalls lists the
- * ways the sprite's own code reads or writes pixels directly ([] when it does not; null when that cannot be told here).
+ * with more than one style also gets metrics.styles: { id: that style's metrics }.
  */
 export function checkSprite(def, options = {}) {
   const t0 = now();
@@ -383,12 +381,6 @@ export function checkSprite(def, options = {}) {
         metrics.styles[id] = r.metrics;
       }
     }
-    // the sprite's own code reading pixels back or writing the pixel buffer: it could never be drawn on another surface
-    const t1 = now();
-    const outside = paramsBuilt(def) ? directPixelUse(def, styleById(known[0]), first.metrics.renders) : null;
-    metrics.outsideCalls = outside ? outside.calls : null;
-    metrics.outsideMs = Math.round((now() - t1) * 10) / 10;
-    if (outside && outside.calls.length) warnings.push(`draws outside the surface's calls: the sprite's own code reads pixels back or writes the pixel buffer directly (${outside.calls.join(', ')}; first at ${outside.where}). That only works on the pixel grid, so the sprite can never be given another style (docs/architecture.md, Contract 12). Do it with a framework helper, or keep in mind that it stays pixel-only`);
   }
   // a version 2 data sprite's data checks (quality/data-checks.js: stamp out of frame, slot never painted, cost); nothing for any other sprite
   const data = dataChecks(def);
@@ -396,140 +388,6 @@ export function checkSprite(def, options = {}) {
   Object.assign(metrics, data.metrics);
   metrics.ms = Math.round((now() - t0) * 10) / 10;
   return { errors, warnings, metrics };
-}
-
-const paramsBuilt = (def) => Object.values(def.params || {}).every((d) => d && d.kind);
-
-// ---- the sprite's own code touching pixels (Contract 12) ----------------------------------------------------------
-// A sprite draws through the surface's calls. Reading pixels back (get, bounds, bytes) or using the pixel buffer
-// (data) ties it to the pixel grid. Framework code (engine/, rigs/) may do both: helpers that must say which
-// styles they suit. To tell the two apart, some frames are drawn again on a stand-in for the surface: an object
-// that passes every call on to a real Surface and notes each read-back made on it, traced to the file it came
-// from. The engine itself is never altered for this (changing Surface, even briefly, leaves every later frame
-// slower), so only the surface the sprite is handed is watched: pixels read from a layer the sprite made itself
-// (new Surface) are not seen.
-// Which frames, in this order, until the allowance is spent (WATCH_SHARE of the check's own renders; at least one
-// per clip, and at least WATCH_SMALL frames of a 32 x 32 sprite, fewer of a bigger one):
-//   1. the first frame of every clip at the default settings;
-//   2. the last frame of every clip at the default settings (a death pose, the end of a break);
-//   3. the first frame of the first clip at every other tested setting (all sliders low, all high, each option
-//      of each choice, each on/off control flipped), so code that runs for one option only is reached;
-//   4. the frames in between, at the default settings;
-//   5. the last frame of the last clip at each of those settings.
-// A rig may read thousands of pixels per frame, so not every use is traced: of each kind (data, get, bounds, bytes)
-// the first TRACE_FIRST are, then one in TRACE_EVERY, TRACE_MOST in all. This is a sample, not a proof: code that
-// runs only for one option on one middle frame, or one read among a helper's thousands, can be missed.
-
-const SITE = new URL('..', import.meta.url).href;                 // the project folder, as stack traces name it
-const THIS_FILE = new URL(import.meta.url).href.split('?')[0];
-const FRAMEWORK_FOLDERS = ['engine/', 'rigs/', 'quality/', 'sound/', 'catalog/'];
-const READS_BACK = new Set(['get', 'bounds', 'bytes']);
-const TRACE_FIRST = 64, TRACE_EVERY = 16, TRACE_MOST = 1500;
-const WATCH_SHARE = 0.02, WATCH_SMALL = 24;
-
-/** Where the code that called into the watcher lives: { url, line } of the first frame outside this file, or null. */
-function callerOf() {
-  const limit = Error.stackTraceLimit;
-  if (typeof Error.captureStackTrace === 'function') {
-    // V8 (Node, Chromium): the frames as objects, which costs far less than writing the trace out as text
-    const prepare = Error.prepareStackTrace, holder = {};
-    let sites = null;
-    Error.stackTraceLimit = 5;
-    Error.prepareStackTrace = (_, frames) => frames;
-    try { Error.captureStackTrace(holder, callerOf); sites = holder.stack; } finally { Error.prepareStackTrace = prepare; Error.stackTraceLimit = limit; }
-    if (Array.isArray(sites)) {
-      for (const site of sites) {
-        const url = site.getFileName?.() ?? site.getScriptNameOrSourceURL?.();
-        if (typeof url === 'string' && url && url.split('?')[0] !== THIS_FILE) return { url, line: site.getLineNumber?.() ?? 0 };
-      }
-      return null;
-    }
-  }
-  Error.stackTraceLimit = 6;
-  const stack = String(new Error().stack ?? '');
-  Error.stackTraceLimit = limit;
-  for (const frame of stack.split('\n')) {
-    const m = /([a-z][a-z0-9+.-]*:[^\s()]+?):(\d+):\d+\)?\s*$/i.exec(frame);
-    if (!m || m[1].split('?')[0] === THIS_FILE) continue;
-    return { url: m[1], line: Number(m[2]) };
-  }
-  return null;
-}
-/** True when this JavaScript engine says where a call came from. */
-const canTrace = () => { try { return typeof new Error().stack === 'string' && new Error().stack.length > 0; } catch { return false; } };
-
-/**
- * A stand-in for a pixel Surface: it has the same calls and passes each one on to `real`, and tells note(what)
- * about every read-back made on it ('get', 'bounds', 'bytes', or 'data' for the pixel buffer). The real Surface's
- * own use of its pixels never comes through here, so everything noted was asked for from outside.
- */
-function standIn(real, note) {
-  const g = { constructor: Surface };
-  Object.defineProperty(g, 'w', { enumerable: true, get: () => real.w });
-  Object.defineProperty(g, 'h', { enumerable: true, get: () => real.h });
-  Object.defineProperty(g, 'shadow', { enumerable: true, get: () => real.shadow, set: (v) => { real.shadow = v; } });
-  Object.defineProperty(g, 'data', { enumerable: true, get: () => { note('data'); return real.data; }, set: (v) => { note('data'); real.data = v; } });
-  for (const name of Object.getOwnPropertyNames(Surface.prototype)) {
-    const fn = Surface.prototype[name];
-    if (name === 'constructor' || typeof fn !== 'function') continue;
-    const reads = READS_BACK.has(name);
-    // eight arguments are the most any call takes; passing them by position costs less than collecting them (a
-    // backdrop helper sets tens of thousands of single pixels per frame). No call counts its arguments.
-    g[name] = (a, b, c, d, e, f, x, y) => { if (reads) note(name); const out = fn.call(real, a, b, c, d, e, f, x, y); return out === real ? g : out; };
-  }
-  return g;
-}
-
-/**
- * Draws the frames named above on a stand-in and reports how the sprite's own code used pixels directly.
- * style: the style to draw in (from engine/styles.js); renders: how many frames the check itself drew.
- * Returns { calls: ['data', 'get', ...] (sorted; empty when it kept to the surface's calls), where: 'file:line' of the
- * first one }, or null when it cannot be told: this JavaScript engine gives no stack traces to tell sprite code from
- * framework code, or the style does not draw on a pixel Surface (there are then no pixels to read).
- */
-function directPixelUse(def, style, renders = 0) {
-  if (!canTrace()) return null;
-  const calls = new Set(), seen = { data: 0, get: 0, bounds: 0, bytes: 0 };
-  let traced = 0, where = null;
-  const note = (what) => {
-    if (calls.has(what) || traced >= TRACE_MOST) return;           // already known, or enough looked at
-    const n = ++seen[what];
-    // after the first few, one in TRACE_EVERY, picked by a scramble of the count so a regular loop cannot hide from it
-    if (n > TRACE_FIRST && (Math.imul(n, 0x9e3779b1) >>> 0) % TRACE_EVERY) return;
-    traced++;
-    const from = callerOf();
-    if (!from) return;
-    const path = from.url.startsWith(SITE) ? from.url.slice(SITE.length).split('?')[0] : null;
-    if (path && FRAMEWORK_FOLDERS.some((d) => path.startsWith(d))) return;      // a framework helper: its business
-    calls.add(what);
-    where ??= `${path ?? (from.url.startsWith('blob:') ? 'the sprite\'s source' : from.url.split('/').pop())}:${from.line}`;
-  };
-  const dflt = defaultParams(def), lo = {}, hi = {}, looks = [];
-  for (const [k, d] of Object.entries(def.params)) {
-    if (d.kind === 'range') { lo[k] = d.min; hi[k] = d.max; }
-    if (d.kind === 'choice') for (const o of d.options) if (o.value !== dflt[k]) looks.push({ ...dflt, [k]: o.value });
-    if (d.kind === 'toggle') looks.push({ ...dflt, [k]: !dflt[k] });
-  }
-  looks.push(cleanParams(def, lo), cleanParams(def, hi));
-  const clips = Object.keys(def.clips || {}), count = (clip) => def.clips[clip].frames;
-  const frames = clips.map((clip) => [clip, 0, dflt]);
-  for (const clip of clips) if (count(clip) > 1) frames.push([clip, count(clip) - 1, dflt]);
-  for (const p of looks) if (clips.length) frames.push([clips[0], 0, p]);
-  for (const clip of clips) for (let f = 1; f < count(clip) - 1; f++) frames.push([clip, f, dflt]);
-  for (const p of looks) if (clips.length) frames.push([clips[clips.length - 1], count(clips[clips.length - 1]) - 1, p]);
-  const [w, h] = def.size;
-  const allowance = Math.max(clips.length, Math.round(renders * WATCH_SHARE), Math.round((WATCH_SMALL * 1024) / (w * h)));
-  for (const [clip, f, p] of frames.slice(0, allowance)) {
-    // what renderFrame (engine/sprite.js) hands to render(), with the stand-in in place of the surface
-    const c = def.clips[clip];
-    const ctx = { clip, t: c.loop ? f / c.frames : c.frames > 1 ? f / (c.frames - 1) : 0, frame: f, frames: c.frames, loop: c.loop, p, style: style.id };
-    try {
-      const real = style.makeSurface(w, h, ctx);
-      if (!(real instanceof Surface)) return null;
-      def.render(standIn(real, note), ctx);
-    } catch { /* the bar itself reports a render that fails */ }
-  }
-  return { calls: [...calls].sort(), where };
 }
 
 /** The bar for one style of a sprite. pass: { style (from engine/styles.js), first (report the sprite's own faults too), tag (starts each message about the drawing) }. */

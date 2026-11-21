@@ -14,7 +14,7 @@ node tools/check.mjs [<id> ...] [--json] [--no-cache]                 sprites (n
 node tools/sfx.mjs check sounds/<id>.json ... [--json] [--no-cache]   sound effects, ambience, jingles, music
 ```
 
-Both run on worker threads and keep each result in `.cache/quality.json`, keyed on the files that asset really loads: its own file, every module it imports followed through their imports (its rig, the engine modules the rig uses, a shared `sprites/_*.js` helper), the checker's own code (`quality/sprite.js` or `quality/sound.js` with what it imports, and `catalog/schema.js`), and for a sprite the sounds its cues name. So an edit to one rig checks only the sprites on that rig again, an edit to the sound engine checks only the sounds, and an edit to a file nothing loads checks nothing (`tools/lib/quality-run.mjs`; the import lists come from `tools/lib/imports.mjs`). An unchanged asset costs nothing; `--no-cache` checks it again. The build (`node tools/build.mjs`) uses the same runner, runs it before it writes anything the site reads, and stops on any error saying which file, what is wrong and what to do.
+Both run on worker threads and keep each result in `.cache/quality.json`, keyed on the files that asset really loads: its own file, what draws it (for a sprite, which is data and loads no module of its own, the generators, pieces and colour rules it names, each by `id@v` with its code, and the framework code every data sprite runs; see the header of `tools/lib/quality-run.mjs`), the checker's own code (`quality/sprite.js` or `quality/sound.js` with what it imports, and `catalog/schema.js`), and for a sprite the sounds its cues name. So an edit to one generator checks only the sprites naming it again, an edit to the sound engine checks only the sounds, and an edit to a file nothing loads checks nothing (`tools/lib/quality-run.mjs`; the import lists come from `tools/lib/imports.mjs`). An unchanged asset costs nothing; `--no-cache` checks it again. The build (`node tools/build.mjs`) uses the same runner, runs it before it writes anything the site reads, and stops on any error saying which file, what is wrong and what to do.
 
 Every threshold below is a named constant in `THRESHOLDS` in the library file. Change the constant and this document together.
 
@@ -36,7 +36,7 @@ Every threshold below is a named constant in `THRESHOLDS` in the library file. C
 - **Type** comes from `meta.type`. A sprite with no `meta` falls back on `kind`: Character = character, Creature = creature, Item = pickup, Effect = effect.
 - **One message per cause.** A fault seen in many frames or looks is reported once, naming the first clip, frame and look where it was seen, then "(and N more)".
 
-A sprite file that cannot be loaded (for example `defineSprite` throws on a bad `parts` declaration) is reported as that sprite's error: "cannot be loaded: ...".
+A sprite file that cannot be loaded (for example a data definition the validator refuses, or one `engine/data-sprite.js` cannot build) is reported as that sprite's error: "cannot be loaded: ...".
 
 ### The checks
 

@@ -1,10 +1,9 @@
-// The quality bar and styles (Contract 12): one pass per style a sprite lists, and the warning for a sprite
-// whose own code reads pixels back or writes the pixel buffer (it could never be drawn on another surface).
+// The quality bar and styles (Contract 12): one pass per style a sprite lists. (The warning for a sprite whose own code reads
+// pixels back, and its tests, went in build item R4b: data sprites cannot read back; tests/unit/quality-no-read-back.test.mjs.)
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { checkSprite } from '../../quality/sprite.js';
-import { defineSprite, renderFrame, defaultParams, range, choice, color, toggle } from '../../engine/sprite.js';
-import { Surface, tilt } from '../../engine/surface.js';
+import { defineSprite, range, choice, color, toggle } from '../../engine/sprite.js';
 import { validateMeta } from '../../catalog/schema.js';
 import { lerp, pulse } from '../../engine/motion.js';
 import { INK } from '../../engine/color.js';
@@ -14,7 +13,6 @@ import sparkle from '../fixtures/styles/sparkle.js';
 import '../fixtures/styles/styles.js';
 
 const show = (r) => `errors:\n  ${r.errors.join('\n  ')}\nwarnings:\n  ${r.warnings.join('\n  ')}`;
-const OUTSIDE = /draws outside the surface's calls/;
 const META = { type: 'creature', role: 'characters/enemy', themes: ['neutral'], gameTypes: ['platformer'], view: 'side', words: ['blob', 'slime', 'goo', 'monster', 'enemy', 'bounce'], license: 'draft' };
 
 // a small creature with one colour control; `more(g, ctx)` adds to the drawing
@@ -102,69 +100,4 @@ test('a style that is not registered is an error, not a crash', () => {
   def.styles = ['pixel', 'crayon'];
   const r = checkSprite(def, { validateMeta });
   assert.ok(r.errors.some((m) => /"crayon" is not a style/.test(m)), show(r));
-});
-
-test('warning: a sprite whose own code reads pixels back', () => {
-  const r = checkSprite(creature({}, (g) => { if (g.get(16, 20)) g.dot(16, 20, '#ffffff'); }), { validateMeta });
-  assert.deepEqual(r.errors, [], show(r));
-  const w = r.warnings.filter((m) => OUTSIDE.test(m));
-  assert.equal(w.length, 1, show(r));
-  assert.match(w[0], /get/);
-  assert.match(w[0], /styles-quality\.test\.mjs:\d+/, 'it says where');
-  assert.deepEqual(r.metrics.outsideCalls, ['get']);
-});
-
-test('warning: a sprite whose own code touches the pixel buffer of the surface it is given', () => {
-  const direct = checkSprite(creature({}, (g) => { g.data[20 * 32 + 16] = g.data[21 * 32 + 16]; }), { validateMeta });
-  assert.ok(direct.warnings.some((m) => OUTSIDE.test(m) && /data/.test(m)), show(direct));
-  const both = checkSprite(creature({}, (g) => { g.bounds(); g.data[0] = 0; g.bytes(); }), { validateMeta });
-  assert.deepEqual(both.metrics.outsideCalls, ['bounds', 'bytes', 'data']);
-  assert.equal(both.warnings.filter((m) => OUTSIDE.test(m)).length, 1, 'one warning, naming all of them');
-  // a read-back from inside a shape's own `clip` test is the sprite's code too
-  const inClip = checkSprite(creature({}, (g) => { g.rect(14, 20, 4, 2, '#ffffff', { clip: (px, py) => g.get(Math.floor(px), Math.floor(py)) !== 0 }); }), { validateMeta });
-  assert.deepEqual(inClip.metrics.outsideCalls, ['get'], show(inClip));
-  // code that only runs for one option, or on a late frame, is reached
-  const oneOption = checkSprite(creature({}, (g, { p }) => { if (p.horns === 'tall') g.get(1, 1); }), { validateMeta });
-  assert.deepEqual(oneOption.metrics.outsideCalls, ['get']);
-  const lastFrame = checkSprite(creature({}, (g, { clip, frame }) => { if (clip === 'hop' && frame === 3) g.bounds(); }), { validateMeta });
-  assert.deepEqual(lastFrame.metrics.outsideCalls, ['bounds']);
-});
-
-test('no warning for the surface\'s own calls, or for a framework helper that reads pixels on the sprite\'s behalf', () => {
-  const clean = checkSprite(creature({}, (g) => { g.outline(INK); g.tint('#ffffff'); }), { validateMeta });
-  assert.ok(!clean.warnings.some((m) => OUTSIDE.test(m)), show(clean));
-  assert.deepEqual(clean.metrics.outsideCalls, []);
-  // tilt() is in engine/surface.js: it reads the surface it is given, and that is the framework's business
-  const helped = checkSprite(creature({}, (g) => { g.blit(tilt(g, 16, 28, 0.02)); }), { validateMeta });
-  assert.ok(!helped.warnings.some((m) => OUTSIDE.test(m)), show(helped));
-  assert.deepEqual(helped.metrics.outsideCalls, []);
-  assert.deepEqual(checkSprite(blob, { validateMeta }).metrics.outsideCalls, []);
-});
-
-test('what the watch cannot see: pixels of a layer the sprite made itself (only the surface it is handed is watched)', () => {
-  const own = checkSprite(creature({}, (g) => { const s = new Surface(32, 32).rect(15, 18, 2, 2, '#ffffff'); s.data[18 * 32 + 15] = 0; if (s.get(16, 18)) g.blit(s); }), { validateMeta });
-  assert.deepEqual(own.metrics.outsideCalls, []);
-});
-
-test('the watched frames are drawn exactly as the engine draws them: the same things are handed to render()', () => {
-  const seen = new Set();
-  const def = creature({}, (g, ctx) => { seen.add(Object.keys(ctx).join(',') + '|' + (typeof g.rect) + (typeof g.w) + (g.data instanceof Uint32Array) + Array.isArray(g.shadow)); });
-  const r = checkSprite(def, { validateMeta });
-  assert.deepEqual(r.metrics.outsideCalls, ['data']);            // the test itself looked at g.data
-  assert.equal(seen.size, 1, [...seen].join('  /  '));
-  // and a chained call on the stand-in still returns the stand-in
-  let chained = null;
-  checkSprite(creature({}, (g) => { chained ??= g.rect(1, 1, 1, 1, INK) === g; }), { validateMeta });
-  assert.equal(chained, true);
-});
-
-test('watching changes nothing in the engine: Surface is never patched', () => {
-  const before = Object.getOwnPropertyNames(Surface.prototype).map((k) => [k, Surface.prototype[k]]);
-  const def = creature({}, (g) => { g.get(1, 1); });
-  checkSprite(def, { validateMeta });
-  assert.ok(!('data' in Surface.prototype));
-  assert.deepEqual(Object.getOwnPropertyNames(Surface.prototype), before.map(([k]) => k));
-  for (const [k, fn] of before) assert.equal(Surface.prototype[k], fn, k);
-  const g = renderFrame(def, 'idle', 0, defaultParams(def));
-  assert.ok(g instanceof Surface && Object.hasOwn(g, 'data') && g.bounds());
 });

@@ -106,12 +106,9 @@ export function writeImages({ root, sprites = [], sounds = [], force = false }) 
   try { cache = JSON.parse(fs.readFileSync(cacheFile, 'utf8')); } catch { cache = {}; }
   const old = cache.images ?? {};
   const images = {};
-  // a sprite's pictures also depend on the engine, the rigs and shared _helper files in sprites/
-  const helpers = fs.existsSync(path.join(root, 'sprites'))
-    ? fs.readdirSync(path.join(root, 'sprites')).filter((f) => f.startsWith('_') && /\.(m?js|json)$/.test(f)).sort()
-      .map((f) => f + '\0' + fs.readFileSync(path.join(root, 'sprites', f)))
-    : [];
-  const spriteCode = sha(String(THUMBS_VERSION), dirHash(root, 'engine'), dirHash(root, 'rigs'), ...helpers);
+  // a sprite's pictures also depend on the engine and the rigs (a sprite is data, so no drawing helper sits beside its file:
+  // R4c removed the hashing of `_*.js` files in sprites/, which the build refuses and none of which exist; the key of a real tree is unchanged)
+  const spriteCode = sha(String(THUMBS_VERSION), dirHash(root, 'engine'), dirHash(root, 'rigs'));
   const soundCode = sha(String(THUMBS_VERSION), dirHash(root, 'sound'));
   const thumbsDir = path.join(root, 'generated', 'thumbs'), stripsDir = path.join(root, 'generated', 'strips');
   fs.mkdirSync(thumbsDir, { recursive: true });

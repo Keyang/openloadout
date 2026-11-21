@@ -49,8 +49,9 @@ test('Open its page from the bag shows the item with its own look, and a change 
   await openRoute(page, '/' + BAG_LINK.replace(/^#\//, ''));
   const before = await knightOf(page);
   expect(before.settings.look).toBeTruthy();
-  await page.locator('.bag-item', { has: page.locator('[aria-label="Open the page of Hero"], [aria-label^="Open the page of"]') }).first()
-    .locator('a.bag-act').click();
+  // the Hero's own row (not "the first row that has an Open link": a sound's row is ready before the Hero's, whose sprite is a data file fetched
+  // and drawn, and then the Look tab would be the sound page's, where the sprite's look is not pressed)
+  await page.locator('.bag-item', { has: page.locator('[aria-label="Open the page of Hero"]') }).locator('a.bag-act').click();
   await waitForDrawn(page);
   await openTab(page, 'look');
   await expect(page.locator(`.rx-panel .looks .vbtn[data-look="${before.settings.look}"]`)).toHaveAttribute('aria-pressed', 'true');
@@ -100,8 +101,9 @@ test('the sound page keeps its version in the address after a slider moves, so a
   await expect(savedState(page)).toContainText(`${count} change`);
 });
 
-test('J13.2: with reduced motion the sprite page does not animate until Play is pressed', async ({ browser }) => {
-  const context = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 }, baseURL: 'http://localhost:5199' });
+test('J13.2: with reduced motion the sprite page does not animate until Play is pressed', async ({ browser, baseURL }) => {
+  // (the site is wherever this run's config says it is: a context made here does not inherit it, so it is passed on, not written as a port)
+  const context = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1440, height: 900 }, baseURL });
   const page = await context.newPage();
   await openRoute(page, '/sprite/knight');
   const btn = page.locator('.stage-tools .icon-btn');

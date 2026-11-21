@@ -212,8 +212,10 @@ test('J4 words: an unchanged row does not say "Standard look" or "Standard style
   await page.evaluate(async () => { const { bag } = await import('/app/bag.js'); bag.clear(); });
   const btn = page.getByRole('link', { name: 'Browse the catalogue' });
   await expect(btn).toBeVisible();
-  const lede = await page.locator('.bag-head .lede').boundingBox(), b = await btn.boundingBox();
-  expect(b.y - (lede.y + lede.height)).toBeGreaterThanOrEqual(16);
+  // (the empty bag is drawn again after the list goes: the gap is measured until both are there, then it has to be 16 px or more)
+  const lede = page.locator('.bag-head .lede');
+  const gap = async () => { const l = await lede.boundingBox(), n = await btn.boundingBox(); return l && n ? n.y - (l.y + l.height) : -1; };
+  await expect.poll(gap).toBeGreaterThanOrEqual(16);
 });
 
 test('J8.1: the download message names sprites, sounds and music in words that match the bag', async ({ page }) => {
@@ -234,5 +236,7 @@ test('J4.6 and J4.3: changes made in the panel are still there after a reload', 
   await expect.poll(async () => (await bagItems(page)).find((i) => i.id === 'knight').settings.params.hair).toBe('#c9423a');
   await page.reload();
   await expect(items(page)).toHaveCount(3);
-  await expect(row(page, 'Hero').locator('.hint')).toContainText(/red hair/i);
+  // (the Hero's hair colour is a colour control of the data sprite, which a part cannot list, so the row says "red colour" where the code sprite said "red hair";
+  // that the saved change is the hair's is the stored parameter above)
+  await expect(row(page, 'Hero').locator('.hint')).toContainText(/red (hair|colour)/i);
 });

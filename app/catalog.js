@@ -250,13 +250,14 @@ export function loadSprite(id) {
   // a sprite program handed over with addRuntimeAsset(row, program) (tests do; since B11 the site hands over data only)
   if (mine && mine.row.kind === 'sprite') return Promise.resolve(typeof mine.definition.whenReady === 'function' ? mine.definition.whenReady() : null).then(() => mine.definition);
   if (!sprites.has(id)) {
-    if (catalog && assetById(id)?.kind !== 'sprite') return Promise.reject(new Error(`"${id}" is not a sprite on this site`));
-    // a data sprite (src sprites/<id>.json; docs/data-sprites.md, build item B9) is fetched and drawn by framework code, never imported.
-    // (A row with no .json src falls back to importing sprites/<id>.js. The build writes none since R4a, which refuses code sprites, so this is a seam
-    // only the tests use (tests/helpers/code-standin.mjs, tests/e2e/parts.spec.mjs); it goes with them, not before.)
-    const src = assetById(id)?.src;
-    const p = (typeof src === 'string' && src.endsWith('.json') ? loadDataFile(src) : import(`../sprites/${id}.js`).then((m) => m.default))
-      .then((s) => { arrived.set(id, s); return s; });
+    // an id is looked up in the catalogue and nowhere else: before it is in, wait for it (no file is guessed from the id)
+    if (!catalog) return loadCatalog().then(() => loadSprite(id));
+    if (assetById(id)?.kind !== 'sprite') return Promise.reject(new Error(`"${id}" is not a sprite on this site`));
+    // a library sprite is a data file (src sprites/<id>.json; docs/data-sprites.md, build item B9), fetched and drawn by framework code, never imported
+    // (the build refuses code sprites since R4a; a saved link to an old code sprite's id opens because that id exists as data)
+    const src = assetById(id).src;
+    if (typeof src !== 'string' || !src.endsWith('.json')) return Promise.reject(new Error(`"${id}" has no data file: its catalogue row has no sprites/${id}.json source`));
+    const p = loadDataFile(src).then((s) => { arrived.set(id, s); return s; });
     p.catch(() => { sprites.delete(id); });      // a later call may try again
     sprites.set(id, p);
   }

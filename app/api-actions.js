@@ -154,7 +154,7 @@ export const ACTIONS = [
   },
   {
     name: 'check', call: 'check', args: ['idOrDefinition'],
-    description: 'Run the quality bar and return its verdict { ok, errors, warnings, metrics } without keeping anything: for an asset id (catalogue or made on a visit), for a sprite definition (a loadout-sprite object, or its JSON text), or for a sound patch.',
+    description: 'Run the quality bar and return its verdict { ok, errors, warnings, metrics } without keeping anything: for an asset id (catalogue or made on a visit), for a sprite definition (a loadout-sprite object, or its JSON text), or for a sound patch. Sprites are data: code (a module, an object with a render function) is refused.',
     inputSchema: { type: 'object', properties: { idOrDefinition: { oneOf: [{ type: 'string' }, { type: 'object', additionalProperties: true }], description: 'An asset id, a sprite definition (object or JSON text), or a sound patch object' } }, required: ['idOrDefinition'], additionalProperties: false },
   },
   {

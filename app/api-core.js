@@ -16,6 +16,7 @@
 //   - ACTIONS (app/api-actions.js) is the one list of actions; the object is built from it.
 import { ACTIONS, LOOK, SETTINGS, LIMITS } from './api-actions.js';
 import { OLDER_VERSION, OLDER_LINE } from './api.js';
+import { DATA_ONLY } from './api-worker.js';        // the one text every refusal of a sprite that is not data starts with (the worker says the same words)
 
 export { ACTIONS };
 /** The refusal every action uses: { ok: false, ...extra, errors: [...] }. errors: one message or a list. */
@@ -129,7 +130,7 @@ export function createLoadout(env = {}) {
 
   // ---- framework and api: loaded on first use ----
   // Until it has arrived each is a promise of itself, so `await loadout.framework` is right at any time,
-  // and `loadout.framework.sprite.defineSprite` is right once anything has waited for it.
+  // and `loadout.framework.sprite.renderFrame` is right once anything has waited for it.
   const lazy = (load, missing) => {
     let value = null, loading = null;
     return () => {
@@ -216,6 +217,13 @@ export function createLoadout(env = {}) {
   const narrowed = (core, rows, f) => core.filterAssets(rows, f.filters).filter((r) => f.runtime === null || !!r.runtime === f.runtime);
   const patchOf = async (a) => a.entry?.patch ?? (await lib.sounds()).soundById[a.id] ?? null;
   const defOf = async (a) => a.entry?.def ?? (await lib.catalog()).loadSprite(a.id);
+  /** The data sprite of an asset to draw: a catalogue row whose file is not a .json data file, or a sprite that is not data, is refused (notData). */
+  async function dataDefOf(a) {
+    if (!a.entry && typeof a.row.src === 'string' && !isJsonFile(a.row.src)) throw notData(a.id, `its catalogue row names ${say(a.row.src)}`);
+    const def = await defOf(a);
+    if (!isData(def)) throw notData(a.id);
+    return def;
+  }
 
   // ---- rows for assets made on this visit: the same fields the build writes (tools/lib/catalog.mjs) ----
   const metaFields = (meta, isSprite) => {
@@ -247,7 +255,13 @@ export function createLoadout(env = {}) {
   }
 
   // ---- a sprite definition -> its data sprite ----
-  const SOURCE_GONE = 'Sprite source text (an ES module) is no longer taken: since sprites are data, nothing handed to Loadout runs. Hand over a sprite definition instead: one JSON object { "format": "loadout-sprite", "version": 2, "id", "name", "meta", "size", "palette", "controls", "body", "clips", ... } or its JSON text (loadout.assets.get gives the definition of any sprite that is data, to start from).';
+  const SOURCE_GONE = `${DATA_ONLY} Sprite source text is no longer taken: nothing handed to Loadout runs. Hand over a sprite definition instead (loadout.assets.get gives the definition of any sprite, to start from).`;
+  /** The answer to a request that names a sprite which is not data (a catalogue row whose file is code, or any object that is not a definition). */
+  const notData = (id, why) => Object.assign(new Problem(`${id ? `"${id}" is not a data sprite${why ? ` (${why})` : ''}. ` : ''}${DATA_ONLY}`), { dataOnly: true, id: id ?? undefined });
+  /** Is this catalogue src a .json data file? The path is read as the worker reads a url (a query or a hash is not part of it): `sprites/x.js?a.json` is code. */
+  const isJsonFile = (src) => typeof src === 'string' && src.split(/[?#]/)[0].toLowerCase().endsWith('.json');
+  /** A refusal in the shape of every other check answer ({ id, kind: 'sprite', ok: false, errors, warnings: [] }), so a caller reading .kind or .warnings finds them. */
+  const refusedCheck = (e, id) => ({ id: id ?? e.id ?? null, kind: 'sprite', ok: false, errors: [forAgents(e.message)], warnings: [] });
   /**
    * A sprite definition handed to make.sprite or check, read and drawn on the page: { value (the cleaned definition),
    * def (its data sprite), warnings }. Nothing in it runs: the plain-data wall and the validator (catalog/sprite-schema.js),
@@ -255,7 +269,7 @@ export function createLoadout(env = {}) {
    * words, and `id` when it has one) for a definition that does not pass, with a message for anything that is not one.
    */
   async function readDefinition(input, where) {
-    if (typeof input === 'string' && !input.trim().startsWith('{')) throw new Problem(`${where}: ${SOURCE_GONE} Got ${say(input)}.`);
+    if (typeof input === 'string' && !input.trim().startsWith('{')) throw Object.assign(new Problem(`${where}: ${SOURCE_GONE} Got ${say(input)}.`), { dataOnly: true });
     if (typeof input !== 'string' && !isObj(input)) throw new Problem(`${where} takes a sprite definition: one JSON object { "format": "loadout-sprite", "version": 2, ... }, or its JSON text. Got ${say(input)}.`);
     const [S, D, P] = await Promise.all([lib.spriteSchema(), lib.dataSprite(), lib.pieces()]);
     const wall = S.plainSpriteData(input);
@@ -284,12 +298,13 @@ export function createLoadout(env = {}) {
     const r = await work({ type: 'checkSprite', data, soundsUrl: at('generated/sounds.json'), sounds: runtimeSounds() }, 2 * LIMITS.checkMs);
     return { verdict: verdictOf(r), metrics: plain(r.metrics) };
   }
+  /** The quality bar on a catalogue sprite's data file (url: its sprites/<id>.json), in the background worker. */
   const checkSpriteAt = (url) => work({ type: 'checkSprite', url, soundsUrl: at('generated/sounds.json'), sounds: runtimeSounds() }, 2 * LIMITS.checkMs);
 
   // ---- drawing ----
   async function renderSprite(a, o) {
     needPage();
-    const [S, def, Y] = await Promise.all([lib.sprite(), defOf(a), lib.styles()]);
+    const [S, def, Y] = await Promise.all([lib.sprite(), dataDefOf(a), lib.styles()]);
     const style = styleOf(Y, def, a.id, o.artStyle);
     const clip = o.clip ?? def.preview;
     if (typeof clip !== 'string' || !def.clips[clip]) throw new Problem(`"${a.id}" has no clip ${say(o.clip)}. Its clips are: ${Object.keys(def.clips).join(', ')}.`);
@@ -491,7 +506,9 @@ export function createLoadout(env = {}) {
           if (a.entry) { const { verdict, metrics } = await judgeData(a.entry.data); return { id: a.id, kind: a.kind, ...verdict, metrics }; }
           // a sprite the bag holds as data has no file: it is judged from its definition
           if (!a.row.src) { const def = await defOf(a); if (isData(def)) { const { verdict, metrics } = await judgeData(plain(def.definition)); return { id: a.id, kind: a.kind, ...verdict, metrics }; } }
-          const r = await checkSpriteAt(at(a.row.src ?? `sprites/${a.id}.js`));
+          // a catalogue sprite is its data file (sprites/<id>.json); a row that names anything else is refused, never imported
+          if (!isJsonFile(a.row.src)) return refusedCheck(notData(a.id, a.row.src ? `its catalogue row names ${say(a.row.src)}` : 'it has no data file'), a.id);
+          const r = await checkSpriteAt(at(a.row.src));
           return { id: a.id, kind: a.kind, ...verdictOf(r, { metrics: r.metrics }) };
         }
         const patch = await patchOf(a);
@@ -502,17 +519,12 @@ export function createLoadout(env = {}) {
       if (typeof what === 'string' || (isObj(what) && (what.format === 'loadout-sprite' || what.format === 'loadout-rig'))) {
         // a sprite definition, or its JSON text: read and drawn here, judged in the background; nothing is kept
         let made;
-        try { made = await readDefinition(what, 'loadout.check(idOrDefinition)'); } catch (e) { const r = refusedDefinition(e); if (r) return r; throw e; }
+        try { made = await readDefinition(what, 'loadout.check(idOrDefinition)'); } catch (e) { if (e instanceof Problem && e.dataOnly) return refusedCheck(e); const r = refusedDefinition(e); if (r) return r; throw e; }
         const { verdict, metrics } = await judgeData(made.value);
         for (const w of made.warnings) if (!verdict.warnings.includes(w)) verdict.warnings.push(w);
         return { id: made.def.id, kind: 'sprite', ...verdict, metrics };
       }
-      if (isObj(what) && typeof what.render === 'function') {
-        // a definition built in the page by whoever is calling (with loadout.framework): it is their own page code, and its functions cannot be sent to a worker
-        await pause();
-        const r = await (await import('./api-worker.js')).runJob({ type: 'checkSprite', def: what, soundsUrl: at('generated/sounds.json'), sounds: runtimeSounds() });
-        return { id: what.id ?? null, kind: 'sprite', ...verdictOf({ ...r, onPage: false }, { metrics: r.metrics }), warnings: [...words(r.warnings), 'A sprite built in the page is checked on the page itself, so the page was busy meanwhile. Hand over a data definition (loadout-sprite), or make it first and check its id, to check it in the background.'] };
-      }
+      if (isObj(what) && typeof what.render === 'function') return refusedCheck(notData(null), typeof what.id === 'string' && ID_RE.test(what.id) ? what.id : null);       // a sprite object built in the page (a render function): never run
       if (isObj(what)) {
         const patch = plain(what);
         const r = await work({ type: 'checkSound', patch }, patch.category === 'music' ? LIMITS.musicCheckMs : LIMITS.soundCheckMs);

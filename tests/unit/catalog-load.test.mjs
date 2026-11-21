@@ -2,7 +2,7 @@
 // It runs in Node with a stand-in fetch. Each test imports its own copy of the module (it keeps what it loaded).
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CODE_STANDIN, useCodeStandIn } from '../helpers/code-standin.mjs';
+import { CODE_STANDIN, standInFetch } from '../helpers/code-standin.mjs';
 
 const CATALOG = {
   version: 1,
@@ -21,9 +21,10 @@ const CATALOG = {
 
 let copy = 0;
 /** A fresh copy of the module, and the list of addresses it asked for. */
-async function fresh({ status = 200, body = CATALOG } = {}) {
+async function fresh({ status = 200, body = CATALOG, standIn = false } = {}) {
   const asked = [];
-  globalThis.fetch = async (url) => { asked.push(String(url)); return { ok: status === 200, status, json: async () => body }; };
+  const inner = async (url) => { asked.push(String(url)); return { ok: status === 200, status, json: async () => body }; };
+  globalThis.fetch = standIn ? standInFetch(async (url) => { asked.push(String(url)); return url === 'generated/catalog.json' ? { ok: true, status: 200, json: async () => body } : { ok: false, status: 404, json: async () => null, text: async () => '' }; }) : inner;
   const m = await import(`../../app/catalog.js?copy=${++copy}`);
   return { m, asked };
 }
@@ -106,8 +107,8 @@ test('loadSprite refuses an id the catalogue does not list as a sprite, without 
 });
 
 test('loadSprite loads a sprite program once; spriteNow gives it at once afterwards; loadSprites skips what is missing', async () => {
-  useCodeStandIn();      // a code file under an id no library sprite uses (tests/helpers/code-standin.mjs)
-  const { m } = await fresh({ body: { version: 1, assets: [{ id: CODE_STANDIN, kind: 'sprite', tech: {} }, { id: 'ghost-of-a-file', kind: 'sprite', tech: {} }], bundles: [] } });
+  // a data file under an id no library sprite uses (tests/helpers/code-standin.mjs); the other row's file is not there
+  const { m } = await fresh({ body: { version: 1, assets: [{ id: CODE_STANDIN, kind: 'sprite', src: `sprites/${CODE_STANDIN}.json`, tech: {} }, { id: 'ghost-of-a-file', kind: 'sprite', src: 'sprites/ghost-of-a-file.json', tech: {} }], bundles: [] }, standIn: true });
   await m.loadCatalog();
   assert.equal(m.spriteNow(CODE_STANDIN), null, 'not loaded yet');
   const coin = await m.loadSprite(CODE_STANDIN);
