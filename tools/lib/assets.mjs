@@ -284,10 +284,57 @@ export const KIT_SIZE = Object.freeze({ sprites: Object.freeze([40, 50]), sounds
 export const SMALL_KIT_SIZE = Object.freeze({ sprites: Object.freeze([12, 50]), sounds: Object.freeze([8, 30]), music: Object.freeze([1, 4]) });
 
 /**
+ * The most a plan's own size may ask for of each kind (kitSize): four times the most any kit may hold without a size
+ * of its own (SMALL_KIT_SIZE). The fewest it may ask for is 1 of each kind. A bound against a slip of the hand
+ * (600 for 60), not a rule about what a kit should be.
+ */
+export const KIT_SIZE_MOST = Object.freeze({ sprites: 200, sounds: 120, music: 16 });
+
+/**
+ * What is wrong with a plan's own `size`: a list of sentences, empty when it is { sprites, sounds, music }, each
+ * [fewest, most]: two whole numbers, 1 or more, fewest not above most, most not above KIT_SIZE_MOST.
+ * size: the value of a plan's "size" field.
+ */
+export function kitSizeFaults(size) {
+  const kinds = Object.keys(SMALL_KIT_SIZE);
+  if (size === null || typeof size !== 'object' || Array.isArray(size)) return [`"size" must be { ${kinds.join(', ')} }, each [fewest, most] (found ${JSON.stringify(size)})`];
+  const out = [];
+  for (const key of Object.keys(size)) if (!kinds.includes(key)) out.push(`"size.${key}" is not a kind of asset a kit holds (the kinds are ${kinds.join(', ')})`);
+  for (const kind of kinds) {
+    const r = size[kind];
+    if (!Array.isArray(r) || r.length !== 2 || !r.every((n) => Number.isInteger(n))) { out.push(`"size.${kind}" must be [fewest, most]: two whole numbers (found ${JSON.stringify(r)})`); continue; }
+    const [lo, hi] = r, found = `"size.${kind}" is [${lo}, ${hi}]`;
+    if (lo < 1) out.push(`${found}; a kit holds at least 1`);
+    else if (lo > hi) out.push(`${found}; the fewest cannot be above the most`);
+    else if (hi > KIT_SIZE_MOST[kind]) out.push(`${found}; the most a plan may ask for is ${KIT_SIZE_MOST[kind]} (KIT_SIZE_MOST in tools/lib/assets.mjs)`);
+  }
+  return out;
+}
+
+/**
+ * The size one kit is held to: { sprites: [fewest, most], sounds: [fewest, most], music: [fewest, most] }. A plan
+ * that declares its own `size` (a plan of any game type may: a falling-block puzzle is smaller than most kits, an
+ * action-adventure bigger) has that size, and a bad one throws (kitSizeFaults); any other plan has the rule that
+ * holds for every kit. KIT_SIZE and SMALL_KIT_SIZE are not changed by this, and neither is which kits count as full.
+ * plan: a kit plan, or nothing. otherwise: the size of a plan that declares none; the caller's own rule
+ * (SMALL_KIT_SIZE for the kit checks, KIT_SIZE for the size note of tools/bundles-from-plans.mjs).
+ */
+export function kitSize(plan, otherwise = SMALL_KIT_SIZE) {
+  const own = plan && Object.hasOwn(plan, 'size') && plan.size !== undefined;
+  if (own) {
+    const faults = kitSizeFaults(plan.size);
+    if (faults.length) throw new Error(faults.join('; '));
+  }
+  const from = own ? plan.size : otherwise;
+  return Object.fromEntries(Object.keys(SMALL_KIT_SIZE).map((kind) => [kind, [...from[kind]]]));
+}
+
+/**
  * The kit plans: [{ id, file, plan }] from bundles/specs/<id>.plan.json, sorted by id. A plan is everything that
  * is about one kit (its name, game type, the sentence shown on its page, its palette, and the sprites, sounds and
  * music it holds), so a new kit is a new plan file and its assets. tools/bundles-from-plans.mjs turns a finished
  * plan into bundles/<id>.json. A bundle that has a plan is a full game kit; the small starter bundles have none.
+ * A plan may declare its own `size` (kitSize); one that is not valid throws here, naming the plan's file.
  */
 export function loadPlans(root = ROOT) {
   const dir = path.join(root, 'bundles', 'specs');
@@ -297,6 +344,7 @@ export function loadPlans(root = ROOT) {
     const plan = readJSON(path.join(dir, f), file);
     const id = f.slice(0, -'.plan.json'.length);
     if (plan.id !== id) throw new Error(`${file}: "id" must be "${id}" (found ${plan.id}); a plan's file is named after its kit`);
+    try { kitSize(plan); } catch (e) { throw new Error(`${file}: ${e.message}`); }
     return { id, file, plan };
   });
 }

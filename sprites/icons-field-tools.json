@@ -1,0 +1,2698 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "icons-field-tools",
+ "name": "Field tool icons",
+ "blurb": "Eight adventure tool icons: a compass, a boss key, a grapple, a gauntlet, a horn, a raft, an amulet and an oil flask; change their size, shine, backing plate and the colours of the metal, the wood and the cloth.",
+ "meta": {
+  "type": "icon",
+  "role": "items/icon",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "arcade"
+  ],
+  "view": "none",
+  "words": [
+   "tool",
+   "item",
+   "inventory",
+   "compass",
+   "grapple",
+   "horn",
+   "raft",
+   "amulet",
+   "gauntlet",
+   "key",
+   "equipment",
+   "adventure"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "compass",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "swatches": [
+    "#c2c9d6",
+    "#f2c230",
+    "#a8806a",
+    "#a8a4a0"
+   ]
+  },
+  {
+   "id": "wood",
+   "label": "Wood, rope and leather",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "swatches": [
+    "#9a6a3e",
+    "#c9a06a",
+    "#e6c96a",
+    "#8e3a4a"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Cloth and stones",
+   "default": "#c9423a",
+   "material": "paint",
+   "swatches": [
+    "#c9423a",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#7fe0a0",
+    "#7aa0f4"
+   ]
+  },
+  {
+   "id": "face",
+   "label": "Plate",
+   "default": "#4a609c",
+   "material": "interface",
+   "swatches": [
+    "#4a609c",
+    "#5a5f7a",
+    "#f0ead8",
+    "#357a4c"
+   ]
+  },
+  {
+   "id": "pole",
+   "material": "wood",
+   "derive": {
+    "rule": "mix",
+    "of": {
+     "rule": "ramp",
+     "of": "wood",
+     "tone": "light"
+    },
+    "with": "cream",
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "cream",
+   "default": "#f0ead8",
+   "material": "paint",
+   "detail": true
+  },
+  {
+   "id": "white",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "backing",
+   "kind": "choice",
+   "label": "Plate",
+   "options": [
+    "none",
+    {
+     "value": "hex",
+     "label": "Hexagon"
+    },
+    "circle"
+   ],
+   "default": "none"
+  },
+  {
+   "key": "shine",
+   "kind": "toggle",
+   "label": "Shine",
+   "default": true
+  },
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal"
+  },
+  {
+   "key": "wood",
+   "kind": "colour",
+   "label": "Wood, rope and leather"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Cloth and stones"
+  },
+  {
+   "key": "face",
+   "kind": "colour",
+   "label": "Plate",
+   "when": {
+    "backing": [
+     "hex",
+     "circle"
+    ]
+   }
+  }
+ ],
+ "versions": [
+  {
+   "name": "Steel and red",
+   "params": {}
+  },
+  {
+   "name": "Gold on a hex plate",
+   "params": {
+    "backing": "hex",
+    "metal": "#f2c230"
+   }
+  },
+  {
+   "name": "Round blue badges",
+   "params": {
+    "backing": "circle",
+    "face": "#5a5f7a",
+    "accent": "#7aa0f4"
+   }
+  },
+  {
+   "name": "Rusty finds",
+   "params": {
+    "metal": "#a8806a",
+    "wood": "#8e3a4a",
+    "shine": false
+   }
+  },
+  {
+   "name": "Big and green",
+   "params": {
+    "size": 1,
+    "accent": "#7fe0a0",
+    "wood": "#c9a06a"
+   }
+  }
+ ],
+ "body": {
+  "pictures": {
+   "draw": [],
+   "pictures": {
+    "compass": {
+     "label": "Compass",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "tilt": true,
+       "turn": 0,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "face",
+       "draw": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -9.6
+         ],
+         "r": [
+          2.9,
+          2.9
+         ],
+         "paint": "metal",
+         "shade": 1,
+         "group": "ring"
+        },
+        {
+         "kind": "cut",
+         "from": "ring",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           0,
+           -9.6
+          ],
+          "r": [
+           1.2,
+           1.2
+          ],
+          "paint": "metal"
+         }
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          1.5
+         ],
+         "r": [
+          9.6,
+          9.6
+         ],
+         "paint": "metal",
+         "shade": 2
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "ellipse",
+           "at": [
+            0,
+            1.5
+           ],
+           "r": [
+            6.6,
+            6.6
+           ],
+           "paint": "cream"
+          }
+         ],
+         "paint": "metal.deep"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          1.5
+         ],
+         "r": [
+          6.6,
+          6.6
+         ],
+         "paint": "cream",
+         "shade": 1,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           4,
+           -3
+          ],
+          [
+           1.5,
+           2.9
+          ],
+          [
+           -1.5,
+           0.1
+          ]
+         ],
+         "paint": "accent",
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4,
+           6
+          ],
+          [
+           1.5,
+           2.9
+          ],
+          [
+           -1.5,
+           0.1
+          ]
+         ],
+         "paint": "wood",
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          0,
+          1.5
+         ],
+         "rows": [
+          "k"
+         ],
+         "key": {
+          "k": "ink"
+         }
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          6.2,
+          -5.4
+         ],
+         "paint": "white"
+        }
+       ]
+      }
+     ]
+    },
+    "boss-key": {
+     "label": "Boss key",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "tilt": true,
+       "turn": 45,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "face",
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1.5,
+           -11.6
+          ],
+          [
+           1.5,
+           -11.6
+          ],
+          [
+           1.5,
+           3
+          ],
+          [
+           -1.5,
+           3
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "metal"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           1.5,
+           -11.6
+          ],
+          [
+           5.6,
+           -11.6
+          ],
+          [
+           5.6,
+           -9.2
+          ],
+          [
+           1.5,
+           -9.2
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "metal"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           1.5,
+           -7.8
+          ],
+          [
+           5.6,
+           -7.8
+          ],
+          [
+           5.6,
+           -5.4
+          ],
+          [
+           1.5,
+           -5.4
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "metal"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.7,
+           -1.2
+          ],
+          [
+           2.7,
+           -1.2
+          ],
+          [
+           2.7,
+           1
+          ],
+          [
+           -2.7,
+           1
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "metal"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          6.6
+         ],
+         "r": [
+          5.4,
+          5.4
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "metal"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5,
+           5.4
+          ],
+          [
+           -7.6,
+           3
+          ],
+          [
+           -8.4,
+           -1.4
+          ],
+          [
+           -5.8,
+           0.8
+          ],
+          [
+           -2.8,
+           2
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "metal"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           5,
+           5.4
+          ],
+          [
+           7.6,
+           3
+          ],
+          [
+           8.4,
+           -1.4
+          ],
+          [
+           5.8,
+           0.8
+          ],
+          [
+           2.8,
+           2
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "metal"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "ellipse",
+           "at": [
+            0,
+            6.6
+           ],
+           "r": [
+            2.5,
+            2.5
+           ],
+           "paint": "accent"
+          }
+         ],
+         "paint": "metal.deep"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          6.6
+         ],
+         "r": [
+          2.5,
+          2.5
+         ],
+         "paint": "accent",
+         "shade": 1,
+         "light": 1
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          0.2,
+          -9.4
+         ],
+         "paint": "white",
+         "len": 3,
+         "dot": false
+        }
+       ]
+      }
+     ]
+    },
+    "grapple": {
+     "label": "Grapple",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "tilt": true,
+       "turn": 26.5651,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "face",
+       "draw": [
+        {
+         "kind": "ellipse",
+         "at": [
+          -5.4,
+          7
+         ],
+         "r": [
+          5.6,
+          5.6
+         ],
+         "paint": "wood",
+         "shade": 1,
+         "light": 1,
+         "group": "loop1"
+        },
+        {
+         "kind": "cut",
+         "from": "loop1",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           -5.4,
+           7
+          ],
+          "r": [
+           2.7,
+           2.7
+          ],
+          "paint": "wood"
+         }
+        },
+        {
+         "kind": "cut",
+         "from": "loop1",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           0,
+           8.4
+          ],
+          "r": [
+           2.7,
+           2.7
+          ],
+          "paint": "wood"
+         }
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          5.4,
+          7
+         ],
+         "r": [
+          5.6,
+          5.6
+         ],
+         "paint": "wood",
+         "shade": 1,
+         "light": 1,
+         "group": "loop3"
+        },
+        {
+         "kind": "cut",
+         "from": "loop3",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           5.4,
+           7
+          ],
+          "r": [
+           2.7,
+           2.7
+          ],
+          "paint": "wood"
+         }
+        },
+        {
+         "kind": "cut",
+         "from": "loop3",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           0,
+           8.4
+          ],
+          "r": [
+           2.7,
+           2.7
+          ],
+          "paint": "wood"
+         }
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "ellipse",
+           "at": [
+            0,
+            8.4
+           ],
+           "r": [
+            5.6,
+            5.6
+           ],
+           "paint": "wood"
+          }
+         ],
+         "holes": [
+          {
+           "kind": "ellipse",
+           "at": [
+            0,
+            8.4
+           ],
+           "r": [
+            2.7,
+            2.7
+           ],
+           "paint": "wood"
+          }
+         ],
+         "paint": "wood.deep",
+         "over": true
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          8.4
+         ],
+         "r": [
+          5.6,
+          5.6
+         ],
+         "paint": "wood",
+         "shade": 1,
+         "light": 1,
+         "group": "loop2"
+        },
+        {
+         "kind": "cut",
+         "from": "loop2",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           0,
+           8.4
+          ],
+          "r": [
+           2.7,
+           2.7
+          ],
+          "paint": "wood"
+         }
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -1.2,
+             -9
+            ],
+            [
+             1.2,
+             -9
+            ],
+            [
+             1.2,
+             3.6
+            ],
+            [
+             -1.2,
+             3.6
+            ]
+           ],
+           "paint": "metal"
+          }
+         ],
+         "paint": "metal.deep",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1.2,
+           -9
+          ],
+          [
+           1.2,
+           -9
+          ],
+          [
+           1.2,
+           3.6
+          ],
+          [
+           -1.2,
+           3.6
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "hook"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           0,
+           -12
+          ],
+          [
+           -5,
+           -11.2
+          ],
+          [
+           -8.4,
+           -8
+          ],
+          [
+           -9.2,
+           -1.6
+          ],
+          [
+           -6,
+           -5.4
+          ],
+          [
+           -4.4,
+           -8
+          ],
+          [
+           0,
+           -8.2
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "hook"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           0,
+           -12
+          ],
+          [
+           5,
+           -11.2
+          ],
+          [
+           8.4,
+           -8
+          ],
+          [
+           9.2,
+           -1.6
+          ],
+          [
+           6,
+           -5.4
+          ],
+          [
+           4.4,
+           -8
+          ],
+          [
+           0,
+           -8.2
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "hook"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -2,
+             -10.6
+            ],
+            [
+             2,
+             -10.6
+            ],
+            [
+             1.4,
+             -4.6
+            ],
+            [
+             0,
+             -1.6
+            ],
+            [
+             -1.4,
+             -4.6
+            ]
+           ],
+           "paint": "metal"
+          }
+         ],
+         "paint": "metal.deep",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2,
+           -10.6
+          ],
+          [
+           2,
+           -10.6
+          ],
+          [
+           1.4,
+           -4.6
+          ],
+          [
+           0,
+           -1.6
+          ],
+          [
+           -1.4,
+           -4.6
+          ]
+         ],
+         "paint": "metal",
+         "shade": 1,
+         "light": 1
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          -5.4,
+          -9.4
+         ],
+         "paint": "white",
+         "len": 2,
+         "dot": false
+        }
+       ]
+      }
+     ]
+    },
+    "glove": {
+     "label": "Gauntlet",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "tilt": true,
+       "turn": 13.2825,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "face",
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -6.4,
+           -11.6
+          ],
+          [
+           6.4,
+           -11.6
+          ],
+          [
+           5.2,
+           -4.6
+          ],
+          [
+           -5.2,
+           -4.6
+          ]
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.6,
+           -4.8
+          ],
+          [
+           5.6,
+           -4.8
+          ],
+          [
+           5.6,
+           4.6
+          ],
+          [
+           -5.6,
+           4.6
+          ]
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.6,
+           4
+          ],
+          [
+           -2.8000000000000003,
+           4
+          ],
+          [
+           -2.8000000000000003,
+           8.6
+          ],
+          [
+           -5.6,
+           8.6
+          ]
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -4.2,
+          8.6
+         ],
+         "r": [
+          1.4,
+          1.4
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.8,
+           4
+          ],
+          [
+           0,
+           4
+          ],
+          [
+           0,
+           10.4
+          ],
+          [
+           -2.8,
+           10.4
+          ]
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -1.4,
+          10.4
+         ],
+         "r": [
+          1.4,
+          1.4
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           0,
+           4
+          ],
+          [
+           2.8,
+           4
+          ],
+          [
+           2.8,
+           9.8
+          ],
+          [
+           0,
+           9.8
+          ]
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          1.4,
+          9.8
+         ],
+         "r": [
+          1.4,
+          1.4
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           2.8000000000000003,
+           4
+          ],
+          [
+           5.6,
+           4
+          ],
+          [
+           5.6,
+           7.8
+          ],
+          [
+           2.8000000000000003,
+           7.8
+          ]
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          4.2,
+          7.8
+         ],
+         "r": [
+          1.4,
+          1.4
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           3.08,
+           -1.86
+          ],
+          [
+           7.44,
+           3.62
+          ],
+          [
+           10.16,
+           1.58
+          ],
+          [
+           6.12,
+           -4.14
+          ]
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          8.8,
+          2.6
+         ],
+         "r": [
+          1.7,
+          1.7
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "group": "glove"
+        },
+        {
+         "kind": "line",
+         "from": [
+          -2.8,
+          4.6
+         ],
+         "to": [
+          -2.8,
+          8.4
+         ],
+         "paint": "wood.deep"
+        },
+        {
+         "kind": "line",
+         "from": [
+          0,
+          4.6
+         ],
+         "to": [
+          0,
+          9.4
+         ],
+         "paint": "wood.deep"
+        },
+        {
+         "kind": "line",
+         "from": [
+          2.8,
+          4.6
+         ],
+         "to": [
+          2.8,
+          7.8
+         ],
+         "paint": "wood.deep"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -6.4,
+             -11.6
+            ],
+            [
+             6.4,
+             -11.6
+            ],
+            [
+             6,
+             -9.2
+            ],
+            [
+             -6,
+             -9.2
+            ]
+           ],
+           "paint": "accent"
+          }
+         ],
+         "paint": "wood.deep",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -6.4,
+           -11.6
+          ],
+          [
+           6.4,
+           -11.6
+          ],
+          [
+           6,
+           -9.2
+          ],
+          [
+           -6,
+           -9.2
+          ]
+         ],
+         "paint": "accent",
+         "shade": 1,
+         "light": 0
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -4.4,
+             -3.8
+            ],
+            [
+             4.4,
+             -3.8
+            ],
+            [
+             4.4,
+             1.6
+            ],
+            [
+             0,
+             4
+            ],
+            [
+             -4.4,
+             1.6
+            ]
+           ],
+           "paint": "metal"
+          }
+         ],
+         "paint": "wood.deep",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.4,
+           -3.8
+          ],
+          [
+           4.4,
+           -3.8
+          ],
+          [
+           4.4,
+           1.6
+          ],
+          [
+           0,
+           4
+          ],
+          [
+           -4.4,
+           1.6
+          ]
+         ],
+         "paint": "metal",
+         "shade": 1,
+         "light": 0
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          2.2,
+          0.6
+         ],
+         "rows": [
+          "r"
+         ],
+         "key": {
+          "r": "metal.dark"
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          -2.6,
+          -2.2
+         ],
+         "rows": [
+          "r"
+         ],
+         "key": {
+          "r": "metal.dark"
+         }
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          2.8,
+          -3
+         ],
+         "paint": "white",
+         "corner": true
+        }
+       ]
+      }
+     ]
+    },
+    "horn": {
+     "label": "Horn",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "tilt": true,
+       "turn": 0,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "face",
+       "draw": [
+        {
+         "gen": "icon.line",
+         "v": 2,
+         "path": [
+          -8.8,
+          3.6,
+          -7.4,
+          -3.4,
+          -2,
+          -8,
+          3.4,
+          -7.4
+         ],
+         "paint": "accent"
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -11.18,
+             3.62
+            ],
+            [
+             -8.48,
+             8.36
+            ],
+            [
+             -2.66,
+             11.3
+            ],
+            [
+             4.4,
+             10.23
+            ],
+            [
+             9.74,
+             5.58
+            ],
+            [
+             12.75,
+             -0.34
+            ],
+            [
+             14.06,
+             -5.9
+            ],
+            [
+             2.34,
+             -7.3
+            ],
+            [
+             2.45,
+             -2.86
+            ],
+            [
+             1.86,
+             0.82
+            ],
+            [
+             0.4,
+             3.77
+            ],
+            [
+             -2.54,
+             5.5
+            ],
+            [
+             -6.32,
+             5.24
+            ],
+            [
+             -9.62,
+             2.38
+            ]
+           ],
+           "paint": "wood.light"
+          }
+         ],
+         "paint": "wood.light",
+         "dark": 1,
+         "soft": 1,
+         "lit": 0
+        },
+        {
+         "kind": "line",
+         "from": [
+          -5.6,
+          6.4
+         ],
+         "to": [
+          -1.8,
+          7.2
+         ],
+         "paint": "wood"
+        },
+        {
+         "kind": "line",
+         "from": [
+          0.6,
+          5.8
+         ],
+         "to": [
+          3.6,
+          3.6
+         ],
+         "paint": "wood"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             13.51,
+             -2.94
+            ],
+            [
+             14.46,
+             -5.87
+            ],
+            [
+             1.94,
+             -7.33
+            ],
+            [
+             2.19,
+             -4.26
+            ]
+           ],
+           "paint": "metal"
+          }
+         ],
+         "paint": "metal.deep",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           13.51,
+           -2.94
+          ],
+          [
+           14.46,
+           -5.87
+          ],
+          [
+           1.94,
+           -7.33
+          ],
+          [
+           2.19,
+           -4.26
+          ]
+         ],
+         "paint": "metal",
+         "shade": 1,
+         "light": 1
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -12.91,
+           2.05
+          ],
+          [
+           -10.91,
+           4.65
+          ],
+          [
+           -8.69,
+           2.95
+          ],
+          [
+           -10.69,
+           0.35
+          ]
+         ],
+         "paint": "metal",
+         "shade": 1,
+         "light": 0
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          10.6,
+          -7
+         ],
+         "paint": "white",
+         "len": 2,
+         "dot": false
+        }
+       ]
+      }
+     ]
+    },
+    "raft": {
+     "label": "Raft",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "tilt": true,
+       "turn": 0,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "face",
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -7,
+           -4.3
+          ],
+          [
+           7,
+           -4.3
+          ],
+          [
+           7,
+           -1.9
+          ],
+          [
+           -7,
+           -1.9
+          ]
+         ],
+         "paint": "wood.deep",
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -7,
+           1.9
+          ],
+          [
+           7,
+           1.9
+          ],
+          [
+           7,
+           4.3
+          ],
+          [
+           -7,
+           4.3
+          ]
+         ],
+         "paint": "wood.deep",
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -8.4,
+           -8.7
+          ],
+          [
+           7.4,
+           -8.7
+          ],
+          [
+           7.4,
+           -3.7
+          ],
+          [
+           -8.4,
+           -3.7
+          ]
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "light": 0,
+         "group": "l1"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -8.4,
+          -6.2
+         ],
+         "r": [
+          1.4,
+          2.5
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "light": 0,
+         "group": "l1"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          7.4,
+          -6.2
+         ],
+         "r": [
+          1.4,
+          2.5
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "light": 0,
+         "group": "l1"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -7.2,
+           -2.5
+          ],
+          [
+           10,
+           -2.5
+          ],
+          [
+           10,
+           2.5
+          ],
+          [
+           -7.2,
+           2.5
+          ]
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "light": 0,
+         "group": "l2"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -7.2,
+          0
+         ],
+         "r": [
+          1.4,
+          2.5
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "light": 0,
+         "group": "l2"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          10,
+          0
+         ],
+         "r": [
+          1.4,
+          2.5
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "light": 0,
+         "group": "l2"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -10,
+           3.7
+          ],
+          [
+           8.2,
+           3.7
+          ],
+          [
+           8.2,
+           8.7
+          ],
+          [
+           -10,
+           8.7
+          ]
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "light": 0,
+         "group": "l3"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -10,
+          6.2
+         ],
+         "r": [
+          1.4,
+          2.5
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "light": 0,
+         "group": "l3"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          8.2,
+          6.2
+         ],
+         "r": [
+          1.4,
+          2.5
+         ],
+         "paint": "wood",
+         "shade": 2,
+         "light": 0,
+         "group": "l3"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -7,
+           -8.7
+          ],
+          [
+           -5,
+           -8.7
+          ],
+          [
+           -5,
+           8.7
+          ],
+          [
+           -7,
+           8.7
+          ]
+         ],
+         "paint": "wood.light",
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           4.4,
+           -8.7
+          ],
+          [
+           6.4,
+           -8.7
+          ],
+          [
+           6.4,
+           8.7
+          ],
+          [
+           4.4,
+           8.7
+          ]
+         ],
+         "paint": "wood.light",
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -4.6,
+             5.2
+            ],
+            [
+             6.4,
+             -5
+            ],
+            [
+             5,
+             -6.6
+            ],
+            [
+             -6,
+             3.6
+            ]
+           ],
+           "paint": "pole"
+          }
+         ],
+         "paint": "wood.dark",
+         "over": true
+        },
+        {
+         "gen": "icon.body",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -4.6,
+             5.2
+            ],
+            [
+             6.4,
+             -5
+            ],
+            [
+             5,
+             -6.6
+            ],
+            [
+             -6,
+             3.6
+            ]
+           ],
+           "paint": "pole"
+          }
+         ],
+         "paint": "pole",
+         "dark": 1,
+         "soft": 0,
+         "lit": 0,
+         "band": "wood.light"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           4.4,
+           -7.4
+          ],
+          [
+           11,
+           -9.6
+          ],
+          [
+           7.2,
+           -4.2
+          ]
+         ],
+         "paint": "metal",
+         "shade": 1,
+         "light": 1
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          -6,
+          -7.3
+         ],
+         "rows": [
+          "mm",
+          "mm"
+         ],
+         "key": {
+          "m": "metal"
+         },
+         "anchor": "c"
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          -6,
+          7.3
+         ],
+         "rows": [
+          "mm",
+          "mm"
+         ],
+         "key": {
+          "m": "metal"
+         },
+         "anchor": "c"
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          5.4,
+          -7.3
+         ],
+         "rows": [
+          "mm",
+          "mm"
+         ],
+         "key": {
+          "m": "metal"
+         },
+         "anchor": "c"
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          5.4,
+          7.3
+         ],
+         "rows": [
+          "mm",
+          "mm"
+         ],
+         "key": {
+          "m": "metal"
+         },
+         "anchor": "c"
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          8.4,
+          -8
+         ],
+         "paint": "white",
+         "len": 2,
+         "dot": false
+        }
+       ],
+       "rise": 0.25,
+       "slant": 0.25
+      }
+     ]
+    },
+    "amulet": {
+     "label": "Amulet",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "tilt": true,
+       "turn": 13.2825,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "face",
+       "draw": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -3.6
+         ],
+         "r": [
+          8.2,
+          8.2
+         ],
+         "paint": "wood",
+         "shade": 1,
+         "light": 0,
+         "group": "cord"
+        },
+        {
+         "kind": "cut",
+         "from": "cord",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           0,
+           -3.6
+          ],
+          "r": [
+           6.8,
+           6.8
+          ],
+          "paint": "wood"
+         }
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          0.6
+         ],
+         "r": [
+          1.8,
+          1.8
+         ],
+         "paint": "metal",
+         "shade": 1,
+         "group": "set"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          6.4
+         ],
+         "r": [
+          5,
+          5.8
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "set"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "ellipse",
+           "at": [
+            0,
+            6.4
+           ],
+           "r": [
+            3,
+            3.8
+           ],
+           "paint": "accent"
+          }
+         ],
+         "paint": "metal.deep"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          6.4
+         ],
+         "r": [
+          3,
+          3.8
+         ],
+         "paint": "accent",
+         "shade": 1,
+         "light": 1
+        },
+        {
+         "kind": "stamp",
+         "at": [
+          0,
+          6.4
+         ],
+         "rows": [
+          "kk",
+          "kk",
+          "kk"
+         ],
+         "key": {
+          "k": "ink"
+         },
+         "anchor": "c"
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          3.6,
+          3.2
+         ],
+         "paint": "white",
+         "len": 2,
+         "dot": false
+        }
+       ]
+      }
+     ]
+    },
+    "oil-flask": {
+     "label": "Oil flask",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "tilt": true,
+       "turn": 0,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "face",
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -3.4,
+           -10.4
+          ],
+          [
+           0.6,
+           -10.4
+          ],
+          [
+           0.6,
+           -6.4
+          ],
+          [
+           -3.4,
+           -6.4
+          ]
+         ],
+         "paint": "wood",
+         "shade": 1,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.2,
+           -7
+          ],
+          [
+           1.4,
+           -7
+          ],
+          [
+           1.4,
+           -1.6
+          ],
+          [
+           -4.2,
+           -1.6
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "flask"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -1.4,
+          4
+         ],
+         "r": [
+          8.2,
+          6.6
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "flask"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.6,
+           8.6
+          ],
+          [
+           2.8,
+           8.6
+          ],
+          [
+           2.8,
+           10.8
+          ],
+          [
+           -5.6,
+           10.8
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "flask"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           5.63,
+           2.57
+          ],
+          [
+           9.25,
+           -1.67
+          ],
+          [
+           11.46,
+           -4.91
+          ],
+          [
+           9.74,
+           -6.29
+          ],
+          [
+           7.15,
+           -3.53
+          ],
+          [
+           3.17,
+           0.23
+          ]
+         ],
+         "paint": "metal",
+         "shade": 2,
+         "group": "flask"
+        },
+        {
+         "kind": "line",
+         "from": [
+          -8.6,
+          1.2
+         ],
+         "to": [
+          5,
+          1.2
+         ],
+         "paint": "metal.dark"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -4.8,
+             -7.4
+            ],
+            [
+             2,
+             -7.4
+            ],
+            [
+             2,
+             -5.6
+            ],
+            [
+             -4.8,
+             -5.6
+            ]
+           ],
+           "paint": "metal"
+          }
+         ],
+         "paint": "metal.deep",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.8,
+           -7.4
+          ],
+          [
+           2,
+           -7.4
+          ],
+          [
+           2,
+           -5.6
+          ],
+          [
+           -4.8,
+           -5.6
+          ]
+         ],
+         "paint": "metal",
+         "shade": 1,
+         "light": 1
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           11,
+           -3.4
+          ],
+          [
+           12.4,
+           -0.4
+          ],
+          [
+           11,
+           1
+          ],
+          [
+           9.6,
+           -0.4
+          ]
+         ],
+         "paint": "accent",
+         "shade": 1,
+         "light": 0
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          1.6,
+          0.2
+         ],
+         "paint": "white",
+         "len": 3
+        }
+       ]
+      }
+     ]
+    }
+   }
+  }
+ },
+ "clips": {
+  "compass": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Compass"
+  },
+  "boss-key": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Boss key"
+  },
+  "grapple": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Grapple"
+  },
+  "glove": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Gauntlet"
+  },
+  "horn": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Horn"
+  },
+  "raft": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Raft"
+  },
+  "amulet": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Amulet"
+  },
+  "oil-flask": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Oil flask"
+  }
+ }
+}

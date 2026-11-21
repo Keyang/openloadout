@@ -1,0 +1,47 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "fuse-hiss",
+  "name": "Fuse hiss",
+  "category": "ambience",
+  "description": "A thin, fluttering hiss with small bright sputters, for a lit bomb's burning fuse. Change how high it is, how fast it sputters, its brightness and how much it crackles.",
+  "meta": {
+    "type": "ambience",
+    "role": "environment/ambience",
+    "themes": ["fantasy", "dungeon"],
+    "gameTypes": ["top-down-rpg", "turn-based-rpg"],
+    "words": ["fuse", "hiss", "bomb", "burn", "sizzle", "sputter", "fizz", "wick", "spark", "lit", "countdown", "danger", "loop"],
+    "license": "draft"
+  },
+  "loop": true,
+  "duration": 4,
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 1500, "max": 6000, "default": 3200, "scale": "log" },
+    { "id": "speed", "label": "Sputter", "min": 0, "max": 2, "default": 1, "options": ["Slow", "Medium", "Fast"] },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "spark", "label": "Crackle", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "air", "type": "noise", "color": "white" },
+    { "id": "edge1", "type": "filter", "mode": "hp", "in": "air", "freq": "pitch", "q": 0.7 },
+    { "id": "edge2", "type": "filter", "mode": "hp", "in": "edge1", "freq": "pitch", "q": 0.7 },
+    { "id": "hiss", "type": "filter", "mode": "lp", "in": "edge2", "freq": "min(18000, pitch * (1.25 + bright * 3.5))", "q": 0.7 },
+    { "id": "flutClock", "type": "clock", "rate": 12, "jitter": 0.6 },
+    { "id": "flutRand", "type": "rand", "lo": 0.15, "hi": 1, "trig": "flutClock" },
+    { "id": "flutter", "type": "lag", "in": "flutRand", "time": 0.03 },
+    { "id": "air2", "type": "noise", "color": "white" },
+    { "id": "whistle", "type": "filter", "mode": "bp", "in": "air2", "freq": "pitch * 2", "q": 6 },
+    { "id": "popClock", "type": "clock", "rate": "2 * pow(2, speed)", "delay": "0.125 / pow(2, speed)" },
+    { "id": "popLevel", "type": "rand", "lo": 0.45, "hi": 1, "trig": "popClock" },
+    { "id": "popAmp", "type": "ad", "attack": 0.0005, "decay": 0.005, "curve": 2, "trig": "popClock" },
+    { "id": "air3", "type": "noise", "color": "white" },
+    { "id": "popBand", "type": "filter", "mode": "bp", "in": "air3", "freq": "4200 + bright * 1800", "q": 1.5 },
+    { "id": "pops", "type": "expr", "expr": "popBand * popAmp * popLevel" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "hiss * 0.6 + whistle * flutter * (0.12 + bright * 0.4) + pops * spark * 2.6", "freq": 300, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Burning": {},
+    "Last second": { "speed": 2, "pitch": 4800, "spark": 0.9 },
+    "Damp fuse": { "speed": 0, "bright": 0.25, "spark": 0.2 }
+  }
+}

@@ -1,0 +1,3362 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "cinder-acolyte",
+ "name": "Cinder acolyte",
+ "blurb": "A hooded crypt acolyte in a long robe who walks with a flame over one hand and casts fire. Change the robe, hood, what is held, the height and the colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/enemy",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "roguelike-action"
+  ],
+  "view": "top-down",
+  "words": [
+   "acolyte",
+   "cultist",
+   "caster",
+   "mage",
+   "hooded",
+   "robe",
+   "fire",
+   "spell",
+   "enemy",
+   "cast",
+   "crypt",
+   "flame"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "styles": [
+  "pixel"
+ ],
+ "versions": [
+  {
+   "name": "Cinder acolyte",
+   "params": {}
+  },
+  {
+   "name": "Lantern bearer",
+   "params": {
+    "held": "lantern",
+    "outfit": "#8e3a4a"
+   }
+  },
+  {
+   "name": "Frost acolyte",
+   "params": {
+    "glow": "#7aa0f4",
+    "outfit": "#2f8f9d",
+    "trim": "#f0ead8"
+   }
+  },
+  {
+   "name": "Bare-headed novice",
+   "params": {
+    "headgear": "none",
+    "held": "none",
+    "outfit": "#7a4fc4",
+    "height": 0.2
+   }
+  },
+  {
+   "name": "Tall elder",
+   "params": {
+    "height": 1,
+    "length": 1,
+    "glow": "#f4e06a",
+    "trim": "#f2c230"
+   }
+  }
+ ],
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "outfit",
+   "label": "Robe",
+   "default": "#c9423a",
+   "material": "cloth",
+   "swatches": [
+    "#c9423a",
+    "#8e3a4a",
+    "#7a4fc4",
+    "#2f8f9d",
+    "#357a4c"
+   ]
+  },
+  {
+   "id": "trim",
+   "label": "Hem and lining",
+   "default": "#e6c96a",
+   "material": "cloth",
+   "swatches": [
+    "#e6c96a",
+    "#f0ead8",
+    "#f2c230",
+    "#a8a4a0"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Fire",
+   "default": "#e8662c",
+   "material": "light",
+   "swatches": [
+    "#e8662c",
+    "#f4e06a",
+    "#7aa0f4",
+    "#7fe0a0",
+    "#7a4fc4"
+   ]
+  },
+  {
+   "id": "rust",
+   "default": "#a8806a",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-topdown",
+    "v": 1,
+    "paint": {
+     "top": "outfit",
+     "bottom": "outfit.dark",
+     "boots": "outfit.deep",
+     "topFar": "outfit.dark",
+     "bottomFar": "outfit.deep"
+    },
+    "clips": [
+     "idle_down",
+     "idle_up",
+     "idle_side",
+     "walk_down",
+     "walk_up",
+     "walk_side",
+     "cast_down",
+     "cast_up",
+     "cast_side",
+     "hurt",
+     "die"
+    ],
+    "drop": [
+     "eyeL",
+     "eyeR",
+     "eyeSide",
+     "mouth",
+     "mouthSide"
+    ]
+   },
+   "shapes": [
+    {
+     "id": "robe",
+     "kind": "use",
+     "use": "part:topdown-robe-long",
+     "v": 1,
+     "on": "waist",
+     "z": 40,
+     "paint": {
+      "cloth": "outfit",
+      "trim": "trim"
+     },
+     "args": {
+      "length": {
+       "from": "length",
+       "map": [
+        [
+         0,
+         0.4
+        ],
+        [
+         1,
+         1
+        ]
+       ]
+      },
+      "trimmed": true
+     }
+    },
+    {
+     "id": "hood",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "cloth": "outfit"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodLie2",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "cloth": "outfit"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodLie3",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "cloth": "outfit"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodLie",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "cloth": "outfit"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "lantern",
+     "kind": "use",
+     "use": "held:topdown-lantern",
+     "v": 1,
+     "on": "cuffF",
+     "z": 60,
+     "paint": {
+      "metal": "rust",
+      "glow": "glow"
+     },
+     "args": {
+      "length": {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         7
+        ],
+        [
+         1.35,
+         13
+        ]
+       ]
+      }
+     },
+     "when": {
+      "held": [
+       "lantern"
+      ]
+     }
+    },
+    {
+     "id": "sash",
+     "kind": "stamp",
+     "on": "waist",
+     "at": [
+      -1,
+      -4.5
+     ],
+     "rows": [
+      "ccccccccc",
+      "ddccccccc"
+     ],
+     "key": {
+      "c": "trim",
+      "d": "trim.dark"
+     },
+     "z": 41,
+     "when": {
+      "direction": [
+       "down",
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "sashSide",
+     "kind": "stamp",
+     "on": "waist",
+     "at": [
+      -1,
+      -3.5
+     ],
+     "rows": [
+      "ccccccc",
+      "ddccccc"
+     ],
+     "key": {
+      "c": "trim",
+      "d": "trim.dark"
+     },
+     "z": 41,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "face",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -6,
+      -6.5
+     ],
+     "rows": [
+      "...eeeeeee...",
+      "..eeeeeeeee..",
+      ".eeeeeeeeeee.",
+      "eeeeeeeeeeeee",
+      "eeeeeeeeeeeee",
+      "eeeeeeeeeeeee",
+      "eeeeeeeeeeeee",
+      "eeeeeeeeeeeee",
+      "eeeeeeeeeeeee",
+      ".eeeeeeeeeee.",
+      "..eeeeeeeee..",
+      "...eeeeeee..."
+     ],
+     "key": {
+      "e": "outfit.deep"
+     },
+     "z": 51,
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "liningDownS",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -7,
+      -7.5
+     ],
+     "rows": [
+      "...............",
+      "...............",
+      "...............",
+      "...............",
+      "...............",
+      "...hhhhhhhhh...",
+      "...h.......h...",
+      "...h.......h...",
+      "...h.......h...",
+      "...h.......h...",
+      "...h.......h...",
+      "...h.......h...",
+      "..............."
+     ],
+     "key": {
+      "h": "trim"
+     },
+     "z": 58,
+     "when": {
+      "direction": [
+       "down"
+      ],
+      "headgear": [
+       "hood"
+      ],
+      "headgearSize": [
+       {
+        "below": 0.9
+       }
+      ]
+     }
+    },
+    {
+     "id": "liningDown",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -7,
+      -7.5
+     ],
+     "rows": [
+      "...............",
+      "...............",
+      "...............",
+      "...............",
+      "...............",
+      "...............",
+      "...hhhhhhhhh...",
+      "...h.......h...",
+      "...h.......h...",
+      "...h.......h...",
+      "...h.......h...",
+      "...h.......h...",
+      "..............."
+     ],
+     "key": {
+      "h": "trim"
+     },
+     "z": 58,
+     "when": {
+      "direction": [
+       "down"
+      ],
+      "headgear": [
+       "hood"
+      ],
+      "headgearSize": [
+       {
+        "atLeast": 0.9
+       }
+      ]
+     }
+    },
+    {
+     "id": "liningSideS",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -7,
+      -7.5
+     ],
+     "rows": [
+      "...............",
+      "...............",
+      "...............",
+      "...............",
+      "...............",
+      "..........hhhh.",
+      "..........h....",
+      "..........h....",
+      "..........h....",
+      "..........h....",
+      "..........h....",
+      "..........h....",
+      "..........h....",
+      "..............."
+     ],
+     "key": {
+      "h": "trim"
+     },
+     "z": 58,
+     "when": {
+      "direction": [
+       "side"
+      ],
+      "headgear": [
+       "hood"
+      ],
+      "headgearSize": [
+       {
+        "below": 0.9
+       }
+      ]
+     }
+    },
+    {
+     "id": "liningSide",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -7,
+      -7.5
+     ],
+     "rows": [
+      "...............",
+      "...............",
+      "...............",
+      "...............",
+      "...............",
+      "...............",
+      ".........hhhhh.",
+      ".........h.....",
+      ".........h.....",
+      ".........h.....",
+      ".........h.....",
+      ".........h.....",
+      ".........h.....",
+      "..............."
+     ],
+     "key": {
+      "h": "trim"
+     },
+     "z": 58,
+     "when": {
+      "direction": [
+       "side"
+      ],
+      "headgear": [
+       "hood"
+      ],
+      "headgearSize": [
+       {
+        "atLeast": 0.9
+       }
+      ]
+     }
+    },
+    {
+     "id": "eyesHood",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      1,
+      -7.5
+     ],
+     "rows": [
+      ".....g...g.....",
+      ".....g...g....."
+     ],
+     "key": {
+      "g": "glow"
+     },
+     "z": 59,
+     "when": {
+      "direction": [
+       "down"
+      ],
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "eyeHoodSide",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      1,
+      -7.5
+     ],
+     "rows": [
+      "...........g...",
+      "...........g..."
+     ],
+     "key": {
+      "g": "glow"
+     },
+     "z": 59,
+     "when": {
+      "direction": [
+       "side"
+      ],
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "eyesBare",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      0,
+      -7.5
+     ],
+     "rows": [
+      "....g......g...",
+      "....g......g..."
+     ],
+     "key": {
+      "g": "glow"
+     },
+     "z": 59,
+     "when": {
+      "direction": [
+       "down"
+      ],
+      "headgear": [
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "eyeBareSide",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      0,
+      -7.5
+     ],
+     "rows": [
+      "...........g...",
+      "...........g..."
+     ],
+     "key": {
+      "g": "glow"
+     },
+     "z": 59,
+     "when": {
+      "direction": [
+       "side"
+      ],
+      "headgear": [
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "flameRim",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         -3.6
+        ],
+        [
+         1,
+         -4.5
+        ],
+        [
+         1.35,
+         -5.7
+        ]
+       ]
+      },
+      0
+     ],
+     "r": [
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         2.3
+        ],
+        [
+         1,
+         3.5
+        ],
+        [
+         1.35,
+         4.7
+        ]
+       ]
+      },
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         1.7
+        ],
+        [
+         1,
+         2.5
+        ],
+        [
+         1.35,
+         3.3
+        ]
+       ]
+      }
+     ],
+     "paint": "glow.dark",
+     "glow": true,
+     "z": 96,
+     "when": {
+      "held": [
+       "flame"
+      ]
+     }
+    },
+    {
+     "id": "flameMid",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         -3
+        ],
+        [
+         1,
+         -3.5
+        ],
+        [
+         1.35,
+         -4.4
+        ]
+       ]
+      },
+      0
+     ],
+     "r": [
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         1.6
+        ],
+        [
+         1,
+         2.5
+        ],
+        [
+         1.35,
+         3.4
+        ]
+       ]
+      },
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         1
+        ],
+        [
+         1,
+         1.5
+        ],
+        [
+         1.35,
+         2.2
+        ]
+       ]
+      }
+     ],
+     "paint": "glow",
+     "glow": true,
+     "z": 97,
+     "when": {
+      "held": [
+       "flame"
+      ]
+     }
+    },
+    {
+     "id": "flameMidUp",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         -4
+        ],
+        [
+         1,
+         -4.5
+        ],
+        [
+         1.35,
+         -5.4
+        ]
+       ]
+      },
+      0
+     ],
+     "r": [
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         1.6
+        ],
+        [
+         1,
+         2.5
+        ],
+        [
+         1.35,
+         3.4
+        ]
+       ]
+      },
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         1
+        ],
+        [
+         1,
+         1.5
+        ],
+        [
+         1.35,
+         2.2
+        ]
+       ]
+      }
+     ],
+     "paint": "glow",
+     "glow": true,
+     "z": 97,
+     "when": {
+      "held": [
+       "flame"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "flameCore",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         -2.2
+        ],
+        [
+         1,
+         -2.5
+        ],
+        [
+         1.35,
+         -3.2
+        ]
+       ]
+      },
+      0
+     ],
+     "r": [
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         1
+        ],
+        [
+         1,
+         1.5
+        ],
+        [
+         1.35,
+         2
+        ]
+       ]
+      },
+      {
+       "from": "heldSize",
+       "map": [
+        [
+         0.65,
+         0.5
+        ],
+        [
+         1,
+         0.5
+        ],
+        [
+         1.35,
+         1
+        ]
+       ]
+      }
+     ],
+     "paint": "glow.light",
+     "glow": true,
+     "z": 98,
+     "when": {
+      "held": [
+       "flame"
+      ]
+     }
+    },
+    {
+     "id": "cast1Rim",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -5,
+      0
+     ],
+     "r": [
+      4,
+      2.5
+     ],
+     "paint": "glow.dark",
+     "glow": true,
+     "z": 96,
+     "hidden": true
+    },
+    {
+     "id": "cast1Mid",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -4.5,
+      0
+     ],
+     "r": [
+      3,
+      1.5
+     ],
+     "paint": "glow",
+     "glow": true,
+     "z": 97,
+     "hidden": true
+    },
+    {
+     "id": "cast1Core",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -3.5,
+      0
+     ],
+     "r": [
+      1.5,
+      1
+     ],
+     "paint": "glow.light",
+     "glow": true,
+     "z": 98,
+     "hidden": true
+    },
+    {
+     "id": "cast2Rim",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -5.5,
+      0
+     ],
+     "r": [
+      4.5,
+      3.5
+     ],
+     "paint": "glow.dark",
+     "glow": true,
+     "z": 96,
+     "hidden": true
+    },
+    {
+     "id": "cast2Mid",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -5,
+      0
+     ],
+     "r": [
+      3.5,
+      2.5
+     ],
+     "paint": "glow",
+     "glow": true,
+     "z": 97,
+     "hidden": true
+    },
+    {
+     "id": "cast2MidUp",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -5.5,
+      0
+     ],
+     "r": [
+      3.5,
+      2.5
+     ],
+     "paint": "glow",
+     "glow": true,
+     "z": 97,
+     "hidden": true
+    },
+    {
+     "id": "cast2Core",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -4,
+      0
+     ],
+     "r": [
+      2,
+      1.5
+     ],
+     "paint": "glow.light",
+     "glow": true,
+     "z": 98,
+     "hidden": true
+    },
+    {
+     "id": "cast4Rim",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -5.5,
+      0
+     ],
+     "r": [
+      5.5,
+      4.5
+     ],
+     "paint": "glow.dark",
+     "glow": true,
+     "z": 96,
+     "hidden": true
+    },
+    {
+     "id": "cast4Mid",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -5.5,
+      0
+     ],
+     "r": [
+      4.5,
+      3.5
+     ],
+     "paint": "glow",
+     "glow": true,
+     "z": 97,
+     "hidden": true
+    },
+    {
+     "id": "cast4Core",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -5,
+      0
+     ],
+     "r": [
+      3,
+      2.5
+     ],
+     "paint": "glow.light",
+     "glow": true,
+     "z": 98,
+     "hidden": true
+    },
+    {
+     "id": "cast4Heart",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -4.5,
+      0
+     ],
+     "r": [
+      1.5,
+      1.5
+     ],
+     "paint": "shine",
+     "glow": true,
+     "z": 99,
+     "hidden": true
+    },
+    {
+     "id": "cast5Rim",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -3,
+      0
+     ],
+     "r": [
+      2.5,
+      2.5
+     ],
+     "paint": "glow.dark",
+     "glow": true,
+     "z": 96,
+     "hidden": true
+    },
+    {
+     "id": "cast5Mid",
+     "kind": "ellipse",
+     "on": "cuffF",
+     "at": [
+      -3,
+      0
+     ],
+     "r": [
+      1.5,
+      1.5
+     ],
+     "paint": "glow",
+     "glow": true,
+     "z": 97,
+     "hidden": true
+    },
+    {
+     "id": "dieTip",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -23.5,
+      -8.5
+     ],
+     "rows": [
+      "..........sssssss.....",
+      "........sssssssss.....",
+      ".......sssssssssss....",
+      "......kssssssssssss...",
+      "......kssssssssssss...",
+      "......kssssssssssss...",
+      ".....kssssssssssss....",
+      ".....kskkssssskkss....",
+      ".....kksssssssssss....",
+      ".....tkkssssssssst....",
+      "...tttkkskkkssstt.....",
+      ".sssttdkkkkkkkddtt....",
+      ".ssst.dtttttttddtt....",
+      ".ddd..dtttttttdddtt...",
+      "......dtttttttt.sss...",
+      ".....dtttttttt.sss....",
+      ".....hhhhhhhhh........",
+      ".....dtttttttt........",
+      ".....dttttttttt.......",
+      "....dtttttttttt.......",
+      "....dtttttttttt.......",
+      "...hhhhhhhhhhhh.......",
+      "....ee....ee.........."
+     ],
+     "key": {
+      "s": "skin",
+      "k": "skin.dark",
+      "t": "outfit",
+      "d": "outfit.dark",
+      "e": "outfit.deep",
+      "h": "trim"
+     },
+     "variants": {
+      "f3": [
+       "......................",
+       "......................",
+       "......................",
+       "......................",
+       "..............sssssss.",
+       "............sssssssss.",
+       "...........sssssssssss",
+       ".........kssssssssssss",
+       ".........kssssssssssss",
+       "........kssssssssssss.",
+       "........kssssssssssss.",
+       ".......kskkssssskkss..",
+       ".......kksssssssssss..",
+       "....dtttkkssssssssst..",
+       "...ssstdkkskkksssdtt..",
+       "...sss..dkkkkkkkddtt..",
+       ".......dtttttttddtt...",
+       ".......dtttttttdddtt..",
+       "......hhhhhhhhh.sss...",
+       "......dtttttttt.sss...",
+       ".....dtttttttttt......",
+       "...hhhhhhhhhhhhh......",
+       "....ee....ee.........."
+      ]
+     },
+     "z": 1,
+     "hidden": true
+    },
+    {
+     "id": "dieLie",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -9.5,
+      -0.5
+     ],
+     "rows": [
+      "..............................",
+      "...........sst................",
+      "...........sstttt.............",
+      "...........ssdttttt..ssssss...",
+      ".httttt......ddddtt.ssssssss..",
+      ".htttttttthttddddddssskssssss.",
+      "ehtttttttthtttttddksssksssssss",
+      "ehtttddddthtttttttksssssssssss",
+      ".htttttttthtttttttkkssssssssss",
+      ".htddddttthtttttttkkssssssssss",
+      "ehtttttttthtttttttkkssssssssss",
+      "ehtttttttthtttttttksssssssssss",
+      ".htttttdddhtttttddkkssksssssss",
+      ".hddddd...ddddddtttkkskssssss.",
+      "..............ttttt.kkssssss..",
+      "............ssttttd..kkkkkk...",
+      "............ssttd.............",
+      "............ssd..............."
+     ],
+     "key": {
+      "s": "skin",
+      "k": "skin.dark",
+      "t": "outfit",
+      "d": "outfit.dark",
+      "e": "outfit.deep",
+      "h": "trim"
+     },
+     "variants": {
+      "f5": [
+       "..............................",
+       "..........dss.................",
+       "..........dssttt..............",
+       "..........dssdttttt..ssssss...",
+       ".httttt......ddddtt.ssssssss..",
+       ".htttttttthttddddddssskssssss.",
+       "ehtttttttthtttttddksssksssssss",
+       "ehtttddddthtttttttksssssssssss",
+       ".htttttttthtttttttkkssssssssss",
+       ".htddddttthtttttttkkssssssssss",
+       "ehtttttttthtttttttkkssssssssss",
+       "ehtttttttthtttttttksssssssssss",
+       ".htttttdddhttttdddkkssksssssss",
+       ".hddddd...dddddttttkkskssssss.",
+       "...........sstttttt.kkssssss..",
+       "...........sstttddd..kkkkkk...",
+       "...........ssdd...............",
+       ".............................."
+      ],
+      "f7": [
+       "..............................",
+       "..............................",
+       "..........ssttt...............",
+       "..........ssttttttt..ssssss...",
+       ".httttt...ssdddtttt.ssssssss..",
+       ".htttttttthddddddddssskssssss.",
+       "ehtttttttthtttddddksssksssssss",
+       "ehtttddddthtttttttksssssssssss",
+       ".htttttttthtttttttkkssssssssss",
+       ".htddddttthtttttttkkssssssssss",
+       "ehtttttttthtttttttkkssssssssss",
+       "ehtttttttthtttttttksssssssssss",
+       ".htttttdddhtttddddkkssksssssss",
+       ".hddddd...ddddtttttkkskssssss.",
+       "..........ssttttttt.kkssssss..",
+       "..........ssttttddd..kkkkkk...",
+       "..........ssddd...............",
+       ".............................."
+      ]
+     },
+     "z": 1,
+     "hidden": true
+    },
+    {
+     "id": "dieTipFaceS",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -23.5,
+      -4.5
+     ],
+     "rows": [
+      "......eeeeeee.....",
+      "....eeeeeeeee.....",
+      "...eeeeeeeeeee....",
+      "..eeeeeeeeeeeee...",
+      "..eehhhhhhhhhee...",
+      "..eeheeeeeeehee...",
+      ".eeheeeeeeehee....",
+      ".eehgeeeeeghee....",
+      ".eeheeeeeeehee....",
+      "..eheeeeeeehe.....",
+      "..heeeeeeeh.......",
+      "...eeeeeee........",
+      "..................",
+      "..................",
+      "..................",
+      ".................."
+     ],
+     "key": {
+      "e": "outfit.deep",
+      "g": "glow",
+      "h": "trim"
+     },
+     "z": 2,
+     "hidden": true,
+     "when": {
+      "headgear": [
+       "hood"
+      ],
+      "headgearSize": [
+       {
+        "below": 0.9
+       }
+      ]
+     },
+     "variants": {
+      "f3": [
+       "..................",
+       "..................",
+       "..................",
+       "..................",
+       "..........eeeeeee.",
+       "........eeeeeeeee.",
+       ".......eeeeeeeeeee",
+       ".....eeeeeeeeeeeee",
+       ".....eehhhhhhhhhee",
+       "....eeheeeeeeehee.",
+       "....eeheeeeeeehee.",
+       "...eehgeeeeeghee..",
+       "...eeheeeeeeehee..",
+       "....eheeeeeee.....",
+       "....heeeeeeee.....",
+       ".....eeeeeee......"
+      ]
+     }
+    },
+    {
+     "id": "dieLieFaceS",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -6.5,
+      17.5
+     ],
+     "rows": [
+      "...eeeeee...",
+      "..eeeeeeee..",
+      ".hhhhhhheee.",
+      "eeeeeeeheeee",
+      "eeeeeeeheeee",
+      "eeeeeeeheeee",
+      "eeeeeeeheeee",
+      "eeeeeeeheeee",
+      "eeeeeeeheeee",
+      "eeeeeeeheeee",
+      ".hhhhhhheee.",
+      "..eeeeeeee..",
+      "...eeeeee..."
+     ],
+     "key": {
+      "e": "outfit.deep",
+      "g": "glow",
+      "h": "trim"
+     },
+     "z": 2,
+     "hidden": true,
+     "when": {
+      "headgear": [
+       "hood"
+      ],
+      "headgearSize": [
+       {
+        "below": 0.9
+       }
+      ]
+     }
+    },
+    {
+     "id": "dieTipFace",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -23.5,
+      -4.5
+     ],
+     "rows": [
+      "......eeeeeee.....",
+      "....eeeeeeeee.....",
+      "...eeeeeeeeeee....",
+      "..eeeeeeeeeeeee...",
+      "..eeeeeeeeeeeee...",
+      "..eehhhhhhhhhee...",
+      ".eeheeeeeeehee....",
+      ".eehgeeeeeghee....",
+      ".eeheeeeeeehee....",
+      "..eheeeeeeehe.....",
+      "..heeeeeeeh.......",
+      "...eeeeeee........",
+      "..................",
+      "..................",
+      "..................",
+      ".................."
+     ],
+     "key": {
+      "e": "outfit.deep",
+      "g": "glow",
+      "h": "trim"
+     },
+     "z": 2,
+     "hidden": true,
+     "when": {
+      "headgear": [
+       "hood"
+      ],
+      "headgearSize": [
+       {
+        "atLeast": 0.9
+       }
+      ]
+     },
+     "variants": {
+      "f3": [
+       "..................",
+       "..................",
+       "..................",
+       "..................",
+       "..........eeeeeee.",
+       "........eeeeeeeee.",
+       ".......eeeeeeeeeee",
+       ".....eeeeeeeeeeeee",
+       ".....eeeeeeeeeeeee",
+       "....eehhhhhhhhhee.",
+       "....eeheeeeeeehee.",
+       "...eehgeeeeeghee..",
+       "...eeheeeeeeehee..",
+       "....eheeeeeee.....",
+       "....heeeeeeee.....",
+       ".....eeeeeee......"
+      ]
+     }
+    },
+    {
+     "id": "dieLieFace",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -6.5,
+      17.5
+     ],
+     "rows": [
+      "...eeeeee...",
+      "..eeeeeeee..",
+      ".hhhhhheeee.",
+      "eeeeeeheeeee",
+      "eeeeeeheeeee",
+      "eeeeeeheeeee",
+      "eeeeeeheeeee",
+      "eeeeeeheeeee",
+      "eeeeeeheeeee",
+      "eeeeeeheeeee",
+      ".hhhhhheeee.",
+      "..eeeeeeee..",
+      "...eeeeee..."
+     ],
+     "key": {
+      "e": "outfit.deep",
+      "g": "glow",
+      "h": "trim"
+     },
+     "z": 2,
+     "hidden": true,
+     "when": {
+      "headgear": [
+       "hood"
+      ],
+      "headgearSize": [
+       {
+        "atLeast": 0.9
+       }
+      ]
+     }
+    },
+    {
+     "id": "hemLDown",
+     "kind": "stamp",
+     "on": "waist",
+     "at": [
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.2083,
+         5
+        ],
+        [
+         0.2084,
+         6
+        ],
+        [
+         0.4583,
+         6
+        ],
+        [
+         0.4584,
+         7
+        ],
+        [
+         0.8749,
+         7
+        ],
+        [
+         0.875,
+         8
+        ],
+        [
+         1,
+         8
+        ]
+       ]
+      },
+      -7.5
+     ],
+     "rows": [
+      "a",
+      "c"
+     ],
+     "key": {
+      "a": "outfit.dark",
+      "c": "trim"
+     },
+     "z": 40,
+     "hidden": true,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "hemRDown",
+     "kind": "stamp",
+     "on": "waist",
+     "at": [
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.2083,
+         5
+        ],
+        [
+         0.2084,
+         6
+        ],
+        [
+         0.4583,
+         6
+        ],
+        [
+         0.4584,
+         7
+        ],
+        [
+         0.8749,
+         7
+        ],
+        [
+         0.875,
+         8
+        ],
+        [
+         1,
+         8
+        ]
+       ]
+      },
+      6.5
+     ],
+     "rows": [
+      "b",
+      "c"
+     ],
+     "key": {
+      "b": "outfit",
+      "c": "trim"
+     },
+     "z": 40,
+     "hidden": true,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "hemLUp",
+     "kind": "stamp",
+     "on": "waist",
+     "at": [
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.2083,
+         5
+        ],
+        [
+         0.2084,
+         6
+        ],
+        [
+         0.4583,
+         6
+        ],
+        [
+         0.4584,
+         7
+        ],
+        [
+         0.8749,
+         7
+        ],
+        [
+         0.875,
+         8
+        ],
+        [
+         1,
+         8
+        ]
+       ]
+      },
+      -7.5
+     ],
+     "rows": [
+      "a",
+      "c"
+     ],
+     "key": {
+      "a": "outfit.dark",
+      "c": "trim"
+     },
+     "z": 40,
+     "hidden": true,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "hemRUp",
+     "kind": "stamp",
+     "on": "waist",
+     "at": [
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.2083,
+         5
+        ],
+        [
+         0.2084,
+         6
+        ],
+        [
+         0.4583,
+         6
+        ],
+        [
+         0.4584,
+         7
+        ],
+        [
+         0.8749,
+         7
+        ],
+        [
+         0.875,
+         8
+        ],
+        [
+         1,
+         8
+        ]
+       ]
+      },
+      6.5
+     ],
+     "rows": [
+      "b",
+      "c"
+     ],
+     "key": {
+      "b": "outfit",
+      "c": "trim"
+     },
+     "z": 40,
+     "hidden": true,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "hemLSide",
+     "kind": "stamp",
+     "on": "waist",
+     "at": [
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.2083,
+         5
+        ],
+        [
+         0.2084,
+         6
+        ],
+        [
+         0.4583,
+         6
+        ],
+        [
+         0.4584,
+         7
+        ],
+        [
+         0.8749,
+         7
+        ],
+        [
+         0.875,
+         8
+        ],
+        [
+         1,
+         8
+        ]
+       ]
+      },
+      -6.5
+     ],
+     "rows": [
+      "a",
+      "c"
+     ],
+     "key": {
+      "a": "outfit.dark",
+      "c": "trim"
+     },
+     "z": 40,
+     "hidden": true,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "hemRSide",
+     "kind": "stamp",
+     "on": "waist",
+     "at": [
+      {
+       "from": "length",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.2083,
+         5
+        ],
+        [
+         0.2084,
+         6
+        ],
+        [
+         0.4583,
+         6
+        ],
+        [
+         0.4584,
+         7
+        ],
+        [
+         0.8749,
+         7
+        ],
+        [
+         0.875,
+         8
+        ],
+        [
+         1,
+         8
+        ]
+       ]
+      },
+      6.5
+     ],
+     "rows": [
+      "b",
+      "c"
+     ],
+     "key": {
+      "b": "outfit",
+      "c": "trim"
+     },
+     "z": 40,
+     "hidden": true,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.6,
+   "scales": {
+    "bones": [
+     "hip",
+     "spine",
+     "thiF",
+     "thiB",
+     "shnF",
+     "shnB",
+     "legF",
+     "legB",
+     "legIF",
+     "legIB"
+    ],
+    "by": [
+     0.82,
+     1.18
+    ]
+   }
+  },
+  {
+   "key": "build",
+   "kind": "range",
+   "label": "Build",
+   "lo": "Slim",
+   "hi": "Stocky",
+   "default": 0.3,
+   "scales": {
+    "bones": [
+     "shoulderF",
+     "shoulderB"
+    ],
+    "by": [
+     0.6,
+     1.3
+    ]
+   }
+  },
+  {
+   "key": "length",
+   "kind": "range",
+   "label": "Robe",
+   "lo": "Knee",
+   "hi": "Floor",
+   "default": 0.85
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "hood",
+    "none"
+   ],
+   "default": "hood"
+  },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "held",
+   "kind": "choice",
+   "label": "Held",
+   "options": [
+    "flame",
+    "lantern",
+    "none"
+   ],
+   "default": "flame"
+  },
+  {
+   "key": "heldSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin"
+  },
+  {
+   "key": "outfit",
+   "kind": "colour",
+   "label": "Robe"
+  },
+  {
+   "key": "trim",
+   "kind": "colour",
+   "label": "Hem and lining"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Fire"
+  },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear",
+    "headgearSize"
+   ],
+   "none": "none",
+   "socket": "head",
+   "shapes": [
+    "hood",
+    "hoodLie2",
+    "hoodLie3",
+    "hoodLie",
+    "liningDownS",
+    "liningDown",
+    "liningSideS",
+    "liningSide",
+    "dieTipFaceS",
+    "dieLieFaceS",
+    "dieTipFace",
+    "dieLieFace"
+   ]
+  },
+  "held": {
+   "label": "Held",
+   "params": [
+    "held",
+    "heldSize"
+   ],
+   "none": "none",
+   "socket": "hand",
+   "shapes": [
+    "flameRim",
+    "flameMid",
+    "flameMidUp",
+    "flameCore",
+    "lantern"
+   ]
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "from": "idle_down",
+   "label": "Idle (down)",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "3": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "5": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "7": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    }
+   }
+  },
+  "idle_up": {
+   "from": "idle_up",
+   "label": "Idle (up)",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "3": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "5": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "7": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    }
+   }
+  },
+  "idle_side": {
+   "from": "idle_side",
+   "label": "Idle (side)",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "first",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "3": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "5": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "7": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    }
+   }
+  },
+  "walk_down": {
+   "from": "walk_down",
+   "label": "Walk (down)",
+   "sounds": [
+    {
+     "sound": "footstep-stone",
+     "frame": 0,
+     "preset": "Soft shoes",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-stone",
+     "frame": 4,
+     "preset": "Soft shoes",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.45
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemRDown"
+     ]
+    },
+    "2": {
+     "show": [
+      "hemRDown"
+     ]
+    },
+    "3": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemRDown"
+     ]
+    },
+    "5": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemLDown"
+     ]
+    },
+    "6": {
+     "show": [
+      "hemLDown"
+     ]
+    },
+    "7": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemLDown"
+     ]
+    }
+   }
+  },
+  "walk_up": {
+   "from": "walk_up",
+   "label": "Walk (up)",
+   "sounds": [
+    {
+     "sound": "footstep-stone",
+     "frame": 0,
+     "preset": "Soft shoes",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-stone",
+     "frame": 4,
+     "preset": "Soft shoes",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.8
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemRUp"
+     ]
+    },
+    "2": {
+     "show": [
+      "hemRUp"
+     ]
+    },
+    "3": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemRUp"
+     ]
+    },
+    "5": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemLUp"
+     ]
+    },
+    "6": {
+     "show": [
+      "hemLUp"
+     ]
+    },
+    "7": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemLUp"
+     ]
+    }
+   }
+  },
+  "walk_side": {
+   "from": "walk_side",
+   "label": "Walk (side)",
+   "sounds": [
+    {
+     "sound": "footstep-stone",
+     "frame": 0,
+     "preset": "Soft shoes",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-stone",
+     "frame": 4,
+     "preset": "Soft shoes",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.3
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemRSide"
+     ]
+    },
+    "2": {
+     "show": [
+      "hemRSide"
+     ]
+    },
+    "3": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemRSide"
+     ]
+    },
+    "5": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemLSide"
+     ]
+    },
+    "6": {
+     "show": [
+      "hemLSide"
+     ]
+    },
+    "7": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp",
+      "hemLSide"
+     ]
+    }
+   }
+  },
+  "cast_down": {
+   "from": "cast_down",
+   "label": "Cast (down)",
+   "sounds": [
+    {
+     "sound": "fire-whoosh",
+     "frame": 2,
+     "preset": "Fireball",
+     "volume": 0.8
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast1Rim",
+      "cast1Mid",
+      "cast1Core"
+     ]
+    },
+    "2": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast2Rim",
+      "cast2Mid",
+      "cast2Core"
+     ]
+    },
+    "3": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast2Rim",
+      "cast2MidUp",
+      "cast2Core"
+     ]
+    },
+    "4": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast4Rim",
+      "cast4Mid",
+      "cast4Core",
+      "cast4Heart"
+     ]
+    },
+    "5": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast5Rim",
+      "cast5Mid"
+     ]
+    },
+    "7": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    }
+   }
+  },
+  "cast_up": {
+   "from": "cast_up",
+   "label": "Cast (up)",
+   "sounds": [
+    {
+     "sound": "fire-whoosh",
+     "frame": 2,
+     "preset": "Fireball",
+     "volume": 0.8
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast1Rim",
+      "cast1Mid",
+      "cast1Core"
+     ]
+    },
+    "2": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast2Rim",
+      "cast2Mid",
+      "cast2Core"
+     ]
+    },
+    "3": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast2Rim",
+      "cast2MidUp",
+      "cast2Core"
+     ]
+    },
+    "4": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast4Rim",
+      "cast4Mid",
+      "cast4Core",
+      "cast4Heart"
+     ]
+    },
+    "5": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast5Rim",
+      "cast5Mid"
+     ]
+    },
+    "7": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    }
+   }
+  },
+  "cast_side": {
+   "from": "cast_side",
+   "label": "Cast (side)",
+   "sounds": [
+    {
+     "sound": "fire-whoosh",
+     "frame": 2,
+     "preset": "Fireball",
+     "volume": 0.8
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast1Rim",
+      "cast1Mid",
+      "cast1Core"
+     ]
+    },
+    "2": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast2Rim",
+      "cast2Mid",
+      "cast2Core"
+     ]
+    },
+    "3": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast2Rim",
+      "cast2MidUp",
+      "cast2Core"
+     ]
+    },
+    "4": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast4Rim",
+      "cast4Mid",
+      "cast4Core",
+      "cast4Heart"
+     ]
+    },
+    "5": {
+     "hide": [
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore"
+     ],
+     "show": [
+      "cast5Rim",
+      "cast5Mid"
+     ]
+    },
+    "7": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    }
+   }
+  },
+  "hurt": {
+   "from": "hurt",
+   "sounds": [
+    {
+     "sound": "punch",
+     "frame": 0,
+     "preset": "Light jab",
+     "volume": 0.9
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "3": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    }
+   }
+  },
+  "die": {
+   "from": "die",
+   "sounds": [
+    {
+     "sound": "monster-fade",
+     "frame": 0,
+     "preset": "Monster fades",
+     "volume": 1
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "hide": [
+      "flameMid"
+     ],
+     "show": [
+      "flameMidUp"
+     ]
+    },
+    "2": {
+     "hide": [
+      "robe",
+      "sash",
+      "sashSide",
+      "hood",
+      "face",
+      "liningDownS",
+      "liningDown",
+      "liningSideS",
+      "liningSide",
+      "eyesHood",
+      "eyeHoodSide",
+      "eyesBare",
+      "eyeBareSide",
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore",
+      "lantern"
+     ],
+     "show": [
+      "hoodLie2",
+      "dieTipFace",
+      "dieTipFaceS"
+     ],
+     "swap": {}
+    },
+    "3": {
+     "hide": [
+      "robe",
+      "sash",
+      "sashSide",
+      "hood",
+      "face",
+      "liningDownS",
+      "liningDown",
+      "liningSideS",
+      "liningSide",
+      "eyesHood",
+      "eyeHoodSide",
+      "eyesBare",
+      "eyeBareSide",
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore",
+      "lantern"
+     ],
+     "show": [
+      "hoodLie3",
+      "dieTipFace",
+      "dieTipFaceS"
+     ],
+     "swap": {
+      "dieTipFace": "f3",
+      "dieTipFaceS": "f3"
+     }
+    },
+    "4": {
+     "hide": [
+      "robe",
+      "sash",
+      "sashSide",
+      "hood",
+      "face",
+      "liningDownS",
+      "liningDown",
+      "liningSideS",
+      "liningSide",
+      "eyesHood",
+      "eyeHoodSide",
+      "eyesBare",
+      "eyeBareSide",
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore",
+      "lantern"
+     ],
+     "show": [
+      "hoodLie",
+      "dieLieFace",
+      "dieLieFaceS"
+     ]
+    },
+    "5": {
+     "hide": [
+      "robe",
+      "sash",
+      "sashSide",
+      "hood",
+      "face",
+      "liningDownS",
+      "liningDown",
+      "liningSideS",
+      "liningSide",
+      "eyesHood",
+      "eyeHoodSide",
+      "eyesBare",
+      "eyeBareSide",
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore",
+      "lantern"
+     ],
+     "show": [
+      "hoodLie",
+      "dieLieFace",
+      "dieLieFaceS"
+     ]
+    },
+    "6": {
+     "hide": [
+      "robe",
+      "sash",
+      "sashSide",
+      "hood",
+      "face",
+      "liningDownS",
+      "liningDown",
+      "liningSideS",
+      "liningSide",
+      "eyesHood",
+      "eyeHoodSide",
+      "eyesBare",
+      "eyeBareSide",
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore",
+      "lantern"
+     ],
+     "show": [
+      "hoodLie",
+      "dieLieFace",
+      "dieLieFaceS"
+     ]
+    },
+    "7": {
+     "hide": [
+      "robe",
+      "sash",
+      "sashSide",
+      "hood",
+      "face",
+      "liningDownS",
+      "liningDown",
+      "liningSideS",
+      "liningSide",
+      "eyesHood",
+      "eyeHoodSide",
+      "eyesBare",
+      "eyeBareSide",
+      "flameRim",
+      "flameMid",
+      "flameMidUp",
+      "flameCore",
+      "lantern"
+     ],
+     "show": [
+      "hoodLie",
+      "dieLieFace",
+      "dieLieFaceS"
+     ]
+    }
+   }
+  }
+ }
+}

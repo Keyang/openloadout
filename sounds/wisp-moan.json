@@ -1,0 +1,48 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "wisp-moan",
+  "name": "Wisp moan",
+  "category": "magic",
+  "description": "A hollow, ghostly voice that swells, slides and fades into a room. Change its pitch, length, fall, brightness, waver and room.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/voice",
+    "themes": ["fantasy", "dungeon", "horror"],
+    "gameTypes": ["top-down-rpg", "turn-based-rpg", "roguelike-action"],
+    "words": ["wisp", "ghost", "moan", "spirit", "wail", "spooky", "haunt", "cry", "hollow", "enemy", "attack", "hurt"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 220, "max": 880, "default": 440, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.3, "max": 1.2, "default": 0.6, "scale": "log" },
+    { "id": "drop", "label": "Fall", "unit": "semitones", "min": -7, "max": 12, "default": 4, "step": 1, "hint": "Below the middle the voice rises instead" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.4 },
+    { "id": "waver", "label": "Waver", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "space", "label": "Room", "min": 0, "max": 0.3, "default": 0.2 }
+  ],
+  "nodes": [
+    { "id": "beat", "type": "rand", "lo": 2.5, "hi": 5.5 },
+    { "id": "vibRate", "type": "rand", "lo": 5, "hi": 6.5 },
+    { "id": "glide", "type": "env", "points": [[0, "pitch"], ["length * 0.1", "pitch"], ["length * 0.7", "pitch * semi(-drop)", "exp"]] },
+    { "id": "vib", "type": "osc", "wave": "sine", "freq": "vibRate" },
+    { "id": "vibIn", "type": "env", "points": [[0, 0.3], ["length * 0.3", 1]] },
+    { "id": "f", "type": "expr", "expr": "glide * semi(vib * vibIn * waver * 1.5)" },
+    { "id": "v1", "type": "osc", "wave": "sine", "freq": "f" },
+    { "id": "v2", "type": "osc", "wave": "sine", "freq": "f + beat", "phase": 0.78 },
+    { "id": "swell", "type": "env", "points": [[0, 0], [0.004, 0.2], [0.06, 1], ["length * 0.4", 0.85], ["length * 0.74", 0, 1.6]] },
+    { "id": "voice", "type": "expr", "expr": "(v1 + v2) * 0.5 * swell * (1 + vib * vibIn * waver * 0.4)" },
+    { "id": "air", "type": "noise", "color": "white" },
+    { "id": "breathBp", "type": "filter", "mode": "bp", "in": "air", "freq": "f * 4", "q": "5 - bright * 3" },
+    { "id": "breath", "type": "expr", "expr": "breathBp * swell * (0.08 + bright * 0.95)" },
+    { "id": "dry", "type": "expr", "expr": "voice + breath" },
+    { "id": "room", "type": "reverb", "in": "dry", "size": "0.45 + space", "damp": "0.6 - bright * 0.3", "mix": "space * 1.6" },
+    { "id": "fin", "type": "env", "points": [[0, 1], ["length * 0.86", 1], ["length * 0.995", 0, 1.4]] }
+  ],
+  "out": "room * fin",
+  "presets": {
+    "Moan": {},
+    "Lunge": { "length": 0.4, "drop": -5, "bright": 0.7 },
+    "Flinch": { "pitch": 660, "length": 0.3, "drop": 7, "waver": 0.9 }
+  }
+}

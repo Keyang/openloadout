@@ -37,9 +37,9 @@ const run = (root, ...args) => {
   return { code: r.status, out: r.stdout + r.stderr };
 };
 const readBundle = (root, id) => JSON.parse(fs.readFileSync(path.join(root, 'bundles', `${id}.json`), 'utf8'));
-/** A fourth kit made from an existing plan: same assets and palette, its own id, name and sentence. */
+/** A fourth kit made from an existing plan: same assets and palette, its own id, name and sentence, and no size of its own unless `change` gives one. */
 function fourthPlan(change = {}) {
-  const base = realPlans[0].plan;
+  const { size: _size, ...base } = realPlans[0].plan;             // the plan it copies may declare a size (kitSize); the fourth kit is an ordinary one
   return { ...base, id: 'kit-fourth-test', name: 'Fourth test kit', blurb: 'A fourth kit, added by a test with no change to any code.', ...change };
 }
 const writePlan = (root, plan) => fs.writeFileSync(path.join(root, 'bundles', 'specs', `${plan.id}.plan.json`), JSON.stringify(plan, null, 2));
@@ -193,4 +193,50 @@ test('the size of a full kit is the one the acceptance criterion gives', () => {
   // 40 to 50 sprites, 20 sounds and 2 music tracks (docs/progress.md, goal G1). Written out here on purpose:
   // changing the rule is a decision, not an edit to one constant.
   assert.deepEqual(KIT_SIZE, { sprites: [40, 50], sounds: [20, 20], music: [2, 2] });
+});
+
+// ---- a plan's own size (helper batch AK0 of bundles/specs/kit-adventure-hearthvale.md) ----
+
+test('a plan that declares its own size and is inside it is written with no size note', () => {
+  const root = makeCopy();
+  const plan = fourthPlan({ size: { sprites: [3, 8], sounds: [1, 120], music: [1, 16] } });
+  plan.sprites = plan.sprites.slice(0, 5);
+  writePlan(root, plan);
+  const r = run(root);
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /kit-fourth-test: written \(5 sprites/);
+  assert.doesNotMatch(r.out, /kit-fourth-test: note/, r.out);
+});
+
+test('a plan outside the size it declares is written, with a note that says its own size', () => {
+  const root = makeCopy();
+  const plan = fourthPlan({ size: { sprites: [50, 60], sounds: [1, 120], music: [1, 16] } });
+  plan.sprites = plan.sprites.slice(0, 5);
+  writePlan(root, plan);
+  const r = run(root);
+  assert.equal(r.code, 0, r.out);
+  assert.match(r.out, /kit-fourth-test: written/);
+  assert.match(r.out, /kit-fourth-test: note: this plan says its kit holds 50 to 60 sprites, 1 to 120 sounds, 1 to 16 music tracks \("size" in bundles\/specs\/kit-fourth-test\.plan\.json\); it lists 5 sprites\./, r.out);
+  assert.doesNotMatch(r.out, /kit-fourth-test: note: a full kit/);
+});
+
+test('a plan whose size is not two whole numbers, fewest first, is not written and is reported by its file name', () => {
+  const root = makeCopy();
+  writePlan(root, fourthPlan({ size: { sprites: [60, 50], sounds: [30, 36], music: [4, 6] } }));
+  const r = run(root);
+  assert.equal(r.code, 1, r.out);
+  assert.match(r.out, /bundles\/specs\/kit-fourth-test\.plan\.json: "size\.sprites" is \[60, 50\]/);
+  assert.doesNotMatch(r.out, /\n\s+at /, 'no stack trace');
+  assert.equal(fs.existsSync(path.join(root, 'bundles', 'kit-fourth-test.json')), false);
+});
+
+test('the real plans: no plan that is inside its own size gets a size note', () => {
+  const root = makeCopy();
+  const r = run(root, '--check');
+  for (const { id, plan } of realPlans) {
+    if (!plan.size) continue;
+    const inside = ['sprites', 'sounds', 'music'].every((k) => plan[k].length >= plan.size[k][0] && plan[k].length <= plan.size[k][1]);
+    assert.ok(inside, `${id} is inside the size its plan declares`);
+    assert.doesNotMatch(r.out, new RegExp(`${id}: note`), r.out);
+  }
 });

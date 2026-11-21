@@ -1,0 +1,1724 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "cracked-wall",
+ "name": "Cracked wall",
+ "blurb": "One tile of dungeon wall with a crack that a bomb blasts open into a ragged passage. Choose the crack, the rubble, moss, the wall colour and the glint that marks the weak spot.",
+ "meta": {
+  "type": "prop",
+  "role": "world/door",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "roguelike-action"
+  ],
+  "view": "top-down",
+  "words": [
+   "wall",
+   "crack",
+   "secret",
+   "bomb",
+   "blast",
+   "passage",
+   "hidden",
+   "break",
+   "rubble",
+   "door",
+   "dungeon",
+   "weak"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  40
+ ],
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "versions": [
+  {
+   "name": "Cracked slabs",
+   "params": {}
+  },
+  {
+   "name": "Web of cracks",
+   "params": {
+    "shape": "web"
+   }
+  },
+  {
+   "name": "Split, mossy",
+   "params": {
+    "shape": "split",
+    "mossy": true
+   }
+  },
+  {
+   "name": "Mossy green wall, little rubble",
+   "params": {
+    "stone": "#357a4c",
+    "pieces": 4
+   }
+  }
+ ],
+ "palette": [
+  {
+   "id": "stone",
+   "label": "Wall",
+   "default": "#5a5f7a",
+   "material": "stone",
+   "swatches": [
+    "#5a5f7a",
+    "#8e3a4a",
+    "#357a4c",
+    "#7a4fc4"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Glint",
+   "default": "#f4e06a",
+   "material": "light",
+   "swatches": [
+    "#f4e06a",
+    "#f0ead8",
+    "#4fd8ee",
+    "#f2c230"
+   ]
+  },
+  {
+   "id": "moss",
+   "default": "#4f9d57",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "floor",
+   "default": "#7e84a0",
+   "material": "stone",
+   "detail": true
+  },
+  {
+   "id": "course",
+   "material": "stone",
+   "derive": {
+    "rule": "mix",
+    "of": "stone",
+    "with": {
+     "rule": "ramp",
+     "of": "stone",
+     "tone": "light"
+    },
+    "amount": 0.45
+   }
+  },
+  {
+   "id": "ooze",
+   "material": "plant",
+   "derive": {
+    "rule": "textureTone",
+    "of": "moss",
+    "against": "stone"
+   }
+  },
+  {
+   "id": "foot",
+   "material": "stone",
+   "derive": {
+    "rule": "textureTone",
+    "of": "floor"
+   }
+  },
+  {
+   "id": "dark",
+   "material": "stone",
+   "derive": {
+    "rule": "ifLight",
+    "of": {
+     "rule": "tone",
+     "of": "stone",
+     "by": -1.6
+    },
+    "above": 0.18,
+    "then": {
+     "rule": "tone",
+     "of": "stone",
+     "by": -1.6
+    },
+    "else": {
+     "rule": "tone",
+     "of": "stone",
+     "by": -1.2
+    }
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "shape",
+   "kind": "choice",
+   "label": "Crack",
+   "options": [
+    "zigzag",
+    "web",
+    "split"
+   ],
+   "default": "zigzag"
+  },
+  {
+   "key": "pieces",
+   "kind": "range",
+   "label": "Rubble",
+   "lo": "Few",
+   "hi": "Many",
+   "min": 4,
+   "max": 10,
+   "step": 1,
+   "default": 8
+  },
+  {
+   "key": "mossy",
+   "kind": "toggle",
+   "label": "Moss",
+   "default": false
+  },
+  {
+   "key": "stone",
+   "kind": "colour",
+   "label": "Wall"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Glint"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [
+    {
+     "id": "wall",
+     "parent": null,
+     "at": [
+      8,
+      8
+     ]
+    },
+    {
+     "id": "drop",
+     "parent": "wall",
+     "at": [
+      15,
+      13
+     ]
+    },
+    {
+     "id": "g-zigzag",
+     "parent": "wall",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "t-zigzag",
+     "parent": "wall",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "g-web",
+     "parent": "wall",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "t-web",
+     "parent": "wall",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "g-split",
+     "parent": "wall",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "t-split",
+     "parent": "wall",
+     "at": [
+      0,
+      0
+     ]
+    }
+   ],
+   "draw": [
+    {
+     "id": "face",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      0,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "llllllllllllllllllllllllllllllll",
+      "ssssssdsssssssssssssssdsssssssss",
+      "ssssssdsssssssssssssssdsssssssss",
+      "ssssssdsssssssssssssssdsssssssss",
+      "ssssssdsssssssssssssssdsssssssss",
+      "ssssssdsssssssssssssssdsssssssss",
+      "dddddddddddddddddddddddddddddddd",
+      "ccccccccccccccdcccccccccccccccdc",
+      "ssssssssssssssdsssssssssssssssds",
+      "ssssssssssssssdsssssssssssssssds",
+      "ssssssssssssssdsssssssssssssssds",
+      "ssssssssssssssdsssssssssssssssds",
+      "ssssssssssssssdsssssssssssssssds",
+      "dddddddddddddddddddddddddddddddd",
+      "ccccccdcccccccccccccccdccccccccc",
+      "ssssssdsssssssssssssssdsssssssss",
+      "ssssssdsssssssssssssssdsssssssss",
+      "ssssssdsssssssssssssssdsssssssss",
+      "ssssssdsssssssssssssssdsssssssss",
+      "ssssssdsssssssssssssssdsssssssss",
+      "dddddddddddddddddddddddddddddddd",
+      "ccccccccccccccdcccccccccccccccdc",
+      "ssssssssssssssdsssssssssssssssds",
+      "ssssssssssssssdsssssssssssssssds",
+      "ssssssssssssssdsssssssssssssssds",
+      "ssssssssssssssdsssssssssssssssds",
+      "ssssssssssssssdsssssssssssssssds",
+      "ssssssssssssssdssssssmmsssssssds",
+      "ssssssssssssssdsssssoooossssssds",
+      "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+      "ffffffffffffffffffffffffffffffff",
+      "ffffffffffffffffffffffffffffffff"
+     ],
+     "key": {
+      "l": "stone.light",
+      "s": "stone",
+      "d": "stone.dark",
+      "c": "course",
+      "m": "moss",
+      "o": "ooze",
+      "k": "ink",
+      "f": "foot"
+     },
+     "group": "wall"
+    },
+    {
+     "id": "crack-zigzag",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      14,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".d...",
+      "..d..",
+      "..d..",
+      "...d.",
+      "...d.",
+      "....d",
+      "...d.",
+      "...d.",
+      "..d..",
+      "..d..",
+      ".d...",
+      "..d..",
+      "..d..",
+      "...d.",
+      "..d..",
+      "..d..",
+      ".d...",
+      ".d...",
+      "d....",
+      ".d...",
+      "..d..",
+      "..d..",
+      "...d.",
+      "....d",
+      "....d",
+      "...d.",
+      "...d.",
+      "..d..",
+      "..d.."
+     ],
+     "key": {
+      "d": "stone.dark",
+      "l": "stone.light"
+     },
+     "group": "wall",
+     "when": {
+      "shape": [
+       "zigzag"
+      ]
+     }
+    },
+    {
+     "id": "crack-web",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      13,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "d..................",
+      "d..................",
+      ".d.................",
+      ".d.................",
+      ".d.................",
+      "..d................",
+      "..d................",
+      "..d................",
+      "..d................",
+      "...d...............",
+      "...d....ddd........",
+      "...d.ddd...dd....dd",
+      "...dd........dddd..",
+      "...d...............",
+      "...d...............",
+      "...d...............",
+      "..d................",
+      "..d................",
+      "..d................",
+      "..d................",
+      "...d...............",
+      "...d...............",
+      "....d..............",
+      "....d..............",
+      "....d..............",
+      "....d..............",
+      "...d...............",
+      "...d...............",
+      "...d..............."
+     ],
+     "key": {
+      "d": "stone.dark",
+      "l": "stone.light"
+     },
+     "group": "wall",
+     "when": {
+      "shape": [
+       "web"
+      ]
+     }
+    },
+    {
+     "id": "crack-split",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      12,
+      0
+     ],
+     "anchor": "tl",
+     "rows": [
+      "dddddddd",
+      ".dddddd.",
+      ".dddddd.",
+      "..ddddd.",
+      "..dddd..",
+      "..dddd..",
+      "...ddd..",
+      "...dd...",
+      "...dd...",
+      "...dd...",
+      "...dd...",
+      "...dd...",
+      "...dd...",
+      "...dd...",
+      "...dd...",
+      "...dd...",
+      "...dd...",
+      "..dd....",
+      "..dd....",
+      "..dd....",
+      "..dd....",
+      "...dd...",
+      "...dd...",
+      "....dd..",
+      "....dd..",
+      "....dd..",
+      "....dd..",
+      "....dd..",
+      "....dd.."
+     ],
+     "key": {
+      "d": "stone.dark",
+      "l": "stone.light"
+     },
+     "group": "wall",
+     "when": {
+      "shape": [
+       "split"
+      ]
+     }
+    },
+    {
+     "id": "tuft-a",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      13,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".mm.",
+      "oooo"
+     ],
+     "key": {
+      "m": "moss",
+      "o": "ooze",
+      "l": "moss.light"
+     },
+     "group": "wall",
+     "when": {
+      "mossy": [
+       true
+      ]
+     }
+    },
+    {
+     "id": "tuft-b",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      15,
+      11
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".mm.",
+      "oooo"
+     ],
+     "key": {
+      "m": "moss",
+      "o": "ooze",
+      "l": "moss.light"
+     },
+     "group": "wall",
+     "when": {
+      "mossy": [
+       true
+      ]
+     }
+    },
+    {
+     "id": "tuft-c",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      12,
+      18
+     ],
+     "anchor": "tl",
+     "rows": [
+      "mm.",
+      "ooo"
+     ],
+     "key": {
+      "m": "moss",
+      "o": "ooze",
+      "l": "moss.light"
+     },
+     "group": "wall",
+     "when": {
+      "mossy": [
+       true
+      ]
+     }
+    },
+    {
+     "id": "tuft-d",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      2,
+      27
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".mm.",
+      "oooo"
+     ],
+     "key": {
+      "m": "moss",
+      "o": "ooze",
+      "l": "moss.light"
+     },
+     "group": "wall",
+     "when": {
+      "mossy": [
+       true
+      ]
+     }
+    },
+    {
+     "id": "tuft-e",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      9,
+      27
+     ],
+     "anchor": "tl",
+     "rows": [
+      "mm.",
+      "ooo"
+     ],
+     "key": {
+      "m": "moss",
+      "o": "ooze",
+      "l": "moss.light"
+     },
+     "group": "wall",
+     "when": {
+      "mossy": [
+       true
+      ]
+     }
+    },
+    {
+     "id": "stone-a",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      9,
+      7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "dcccl",
+      "dcccc",
+      "dcccc",
+      "dcccc",
+      "ddddd"
+     ],
+     "key": {
+      "d": "stone.dark",
+      "l": "stone.light",
+      "c": "course"
+     },
+     "group": "wall"
+    },
+    {
+     "id": "stone-b",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      17,
+      15
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ddddd",
+      "dcccl",
+      "dcccc",
+      "dcccc",
+      "dcccc"
+     ],
+     "key": {
+      "d": "stone.dark",
+      "l": "stone.light",
+      "c": "course"
+     },
+     "group": "wall"
+    },
+    {
+     "id": "stone-c",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      9,
+      21
+     ],
+     "anchor": "tl",
+     "rows": [
+      "dcccl",
+      "dcccc",
+      "dcccc",
+      "dcccc",
+      "ddddd"
+     ],
+     "key": {
+      "d": "stone.dark",
+      "l": "stone.light",
+      "c": "course"
+     },
+     "group": "wall"
+    },
+    {
+     "id": "passage",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      6,
+      4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "......yyyyyyyy......",
+      "....yyyyyyyyyyy.....",
+      "...yyyxxxxxxxxyyy...",
+      "..yyxxxxxxxxxxxyyy..",
+      ".yyxxxxxxxxxxxxxxy..",
+      ".yyxxxxxxxxxxxxxxxy.",
+      "yyxxxxxxxxxxxxxxxxy.",
+      ".yyxxxxxxxxxxxxxxxxy",
+      ".yyxxxxxxxxxxxxxxxxy",
+      "yyxxxxxxxxxxxxxxxxxx",
+      "yyxxxxxxxxxxxxxxxxx.",
+      "yyxxxxxxxxxxxxxxxxx.",
+      ".yyxxxxxxxxxxxxxxxxx",
+      "..yyxxxxxxxxxxxxxxxx",
+      ".yyxxxxxxxxxxxxxxxxx",
+      "yyxxxxxxxxxxxxxxxxxx",
+      "yyxxxxxxxxxxxxxxxxx.",
+      "yyxxxxxxxxxxxxxxxx..",
+      ".yyxxxxxxxxxxxxxxxx.",
+      ".yyxxxxxxxxxxxxxxxxx",
+      "yyxxxxxxxxxxxxxxxxxx",
+      "yyxxxxxxxxxxxxxxxxxx",
+      ".yyxxxxxxxxxxxxxxxxx",
+      ".yyxxxxxxxxxxxxxxxx.",
+      "yyxxxxxxxxxxxxxxxxxx",
+      "yyxxxxxxxxxxxxxxxxxx"
+     ],
+     "key": {
+      "x": "dark",
+      "y": "stone.deep"
+     },
+     "group": "loose",
+     "when": {
+      "clip": [
+       "break"
+      ]
+     }
+    },
+    {
+     "id": "drop",
+     "kind": "rect",
+     "on": "drop",
+     "at": [
+      0,
+      0
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "stone.light",
+     "group": "loose",
+     "hidden": true,
+     "shade": 0,
+     "when": {
+      "clip": [
+       "hurt"
+      ]
+     }
+    },
+    {
+     "id": "crumb-a",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      1,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      "lss",
+      "ssd"
+     ],
+     "key": {
+      "l": "stone.light",
+      "s": "stone",
+      "d": "stone.dark"
+     },
+     "group": "loose",
+     "hidden": true,
+     "when": {
+      "clip": [
+       "break"
+      ]
+     }
+    },
+    {
+     "id": "crumb-b",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      9,
+      34
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".ls.",
+      "sssd",
+      ".sd."
+     ],
+     "key": {
+      "l": "stone.light",
+      "s": "stone",
+      "d": "stone.dark"
+     },
+     "group": "loose",
+     "hidden": true,
+     "when": {
+      "clip": [
+       "break"
+      ]
+     }
+    },
+    {
+     "id": "crumb-c",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      22,
+      33
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ls.",
+      "ssd"
+     ],
+     "key": {
+      "l": "stone.light",
+      "s": "stone",
+      "d": "stone.dark"
+     },
+     "group": "loose",
+     "hidden": true,
+     "when": {
+      "clip": [
+       "break"
+      ],
+      "pieces": [
+       {
+        "atLeast": 6
+       }
+      ]
+     }
+    },
+    {
+     "id": "crumb-d",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      27,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".ls",
+      "ssd"
+     ],
+     "key": {
+      "l": "stone.light",
+      "s": "stone",
+      "d": "stone.dark"
+     },
+     "group": "loose",
+     "hidden": true,
+     "when": {
+      "clip": [
+       "break"
+      ],
+      "pieces": [
+       {
+        "atLeast": 8
+       }
+      ]
+     }
+    },
+    {
+     "id": "crumb-e",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      15,
+      35
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ls",
+      "sd"
+     ],
+     "key": {
+      "l": "stone.light",
+      "s": "stone",
+      "d": "stone.dark"
+     },
+     "group": "loose",
+     "hidden": true,
+     "when": {
+      "clip": [
+       "break"
+      ],
+      "pieces": [
+       {
+        "atLeast": 10
+       }
+      ]
+     }
+    },
+    {
+     "kind": "outline",
+     "paint": "ink",
+     "only": "loose"
+    },
+    {
+     "id": "sill",
+     "kind": "stamp",
+     "on": "wall",
+     "at": [
+      5,
+      30
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ffffffffffffffffffffff"
+     ],
+     "key": {
+      "f": "foot"
+     },
+     "when": {
+      "clip": [
+       "break"
+      ]
+     }
+    },
+    {
+     "id": "trail-zigzag",
+     "kind": "dot",
+     "on": "t-zigzag",
+     "at": [
+      0,
+      0
+     ],
+     "paint": "glow",
+     "glow": true,
+     "when": {
+      "shape": [
+       "zigzag"
+      ],
+      "clip": [
+       "hint"
+      ]
+     }
+    },
+    {
+     "id": "trail-web",
+     "kind": "dot",
+     "on": "t-web",
+     "at": [
+      0,
+      0
+     ],
+     "paint": "glow",
+     "glow": true,
+     "when": {
+      "shape": [
+       "web"
+      ],
+      "clip": [
+       "hint"
+      ]
+     }
+    },
+    {
+     "id": "trail-split",
+     "kind": "dot",
+     "on": "t-split",
+     "at": [
+      0,
+      0
+     ],
+     "paint": "glow",
+     "glow": true,
+     "when": {
+      "shape": [
+       "split"
+      ],
+      "clip": [
+       "hint"
+      ]
+     }
+    }
+   ],
+   "emitters": [
+    {
+     "id": "stones",
+     "gen": "chunks",
+     "v": 1,
+     "on": "wall",
+     "clip": [
+      "break"
+     ],
+     "count": {
+      "from": "pieces",
+      "map": [
+       [
+        4,
+        4
+       ],
+       [
+        10,
+        10
+       ]
+      ],
+      "round": "px"
+     },
+     "ink": true,
+     "rest": false,
+     "paint": "stone",
+     "area": {
+      "x0": 1,
+      "y0": 1,
+      "x1": 47,
+      "y1": 47
+     },
+     "at": [
+      16,
+      16
+     ],
+     "seed": 3,
+     "dist": 13,
+     "rise": 8,
+     "size": 5,
+     "thick": 3,
+     "spread": 5,
+     "spin": 1,
+     "floor": 44,
+     "land": 0.9,
+     "shrink": 0.4
+    },
+    {
+     "id": "dust",
+     "gen": "puffs",
+     "v": 1,
+     "on": "wall",
+     "clip": [
+      "break"
+     ],
+     "paints": [
+      "stone.light",
+      "course",
+      "stone",
+      "stone.dark"
+     ],
+     "area": {
+      "x0": 1,
+      "y0": 1,
+      "x1": 47,
+      "y1": 47
+     },
+     "at": [
+      16,
+      22
+     ],
+     "count": 8,
+     "seed": 5,
+     "angle": 180,
+     "arc": 200,
+     "dist": 13,
+     "rise": 6,
+     "size": 3,
+     "lobes": 2,
+     "floor": 45,
+     "stagger": 0.15,
+     "begin": 0.1,
+     "end": 0.9
+    },
+    {
+     "id": "glint-zigzag",
+     "gen": "twinkle",
+     "v": 2,
+     "on": "g-zigzag",
+     "at": [
+      0,
+      0
+     ],
+     "clip": [
+      "hint"
+     ],
+     "when": {
+      "shape": [
+       "zigzag"
+      ]
+     },
+     "size": 2,
+     "paint": "glow",
+     "core": "shine",
+     "area": {
+      "x0": 1,
+      "y0": 1,
+      "x1": 47,
+      "y1": 47
+     },
+     "glow": true
+    },
+    {
+     "id": "glint-web",
+     "gen": "twinkle",
+     "v": 2,
+     "on": "g-web",
+     "at": [
+      0,
+      0
+     ],
+     "clip": [
+      "hint"
+     ],
+     "when": {
+      "shape": [
+       "web"
+      ]
+     },
+     "size": 2,
+     "paint": "glow",
+     "core": "shine",
+     "area": {
+      "x0": 1,
+      "y0": 1,
+      "x1": 47,
+      "y1": 47
+     },
+     "glow": true
+    },
+    {
+     "id": "glint-split",
+     "gen": "twinkle",
+     "v": 2,
+     "on": "g-split",
+     "at": [
+      0,
+      0
+     ],
+     "clip": [
+      "hint"
+     ],
+     "when": {
+      "shape": [
+       "split"
+      ]
+     },
+     "size": 2,
+     "paint": "glow",
+     "core": "shine",
+     "area": {
+      "x0": 1,
+      "y0": 1,
+      "x1": 47,
+      "y1": 47
+     },
+     "glow": true
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Cracked"
+  },
+  "hurt": {
+   "frames": 4,
+   "fps": 9,
+   "loop": false,
+   "frameEdits": {
+    "0": {
+     "flash": true
+    },
+    "1": {
+     "show": [
+      "drop"
+     ]
+    },
+    "2": {
+     "show": [
+      "drop"
+     ]
+    }
+   },
+   "keys": [
+    {
+     "t": 0,
+     "ease": "in",
+     "nodes": {
+      "drop": {
+       "move": [
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 1,
+     "nodes": {
+      "drop": {
+       "move": [
+        2,
+        26
+       ]
+      }
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "punch",
+     "preset": "Light jab",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  },
+  "break": {
+   "frames": 8,
+   "fps": 12,
+   "loop": false,
+   "label": "Blast open",
+   "frameEdits": {
+    "0": {
+     "flash": true,
+     "hide": [
+      "passage",
+      "sill"
+     ]
+    },
+    "1": {
+     "hide": [
+      "crack-zigzag",
+      "crack-web",
+      "crack-split",
+      "stone-a",
+      "stone-b",
+      "stone-c"
+     ]
+    },
+    "2": {
+     "hide": [
+      "crack-zigzag",
+      "crack-web",
+      "crack-split",
+      "stone-a",
+      "stone-b",
+      "stone-c"
+     ]
+    },
+    "3": {
+     "hide": [
+      "crack-zigzag",
+      "crack-web",
+      "crack-split",
+      "stone-a",
+      "stone-b",
+      "stone-c"
+     ]
+    },
+    "4": {
+     "hide": [
+      "crack-zigzag",
+      "crack-web",
+      "crack-split",
+      "stone-a",
+      "stone-b",
+      "stone-c"
+     ]
+    },
+    "5": {
+     "hide": [
+      "crack-zigzag",
+      "crack-web",
+      "crack-split",
+      "stone-a",
+      "stone-b",
+      "stone-c"
+     ],
+     "show": [
+      "crumb-a",
+      "crumb-b",
+      "crumb-c",
+      "crumb-d",
+      "crumb-e"
+     ]
+    },
+    "6": {
+     "hide": [
+      "crack-zigzag",
+      "crack-web",
+      "crack-split",
+      "stone-a",
+      "stone-b",
+      "stone-c"
+     ],
+     "show": [
+      "crumb-a",
+      "crumb-b",
+      "crumb-c",
+      "crumb-d",
+      "crumb-e"
+     ]
+    },
+    "7": {
+     "hide": [
+      "crack-zigzag",
+      "crack-web",
+      "crack-split",
+      "stone-a",
+      "stone-b",
+      "stone-c"
+     ],
+     "show": [
+      "crumb-a",
+      "crumb-b",
+      "crumb-c",
+      "crumb-d",
+      "crumb-e"
+     ]
+    }
+   },
+   "keys": [
+    {
+     "t": 0,
+     "ease": "hold",
+     "emit": {
+      "stones": {
+       "amount": 0
+      },
+      "dust": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.1428,
+     "ease": "linear",
+     "emit": {
+      "stones": {
+       "amount": 0.12
+      },
+      "dust": {
+       "amount": 1
+      }
+     }
+    },
+    {
+     "t": 0.7143,
+     "ease": "hold",
+     "emit": {
+      "stones": {
+       "amount": 1
+      },
+      "dust": {
+       "amount": 1
+      }
+     }
+    },
+    {
+     "t": 1,
+     "emit": {
+      "stones": {
+       "amount": 0
+      },
+      "dust": {
+       "amount": 0
+      }
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "rock-crumble",
+     "preset": "Cracked wall",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  },
+  "hint": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Glinting crack",
+   "keys": [
+    {
+     "t": 0,
+     "ease": "hold",
+     "nodes": {
+      "g-zigzag": {
+       "move": [
+        16,
+        2
+       ]
+      },
+      "t-zigzag": {
+       "move": [
+        17,
+        26
+       ]
+      },
+      "g-web": {
+       "move": [
+        14,
+        2
+       ]
+      },
+      "t-web": {
+       "move": [
+        16,
+        26
+       ]
+      },
+      "g-split": {
+       "move": [
+        15,
+        2
+       ]
+      },
+      "t-split": {
+       "move": [
+        16,
+        26
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.125,
+     "ease": "hold",
+     "nodes": {
+      "g-zigzag": {
+       "move": [
+        18,
+        5
+       ]
+      },
+      "t-zigzag": {
+       "move": [
+        16,
+        2
+       ]
+      },
+      "g-web": {
+       "move": [
+        15,
+        5
+       ]
+      },
+      "t-web": {
+       "move": [
+        14,
+        2
+       ]
+      },
+      "g-split": {
+       "move": [
+        15,
+        5
+       ]
+      },
+      "t-split": {
+       "move": [
+        15,
+        2
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.25,
+     "ease": "hold",
+     "nodes": {
+      "g-zigzag": {
+       "move": [
+        16,
+        9
+       ]
+      },
+      "t-zigzag": {
+       "move": [
+        18,
+        5
+       ]
+      },
+      "g-web": {
+       "move": [
+        15,
+        9
+       ]
+      },
+      "t-web": {
+       "move": [
+        15,
+        5
+       ]
+      },
+      "g-split": {
+       "move": [
+        15,
+        9
+       ]
+      },
+      "t-split": {
+       "move": [
+        15,
+        5
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.375,
+     "ease": "hold",
+     "nodes": {
+      "g-zigzag": {
+       "move": [
+        17,
+        12
+       ]
+      },
+      "t-zigzag": {
+       "move": [
+        16,
+        9
+       ]
+      },
+      "g-web": {
+       "move": [
+        16,
+        12
+       ]
+      },
+      "t-web": {
+       "move": [
+        15,
+        9
+       ]
+      },
+      "g-split": {
+       "move": [
+        15,
+        12
+       ]
+      },
+      "t-split": {
+       "move": [
+        15,
+        9
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.5,
+     "ease": "hold",
+     "nodes": {
+      "g-zigzag": {
+       "move": [
+        15,
+        16
+       ]
+      },
+      "t-zigzag": {
+       "move": [
+        17,
+        12
+       ]
+      },
+      "g-web": {
+       "move": [
+        15,
+        16
+       ]
+      },
+      "t-web": {
+       "move": [
+        16,
+        12
+       ]
+      },
+      "g-split": {
+       "move": [
+        15,
+        16
+       ]
+      },
+      "t-split": {
+       "move": [
+        15,
+        12
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.625,
+     "ease": "hold",
+     "nodes": {
+      "g-zigzag": {
+       "move": [
+        15,
+        19
+       ]
+      },
+      "t-zigzag": {
+       "move": [
+        15,
+        16
+       ]
+      },
+      "g-web": {
+       "move": [
+        16,
+        19
+       ]
+      },
+      "t-web": {
+       "move": [
+        15,
+        16
+       ]
+      },
+      "g-split": {
+       "move": [
+        14,
+        19
+       ]
+      },
+      "t-split": {
+       "move": [
+        15,
+        16
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.75,
+     "ease": "hold",
+     "nodes": {
+      "g-zigzag": {
+       "move": [
+        18,
+        22
+       ]
+      },
+      "t-zigzag": {
+       "move": [
+        15,
+        19
+       ]
+      },
+      "g-web": {
+       "move": [
+        17,
+        23
+       ]
+      },
+      "t-web": {
+       "move": [
+        16,
+        19
+       ]
+      },
+      "g-split": {
+       "move": [
+        16,
+        23
+       ]
+      },
+      "t-split": {
+       "move": [
+        14,
+        19
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.875,
+     "ease": "hold",
+     "nodes": {
+      "g-zigzag": {
+       "move": [
+        17,
+        26
+       ]
+      },
+      "t-zigzag": {
+       "move": [
+        18,
+        22
+       ]
+      },
+      "g-web": {
+       "move": [
+        16,
+        26
+       ]
+      },
+      "t-web": {
+       "move": [
+        17,
+        23
+       ]
+      },
+      "g-split": {
+       "move": [
+        16,
+        26
+       ]
+      },
+      "t-split": {
+       "move": [
+        16,
+        23
+       ]
+      }
+     }
+    }
+   ]
+  }
+ }
+}

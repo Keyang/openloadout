@@ -1,0 +1,166 @@
+{
+  "format": "loadout-sprite",
+  "version": 2,
+  "id": "fused-bomb",
+  "name": "Lit bomb",
+  "blurb": "A bomb set down with its fuse lit: it sputters, flashes white when it is about to go, then blows into smoke and a scorch mark. Change its shape, size, fuse, sparks and colours.",
+  "meta": {"type":"prop","role":"world/hazard","themes":["fantasy","dungeon"],"gameTypes":["top-down-rpg","roguelike-action","arcade"],"view":"top-down","words":["bomb","fuse","explosive","lit","blast","explode","timer","danger","placed","spark","boom","powder"],"license":"draft"},
+  "size": [32,32],
+  "pivot": [16,30],
+  "preview": "idle",
+  "styles": ["pixel"],
+  "versions": [
+    {"name":"Iron bomb","params":{}},
+    {"name":"Blasting stick","params":{"shape":"stick","body":"#8e3a4a","accent":"#e6c96a"}},
+    {"name":"Bundle of three","params":{"shape":"bundle","body":"#9a6a3e","fuse":1,"pieces":5}},
+    {"name":"Small, short fuse","params":{"size":0,"fuse":0,"glow":"#f4e06a"}}
+  ],
+  "palette": [
+    {"id":"body","label":"Shell","default":"#5a5f7a","material":"metal","swatches":["#5a5f7a","#8e3a4a","#357a4c","#9a6a3e"]},
+    {"id":"accent","label":"Band and collar","default":"#f0ead8","material":"metal","swatches":["#f0ead8","#e6c96a","#c2c9d6","#f2c230"]},
+    {"id":"glow","label":"Spark","default":"#e8662c","material":"light","swatches":["#e8662c","#f4e06a","#c9423a","#4fd8ee"]},
+    {"id":"gloss","material":"light","derive":{"rule":"mix","of":{"rule":"ramp","of":"body","tone":"light"},"with":"shine","amount":0.5}},
+    {"id":"flash","material":"light","derive":{"rule":"mix","of":{"rule":"ramp","of":"glow","tone":"light"},"with":"shine","amount":0.6}},
+    {"id":"smoke","default":"#a8a4a0","material":"stone","detail":true},
+    {"id":"soot","default":"#5a5f7a","material":"stone","detail":true},
+    {"id":"shine","default":"#ffffff","material":"light","detail":true}
+  ],
+  "controls": [
+    {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+    {"key":"shape","kind":"choice","label":"Shape","options":["round","stick","bundle"],"default":"round"},
+    {"key":"fuse","kind":"range","label":"Fuse","lo":"Short","hi":"Long","default":0.5},
+    {"key":"pieces","kind":"range","label":"Sparks","lo":"Few","hi":"Many","min":2,"max":5,"step":1,"default":3},
+    {"key":"body","kind":"colour","label":"Shell"},
+    {"key":"accent","kind":"colour","label":"Band and collar"},
+    {"key":"glow","kind":"colour","label":"Spark"},
+    {"key":"speed","standard":"speed"}
+  ],
+  "body": { "pictures": {
+    "nodes": [
+      {"id":"bomb","parent":null,"at":[16,30]},
+      {"id":"spot","parent":null,"at":[16,30],"scale":{"from":"size","map":[[0,0.85],[1,1.15]]}},
+      {"id":"collar","parent":"spot","at":[{"from":"shape","pick":{"round":6.5,"stick":0,"bundle":0}},{"from":"shape","pick":{"round":-12.5,"stick":-13.6,"bundle":-13.3}}]},
+      {"id":"tip","parent":"collar","at":[{"from":"fuse","map":[[0,1.35],[1,3.55]]},{"from":"fuse","map":[[0,-2.7],[1,-7.1]]}]},
+      {"id":"blast","parent":null,"at":[16,20]}
+    ],
+    "draw": [
+      {"id":"fuse","on":"collar","kind":"line","when":{"clip":["idle"]},"from":[0,0],"to":[{"from":"fuse","map":[[0,0.9],[1,3.1]]},{"from":"fuse","map":[[0,-1.8],[1,-6.2]]}],"thick":2,"paint":"accent","shade":0},
+      {"id":"fuse-end","on":"collar","kind":"line","when":{"clip":["idle"]},"from":[{"from":"fuse","map":[[0,0.9],[1,3.1]]},{"from":"fuse","map":[[0,-1.8],[1,-6.2]]}],"to":[{"from":"fuse","map":[[0,1.35],[1,3.55]]},{"from":"fuse","map":[[0,-2.7],[1,-7.1]]}],"thick":2,"paint":"accent","shade":0},
+      {"id":"fuse-twist","on":"collar","kind":"dot","when":{"clip":["idle"]},"at":[{"from":"fuse","map":[[0,0.45],[1,1.55]]},{"from":"fuse","map":[[0,-0.9],[1,-3.1]]}],"paint":"accent.dark"},
+
+      {"id":"ball","on":"bomb","kind":"ellipse","at":[0.5,-6.5],"r":[6.5,6.5],"paint":"body","shade":2,"when":{"shape":["round"]}},
+      {"id":"lit-ball","on":"bomb","kind":"ellipse","at":[0.5,-6.5],"r":[6.5,6.5],"paint":"body.light","shade":2,"hidden":true,"when":{"shape":["round"],"clip":["warn"]}},
+      {"id":"ball-light","on":"bomb","kind":"ellipse","at":[2.7,-9.2],"r":[2.1,1.7],"paint":"body.light","shade":0,"when":{"shape":["round"]}},
+      {"id":"ball-glint","on":"bomb","kind":"stamp","at":[2,-11],"anchor":"tl","rows":["aa","a."],"key":{"a":"gloss"},"when":{"shape":["round"]}},
+      {"id":"neck","on":"bomb","kind":"poly","points":[[5,-14.1],[8.1,-11],[6,-8.9],[2.9,-12]],"paint":"accent","shade":1,"when":{"shape":["round"]}},
+      {"id":"rivets","on":"bomb","kind":"stamp","at":[3,-12],"anchor":"tl","rows":["a..","...","..a"],"key":{"a":"accent.dark"},"when":{"shape":["round"]}},
+
+      {"id":"stick-side","on":"bomb","kind":"poly","points":[[-3,-12.8],[3,-12.8],[3,-1.2],[-3,-1.2]],"paint":"body","shade":1,"group":"stick-g","when":{"shape":["stick"]}},
+      {"id":"stick-top","on":"bomb","kind":"ellipse","at":[0,-12.8],"r":[3,1.2],"paint":"body","shade":0,"group":"stick-g","when":{"shape":["stick"]}},
+      {"id":"stick-foot","on":"bomb","kind":"ellipse","at":[0,-1.2],"r":[3,1.2],"paint":"body","shade":0,"group":"stick-g","when":{"shape":["stick"]}},
+      {"id":"lit-stick","on":"bomb","kind":"poly","points":[[-3,-12.8],[3,-12.8],[3,-1.2],[-3,-1.2]],"paint":"body.light","shade":0,"hidden":true,"when":{"shape":["stick"],"clip":["warn"]}},
+      {"id":"stick-cap","on":"bomb","kind":"ellipse","at":[0,-12.8],"r":[2.5,1.1],"paint":"body.light","shade":0,"when":{"shape":["stick"]}},
+      {"id":"stick-wrap","on":"bomb","kind":"stamp","at":[-2,-8],"anchor":"tl","rows":["...a","..a.",".a.."],"key":{"a":"body.dark"},"when":{"shape":["stick"]}},
+      {"id":"stick-band-a","on":"bomb","kind":"poly","points":[[-4,-10.5],[4,-10.5],[4,-8.5],[-4,-8.5]],"paint":"accent","shade":1,"when":{"shape":["stick"]}},
+      {"id":"stick-band-b","on":"bomb","kind":"poly","points":[[-4,-5],[4,-5],[4,-3],[-4,-3]],"paint":"accent","shade":1,"when":{"shape":["stick"]}},
+      {"id":"stick-knots","on":"bomb","kind":"stamp","at":[-2,-10],"anchor":"tl","rows":["a","."," "," "," ",".","a"],"key":{"a":"accent.dark"},"when":{"shape":["stick"]}},
+
+      {"id":"left-side","on":"bomb","kind":"poly","points":[[-7,-10.5],[-2,-10.5],[-2,-1.2],[-7,-1.2]],"paint":"body","shade":1,"group":"left-g","when":{"shape":["bundle"]}},
+      {"id":"left-top","on":"bomb","kind":"ellipse","at":[-4.5,-10.5],"r":[2.5,1.2],"paint":"body","shade":0,"group":"left-g","when":{"shape":["bundle"]}},
+      {"id":"left-foot","on":"bomb","kind":"ellipse","at":[-4.5,-1.2],"r":[2.5,1.2],"paint":"body","shade":0,"group":"left-g","when":{"shape":["bundle"]}},
+      {"id":"lit-left","on":"bomb","kind":"poly","points":[[-7,-10.5],[-2,-10.5],[-2,-1.2],[-7,-1.2]],"paint":"body.light","shade":0,"hidden":true,"when":{"shape":["bundle"],"clip":["warn"]}},
+      {"id":"left-cap","on":"bomb","kind":"ellipse","at":[-4.5,-10.5],"r":[2,1.1],"paint":"body.light","shade":0,"when":{"shape":["bundle"]}},
+      {"id":"right-side","on":"bomb","kind":"poly","points":[[2,-10.5],[7,-10.5],[7,-1.2],[2,-1.2]],"paint":"body","shade":1,"group":"right-g","when":{"shape":["bundle"]}},
+      {"id":"right-top","on":"bomb","kind":"ellipse","at":[4.5,-10.5],"r":[2.5,1.2],"paint":"body","shade":0,"group":"right-g","when":{"shape":["bundle"]}},
+      {"id":"right-foot","on":"bomb","kind":"ellipse","at":[4.5,-1.2],"r":[2.5,1.2],"paint":"body","shade":0,"group":"right-g","when":{"shape":["bundle"]}},
+      {"id":"lit-right","on":"bomb","kind":"poly","points":[[2,-10.5],[7,-10.5],[7,-1.2],[2,-1.2]],"paint":"body.light","shade":0,"hidden":true,"when":{"shape":["bundle"],"clip":["warn"]}},
+      {"id":"right-cap","on":"bomb","kind":"ellipse","at":[4.5,-10.5],"r":[2,1.1],"paint":"body.light","shade":0,"when":{"shape":["bundle"]}},
+      {"id":"mid-side","on":"bomb","kind":"poly","points":[[-2.5,-12.5],[2.5,-12.5],[2.5,-2.2],[-2.5,-2.2]],"paint":"body","shade":1,"group":"mid-g","when":{"shape":["bundle"]}},
+      {"id":"mid-top","on":"bomb","kind":"ellipse","at":[0,-12.5],"r":[2.5,1.2],"paint":"body","shade":0,"group":"mid-g","when":{"shape":["bundle"]}},
+      {"id":"mid-foot","on":"bomb","kind":"ellipse","at":[0,-2.2],"r":[2.5,1.2],"paint":"body","shade":0,"group":"mid-g","when":{"shape":["bundle"]}},
+      {"kind":"outline","paint":"ink","only":"mid-g","when":{"shape":["bundle"]}},
+      {"id":"lit-mid","on":"bomb","kind":"poly","points":[[-2.5,-12.5],[2.5,-12.5],[2.5,-2.2],[-2.5,-2.2]],"paint":"body.light","shade":0,"hidden":true,"when":{"shape":["bundle"],"clip":["warn"]}},
+      {"id":"mid-cap","on":"bomb","kind":"ellipse","at":[0,-12.5],"r":[2,1.1],"paint":"body.light","shade":0,"when":{"shape":["bundle"]}},
+      {"id":"bundle-wrap","on":"bomb","kind":"stamp","at":[-6,-9],"anchor":"tl","rows":["..a.......a.",".a.......a.."],"key":{"a":"body.dark"},"when":{"shape":["bundle"]}},
+      {"id":"bundle-band","on":"bomb","kind":"poly","points":[[-8,-6.5],[8,-6.5],[8,-4.5],[-8,-4.5]],"paint":"accent","shade":1,"when":{"shape":["bundle"]}},
+      {"id":"bundle-knots","on":"bomb","kind":"stamp","at":[-6,-6],"anchor":"tl","rows":["a.....a.....a"],"key":{"a":"accent.dark"},"when":{"shape":["bundle"]}},
+
+      {"kind":"outline","paint":"ink"},
+
+      {"id":"disc-rim","on":"blast","kind":"ellipse","at":[0,0],"r":[10,10],"paint":"flash","shade":0,"glow":true,"hidden":true,"when":{"clip":["break"]}},
+      {"id":"disc","on":"blast","kind":"ellipse","at":[0,0],"r":[9,9],"paint":"shine","shade":0,"glow":true,"hidden":true,"when":{"clip":["break"]}},
+      {"id":"ember-a","kind":"stamp","at":[12,26],"anchor":"tl","rows":["ab","bb"],"key":{"a":"flash","b":"glow"},"glow":true,"hidden":true,"when":{"clip":["break"]}},
+      {"id":"ember-b","kind":"stamp","at":[16,27],"anchor":"tl","rows":["ba","bb"],"key":{"a":"flash","b":"glow"},"glow":true,"hidden":true,"when":{"clip":["break"]}},
+      {"id":"ember-c","kind":"stamp","at":[19,26],"anchor":"tl","rows":["bb","ab"],"key":{"a":"flash","b":"glow"},"glow":true,"hidden":true,"when":{"clip":["break"]}},
+      {"id":"spark-x","on":"tip","kind":"stamp","at":[0.6,-1.2],"anchor":"c","rows":["a.a","...","a.a"],"key":{"a":"glow"},"glow":true,"hidden":true,"when":{"clip":["idle","warn"]}}
+    ],
+    "motion": [
+      {"gen":"node.size","v":1,"node":"bomb","scale":{"from":"size","map":[[0,0.85],[1,1.15]]}},
+      {"gen":"node.hide","v":1,"node":"bomb","clip":["break"]}
+    ],
+    "emitters": [
+      {"id":"scorch","gen":"scorch","v":1,"at":[16,27],"clip":["break"],"r":[7,3],"spread":1,"start":0.6,"hole":0.45,"gaps":0.22,"paint":"soot.deep","embers":0,"heat":0,"paints":["flash","glow","glow.dark"],"seed":4},
+      {"id":"blast","gen":"blast.ball","v":1,"on":"blast","at":[0,0],"clip":["break"],"r":10,"hole":0,"bumps":8,"bump":0.18,"heat":0.6,"gaps":0,"seed":2,"paints":["shine","flash","glow","glow.dark"],"area":{"x0":0,"y0":0,"x1":32,"y1":32},"glow":true},
+      {"id":"smoke","gen":"puffs","v":1,"on":"blast","at":[0,3],"clip":["break"],"count":5,"seed":3,"angle":180,"arc":140,"dist":6,"rise":5,"size":4,"lobes":2,"stagger":0.1,"begin":0.5,"end":1,"paints":["smoke.light","smoke","smoke.dark"],"area":{"x0":0,"y0":0,"x1":32,"y1":32}},
+      {"id":"sputter","gen":"particles","v":1,"on":"tip","at":[0.6,-1.2],"clip":["idle","warn"],"count":{"from":"pieces","map":[[2,2],[5,5]],"round":"px"},"seed":5,"loop":true,"cycles":1,"angle":180,"arc":150,"dist":8,"gravity":4,"size":3,"lifespan":1,"paints":["shine","flash","glow","glow.dark"],"area":{"x0":0,"y0":0,"x1":32,"y1":32},"glow":true},
+      {"id":"spark","gen":"twinkle","v":2,"on":"tip","at":[0.6,-1.2],"clip":["idle","warn"],"size":1,"paint":"glow","core":"shine","area":{"x0":0,"y0":0,"x1":32,"y1":32},"glow":true}
+    ]
+  } },
+  "clips": {
+    "idle": {"frames":8,"fps":8,"label":"Fuse burning",
+      "keys": [
+        {"t":0,"ease":"hold","nodes":{"tip":{"move":[0,0]}},"emit":{"spark":{"size":1}}},
+        {"t":0.125,"ease":"hold","nodes":{"tip":{"move":[0,0]}},"emit":{"spark":{"size":0}}},
+        {"t":0.25,"ease":"hold","nodes":{"tip":{"move":[0,0]}},"emit":{"spark":{"size":1}}},
+        {"t":0.375,"ease":"hold","nodes":{"tip":{"move":[0,0]}},"emit":{"spark":{"size":0}}},
+        {"t":0.5,"ease":"hold","nodes":{"tip":{"move":[-0.45,0.9]}},"emit":{"spark":{"size":1}}},
+        {"t":0.625,"ease":"hold","nodes":{"tip":{"move":[-0.45,0.9]}},"emit":{"spark":{"size":0}}},
+        {"t":0.75,"ease":"hold","nodes":{"tip":{"move":[-0.45,0.9]}},"emit":{"spark":{"size":1}}},
+        {"t":0.875,"ease":"hold","nodes":{"tip":{"move":[-0.45,0.9]}},"emit":{"spark":{"size":0}}}
+      ],
+      "frameEdits": {
+        "1": {"show":["spark-x"]},
+        "3": {"show":["spark-x"]},
+        "4": {"hide":["fuse-end"]},
+        "5": {"hide":["fuse-end"],"show":["spark-x"]},
+        "6": {"hide":["fuse-end"]},
+        "7": {"hide":["fuse-end"],"show":["spark-x"]}
+      },
+      "sounds": [{"sound":"fuse-hiss","preset":"Burning","frame":0,"volume":0.35}]
+    },
+    "warn": {"frames":8,"fps":8,"label":"About to blow",
+      "keys": [
+        {"t":0,"ease":"hold","nodes":{"tip":{"move":[-2.45,4.9]},"bomb":{"scale":1}},"emit":{"spark":{"size":1}}},
+        {"t":0.125,"ease":"hold","nodes":{"tip":{"move":[-2.45,4.9]},"bomb":{"scale":1}},"emit":{"spark":{"size":0}}},
+        {"t":0.25,"ease":"hold","nodes":{"tip":{"move":[-2.45,4.9]},"bomb":{"scale":1}},"emit":{"spark":{"size":1}}},
+        {"t":0.375,"ease":"hold","nodes":{"tip":{"move":[-2.45,4.9]},"bomb":{"scale":1.08}},"emit":{"spark":{"size":0}}},
+        {"t":0.5,"ease":"hold","nodes":{"tip":{"move":[-2.45,4.9]},"bomb":{"scale":1}},"emit":{"spark":{"size":1}}},
+        {"t":0.625,"ease":"hold","nodes":{"tip":{"move":[-2.45,4.9]},"bomb":{"scale":1}},"emit":{"spark":{"size":0}}},
+        {"t":0.75,"ease":"hold","nodes":{"tip":{"move":[-2.45,4.9]},"bomb":{"scale":1}},"emit":{"spark":{"size":1}}},
+        {"t":0.875,"ease":"hold","nodes":{"tip":{"move":[-2.45,4.9]},"bomb":{"scale":1.08}},"emit":{"spark":{"size":0}}}
+      ],
+      "travel": [{"tracks":["nodes.tip.move"],"about":0,"by":{"from":"fuse","map":[[0,0.551],[0.5,1],[1,1.449]]}}],
+      "frameEdits": {
+        "1": {"show":["lit-ball","lit-stick","lit-left","lit-right","lit-mid","spark-x"]},
+        "3": {"flash":true,"show":["spark-x"]},
+        "5": {"show":["lit-ball","lit-stick","lit-left","lit-right","lit-mid","spark-x"]},
+        "7": {"flash":true,"show":["spark-x"]}
+      },
+      "sounds": [{"sound":"fuse-hiss","preset":"Last second","frame":0,"volume":0.5}]
+    },
+    "break": {"frames":8,"fps":12,"loop":false,"label":"Explode",
+      "keys": [
+        {"t":0,"ease":"hold","emit":{"blast":{"amount":0,"hole":0,"gaps":0,"turn":0},"smoke":{"amount":0},"scorch":{"amount":0,"spread":0.4}}},
+        {"t":0.1428,"ease":"hold","emit":{"blast":{"amount":1,"r":7,"hole":0,"gaps":0,"turn":0},"smoke":{"amount":0},"scorch":{"amount":0,"spread":0.4}}},
+        {"t":0.2857,"ease":"hold","emit":{"blast":{"amount":1,"r":10,"hole":5,"gaps":0.1,"turn":20},"smoke":{"amount":0},"scorch":{"amount":0,"spread":0.4}}},
+        {"t":0.4285,"ease":"hold","emit":{"blast":{"amount":1,"r":10,"hole":8,"gaps":0.4,"turn":40},"smoke":{"amount":0},"scorch":{"amount":0,"spread":0.4}}},
+        {"t":0.5714,"ease":"hold","emit":{"blast":{"amount":0,"hole":8,"gaps":0.4,"turn":40},"smoke":{"amount":1},"scorch":{"amount":1,"spread":0.5}}},
+        {"t":0.7142,"ease":"hold","emit":{"blast":{"amount":0},"smoke":{"amount":1},"scorch":{"amount":1,"spread":0.75}}},
+        {"t":0.8571,"ease":"hold","emit":{"blast":{"amount":0},"smoke":{"amount":1},"scorch":{"amount":1,"spread":1}}},
+        {"t":1,"emit":{"blast":{"amount":0},"smoke":{"amount":0},"scorch":{"amount":1,"spread":1}}}
+      ],
+      "frameEdits": {"0": {"show":["disc-rim","disc"]}, "6": {"show":["ember-a","ember-b","ember-c"]}, "7": {"show":["ember-a","ember-b","ember-c"]}},
+      "sounds": [{"sound":"explosion","preset":"Grenade","frame":0,"volume":1}]
+    }
+  }
+}

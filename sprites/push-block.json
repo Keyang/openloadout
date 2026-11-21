@@ -1,0 +1,4216 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "push-block",
+ "name": "Push block",
+ "blurb": "A heavy stone block to push across a floor until it sinks into its socket and its carving lights up. Change its size, style, carving, wear, stone and rune light.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "puzzle"
+  ],
+  "view": "top-down",
+  "words": [
+   "block",
+   "push",
+   "stone",
+   "puzzle",
+   "slide",
+   "crate",
+   "socket",
+   "rune",
+   "heavy",
+   "move",
+   "dungeon",
+   "switch"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "versions": [
+  {
+   "name": "Stone block",
+   "params": {}
+  },
+  {
+   "name": "Carved sun block",
+   "params": {
+    "style": "carved",
+    "mark": "sun",
+    "stone": "#f0ead8"
+   }
+  },
+  {
+   "name": "Iron-banded",
+   "params": {
+    "style": "banded",
+    "mark": "none",
+    "stone": "#c9a06a",
+    "wear": 1
+   }
+  },
+  {
+   "name": "Small pale block",
+   "params": {
+    "size": 0,
+    "mark": "diamond",
+    "stone": "#e6c96a",
+    "glow": "#7fe0a0"
+   }
+  }
+ ],
+ "palette": [
+  {
+   "id": "stone",
+   "label": "Stone",
+   "default": "#a8a4a0",
+   "material": "stone",
+   "swatches": [
+    "#a8a4a0",
+    "#f0ead8",
+    "#c9a06a",
+    "#e6c96a"
+   ]
+  },
+  {
+   "id": "glow",
+   "label": "Rune light",
+   "default": "#4fd8ee",
+   "material": "light",
+   "swatches": [
+    "#4fd8ee",
+    "#7fe0a0",
+    "#f4e06a",
+    "#7aa0f4"
+   ]
+  },
+  {
+   "id": "top",
+   "material": "stone",
+   "derive": {
+    "rule": "faceTone",
+    "of": "stone",
+    "face": "top",
+    "tone": "base"
+   }
+  },
+  {
+   "id": "top-light",
+   "material": "stone",
+   "derive": {
+    "rule": "faceTone",
+    "of": "stone",
+    "face": "top",
+    "tone": "light"
+   }
+  },
+  {
+   "id": "front",
+   "material": "stone",
+   "derive": {
+    "rule": "apart",
+    "of": {
+     "rule": "faceTone",
+     "of": "stone",
+     "face": "wall",
+     "tone": "base"
+    },
+    "from": [
+     [
+      "top",
+      0.18
+     ]
+    ],
+    "least": 0.18
+   }
+  },
+  {
+   "id": "front-dark",
+   "material": "stone",
+   "derive": {
+    "rule": "faceTone",
+    "of": "stone",
+    "face": "wall",
+    "tone": "dark"
+   }
+  },
+  {
+   "id": "front-deep",
+   "material": "stone",
+   "derive": {
+    "rule": "faceTone",
+    "of": "stone",
+    "face": "wall",
+    "tone": "deep"
+   }
+  },
+  {
+   "id": "carve",
+   "material": "stone",
+   "derive": {
+    "rule": "apart",
+    "of": {
+     "rule": "ifLight",
+     "of": "stone",
+     "above": 0.85,
+     "then": {
+      "rule": "faceTone",
+      "of": "stone",
+      "face": "wall",
+      "tone": "dark"
+     },
+     "else": {
+      "rule": "ramp",
+      "of": "stone",
+      "tone": "dark"
+     }
+    },
+    "from": [
+     [
+      "top",
+      0.34
+     ]
+    ],
+    "least": 0.34
+   }
+  },
+  {
+   "id": "glow-mid",
+   "material": "light",
+   "derive": {
+    "rule": "mix",
+    "of": "glow",
+    "with": {
+     "rule": "ramp",
+     "of": "glow",
+     "tone": "light"
+    },
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "iron",
+   "default": "#a8806a",
+   "material": "metal",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "stone",
+    "carved",
+    "banded"
+   ],
+   "default": "stone"
+  },
+  {
+   "key": "mark",
+   "kind": "choice",
+   "label": "Carving",
+   "options": [
+    "star",
+    "sun",
+    "diamond",
+    "none"
+   ],
+   "default": "star"
+  },
+  {
+   "key": "wear",
+   "kind": "range",
+   "label": "Wear",
+   "lo": "New",
+   "hi": "Worn",
+   "default": 0.5
+  },
+  {
+   "key": "stone",
+   "kind": "colour",
+   "label": "Stone"
+  },
+  {
+   "key": "glow",
+   "kind": "colour",
+   "label": "Rune light"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "pictures": {
+   "nodes": [
+    {
+     "id": "block",
+     "parent": null,
+     "at": [
+      16,
+      30
+     ]
+    },
+    {
+     "id": "rise",
+     "parent": "block",
+     "at": [
+      0,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13
+        ],
+        [
+         0.24999,
+         -13
+        ],
+        [
+         0.25,
+         -14
+        ],
+        [
+         0.74999,
+         -14
+        ],
+        [
+         0.75,
+         -15
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ]
+    },
+    {
+     "id": "west",
+     "parent": "block",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -12
+        ],
+        [
+         0.49999,
+         -12
+        ],
+        [
+         0.5,
+         -13
+        ],
+        [
+         1,
+         -13
+        ]
+       ],
+       "round": "px"
+      },
+      0
+     ]
+    }
+   ],
+   "draw": [
+    {
+     "id": "south",
+     "kind": "rect",
+     "on": "block",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -11
+        ],
+        [
+         0.49999,
+         -11
+        ],
+        [
+         0.5,
+         -12
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13
+        ],
+        [
+         0.24999,
+         -13
+        ],
+        [
+         0.25,
+         -14
+        ],
+        [
+         0.74999,
+         -14
+        ],
+        [
+         0.75,
+         -15
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "size": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         23
+        ],
+        [
+         0.49999,
+         23
+        ],
+        [
+         0.5,
+         25
+        ],
+        [
+         1,
+         25
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         13
+        ],
+        [
+         0.24999,
+         13
+        ],
+        [
+         0.25,
+         14
+        ],
+        [
+         0.74999,
+         14
+        ],
+        [
+         0.75,
+         15
+        ],
+        [
+         1,
+         15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "front",
+     "shade": 0
+    },
+    {
+     "id": "foot-shade",
+     "kind": "rect",
+     "on": "block",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -11
+        ],
+        [
+         0.49999,
+         -11
+        ],
+        [
+         0.5,
+         -12
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      },
+      -1
+     ],
+     "size": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         23
+        ],
+        [
+         0.49999,
+         23
+        ],
+        [
+         0.5,
+         25
+        ],
+        [
+         1,
+         25
+        ]
+       ],
+       "round": "px"
+      },
+      1
+     ],
+     "paint": "front-dark",
+     "shade": 0
+    },
+    {
+     "id": "top",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -11
+        ],
+        [
+         0.49999,
+         -11
+        ],
+        [
+         0.5,
+         -12
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      },
+      -10
+     ],
+     "size": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         23
+        ],
+        [
+         0.49999,
+         23
+        ],
+        [
+         0.5,
+         25
+        ],
+        [
+         1,
+         25
+        ]
+       ],
+       "round": "px"
+      },
+      10
+     ],
+     "paint": "top",
+     "shade": 0
+    },
+    {
+     "id": "top-back",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -10
+        ],
+        [
+         0.49999,
+         -10
+        ],
+        [
+         0.5,
+         -11
+        ],
+        [
+         1,
+         -11
+        ]
+       ],
+       "round": "px"
+      },
+      -11
+     ],
+     "size": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         21
+        ],
+        [
+         0.49999,
+         21
+        ],
+        [
+         0.5,
+         23
+        ],
+        [
+         1,
+         23
+        ]
+       ],
+       "round": "px"
+      },
+      1
+     ],
+     "paint": "top",
+     "shade": 0
+    },
+    {
+     "id": "lip",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -11
+        ],
+        [
+         0.49999,
+         -11
+        ],
+        [
+         0.5,
+         -12
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      },
+      -1
+     ],
+     "size": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         23
+        ],
+        [
+         0.49999,
+         23
+        ],
+        [
+         0.5,
+         25
+        ],
+        [
+         1,
+         25
+        ]
+       ],
+       "round": "px"
+      },
+      1
+     ],
+     "paint": "top-light",
+     "shade": 0
+    },
+    {
+     "id": "bevel-back",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -10
+        ],
+        [
+         0.49999,
+         -10
+        ],
+        [
+         0.5,
+         -11
+        ],
+        [
+         1,
+         -11
+        ]
+       ],
+       "round": "px"
+      },
+      -11
+     ],
+     "size": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         21
+        ],
+        [
+         0.49999,
+         21
+        ],
+        [
+         0.5,
+         23
+        ],
+        [
+         1,
+         23
+        ]
+       ],
+       "round": "px"
+      },
+      1
+     ],
+     "paint": "top-light",
+     "shade": 0,
+     "when": {
+      "style": [
+       "stone"
+      ]
+     }
+    },
+    {
+     "id": "bevel-east",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         11
+        ],
+        [
+         0.49999,
+         11
+        ],
+        [
+         0.5,
+         12
+        ],
+        [
+         1,
+         12
+        ]
+       ],
+       "round": "px"
+      },
+      -10
+     ],
+     "size": [
+      1,
+      9
+     ],
+     "paint": "top-light",
+     "shade": 0,
+     "when": {
+      "style": [
+       "stone"
+      ]
+     }
+    },
+    {
+     "id": "bevel-west",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -11
+        ],
+        [
+         0.49999,
+         -11
+        ],
+        [
+         0.5,
+         -12
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      },
+      -10
+     ],
+     "size": [
+      1,
+      9
+     ],
+     "paint": "front",
+     "shade": 0,
+     "when": {
+      "style": [
+       "stone"
+      ]
+     }
+    },
+    {
+     "id": "under-lip",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -11
+        ],
+        [
+         0.49999,
+         -11
+        ],
+        [
+         0.5,
+         -12
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      },
+      0
+     ],
+     "size": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         23
+        ],
+        [
+         0.49999,
+         23
+        ],
+        [
+         0.5,
+         25
+        ],
+        [
+         1,
+         25
+        ]
+       ],
+       "round": "px"
+      },
+      1
+     ],
+     "paint": "front-dark",
+     "shade": 0
+    },
+    {
+     "id": "crack-a",
+     "kind": "stamp",
+     "on": "rise",
+     "at": [
+      6,
+      -10
+     ],
+     "anchor": "tl",
+     "rows": [
+      "...c",
+      "..c.",
+      "..c.",
+      ".c..",
+      "c...",
+      "c..."
+     ],
+     "key": {
+      "c": "carve"
+     },
+     "when": {
+      "wear": [
+       {
+        "atLeast": 0.35
+       }
+      ]
+     }
+    },
+    {
+     "id": "crack-b",
+     "kind": "stamp",
+     "on": "rise",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         0.49999,
+         -9
+        ],
+        [
+         0.5,
+         -10
+        ],
+        [
+         1,
+         -10
+        ]
+       ],
+       "round": "px"
+      },
+      1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "c....",
+      ".c...",
+      ".cc..",
+      "...c.",
+      "...c.",
+      "....c"
+     ],
+     "key": {
+      "c": "front-deep"
+     },
+     "when": {
+      "wear": [
+       {
+        "atLeast": 0.7
+       }
+      ]
+     }
+    },
+    {
+     "id": "panel",
+     "kind": "stamp",
+     "on": "rise",
+     "at": [
+      -8,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         2
+        ],
+        [
+         0.24999,
+         2
+        ],
+        [
+         0.25,
+         3
+        ],
+        [
+         0.74999,
+         3
+        ],
+        [
+         0.75,
+         4
+        ],
+        [
+         1,
+         4
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "tl",
+     "when": {
+      "style": [
+       "carved"
+      ]
+     },
+     "rows": [
+      "ddddddddddddddddd",
+      "pppppppppppppppdd",
+      "ppppppppppppppppd",
+      "ppppppppppppppppd",
+      "ppppppppppppppppd",
+      "ppppppppppppppppd",
+      "ppppppppppppppppd",
+      "lllllllllllllllll"
+     ],
+     "key": {
+      "d": "front-deep",
+      "p": "front-dark",
+      "l": "top"
+     }
+    },
+    {
+     "id": "joint-narrow",
+     "kind": "stamp",
+     "on": "block",
+     "at": [
+      -11,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "jjjjjjjjjjjjjjjjjjjjjjj"
+     ],
+     "key": {
+      "j": "front-deep"
+     },
+     "when": {
+      "style": [
+       "banded"
+      ],
+      "size": [
+       {
+        "below": 0.5
+       }
+      ]
+     },
+     "detail": true
+    },
+    {
+     "id": "joint-wide",
+     "kind": "stamp",
+     "on": "block",
+     "at": [
+      -12,
+      -7
+     ],
+     "anchor": "tl",
+     "rows": [
+      "jjjjjjjjjjjjjjjjjjjjjjjjj"
+     ],
+     "key": {
+      "j": "front-deep"
+     },
+     "when": {
+      "style": [
+       "banded"
+      ],
+      "size": [
+       {
+        "atLeast": 0.5
+       }
+      ]
+     },
+     "detail": true
+    },
+    {
+     "id": "joint-up",
+     "kind": "stamp",
+     "on": "block",
+     "at": [
+      -3,
+      -12
+     ],
+     "anchor": "tl",
+     "rows": [
+      "j",
+      "j",
+      "j",
+      "j",
+      "j"
+     ],
+     "key": {
+      "j": "front-dark"
+     },
+     "when": {
+      "style": [
+       "banded"
+      ]
+     },
+     "detail": true
+    },
+    {
+     "id": "joint-up-b",
+     "kind": "stamp",
+     "on": "block",
+     "at": [
+      -3,
+      -13
+     ],
+     "anchor": "tl",
+     "rows": [
+      "j"
+     ],
+     "key": {
+      "j": "front-dark"
+     },
+     "when": {
+      "style": [
+       "banded"
+      ],
+      "size": [
+       {
+        "atLeast": 0.25
+       }
+      ]
+     },
+     "detail": true
+    },
+    {
+     "id": "joint-up-c",
+     "kind": "stamp",
+     "on": "block",
+     "at": [
+      -3,
+      -14
+     ],
+     "anchor": "tl",
+     "rows": [
+      "j"
+     ],
+     "key": {
+      "j": "front-dark"
+     },
+     "when": {
+      "style": [
+       "banded"
+      ],
+      "size": [
+       {
+        "atLeast": 0.75
+       }
+      ]
+     },
+     "detail": true
+    },
+    {
+     "id": "joint-down",
+     "kind": "stamp",
+     "on": "block",
+     "at": [
+      4,
+      -6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "j",
+      "j",
+      "j",
+      "j"
+     ],
+     "key": {
+      "j": "front-dark"
+     },
+     "when": {
+      "style": [
+       "banded"
+      ]
+     },
+     "detail": true
+    },
+    {
+     "id": "chisel-front-a",
+     "kind": "stamp",
+     "on": "block",
+     "at": [
+      1,
+      -11
+     ],
+     "anchor": "tl",
+     "rows": [
+      "dd",
+      ".d"
+     ],
+     "key": {
+      "d": "front-dark"
+     },
+     "when": {
+      "style": [
+       "banded"
+      ]
+     },
+     "detail": true
+    },
+    {
+     "id": "chisel-front-b",
+     "kind": "stamp",
+     "on": "block",
+     "at": [
+      -4,
+      -4
+     ],
+     "anchor": "tl",
+     "rows": [
+      "d.",
+      "dd"
+     ],
+     "key": {
+      "d": "front-dark"
+     },
+     "when": {
+      "style": [
+       "banded"
+      ]
+     },
+     "detail": true
+    },
+    {
+     "id": "chisel-top",
+     "kind": "stamp",
+     "on": "rise",
+     "at": [
+      -3,
+      -8
+     ],
+     "anchor": "tl",
+     "rows": [
+      "ff.....",
+      ".f.....",
+      ".......",
+      "....ff.",
+      ".....f."
+     ],
+     "key": {
+      "f": "front"
+     },
+     "when": {
+      "style": [
+       "banded"
+      ],
+      "mark": [
+       "none"
+      ]
+     },
+     "detail": true
+    },
+    {
+     "id": "chisel-top-edge",
+     "kind": "stamp",
+     "on": "rise",
+     "at": [
+      10,
+      -6
+     ],
+     "anchor": "tl",
+     "rows": [
+      "f.",
+      ".f"
+     ],
+     "key": {
+      "f": "front"
+     },
+     "when": {
+      "style": [
+       "banded"
+      ]
+     },
+     "detail": true
+    },
+    {
+     "id": "band-west-front-edge",
+     "kind": "rect",
+     "on": "block",
+     "at": [
+      -9,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13
+        ],
+        [
+         0.24999,
+         -13
+        ],
+        [
+         0.25,
+         -14
+        ],
+        [
+         0.74999,
+         -14
+        ],
+        [
+         0.75,
+         -15
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "size": [
+      4,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         13
+        ],
+        [
+         0.24999,
+         13
+        ],
+        [
+         0.25,
+         14
+        ],
+        [
+         0.74999,
+         14
+        ],
+        [
+         0.75,
+         15
+        ],
+        [
+         1,
+         15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "ink",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-east-front-edge",
+     "kind": "rect",
+     "on": "block",
+     "at": [
+      6,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13
+        ],
+        [
+         0.24999,
+         -13
+        ],
+        [
+         0.25,
+         -14
+        ],
+        [
+         0.74999,
+         -14
+        ],
+        [
+         0.75,
+         -15
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "size": [
+      4,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         13
+        ],
+        [
+         0.24999,
+         13
+        ],
+        [
+         0.25,
+         14
+        ],
+        [
+         0.74999,
+         14
+        ],
+        [
+         0.75,
+         15
+        ],
+        [
+         1,
+         15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "ink",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-west-front",
+     "kind": "rect",
+     "on": "block",
+     "at": [
+      -8,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13
+        ],
+        [
+         0.24999,
+         -13
+        ],
+        [
+         0.25,
+         -14
+        ],
+        [
+         0.74999,
+         -14
+        ],
+        [
+         0.75,
+         -15
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "size": [
+      2,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         13
+        ],
+        [
+         0.24999,
+         13
+        ],
+        [
+         0.25,
+         14
+        ],
+        [
+         0.74999,
+         14
+        ],
+        [
+         0.75,
+         15
+        ],
+        [
+         1,
+         15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "iron.dark",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-east-front",
+     "kind": "rect",
+     "on": "block",
+     "at": [
+      7,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13
+        ],
+        [
+         0.24999,
+         -13
+        ],
+        [
+         0.25,
+         -14
+        ],
+        [
+         0.74999,
+         -14
+        ],
+        [
+         0.75,
+         -15
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "size": [
+      2,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         13
+        ],
+        [
+         0.24999,
+         13
+        ],
+        [
+         0.25,
+         14
+        ],
+        [
+         0.74999,
+         14
+        ],
+        [
+         0.75,
+         15
+        ],
+        [
+         1,
+         15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "iron.dark",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-west-top-edge",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      -9,
+      -11
+     ],
+     "size": [
+      4,
+      11
+     ],
+     "paint": "ink",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-east-top-edge",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      6,
+      -11
+     ],
+     "size": [
+      4,
+      11
+     ],
+     "paint": "ink",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-west-top",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      -8,
+      -11
+     ],
+     "size": [
+      2,
+      11
+     ],
+     "paint": "iron",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-east-top",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      7,
+      -11
+     ],
+     "size": [
+      2,
+      11
+     ],
+     "paint": "iron",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-west-top-sheen",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      -7,
+      -11
+     ],
+     "size": [
+      1,
+      11
+     ],
+     "paint": "iron.light",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-east-top-sheen",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      8,
+      -11
+     ],
+     "size": [
+      1,
+      11
+     ],
+     "paint": "iron.light",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-west-front-sheen",
+     "kind": "rect",
+     "on": "block",
+     "at": [
+      -7,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13
+        ],
+        [
+         0.24999,
+         -13
+        ],
+        [
+         0.25,
+         -14
+        ],
+        [
+         0.74999,
+         -14
+        ],
+        [
+         0.75,
+         -15
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "size": [
+      1,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         13
+        ],
+        [
+         0.24999,
+         13
+        ],
+        [
+         0.25,
+         14
+        ],
+        [
+         0.74999,
+         14
+        ],
+        [
+         0.75,
+         15
+        ],
+        [
+         1,
+         15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "iron",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-east-front-sheen",
+     "kind": "rect",
+     "on": "block",
+     "at": [
+      8,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13
+        ],
+        [
+         0.24999,
+         -13
+        ],
+        [
+         0.25,
+         -14
+        ],
+        [
+         0.74999,
+         -14
+        ],
+        [
+         0.75,
+         -15
+        ],
+        [
+         1,
+         -15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "size": [
+      1,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         13
+        ],
+        [
+         0.24999,
+         13
+        ],
+        [
+         0.25,
+         14
+        ],
+        [
+         0.74999,
+         14
+        ],
+        [
+         0.75,
+         15
+        ],
+        [
+         1,
+         15
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "paint": "iron",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-west-lip",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      -8,
+      -1
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "iron.light",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "band-east-lip",
+     "kind": "rect",
+     "on": "rise",
+     "at": [
+      7,
+      -1
+     ],
+     "size": [
+      2,
+      1
+     ],
+     "paint": "iron.light",
+     "shade": 0,
+     "when": {
+      "style": [
+       "banded"
+      ]
+     }
+    },
+    {
+     "id": "rivets-west",
+     "kind": "stamp",
+     "on": "rise",
+     "at": [
+      -8,
+      -9
+     ],
+     "anchor": "tl",
+     "when": {
+      "style": [
+       "banded"
+      ]
+     },
+     "rows": [
+      "dh",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "dh",
+      "..",
+      "..",
+      "..",
+      "..",
+      "dh",
+      "..",
+      "..",
+      "..",
+      "..",
+      "dh"
+     ],
+     "key": {
+      "h": "top-light",
+      "d": "iron.deep"
+     },
+     "detail": true
+    },
+    {
+     "id": "rivets-east",
+     "kind": "stamp",
+     "on": "rise",
+     "at": [
+      7,
+      -9
+     ],
+     "anchor": "tl",
+     "when": {
+      "style": [
+       "banded"
+      ]
+     },
+     "rows": [
+      "dh",
+      "..",
+      "..",
+      "..",
+      "..",
+      "..",
+      "dh",
+      "..",
+      "..",
+      "..",
+      "..",
+      "dh",
+      "..",
+      "..",
+      "..",
+      "..",
+      "dh"
+     ],
+     "key": {
+      "h": "top-light",
+      "d": "iron.deep"
+     },
+     "detail": true
+    },
+    {
+     "id": "pits-top",
+     "kind": "stamp",
+     "on": "rise",
+     "at": [
+      -10,
+      -9
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".....",
+      ".....",
+      ".....",
+      ".....",
+      ".....",
+      ".....",
+      "..d..",
+      "...d."
+     ],
+     "key": {
+      "d": "front"
+     }
+    },
+    {
+     "id": "pits-front",
+     "kind": "stamp",
+     "on": "rise",
+     "at": [
+      2,
+      3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "dd......",
+      "........",
+      "......d.",
+      ".....dd."
+     ],
+     "key": {
+      "d": "front-dark"
+     },
+     "when": {
+      "style": [
+       "stone"
+      ]
+     }
+    },
+    {
+     "id": "carving",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      0,
+      -6
+     ],
+     "size": 9,
+     "paint": "carve",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ]
+     }
+    },
+    {
+     "id": "chip-a",
+     "kind": "cut",
+     "on": "rise",
+     "shape": {
+      "kind": "poly",
+      "points": [
+       [
+        {
+         "from": "size",
+         "map": [
+          [
+           0,
+           9
+          ],
+          [
+           0.49999,
+           9
+          ],
+          [
+           0.5,
+           10
+          ],
+          [
+           1,
+           10
+          ]
+         ],
+         "round": "px"
+        },
+        -11
+       ],
+       [
+        {
+         "from": "size",
+         "map": [
+          [
+           0,
+           12
+          ],
+          [
+           0.49999,
+           12
+          ],
+          [
+           0.5,
+           13
+          ],
+          [
+           1,
+           13
+          ]
+         ],
+         "round": "px"
+        },
+        -11
+       ],
+       [
+        {
+         "from": "size",
+         "map": [
+          [
+           0,
+           12
+          ],
+          [
+           0.49999,
+           12
+          ],
+          [
+           0.5,
+           13
+          ],
+          [
+           1,
+           13
+          ]
+         ],
+         "round": "px"
+        },
+        -8
+       ]
+      ]
+     },
+     "when": {
+      "wear": [
+       {
+        "atLeast": 0.35
+       }
+      ]
+     }
+    },
+    {
+     "id": "chip-b",
+     "kind": "cut",
+     "on": "rise",
+     "shape": {
+      "kind": "rect",
+      "at": [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       -11
+      ],
+      "size": [
+       2,
+       2
+      ]
+     },
+     "when": {
+      "wear": [
+       {
+        "atLeast": 0.7
+       }
+      ]
+     }
+    },
+    {
+     "id": "floor",
+     "kind": "cut",
+     "on": "block",
+     "shape": {
+      "kind": "rect",
+      "at": [
+       -16,
+       0
+      ],
+      "size": [
+       32,
+       8
+      ]
+     }
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    },
+    {
+     "id": "grit-1",
+     "kind": "stamp",
+     "on": "west",
+     "at": [
+      1,
+      -1
+     ],
+     "anchor": "tl",
+     "rows": [
+      "td.td",
+      "dk.dk"
+     ],
+     "key": {
+      "d": "stone.dark",
+      "k": "front-deep",
+      "t": "top"
+     },
+     "when": {
+      "clip": [
+       "push"
+      ]
+     },
+     "detail": true,
+     "hidden": true
+    },
+    {
+     "id": "grit-2",
+     "kind": "stamp",
+     "on": "west",
+     "at": [
+      -1,
+      -2
+     ],
+     "anchor": "tl",
+     "rows": [
+      "td.td.td",
+      "dk.dk.dk"
+     ],
+     "key": {
+      "d": "stone.dark",
+      "k": "front-deep",
+      "t": "top"
+     },
+     "when": {
+      "clip": [
+       "push"
+      ]
+     },
+     "detail": true,
+     "hidden": true
+    },
+    {
+     "id": "grit-3",
+     "kind": "stamp",
+     "on": "west",
+     "at": [
+      -2,
+      -1
+     ],
+     "anchor": "tl",
+     "rows": [
+      ".k..k",
+      "k...."
+     ],
+     "key": {
+      "d": "stone.dark",
+      "k": "front-deep",
+      "t": "top"
+     },
+     "when": {
+      "clip": [
+       "push"
+      ]
+     },
+     "detail": true,
+     "hidden": true
+    },
+    {
+     "id": "dust-west",
+     "kind": "stamp",
+     "on": "west",
+     "at": [
+      -2,
+      -3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "d.",
+      "..",
+      "kk"
+     ],
+     "key": {
+      "d": "front-dark",
+      "k": "front-deep"
+     },
+     "when": {
+      "clip": [
+       "set"
+      ]
+     },
+     "detail": true,
+     "hidden": true
+    },
+    {
+     "id": "dust-east",
+     "kind": "stamp",
+     "on": "block",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         13
+        ],
+        [
+         0.49999,
+         13
+        ],
+        [
+         0.5,
+         14
+        ],
+        [
+         1,
+         14
+        ]
+       ],
+       "round": "px"
+      },
+      -3
+     ],
+     "anchor": "tl",
+     "rows": [
+      "d",
+      ".",
+      "k"
+     ],
+     "key": {
+      "d": "front-dark",
+      "k": "front-deep"
+     },
+     "when": {
+      "clip": [
+       "set"
+      ]
+     },
+     "detail": true,
+     "hidden": true
+    },
+    {
+     "id": "dust-west-up",
+     "kind": "stamp",
+     "on": "west",
+     "at": [
+      -2,
+      -5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "d"
+     ],
+     "key": {
+      "d": "front-dark"
+     },
+     "when": {
+      "clip": [
+       "set"
+      ]
+     },
+     "detail": true,
+     "hidden": true
+    },
+    {
+     "id": "dust-east-up",
+     "kind": "stamp",
+     "on": "block",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         13
+        ],
+        [
+         0.49999,
+         13
+        ],
+        [
+         0.5,
+         14
+        ],
+        [
+         1,
+         14
+        ]
+       ],
+       "round": "px"
+      },
+      -5
+     ],
+     "anchor": "tl",
+     "rows": [
+      "d"
+     ],
+     "key": {
+      "d": "front-dark"
+     },
+     "when": {
+      "clip": [
+       "set"
+      ]
+     },
+     "detail": true,
+     "hidden": true
+    },
+    {
+     "id": "rim-n",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      0,
+      -7
+     ],
+     "size": 9,
+     "paint": "glow.dark",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "rim-s",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      0,
+      -5
+     ],
+     "size": 9,
+     "paint": "glow.dark",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "rim-w",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      -1,
+      -6
+     ],
+     "size": 9,
+     "paint": "glow.dark",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "rim-e",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      1,
+      -6
+     ],
+     "size": 9,
+     "paint": "glow.dark",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "foot-rim",
+     "kind": "poly",
+     "on": "block",
+     "hidden": true,
+     "when": {
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "shade": 0,
+     "paint": "glow.dark",
+     "points": [
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       -5
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -9
+         ],
+         [
+          0.49999,
+          -9
+         ],
+         [
+          0.5,
+          -10
+         ],
+         [
+          1,
+          -10
+         ]
+        ],
+        "round": "px"
+       },
+       -5
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -9
+         ],
+         [
+          0.49999,
+          -9
+         ],
+         [
+          0.5,
+          -10
+         ],
+         [
+          1,
+          -10
+         ]
+        ],
+        "round": "px"
+       },
+       -2
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          10
+         ],
+         [
+          0.49999,
+          10
+         ],
+         [
+          0.5,
+          11
+         ],
+         [
+          1,
+          11
+         ]
+        ],
+        "round": "px"
+       },
+       -2
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          10
+         ],
+         [
+          0.49999,
+          10
+         ],
+         [
+          0.5,
+          11
+         ],
+         [
+          1,
+          11
+         ]
+        ],
+        "round": "px"
+       },
+       -5
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          12
+         ],
+         [
+          0.49999,
+          12
+         ],
+         [
+          0.5,
+          13
+         ],
+         [
+          1,
+          13
+         ]
+        ],
+        "round": "px"
+       },
+       -5
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          12
+         ],
+         [
+          0.49999,
+          12
+         ],
+         [
+          0.5,
+          13
+         ],
+         [
+          1,
+          13
+         ]
+        ],
+        "round": "px"
+       },
+       0
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       0
+      ]
+     ]
+    },
+    {
+     "id": "dim-n",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      0,
+      -7
+     ],
+     "size": 9,
+     "paint": "glow.deep",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "dim-s",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      0,
+      -5
+     ],
+     "size": 9,
+     "paint": "glow.deep",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "dim-w",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      -1,
+      -6
+     ],
+     "size": 9,
+     "paint": "glow.deep",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "dim-e",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      1,
+      -6
+     ],
+     "size": 9,
+     "paint": "glow.deep",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "foot-dim",
+     "kind": "poly",
+     "on": "block",
+     "hidden": true,
+     "when": {
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "shade": 0,
+     "paint": "glow.deep",
+     "points": [
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       -5
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -9
+         ],
+         [
+          0.49999,
+          -9
+         ],
+         [
+          0.5,
+          -10
+         ],
+         [
+          1,
+          -10
+         ]
+        ],
+        "round": "px"
+       },
+       -5
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -9
+         ],
+         [
+          0.49999,
+          -9
+         ],
+         [
+          0.5,
+          -10
+         ],
+         [
+          1,
+          -10
+         ]
+        ],
+        "round": "px"
+       },
+       -2
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          10
+         ],
+         [
+          0.49999,
+          10
+         ],
+         [
+          0.5,
+          11
+         ],
+         [
+          1,
+          11
+         ]
+        ],
+        "round": "px"
+       },
+       -2
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          10
+         ],
+         [
+          0.49999,
+          10
+         ],
+         [
+          0.5,
+          11
+         ],
+         [
+          1,
+          11
+         ]
+        ],
+        "round": "px"
+       },
+       -5
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          12
+         ],
+         [
+          0.49999,
+          12
+         ],
+         [
+          0.5,
+          13
+         ],
+         [
+          1,
+          13
+         ]
+        ],
+        "round": "px"
+       },
+       -5
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          12
+         ],
+         [
+          0.49999,
+          12
+         ],
+         [
+          0.5,
+          13
+         ],
+         [
+          1,
+          13
+         ]
+        ],
+        "round": "px"
+       },
+       0
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       0
+      ]
+     ]
+    },
+    {
+     "id": "lit-lo",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      0,
+      -6
+     ],
+     "size": 9,
+     "paint": "glow",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true,
+     "glow": true
+    },
+    {
+     "id": "foot-lo",
+     "kind": "poly",
+     "on": "block",
+     "hidden": true,
+     "glow": true,
+     "when": {
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "shade": 0,
+     "paint": "glow",
+     "points": [
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -10
+         ],
+         [
+          0.49999,
+          -10
+         ],
+         [
+          0.5,
+          -11
+         ],
+         [
+          1,
+          -11
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -10
+         ],
+         [
+          0.49999,
+          -10
+         ],
+         [
+          0.5,
+          -11
+         ],
+         [
+          1,
+          -11
+         ]
+        ],
+        "round": "px"
+       },
+       -1
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          11
+         ],
+         [
+          0.49999,
+          11
+         ],
+         [
+          0.5,
+          12
+         ],
+         [
+          1,
+          12
+         ]
+        ],
+        "round": "px"
+       },
+       -1
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          11
+         ],
+         [
+          0.49999,
+          11
+         ],
+         [
+          0.5,
+          12
+         ],
+         [
+          1,
+          12
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          12
+         ],
+         [
+          0.49999,
+          12
+         ],
+         [
+          0.5,
+          13
+         ],
+         [
+          1,
+          13
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          12
+         ],
+         [
+          0.49999,
+          12
+         ],
+         [
+          0.5,
+          13
+         ],
+         [
+          1,
+          13
+         ]
+        ],
+        "round": "px"
+       },
+       0
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       0
+      ]
+     ]
+    },
+    {
+     "id": "lit",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      0,
+      -6
+     ],
+     "size": 9,
+     "paint": "glow-mid",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true,
+     "glow": true
+    },
+    {
+     "id": "foot-lit",
+     "kind": "poly",
+     "on": "block",
+     "hidden": true,
+     "glow": true,
+     "when": {
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "shade": 0,
+     "paint": "glow-mid",
+     "points": [
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -10
+         ],
+         [
+          0.49999,
+          -10
+         ],
+         [
+          0.5,
+          -11
+         ],
+         [
+          1,
+          -11
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -10
+         ],
+         [
+          0.49999,
+          -10
+         ],
+         [
+          0.5,
+          -11
+         ],
+         [
+          1,
+          -11
+         ]
+        ],
+        "round": "px"
+       },
+       -1
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          11
+         ],
+         [
+          0.49999,
+          11
+         ],
+         [
+          0.5,
+          12
+         ],
+         [
+          1,
+          12
+         ]
+        ],
+        "round": "px"
+       },
+       -1
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          11
+         ],
+         [
+          0.49999,
+          11
+         ],
+         [
+          0.5,
+          12
+         ],
+         [
+          1,
+          12
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          12
+         ],
+         [
+          0.49999,
+          12
+         ],
+         [
+          0.5,
+          13
+         ],
+         [
+          1,
+          13
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          12
+         ],
+         [
+          0.49999,
+          12
+         ],
+         [
+          0.5,
+          13
+         ],
+         [
+          1,
+          13
+         ]
+        ],
+        "round": "px"
+       },
+       0
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       0
+      ]
+     ]
+    },
+    {
+     "id": "lit-hi",
+     "gen": "mark",
+     "v": 1,
+     "on": "rise",
+     "name": {
+      "from": "mark",
+      "pick": {
+       "star": "star",
+       "sun": "sun",
+       "diamond": "diamond",
+       "none": "star"
+      }
+     },
+     "at": [
+      0,
+      -6
+     ],
+     "size": 9,
+     "paint": "glow.light",
+     "when": {
+      "mark": [
+       "star",
+       "sun",
+       "diamond"
+      ],
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "hidden": true,
+     "glow": true
+    },
+    {
+     "id": "foot-hi",
+     "kind": "poly",
+     "on": "block",
+     "hidden": true,
+     "glow": true,
+     "when": {
+      "clip": [
+       "set",
+       "on"
+      ]
+     },
+     "shade": 0,
+     "paint": "glow.light",
+     "points": [
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -10
+         ],
+         [
+          0.49999,
+          -10
+         ],
+         [
+          0.5,
+          -11
+         ],
+         [
+          1,
+          -11
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -10
+         ],
+         [
+          0.49999,
+          -10
+         ],
+         [
+          0.5,
+          -11
+         ],
+         [
+          1,
+          -11
+         ]
+        ],
+        "round": "px"
+       },
+       -1
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          11
+         ],
+         [
+          0.49999,
+          11
+         ],
+         [
+          0.5,
+          12
+         ],
+         [
+          1,
+          12
+         ]
+        ],
+        "round": "px"
+       },
+       -1
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          11
+         ],
+         [
+          0.49999,
+          11
+         ],
+         [
+          0.5,
+          12
+         ],
+         [
+          1,
+          12
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          12
+         ],
+         [
+          0.49999,
+          12
+         ],
+         [
+          0.5,
+          13
+         ],
+         [
+          1,
+          13
+         ]
+        ],
+        "round": "px"
+       },
+       -4
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          12
+         ],
+         [
+          0.49999,
+          12
+         ],
+         [
+          0.5,
+          13
+         ],
+         [
+          1,
+          13
+         ]
+        ],
+        "round": "px"
+       },
+       0
+      ],
+      [
+       {
+        "from": "size",
+        "map": [
+         [
+          0,
+          -11
+         ],
+         [
+          0.49999,
+          -11
+         ],
+         [
+          0.5,
+          -12
+         ],
+         [
+          1,
+          -12
+         ]
+        ],
+        "round": "px"
+       },
+       0
+      ]
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 1,
+   "fps": 8,
+   "label": "Free to push"
+  },
+  "set": {
+   "frames": 6,
+   "fps": 12,
+   "loop": false,
+   "label": "Sink into the socket",
+   "keys": [
+    {
+     "t": 0,
+     "ease": "hold",
+     "nodes": {
+      "rise": {
+       "move": [
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.4,
+     "ease": "hold",
+     "nodes": {
+      "rise": {
+       "move": [
+        0,
+        2
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.6,
+     "ease": "hold",
+     "nodes": {
+      "rise": {
+       "move": [
+        0,
+        4
+       ]
+      }
+     }
+    },
+    {
+     "t": 1,
+     "nodes": {
+      "rise": {
+       "move": [
+        0,
+        4
+       ]
+      }
+     }
+    }
+   ],
+   "frameEdits": {
+    "1": {
+     "nudge": [
+      1,
+      0
+     ]
+    },
+    "3": {
+     "show": [
+      "dust-west",
+      "dust-east"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    },
+    "4": {
+     "show": [
+      "rim-n",
+      "rim-s",
+      "rim-w",
+      "rim-e",
+      "foot-rim",
+      "lit-hi",
+      "foot-hi",
+      "dust-west-up",
+      "dust-east-up"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    },
+    "5": {
+     "show": [
+      "rim-n",
+      "rim-s",
+      "rim-w",
+      "rim-e",
+      "foot-rim",
+      "lit",
+      "foot-lit"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    }
+   },
+   "sounds": [
+    {
+     "sound": "stone-scrape",
+     "preset": "Settle",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  },
+  "on": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Set in its socket",
+   "keys": [
+    {
+     "t": 0,
+     "ease": "hold",
+     "nodes": {
+      "rise": {
+       "move": [
+        0,
+        4
+       ]
+      }
+     }
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "show": [
+      "rim-n",
+      "rim-s",
+      "rim-w",
+      "rim-e",
+      "foot-rim",
+      "lit-hi",
+      "foot-hi"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    },
+    "1": {
+     "show": [
+      "rim-n",
+      "rim-s",
+      "rim-w",
+      "rim-e",
+      "foot-rim",
+      "lit-hi",
+      "foot-hi"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    },
+    "2": {
+     "show": [
+      "rim-n",
+      "rim-s",
+      "rim-w",
+      "rim-e",
+      "foot-rim",
+      "lit",
+      "foot-lit"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    },
+    "3": {
+     "show": [
+      "dim-n",
+      "dim-s",
+      "dim-w",
+      "dim-e",
+      "foot-dim",
+      "lit-lo",
+      "foot-lo"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    },
+    "4": {
+     "show": [
+      "dim-n",
+      "dim-s",
+      "dim-w",
+      "dim-e",
+      "foot-dim",
+      "lit-lo",
+      "foot-lo"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    },
+    "5": {
+     "show": [
+      "dim-n",
+      "dim-s",
+      "dim-w",
+      "dim-e",
+      "foot-dim",
+      "lit-lo",
+      "foot-lo"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    },
+    "6": {
+     "show": [
+      "rim-n",
+      "rim-s",
+      "rim-w",
+      "rim-e",
+      "foot-rim",
+      "lit",
+      "foot-lit"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    },
+    "7": {
+     "show": [
+      "rim-n",
+      "rim-s",
+      "rim-w",
+      "rim-e",
+      "foot-rim",
+      "lit",
+      "foot-lit"
+     ],
+     "hide": [
+      "joint-up",
+      "joint-up-b",
+      "joint-up-c",
+      "chisel-front-a"
+     ]
+    }
+   }
+  },
+  "push": {
+   "frames": 6,
+   "fps": 12,
+   "loop": false,
+   "label": "Pushed",
+   "frameEdits": {
+    "1": {
+     "nudge": [
+      0,
+      -1
+     ],
+     "show": [
+      "grit-1"
+     ]
+    },
+    "2": {
+     "show": [
+      "grit-2"
+     ]
+    },
+    "3": {
+     "nudge": [
+      0,
+      -1
+     ],
+     "show": [
+      "grit-3"
+     ]
+    }
+   },
+   "sounds": [
+    {
+     "sound": "stone-scrape",
+     "preset": "Push",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  }
+ }
+}
