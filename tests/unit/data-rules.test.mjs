@@ -3,7 +3,8 @@
 // it names; a paint expression is a colour, a colour slot's key, or { rule, ...arguments }; nothing in it ever runs.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { COLOUR_RULES, FIGURE_BLOCKS, paintColour, paintFigure, whenMatches } from '../../engine/data-rules.js';
+import * as RULES from '../../engine/data-rules.js';
+import { COLOUR_RULES, paintColour, whenMatches } from '../../engine/data-rules.js';
 import { tone, ramp, mix, pick } from '../../engine/color.js';
 import { apart } from '../../rigs/humanoid-figure.js';
 import { bandTone } from '../../engine/tones.js';
@@ -65,33 +66,9 @@ test('data-rules: never throws; anything it cannot read paints the fallback colo
   assert.match(paintColour(loop, V), /^#[0-9a-f]{6}$/);
 });
 
-test('data-rules: paintFigure paints the named fields of parts the figure has, and leaves the figure given unchanged', () => {
-  const fig = { look: { skin: '#000000', top: '#000000' }, held: { kind: 'daggers', metal: '#111111' } };
-  const out = paintFigure(fig, { 'look.skin': 'skin', 'look.top': { rule: 'tone', of: 'outfit', by: -0.6 }, 'held.metal': '#c2c9d6', 'mask.colour': 'trim' }, V);
-  assert.deepEqual(out, { look: { skin: V.skin, top: tone(V.outfit, -0.6) }, held: { kind: 'daggers', metal: '#c2c9d6' } });
-  assert.equal(out.mask, undefined, 'a part the figure does not have is not made by painting it');
-  assert.equal(fig.look.skin, '#000000');
-});
-
-test('data-rules (review F1, issue 3): a frozen paint is worked out once per settings; each call gets its own figure, other settings their own colours', () => {
-  const deepFreeze = (o) => { for (const v of Object.values(o)) if (v && typeof v === 'object') deepFreeze(v); return Object.freeze(o); };
-  const paint = deepFreeze({ 'look.top': { rule: 'tone', of: 'outfit', by: -0.6 }, 'held.metal': 'trim' });
-  const fig = { look: { top: '#000000' }, held: { kind: 'daggers', metal: '#111111' } };
-  const a = paintFigure(fig, paint, V), b = paintFigure(fig, paint, V);
-  assert.deepEqual(a, b);
-  assert.notEqual(a.look, b.look, 'no figure is shared between calls');
-  a.look.top = '#ffffff';
-  assert.equal(paintFigure(fig, paint, V).look.top, tone(V.outfit, -0.6));
-  assert.equal(paintFigure(fig, paint, { ...V, outfit: '#c9423a' }).look.top, tone('#c9423a', -0.6));
-  assert.equal(paintFigure(fig, paint, { ...V, trim: '#123456' }).held.metal, '#123456');
-  // a paint that can still change is worked out every time
-  const open = { 'look.top': 'outfit' };
-  assert.equal(paintFigure(fig, open, V).look.top, V.outfit);
-  open['look.top'] = 'trim';
-  assert.equal(paintFigure(fig, open, V).look.top, V.trim);
-});
-
-test('data-rules: FIGURE_BLOCKS lists the figure blocks read with defaults when absent', () => {
-  assert.ok(Object.isFrozen(FIGURE_BLOCKS));
-  assert.deepEqual([...FIGURE_BLOCKS], ['body', 'motion', 'look', 'hair']);
+test('data-rules: paintFigure and FIGURE_BLOCKS went with the library bodies (build item R1); the rules stay', () => {
+  assert.equal(RULES.paintFigure, undefined);
+  assert.equal(RULES.FIGURE_BLOCKS, undefined);
+  assert.equal(typeof RULES.paintColour, 'function');
+  assert.equal(typeof RULES.whenMatches, 'function');
 });

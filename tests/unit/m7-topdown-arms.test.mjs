@@ -1,28 +1,22 @@
 // The arms and the lean of the nine top-down redraws' walks and runs at the ends of Bounce and Stride (M7b review 2,
-// issue 3). The code rig moves more than the head and the feet with these sliders (rigs/topdown.js pose):
-//   walk: the hands swing A = lerp(2.8, 4.8, (bounce + stride) / 2) each way, and the body leans 0.3 + 0.4 * stride
-//         (from the side the neck stands round(lean) px ahead of the hips: 0 px at Stride 0, 1 px from the middle up);
-//   run:  the hands swing lerp(3, 5, bounce), and the body leans 1.6 + stride (from the side 2 px, 3 px at Stride 1,
-//         and the shoulders sit round(0.3 * lean) rows lower).
+// issue 3). The code rig moved more than the head and the feet with these sliders (rigs/topdown.js pose, deleted in R2):
+//   walk: the hands swing A = lerp(2.8, 4.8, (bounce + stride) / 2) each way, and the body leans 0.3 + 0.4 * stride;
+//   run:  the hands swing lerp(3, 5, bounce), and the body leans 1.6 + stride.
 // m7-topdown-travel measures only the head's bob and the feet's spread, so a redraw whose travel scaled the legs alone
-// passed it while its walks changed far less than the code's at the slider ends (hero walk_side at Stride 0: the code
-// 1658 pixels over the clip, the data 239). Held here:
-//   6. every walk and run clip's travel scales the arms by Bounce, the walk's by Stride too (an entry naming the upper
-//      arm bones the clip keys: the trooper's shield arm is not keyed facing down or up, so only bones.armB is), and
-//      every side-view walk and run clip's scales the spine (the lean) by Stride;
-//   7. at each end of Bounce and Stride, over each walk and run clip, the data changes from its defaults at least
-//      MOVE_SHARE as many pixels as the code sprite does from its own (where the code changes 100 pixels or more), so
-//      a slider that moves only a few pixels of a clip the code moves broadly is caught.
-// The per-clip ceilings in m7-topdown-pixels hold how near those moves come to the code's. The tables were fitted per
-// clip and slider end to the code sprite (fewest pixels off the code, never more than before the arms and lean came),
-// and where moving as far as the code costs pixels the data does not move that far: those ends are listed in SHORT
-// and NO_LEAN with what was measured, so they stay known and a new one fails.
+// could change its walks far less than the code's at the slider ends. Held here:
+//   1. every walk and run clip's travel scales the arms by Bounce, the walk's by Stride too (an entry naming the upper arm
+//      bones the clip keys: the trooper's shield arm is not keyed facing down or up, so only bones.armB is), and every
+//      side-view walk and run clip's scales the spine (the lean) by Stride;
+//   2. at each end of Bounce and Stride, over each walk and run clip, the data changes from its defaults at least
+//      MOVE_SHARE as many pixels as the code sprite does from its own (where the code changes 100 pixels or more).
+// R2: the code sprites are gone; check 2 reads what they did from tests/fixtures/m7-topdown-motion.json (`shifted`,
+// recorded from the frozen copies at commit 7e328c3). SHORT, NO_LEAN and NO_ARMS list what was measured against the code
+// then ("off the code" numbers are those old ones).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, loadDataSprite } from '../../tools/lib/assets.mjs';
-import { codeSprite } from '../helpers/library.mjs';
 import { cleanParams, defaultParams, renderPixels } from '../../engine/sprite.js';
 
 const IDS = ['village-elder', 'farm-kid', 'hero-walker', 'mage-walker', 'merchant', 'town-guard', 'void-ranger', 'shield-trooper', 'rogue-walker'];
@@ -60,6 +54,7 @@ const NO_ARMS = {
   'void-ranger': { 'walk_down stride': 'at 0.9 and 1.1: 435 and 435 off, with none: 403 and 433' },
 };
 const def = (id) => JSON.parse(fs.readFileSync(path.join(ROOT, 'sprites', `${id}.json`), 'utf8'));
+const motion = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'm7-topdown-motion.json'), 'utf8'));
 const data = (id) => loadDataSprite(ROOT, path.join(ROOT, 'sprites', `${id}.json`));
 const at = (s, set) => cleanParams(s, { ...defaultParams(s), ...set });
 const diff = (a, b) => { let n = 0; for (let i = 0; i < a.length; i++) if (((a[i] >>> 24) ? a[i] : 0) !== ((b[i] >>> 24) ? b[i] : 0)) n++; return n; };
@@ -90,15 +85,16 @@ for (const id of IDS) {
   });
 }
 
+
 for (const id of IDS) {
-  test(`${id}: at each end of Bounce and Stride each walk and run changes at least ${MOVE_SHARE * 100}% as much as the code sprite's`, async () => {
-    const code = await codeSprite(id), s = await data(id), short = [];
-    for (const clip of Object.keys(code.clips).filter((n) => /^(walk|run)_/.test(n))) {
-      for (const k of ['bounce', 'stride']) {
-        if (!s.params[k]) continue;
+  test(`${id}: at each end of Bounce and Stride each walk and run changes at least ${MOVE_SHARE * 100}% as much as the code sprite's did (recorded)`, async () => {
+    const s = await data(id), short = [];
+    for (const k of ['bounce', 'stride']) {
+      if (!s.params[k]) continue;
+      for (const clip of Object.keys(motion[id].shifted[k][0])) {
         for (const v of [0, 1]) {
-          const c = moved(code, clip, { [k]: v });
-          if (c < 100) { assert.ok(!SHORT[id]?.[`${clip} ${k}=${v}`], `${id} ${clip} ${k}=${v}: listed in SHORT, but the code moves only ${c}`); continue; }
+          const c = motion[id].shifted[k][v][clip];
+          if (c < 100) { assert.ok(!SHORT[id]?.[`${clip} ${k}=${v}`], `${id} ${clip} ${k}=${v}: listed in SHORT, but the code moved only ${c}`); continue; }
           const m = moved(s, clip, { [k]: v });
           const known = SHORT[id]?.[`${clip} ${k}=${v}`];
           if (m < MOVE_SHARE * c && !known) short.push(`${clip} ${k}=${v}: code ${c}, data ${m}`);

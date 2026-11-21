@@ -28,7 +28,7 @@
 .st-drafts { display: grid; grid-template-columns: repeat(auto-fill, minmax(176px, 1fr)); gap: var(--s5) var(--s4); }
 .st-drafts > p { grid-column: 1 / -1; }
 .st-draft-pic { display: block; }
-.st-draft-acts { display: flex; gap: var(--s2); margin-top: var(--s2); }
+.st-draft-acts { display: flex; flex-wrap: wrap; gap: var(--s2); margin-top: var(--s2); }
 .st-broken { grid-column: 1 / -1; }
 
 /* ======================================================= the editing page */

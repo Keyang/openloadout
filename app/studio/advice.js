@@ -34,7 +34,7 @@ function thickness(s) {
 
 /**
  * The shapes of a bone rig too thin to draw well: [{ kind: 'thin' (under 2 px thick: it breaks into stairs when it turns)
- * | 'too-thin' (under 1 px: it may not show at all), shape, bone, text }]. [] for a library body.
+ * | 'too-thin' (under 1 px: it may not show at all), shape, bone, text }]. [] for a definition with no bone rig.
  * Arguments: def.
  */
 export function thinShapes(def) {

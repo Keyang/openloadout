@@ -1,10 +1,10 @@
 // Framework additions made with batch P08 (the platformer boss, moss-golem; the pathfinder for bosses):
-//   rigs/bigbody.js   the side-view large two-legged body rig: dims, clips, clipsFor, pose, solve, pieces, onPiece,
-//                     collapse (a body falling apart into a pile), sockets, chainJoints (a chain of segments)
+//   (rigs/bigbody.js, the side-view large two-legged body rig, was also added; R2 deleted it and its tests)
 //   engine/rock.js    seam (the dark line between stacked stones), capIn (the layer on top of a shape: moss, snow),
 //                     crack (a jagged crack)
 //   engine/growth.js  mossCap (a cap of moss drawn on a shape), mushroom, sapling (things standing on a point that turn with it)
 //   engine/creature.js  hornFit (the longest a horn can be without leaving a box; added in fix round 1)
+// R2: rigs/bigbody.js went: the tests of the big-body rig are deleted; those of the engine helpers (engine/rock.js and the rest) stay.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface, ellipseIn, rectIn } from '../../engine/surface.js';
@@ -13,13 +13,11 @@ import { PI } from '../../engine/motion.js';
 import { seam, capIn, crack } from '../../engine/rock.js';
 import { mossCap, mushroom, sapling } from '../../engine/growth.js';
 import { ramp } from '../../engine/color.js';
-import * as B from '../../rigs/bigbody.js';
 import { hornPath, hornIn, hornFit } from '../../engine/creature.js';
 
 const lit = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);
 const count = (g, c) => { const v = col(c); return g.data.reduce((n, x) => n + (x === v ? 1 : 0), 0); };
 const close = (a, b, eps = 1e-9) => Math.abs(a - b) <= eps;
-const frames = (n, loop) => Array.from({ length: n }, (_, i) => (loop ? i / n : i / (n - 1)));
 
 // ---- engine/rock.js: seam -----------------------------------------------------------
 
@@ -153,228 +151,6 @@ test('sapling: a stem about as tall as asked with leaves at the top; it bends wi
   const boxed = draw({ box: [10, 30, 38, 46] });
   assert.ok(boxed.drawn === false || boxed.g.bounds().y0 >= 29, 'in a low box it is shorter or left out');
   assert.equal(draw({ box: [22, 38, 26, 42] }).drawn, false);
-});
-
-// ---- rigs/bigbody.js: sizes and clips ---------------------------------------------------
-
-test('bigbody: the frame, pivot and clip table are those of a side-view boss', () => {
-  assert.deepEqual(B.SIZE, [96, 96]);
-  assert.deepEqual(B.PIVOT, [44, 90]);
-  const c = B.clips((p) => p.speed);
-  assert.deepEqual(Object.keys(c), ['idle', 'walk', 'attack', 'roar', 'hurt', 'stagger', 'die']);
-  assert.deepEqual(Object.values(c).map((x) => x.frames), [8, 8, 12, 10, 4, 8, 12]);
-  assert.deepEqual(Object.values(c).map((x) => x.loop), [true, true, false, false, false, false, false]);
-  assert.equal(c.attack.label, 'Slam');
-  assert.ok(c.walk.fps({ speed: 1 }) > c.walk.fps({ speed: 0.5 }) && c.walk.fps({ speed: 0.5 }) > c.walk.fps({ speed: 0 }));
-  assert.ok(close(c.attack.fps({ speed: 0.5 }), 11 * 1.05));
-  assert.deepEqual(Object.keys(B.clipsFor(['idle', 'die'])), ['idle', 'die']);
-  assert.throws(() => B.clipsFor(['fly']), /no standard clip "fly"/);
-  const extra = B.clips(undefined, { breath: { frames: 10, fps: 10, loop: false } });
-  assert.equal(Object.keys(extra).at(-1), 'breath');
-});
-
-test('bigbody: dims grow with their sliders and stay a hunched giant', () => {
-  const lo = B.dims({ size: 0, bulk: 0, arms: 0 }), mid = B.dims(), hi = B.dims({ size: 1, bulk: 1, arms: 1 });
-  for (const k of ['hip', 'torso', 'rx', 'ry', 'fist', 'upper', 'fore', 'shoulderR', 'headR']) assert.ok(lo[k] < mid[k] && mid[k] < hi[k], k);
-  assert.ok(B.dims({ bulk: 1 }).rx > B.dims({ bulk: 0 }).rx && B.dims({ bulk: 1 }).hip === B.dims({ bulk: 0 }).hip, 'bulk widens, it does not lengthen the legs');
-  assert.ok(B.dims({ arms: 1 }).upper > B.dims({ arms: 0 }).upper);
-  assert.ok(mid.upper + mid.fore > mid.hip, 'the arms are longer than the legs');
-  assert.ok(mid.headR < mid.shoulderR, 'a small head between big shoulders');
-});
-
-// ---- rigs/bigbody.js: poses ---------------------------------------------------------
-
-const D = B.dims();
-const flat = (P) => JSON.stringify(P, (k, v) => (typeof v === 'number' ? Math.round(v * 1e6) / 1e6 : v));
-
-test('bigbody: every pose name works and an unknown one says which exist', () => {
-  for (const name of B.POSES) for (const t of [0, 0.3, 0.7, 1]) {
-    const P = B.pose(name, t, {}, D);
-    for (const k of ['bx', 'by', 'lean', 'squash', 'rise', 'jaw', 'glow', 'fall']) assert.ok(Number.isFinite(P[k]), `${name} t=${t}: ${k}`);
-    for (const k of ['near', 'far', 'nf', 'ff', 'head']) assert.ok(P[k].length === 2 && P[k].every(Number.isFinite), `${name} t=${t}: ${k}`);
-  }
-  assert.equal(flat(B.pose('attack', 0.5, {}, D)), flat(B.pose('slam', 0.5, {}, D)));
-  assert.throws(() => B.pose('fly', 0, {}, D), /no pose "fly"/);
-});
-
-test('bigbody: loops close and one-shots come back to the resting pose', () => {
-  for (const name of ['idle', 'walk']) {
-    const a = B.pose(name, 0, {}, D), b = B.pose(name, 1, {}, D);
-    for (const k of ['bx', 'by', 'lean', 'rise']) assert.ok(close(a[k], b[k], 1e-6), `${name}: ${k}`);
-    for (const k of ['near', 'far', 'nf', 'ff']) assert.ok(close(a[k][0], b[k][0], 1e-6) && close(a[k][1], b[k][1], 1e-6), `${name}: ${k}`);
-  }
-  const rest = B.pose('hurt', 1, {}, D);
-  for (const name of ['slam', 'roar', 'hurt', 'stagger']) {
-    const end = B.pose(name, 1, {}, D);
-    for (const k of ['bx', 'by', 'lean', 'squash', 'rise', 'jaw', 'kneel', 'fall']) assert.ok(close(end[k], 0, 1e-6), `${name} ends with ${k} = 0 (${end[k]})`);
-    for (const k of ['near', 'far', 'nf', 'ff', 'head']) assert.ok(close(end[k][0], rest[k][0], 1e-6) && close(end[k][1], rest[k][1], 1e-6), `${name}: ${k}`);
-    assert.equal(end.glow, 1);
-    assert.equal(end.flash, false);
-  }
-  assert.equal(B.pose('slam', 0, {}, D).lean, 0, 'and start on it');
-});
-
-test('bigbody walk: the near foot lands on frame 0 and the far foot on frame 4, and the body drops onto each step', () => {
-  const at = (f) => B.pose('walk', f / 8, {}, D);
-  assert.equal(at(0).nf[1], 0); assert.equal(at(4).ff[1], 0);
-  assert.ok(at(0).nf[0] > 3 && at(4).ff[0] > 3, 'each lands ahead of where it stands');
-  assert.ok(at(6).nf[1] > 1 && at(2).ff[1] > 1, 'the other foot is in the air');
-  assert.ok(at(0).by > at(2).by + 1 && at(4).by > at(6).by + 1, 'it is lowest just after a foot lands');
-  assert.ok(Math.sign(at(0).near[0] - at(4).near[0]) === -Math.sign(at(0).far[0] - at(4).far[0]), 'the arms swing against each other');
-  const heavy = B.pose('walk', 0, { bounce: 1 }, D), light = B.pose('walk', 0, { bounce: 0 }, D);
-  assert.ok(heavy.by > light.by + 1, 'bounce makes it stomp');
-});
-
-test('bigbody slam: six frames of warning with the fists going up, the hit on frame 7, then the dust', () => {
-  const fistY = (f) => { const J = B.solve(B.pose('slam', f / 11, {}, D), D); return [J.armN.hand[1], J.armF.hand[1]]; };
-  for (let f = 2; f <= 5; f++) assert.ok(fistY(f)[1] < fistY(f - 1)[1], `far fist higher on frame ${f}`);
-  assert.ok(fistY(6)[1] <= fistY(5)[1] + 1, 'and held up on frame 6');
-  for (let f = 3; f <= 6; f++) assert.ok(fistY(f)[0] < fistY(f - 1)[0], `near fist higher on frame ${f}`);
-  const J6 = B.solve(B.pose('slam', 6 / 11, {}, D), D);
-  assert.ok(J6.armN.hand[1] < J6.head[1] - 10 && J6.armF.hand[1] < J6.head[1] - 10, 'both fists are over the head on frame 6');
-  const [n7, f7] = fistY(7), floor = Math.floor(B.GROUND - D.fist);
-  assert.ok(n7 >= floor - 2 && f7 >= floor - 2, `both fists are down on frame 7 (${n7}, ${f7} of ${floor})`);
-  const hit = B.pose('slam', 7 / 11, {}, D);
-  assert.ok(hit.squash >= 3 && hit.by > 2, 'the body is pressed down by the hit');
-  assert.equal(B.pose('slam', 6 / 11, {}, D).impact, -1);
-  assert.equal(hit.impact, 0);
-  assert.ok(B.pose('slam', 9 / 11, {}, D).impact > 0.4);
-  assert.equal(B.pose('slam', 1, {}, D).impact, -1, 'no dust left on the last frame');
-});
-
-test('bigbody: roar rears back then leans in with the arms wide; stagger goes down on the near knee; hurt and die start white', () => {
-  const roar = (f) => B.pose('roar', f / 9, {}, D);
-  assert.ok(roar(3).lean < -0.15 && roar(5).lean > 0.15);
-  assert.ok(roar(5).near[0] < -0.6 && roar(5).far[0] > 0, 'near arm flung back, far arm forward');
-  assert.ok(roar(5).jaw > 0.9 && roar(5).shout >= 0 && roar(2).shout === -1 && roar(9).shout === -1);
-  const down = B.pose('stagger', 3 / 7, {}, D);
-  assert.ok(down.kneel === 1 && down.by > 6 && down.nf[0] < -5);
-  const glows = [2, 3, 4, 5].map((f) => B.pose('stagger', f / 7, {}, D).glow);
-  assert.ok(glows.every((v) => v > 1) && new Set(glows).size === 2, 'the core flashes between two levels while it is down');
-  assert.equal(B.pose('hurt', 0, {}, D).flash, true); assert.equal(B.pose('hurt', 1 / 3, {}, D).flash, false);
-  assert.equal(B.pose('die', 0, {}, D).flash, true);
-  assert.equal(B.pose('die', 0, {}, D).fall, 0);
-  assert.equal(B.pose('die', 7 / 11, {}, D).fall, 1, 'the last pieces land on frame 7');
-  assert.equal(B.pose('die', 1, {}, D).glow, 0, 'and the light is out');
-});
-
-// ---- rigs/bigbody.js: joints and pieces ----------------------------------------------------
-
-const NAMES = ['armF.upper', 'armF.fore', 'fistF', 'legF.thigh', 'legF.shin', 'footF', 'shoulderF', 'pelvis', 'legN.thigh', 'legN.shin', 'footN', 'chest', 'head', 'shoulderN', 'armN.upper', 'armN.fore', 'fistN'];
-const standing = (d = D) => { const P = B.pose('hurt', 1, {}, d), J = B.solve(P, d); return { P, J, list: B.pieces(J, P, d) }; };
-
-test('bigbody: seventeen pieces in painting order, far ones first, each with a fixed seed', () => {
-  const { list } = standing();
-  assert.deepEqual(list.map((p) => p.name), NAMES);
-  assert.deepEqual(list.filter((p) => p.far).map((p) => p.name), NAMES.slice(0, 7));
-  assert.equal(new Set(list.map((p) => p.seed)).size, list.length);
-  for (const p of list) assert.ok(p.rx > 2 && p.ry > 2 && Number.isFinite(p.x + p.y + p.angle), p.name);
-  const again = B.pieces(B.solve(B.pose('walk', 0.3, {}, D), D), B.pose('walk', 0.3, {}, D), D);
-  assert.deepEqual(again.map((p) => p.seed), list.map((p) => p.seed), 'the seeds do not change with the pose');
-});
-
-test('bigbody: it stands on the ground, hunched, with the head below the shoulders and the fists near the knees', () => {
-  const { J, list } = standing();
-  const by = Object.fromEntries(list.map((p) => [p.name, p]));
-  assert.equal(by.footN.sole, B.GROUND); assert.equal(by.footF.sole, B.GROUND);
-  assert.ok(J.chest[0] > J.pelvis[0] + 4, 'the chest leans out over the feet');
-  assert.ok(J.head[1] - D.headR > J.shoulderN[1] - D.shoulderR, 'the top of the head is below the top of the near shoulder');
-  assert.ok(J.head[0] > J.chest[0], 'and in front of the chest');
-  for (const A of [J.armN, J.armF]) assert.ok(Math.abs(A.hand[1] - J.legN.knee[1]) < 12, `a fist hangs at about knee height (${A.hand[1]} against ${J.legN.knee[1]})`);
-  assert.ok(J.armN.hand[0] < J.armF.hand[0], 'the near arm hangs behind, the far one in front');
-  const top = Math.min(...list.map((p) => p.y - Math.max(p.rx, p.ry)));
-  assert.ok(B.GROUND - top >= 52 && B.GROUND - top <= 72, `about two tiles tall (${B.GROUND - top})`);
-});
-
-test('bigbody: at every size the fists stay inside the frame and above the ground in every pose', () => {
-  for (const o of [{ size: 0, bulk: 0, arms: 0 }, {}, { size: 1, bulk: 1, arms: 1 }]) {
-    const d = B.dims(o);
-    for (const [name, n, loop] of [['idle', 8, true], ['walk', 8, true], ['slam', 12], ['roar', 10], ['hurt', 4], ['stagger', 8], ['die', 12]]) for (const t of frames(n, loop)) {
-      const J = B.solve(B.pose(name, t, { bounce: 1 }, d), d);
-      for (const A of [J.armN, J.armF]) {
-        assert.ok(A.hand[0] - d.fist >= 1.5 && A.hand[0] + d.fist <= 94.5, `${name} t=${t}: fist x ${A.hand[0]}`);
-        assert.ok(A.hand[1] - d.fist >= 1.5 && A.hand[1] + d.fist <= B.GROUND + 0.5, `${name} t=${t}: fist y ${A.hand[1]}`);
-      }
-    }
-  }
-});
-
-test('bigbody onPiece: a point on a piece turns with it', () => {
-  const piece = { x: 40, y: 50, rx: 10, ry: 4, angle: 0 };
-  assert.deepEqual(B.onPiece(piece, 1, 0), [50, 50]);
-  assert.deepEqual(B.onPiece(piece, 0, -1), [40, 46]);
-  const [x, y] = B.onPiece({ ...piece, angle: PI / 2 }, 1, 0);       // a quarter turn clockwise: its long axis points down
-  assert.ok(close(x, 40, 1e-9) && close(y, 60, 1e-9));
-});
-
-// ---- rigs/bigbody.js: falling apart --------------------------------------------------------
-
-test('bigbody collapse: nothing moves at 0; at 1 every piece lies in a pile on the ground, lower and wider than the body', () => {
-  const { list } = standing();
-  const still = B.collapse(list, 0);
-  assert.deepEqual(still.map((p) => [p.x, p.y, p.angle]), list.map((p) => [p.x, p.y, p.angle]));
-  assert.ok(still.every((p) => p.landed === false));
-  const pile = B.collapse(list, 1, { cx: 44, seed: 5 });
-  assert.equal(pile.length, list.length);
-  assert.deepEqual(pile.map((p) => p.name), list.map((p) => p.name), 'the painting order is kept');
-  assert.ok(pile.every((p) => p.landed));
-  for (const p of pile) {
-    const hw = Math.max(p.rx, p.ry), hh = Math.min(p.rx, p.ry);
-    assert.ok(p.y + hh <= B.GROUND + 0.01, `${p.name} is not under the ground`);
-    assert.ok(p.x - hw >= 2 - 0.01 && p.x + hw <= 94.01, `${p.name} is inside the frame`);
-    assert.ok(p.x - hw >= 44 - 32 - 0.01 && p.x + hw <= 44 + 32 + 0.01, `${p.name} is within reach of the middle`);
-  }
-  const topOf = (ps) => Math.min(...ps.map((p) => p.y - Math.min(p.rx, p.ry)));
-  assert.ok(topOf(pile) > topOf(list) + 12, `the pile is lower than the body (${topOf(pile)} against ${topOf(list)})`);
-  const feet = pile.filter((p) => p.name.startsWith('foot')), feet0 = list.filter((p) => p.name.startsWith('foot'));
-  feet.forEach((p, i) => assert.equal(p.x, feet0[i].x, 'the feet stay where they stood'));
-  assert.deepEqual(B.collapse(list, 1, { cx: 44, seed: 5 }).map((p) => [p.x, p.y]), pile.map((p) => [p.x, p.y]), 'repeatable');
-});
-
-test('bigbody collapse: it goes from the top, each piece falls and never rises above where it started', () => {
-  const { list } = standing();
-  const early = B.collapse(list, 0.25, { cx: 44, seed: 5 });
-  const moved = (name) => { const a = list.find((p) => p.name === name), b = early.find((p) => p.name === name); return Math.hypot(a.x - b.x, a.y - b.y); };
-  assert.ok(moved('shoulderN') > 2, 'the top has started');
-  assert.equal(moved('pelvis'), 0, 'the bottom has not');
-  let last = list;
-  for (const k of [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]) {
-    const now = B.collapse(list, k, { cx: 44, seed: 5 });
-    now.forEach((p, i) => assert.ok(p.y >= list[i].y - 2.01, `${p.name} at ${k}: no higher than it started (bar its one small hop)`));
-    assert.ok(now.filter((p) => p.landed).length >= last.filter((p) => p.landed).length);
-    last = now;
-  }
-});
-
-// ---- rigs/bigbody.js: sockets and chains ------------------------------------------------------
-
-test('bigbody sockets: six named points, and they follow the pieces when a list is given', () => {
-  const { P, J, list } = standing();
-  const S = B.sockets(J, P, D);
-  assert.deepEqual(Object.keys(S), ['hand', 'offhand', 'head', 'back', 'feet', 'core']);
-  for (const v of Object.values(S)) assert.ok(Number.isFinite(v.x + v.y + v.angle));
-  assert.deepEqual([S.hand.x, S.hand.y], J.armN.hand);
-  assert.deepEqual([S.feet.x, S.feet.y], [44, 90]);
-  assert.ok(S.core.x > J.chest[0] && Math.abs(S.core.y - J.chest[1]) < D.ry * 0.3, 'the core is on the front of the chest');
-  assert.ok(S.back.y < S.head.y, 'the back socket is on top of the near shoulder, above the head');
-  const pile = B.collapse(list, 1, { cx: 44, seed: 5 });
-  const T = B.sockets(J, P, D, pile);
-  const chest = pile.find((p) => p.name === 'chest'), fist = pile.find((p) => p.name === 'fistN');
-  assert.deepEqual([T.core.x, T.core.y], B.onPiece(chest, B.CORE_AT[0], B.CORE_AT[1]));
-  assert.deepEqual([T.hand.x, T.hand.y], [fist.x, fist.y]);
-  assert.deepEqual(T.feet, S.feet);
-});
-
-test('bigbody chainJoints: segments laid end to end, by list or by function', () => {
-  const up = B.chainJoints(10, 40, [5, 5, 5], [PI, PI, PI]);
-  assert.equal(up.length, 4);
-  assert.ok(close(up[3][0], 10, 1e-9) && close(up[3][1], 25, 1e-9));
-  const bent = B.chainJoints(0, 0, 4, (i) => PI / 2 + i * 0.3, 5);
-  assert.equal(bent.length, 6);
-  for (let i = 0; i < 5; i++) assert.ok(close(Math.hypot(bent[i + 1][0] - bent[i][0], bent[i + 1][1] - bent[i][1]), 4, 1e-9));
-  assert.ok(bent[5][1] < bent[1][1], 'it curls upward as the angles grow');
-  const mixed = B.chainJoints(0, 0, [3, 6], [0, PI / 2]);
-  assert.ok(close(mixed[2][0], 6, 1e-9) && close(mixed[2][1], 3, 1e-9));
 });
 
 // ---- engine/creature.js: hornFit (fix round 1) ------------------------------------------

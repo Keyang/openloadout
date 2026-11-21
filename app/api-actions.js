@@ -265,7 +265,7 @@ function studioActions() {
   return [
     {
       name: 'studio_starts', call: 'studio.starts', args: [],
-      description: 'What a new studio sprite can start from: bone-rig templates (Two legs, Four legs, Crawler, Flyer, Blob, Blank, and top-down ones) and library bodies with a preset (the Hero). Each has a "from" to give studio_create, its view, frame size and clips.',
+      description: 'What a new studio sprite can start from: bone-rig templates (Two legs, Four legs, Crawler, Flyer, Blob, Blank, and top-down ones) and the version 2 templates. A library sprite is started as a copy by its own id ("library:<id>"). Each has a "from" to give studio_create, its view, frame size and clips.',
       inputSchema: NONE,
     },
     {
@@ -299,19 +299,6 @@ function studioActions() {
       name: 'studio_validate', call: 'studio.validate', args: ['definition'],
       description: 'Check a studio sprite definition without keeping it: { ok, errors, warnings, value } where value is the cleaned copy that studio_set would keep. Errors stop it being drawn or kept; warnings are advice.',
       inputSchema: { type: 'object', properties: { definition: DEFINITION }, required: ['definition'], additionalProperties: false },
-    },
-    {
-      name: 'studio_bake', call: 'studio.bake', args: ['draft', 'clip', 'from'],
-      description: 'For a library body (the Hero): turn one of the body\'s own poses into keys for a clip, one key on every frame ("Start this clip over"), replacing that clip\'s keys and keeping its frame count, speed, sounds and nudges; a clip the draft has not got yet is made, with the pose\'s own frame count. Then move or delete keys with studio_set. Bone rigs have no poses to bake from.',
-      inputSchema: {
-        type: 'object',
-        properties: {
-          draft: DRAFT,
-          clip: { type: 'string', description: 'The clip to bake into, an existing one or a new one ("walk", "wave")' },
-          from: { type: 'string', description: 'The pose to take: idle, walk, run, jump, attack, punch, thrust, shoot, cast, block, hurt, die, victory, talk, stab, throw, toss or steal. Left out: the pose the clip was baked from before' },
-        },
-        required: ['draft', 'clip'], additionalProperties: false,
-      },
     },
     {
       name: 'studio_render', call: 'studio.render', args: ['draftOrDefinition', 'options'],

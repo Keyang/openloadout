@@ -10,7 +10,6 @@ import { ACTIONS } from '../../app/api-actions.js';
 import { studioTemplate, studioTemplates } from '../../rigs/studio-templates.js';
 import { makeDataSprite, validateDataSprite } from '../../engine/data-sprite.js';
 import { renderFrame } from '../../engine/sprite.js';
-import { bakeClips, bake as bakeKeys, heroFigure } from '../../rigs/humanoid-studio.js';
 import { readDataFile } from '../../tools/lib/data-file.mjs';
 
 const { createStudio, STUDIO_KEY, STUDIO_API_LIMITS } = A;
@@ -61,7 +60,7 @@ const plainData = (v) => assert.doesNotThrow(() => assert.deepEqual(JSON.parse(J
 
 // ---- the action list ---------------------------------------------------------------------------------------------
 
-const NAMES = ['studio_starts', 'studio_create', 'studio_list', 'studio_get', 'studio_set', 'studio_validate', 'studio_bake', 'studio_render', 'studio_advice', 'studio_to_bag', 'studio_file', 'studio_remove'];
+const NAMES = ['studio_starts', 'studio_create', 'studio_list', 'studio_get', 'studio_set', 'studio_validate', 'studio_render', 'studio_advice', 'studio_to_bag', 'studio_file', 'studio_remove'];
 
 test('api-studio: every studio member of Contract 14 is an action in generated/api.json, described for an agent', () => {
   const studio = ACTIONS.filter((a) => a.call.startsWith('studio.'));
@@ -82,17 +81,17 @@ test('api-studio: every studio member of Contract 14 is an action in generated/a
 
 // ---- starts and create -------------------------------------------------------------------------------------------
 
-test('api-studio: starts lists the templates and the Hero, as plain data', async () => {
+test('api-studio: starts lists the templates, not the Hero (the library bodies are gone, build item R1), as plain data', async () => {
   const r = await studioWith().starts();
   assert.equal(r.ok, true);
   plainData(r.starts);
   const froms = r.starts.map((x) => x.from);
   for (const t of studioTemplates()) assert.ok(froms.includes(`template:${t.id}`), t.id);
-  assert.ok(froms.includes('library:knight'), 'the Hero, a library sprite with a preset');
+  assert.ok(!froms.some((f) => f.startsWith('library:')), 'no library body to start from');
   const four = r.starts.find((x) => x.from === 'template:four-legs');
   assert.deepEqual({ label: four.label, view: four.view, size: four.size, body: four.body }, { label: 'Four legs', view: 'side', size: [64, 48], body: 'bone rig' });
   assert.ok(four.clips.includes('walk'));
-  assert.equal(r.starts.find((x) => x.from === 'library:knight').body, 'library body');
+  assert.ok(!r.starts.some((x) => x.body === 'library body'));
 });
 
 test('api-studio: create makes a draft from a template, saved under loadout-studio-v1', async () => {
@@ -124,7 +123,7 @@ test('api-studio: create refuses what it cannot start from, saying what can be',
   for (const [args, re] of [
     [[{ from: 'template:dragon' }], /four-legs/],
     [[{}], /from/],
-    [['library:wolf'], /library:knight/],
+    [['library:wolf'], /library:<id>/],
     [[{ from: 'blob', name: 42 }], /name/],
     [[{ from: 'blob', name: 'x'.repeat(61) }], /60/],
     [[{ from: 'blob', name: '!!!' }], /letter/],
@@ -137,12 +136,33 @@ test('api-studio: create refuses what it cannot start from, saying what can be',
   assert.equal(s.storage.getItem(STUDIO_KEY), null, 'nothing saved');
 });
 
-test('api-studio: create from the Hero gives a library body with every clip baked', async () => {
-  const r = await studioWith().create('library:knight', 'Sir Test');
-  assert.equal(r.ok, true, JSON.stringify(r.errors));
-  assert.equal(r.definition.body.library, 'humanoid');
-  assert.ok(r.definition.clips.walk.keys.length >= 8);
-  assert.deepEqual(r.definition.made, { in: 'studio', from: 'library:knight' });
+// the saved draft of a sprite that used a library body (build item R1): kept, listed, never drawn, and said so in words
+const GONE = JSON.parse(fs.readFileSync(new URL('../fixtures/studio/waving-hero.json', import.meta.url), 'utf8'));
+const withGone = () => { const storage = store({ text: JSON.stringify({ version: 1, drafts: { 'sir-wave': { definition: GONE, savedAt: 5 } } }) }); return studioWith({ storage }); };
+
+test('api-studio: a saved draft that used a library body is listed with the note, kept, and refused everywhere in words that say what to do', async () => {
+  const s = withGone();
+  const l = await s.list();
+  assert.equal(l.ok, true);
+  assert.equal(l.drafts.length, 1);
+  assert.equal(l.drafts[0].draft, 'sir-wave');
+  assert.equal(l.drafts[0].state, 'damaged');
+  assert.match(l.drafts[0].errors.join(' '), /library body, which is gone: open the library sprite and edit a copy/);
+  for (const [name, call] of [['get', () => s.get('sir-wave')], ['render', () => s.render('sir-wave')], ['advice', () => s.advice('sir-wave')], ['file', () => s.file('sir-wave')], ['toBag', () => s.toBag('sir-wave')]]) {
+    const r = await call();
+    assert.equal(r.ok, false, name);
+    assert.match(r.errors.join(' '), /library body, which is gone/, name);
+    assert.match(r.errors.join(' '), /studio_remove|library:<id>/, name);
+  }
+  // a library sprite is started again as a copy, and the old draft is not touched until it is removed
+  assert.deepEqual(stored(s.storage).drafts['sir-wave'].definition, GONE, 'kept as it was');
+  assert.equal((await s.remove('sir-wave')).ok, true);
+});
+
+test('api-studio: bake is gone with the library bodies (nothing called it; a version 2 sprite extends a base piece and inherits its clips)', async () => {
+  const s = studioWith();
+  assert.equal(s.bake, undefined);
+  assert.ok(!ACTIONS.some((a) => a.call === 'studio.bake' || a.name === 'studio_bake'));
 });
 
 // ---- list, get, set, remove --------------------------------------------------------------------------------------
@@ -475,35 +495,6 @@ test('api-studio: validate is the validator alone and stores nothing', async () 
   assert.equal(s.storage.getItem(STUDIO_KEY), null);
 });
 
-// ---- bake --------------------------------------------------------------------------------------------------------
-
-test('api-studio: bake turns a library pose into keys for a clip', async () => {
-  const s = studioWith();
-  const { draft, definition } = await s.create('library:knight', 'Sir Test');
-  const r = await s.bake(draft, 'walk', 'run');
-  assert.equal(r.ok, true, JSON.stringify(r.errors));
-  const want = validateDataSprite({ ...definition, clips: { ...definition.clips, walk: bakeClips(definition.body.figure, { walk: { ...definition.clips.walk, from: 'run' } }).walk } }).value.clips.walk;
-  assert.deepEqual(r.clip, want);
-  assert.deepEqual((await s.get(draft)).definition.clips.walk, want);
-  // a new clip: frames and loop from the pose
-  const w = await s.bake(draft, 'wave', 'idle');
-  assert.equal(w.ok, true, JSON.stringify(w.errors));
-  assert.equal(w.clip.from, 'idle');
-  assert.equal(w.clip.frames, bakeKeys(heroFigure(), 'wave', { from: 'idle', between: false }).length);
-  assert.equal(w.clip.loop, true);
-  // from left out: the clip's own from
-  assert.equal((await s.bake(draft, 'attack')).ok, true);
-  for (const [args, re] of [[[draft, 'walk', 'moonwalk'], /idle/], [[draft, 'Bad Name', 'idle'], /clip/], [[draft, 'newclip'], /from/], [['nobody', 'walk', 'run'], /draft/]]) {
-    const x = await s.bake(...args);
-    assert.equal(x.ok, false, JSON.stringify(args));
-    assert.match(x.errors.join(' '), re);
-  }
-  const bone = await s.create('four-legs', 'Beast');
-  const b = await s.bake(bone.draft, 'walk', 'walk');
-  assert.equal(b.ok, false);
-  assert.match(b.errors[0], /library bod/);
-});
-
 // ---- render ------------------------------------------------------------------------------------------------------
 
 test('api-studio: render gives a PNG of one frame or a whole clip, the sprite\'s own pixels', async () => {
@@ -566,18 +557,6 @@ test('api-studio: render refuses what it cannot draw, saying what it can', async
   const big = await t.render('beast', { clip: 'walk', scale: 2 });
   assert.equal(big.ok, false);
   assert.match(big.errors[0], /pixels/);
-});
-
-test('api-studio: render draws a library body (the Hero) too', async () => {
-  const s = studioWith();
-  const { draft } = await s.create('library:knight', 'Sir Test');
-  const r = await s.render(draft, { clip: 'attack', frame: 3, scale: 2 });
-  assert.equal(r.ok, true, JSON.stringify(r.errors));
-  assert.deepEqual([r.width, r.height], [128, 128]);
-  assert.ok(r.opaque > 400);
-  const b = await s.render(draft, { clip: 'idle', frame: 0, bones: true });
-  assert.equal(b.ok, true);
-  assert.ok(b.warnings.some((w) => /bone/.test(w)), 'the skeleton is drawn for bone rigs only, and it says so');
 });
 
 // ---- advice and file ---------------------------------------------------------------------------------------------

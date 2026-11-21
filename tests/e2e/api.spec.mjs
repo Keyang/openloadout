@@ -32,7 +32,7 @@ test('window.loadout has the Contract 11 members, and the home page does not pay
     studio: Object.keys(window.loadout.studio).sort(),
   }));
   expect(shape.top).toEqual(['api', 'assets', 'bag', 'call', 'check', 'framework', 'go', 'make', 'render', 'studio']);
-  expect(shape.studio).toEqual(['advice', 'bake', 'create', 'file', 'get', 'list', 'remove', 'render', 'set', 'starts', 'toBag', 'validate']);
+  expect(shape.studio).toEqual(['advice', 'create', 'file', 'get', 'list', 'remove', 'render', 'set', 'starts', 'toBag', 'validate']);
   expect(shape.assets).toEqual(['get', 'list', 'remove', 'search', 'similar']);
   expect(shape.make).toEqual(['sound', 'sprite']);
   expect(shape.bag).toEqual(['add', 'clear', 'download', 'items', 'link', 'remove', 'setLook', 'update']);

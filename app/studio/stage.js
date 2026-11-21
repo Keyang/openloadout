@@ -7,7 +7,6 @@ import { drawStage, sceneFor } from '../stage.js';
 import { drawFrame, drawRest } from './draw.js';
 import { handles, skeleton, isRig, dragHandle } from './edit.js';
 import { rigPoints } from '../../rigs/bones.js';
-import { librarySockets } from './library-body.js';
 import { bandBox } from './advice.js';
 
 const INK = '#000000';
@@ -126,23 +125,7 @@ export function makeStage({ view, onLive, onCommit, onSelect, afterDraw }) {
       g.strokeRect(X(1) + 0.5, Y(1) + 0.5, (W - 2) * z - 1, (H - 2) * z - 1);
       g.restore();
     }
-    // item S10: a library body's attach points on its rest pose, where the body puts them
-    if (restPose && !isRig(def) && v.bones) {
-      g.font = '500 11px Geist, system-ui, sans-serif';
-      const named = [];
-      for (const p of librarySockets(def)) {
-        const x = X(p.x), y = Y(p.y);
-        // two points close together (the hands at rest) are both marked, the second without its name over the first
-        const crowded = named.some(([a, b]) => Math.hypot(a - x, b - y) < 28);
-        if (!crowded) named.push([x, y]);
-        g.beginPath(); g.moveTo(x, y - 4); g.lineTo(x + 4, y); g.lineTo(x, y + 4); g.lineTo(x - 4, y); g.closePath();
-        g.fillStyle = '#fff'; g.fill(); g.strokeStyle = INK; g.lineWidth = 1; g.stroke();
-        if (z >= 4 && !crowded) { g.fillStyle = '#5c5c5c'; g.fillText(p.label.toLowerCase(), x + 6, y - 5); }
-      }
-    }
-    // a library body (item S10) has handles on Move: hips, hands, feet, head, upper body, the held thing
-    const libMove = !isRig(def) && v.mode === 'move';
-    if (!editing(v) || !(isRig(def) || libMove) || !v.bones) {
+    if (!editing(v) || !isRig(def) || !v.bones) {
       if (v.mode === 'frames' && editing(v) && isRig(def)) spots = [{ id: 'pivot', kind: 'pivot', x: X(def.pivot[0] + 0.5), y: Y(def.pivot[1] + 0.5) }];
       afterDraw?.(positions());
       return;
@@ -175,8 +158,6 @@ export function makeStage({ view, onLive, onCommit, onSelect, afterDraw }) {
     }
     for (const h of handles(def, ctx)) {
       spots.push({ id: h.id, kind: h.kind, x: X(h.at[0]), y: Y(h.at[1]), label: h.label });
-      // a library body has no bones to draw: a thin line from where each handle hangs shows what it moves
-      if (libMove && h.from) { g.strokeStyle = v.sel?.handle === h.id ? INK : 'rgba(0,0,0,0.4)'; g.lineWidth = 1.25; g.beginPath(); g.moveTo(X(h.from[0]), Y(h.from[1])); g.lineTo(X(h.at[0]), Y(h.at[1])); g.stroke(); }
     }
     const k = cw < 420 ? 0.75 : 1;        // a small picture (a phone): smaller handles, so the sprite still shows
     for (const s of spots) {

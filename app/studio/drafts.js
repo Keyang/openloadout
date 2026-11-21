@@ -11,7 +11,11 @@
 // Everything read back is checked by the validator before it is drawn (Contract 11); a broken draft is left out and
 // counted, never drawn. Pure: the storage is handed in (the page passes localStorage or memory), so it runs in Node too.
 import { checkDraft } from './v2-check.js';
+import { usedLibraryBody, LIBRARY_BODY_GONE } from '../../catalog/studio-schema.js';
 import { createDraftStore, StoreRefused, STUDIO_KEY as STORE_KEY } from '../studio-store.js';
+
+/** What a saved draft of the removed library-body path is told (catalog/studio-schema.js; build item R1): it is not damaged, its body is gone. */
+export { LIBRARY_BODY_GONE };
 
 /** The localStorage key of the studio's drafts (docs/studio.md section 5). */
 export const STUDIO_KEY = STORE_KEY;
@@ -50,7 +54,10 @@ export function draftIdFor(name, taken = []) {
 /**
  * The drafts kept in a storage: { list, get, put, remove, ids, broken, problem, pending, savedText, startAfresh }.
  * list() gives [{ id, name, savedAt, definition, bagKey? }], newest first, valid ones only; get(id) gives { definition,
- * savedAt, bagKey? } or null; put(id, definition, { bagKey }) (bagKey null forgets it) and remove(id) give { ok, error? }
+ * savedAt, bagKey? } or null; gone() lists the saved version 1 drafts that used a library body (a path that is removed,
+ * build item R1) as [{ id, name, savedAt, from (the library sprite it started from, or null), definition }], and
+ * gone(id) gives one or null: they are not drawn or opened for editing, the page says so, and broken() does not count
+ * them; put(id, definition, { bagKey }) (bagKey null forgets it) and remove(id) give { ok, error? }
  * with the error in everyday words; broken() counts stored drafts that could not be read; problem() is null, or why the
  * store cannot be used (then nothing is saved); pending() says a failed save waits; savedText() is what storage holds, to
  * download; startAfresh() clears a store that cannot be read whole (and only such a store): { ok, error? }.
@@ -84,6 +91,13 @@ export function createDrafts(storage, { now = () => Date.now(), check = (d) => c
     return { definition: JSON.parse(JSON.stringify(value)), savedAt: Number.isFinite(d.savedAt) ? d.savedAt : 0, ...(typeof d.bagKey === 'string' && d.bagKey.length <= BAG_KEY_CHARS ? { bagKey: d.bagKey } : {}) };
   }
 
+  /** One stored entry as a draft of the removed library-body path, or null. */
+  function goneOf(id, d) {
+    if (!DRAFT_ID.test(id) || !isObj(d) || !isObj(d.definition) || !usedLibraryBody(d.definition)) return null;
+    const def = d.definition, made = isObj(def.made) && typeof def.made.from === 'string' ? /^library:([a-z][a-z0-9-]{0,39})$/.exec(def.made.from) : null;
+    return { id, name: typeof def.name === 'string' && def.name.trim() ? def.name.trim().slice(0, 60) : id, savedAt: Number.isFinite(d.savedAt) ? d.savedAt : 0, from: made ? made[1] : null, definition: JSON.parse(JSON.stringify(def)) };
+  }
+
   /** Change one entry through the store: { ok, error? } in everyday words. */
   function commit(id, change) {
     let w;
@@ -104,7 +118,7 @@ export function createDrafts(storage, { now = () => Date.now(), check = (d) => c
       for (const [id, d] of Object.entries(readAll().entries)) {
         const c = checked(id, d);
         if (c) out.push({ id, name: c.definition.name, savedAt: c.savedAt, definition: c.definition, ...(c.bagKey ? { bagKey: c.bagKey } : {}) });
-        else if (DRAFT_ID.test(id)) bad++;
+        else if (DRAFT_ID.test(id) && !goneOf(id, d)) bad++;
       }
       return out.sort((a, b) => b.savedAt - a.savedAt || a.id.localeCompare(b.id));
     },
@@ -112,6 +126,12 @@ export function createDrafts(storage, { now = () => Date.now(), check = (d) => c
     get(id) {
       const { entries } = readAll();
       return typeof id === 'string' && Object.hasOwn(entries, id) ? checked(id, entries[id]) : null;
+    },
+    /** The saved drafts that used a library body, newest first (one by id when `id` is given: it or null). */
+    gone(id) {
+      const { entries } = readAll();
+      if (typeof id === 'string') return Object.hasOwn(entries, id) ? goneOf(id, entries[id]) : null;
+      return Object.entries(entries).map(([k, d]) => goneOf(k, d)).filter(Boolean).sort((a, b) => b.savedAt - a.savedAt || a.id.localeCompare(b.id));
     },
     /** The ids of every stored entry, readable or not (for a new id that does not clash). */
     ids: () => Object.keys(readAll().entries),

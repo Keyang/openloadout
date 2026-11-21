@@ -7,7 +7,7 @@
 import { el, header } from './ui.js';
 import { pickStorage } from './bag.js';
 import { createDrafts } from './studio/drafts.js';
-import { homePage } from './studio/home.js';
+import { homePage, gonePage } from './studio/home.js';
 import { editorPage } from './studio/editor.js';
 
 /**
@@ -22,6 +22,9 @@ export function studioPage(app, draft, query = {}, still = () => true) {
   let id = null;
   try { id = decodeURIComponent(draft); } catch { id = null; }      // a badly written address is a draft that is not here
   const entry = id === null ? null : drafts.get(id);
+  // a saved draft of the removed library-body path (build item R1): said so, with what to do, never "damaged" or a crash
+  const gone = !entry && id !== null ? drafts.gone(id) : null;
+  if (gone) return gonePage(app, { id, gone, drafts });
   if (!entry) {
     document.title = 'Not here · Studio · Loadout';
     app.replaceChildren(header('studio'), el('main', { class: 'v2 home notice' },

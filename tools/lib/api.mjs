@@ -322,8 +322,8 @@ function purposeOf(text) {
 // ---- W7-A: rigs that describe themselves (Contract 13) --- start ---------------------------------------------
 // A framework module rigs/<id>-describe.js that exports RIG (plain data: poses, body, hair, parts, held kinds,
 // sockets, and what overlaps) is a rig's description. Each is copied into the `rigs` section, so an agent reads what
-// a rig can wear and hold from generated/api.json without loading code. tests/unit/rig-describe-*.test.mjs keep
-// every description true of the rig's code; tools/rig.mjs prints one as tables and draws its contact sheets.
+// a rig can wear and hold from generated/api.json without loading code. (R2 deleted tools/rig.mjs and the tests that kept
+// every description true; rigs/humanoid-describe.js, the one description left, goes with rigs/humanoid.js.)
 
 /** The rig descriptions among the loaded framework modules: [{ ...RIG, describedIn (its file), module (its name on loadout.framework) }]. modules: as buildApi() collects them, each with `real` (the module itself). */
 export function describedRigs(modules) {
@@ -334,7 +334,7 @@ export function describedRigs(modules) {
 /** The lines of the "Rigs" part of generated/api.md: one row per described rig, with what it has. api: as buildApi() returns it. */
 export function rigsMarkdown(api) {
   if (!(api.rigs ?? []).length) return [];
-  const out = ['', '### Rigs', '', 'The body rigs that describe themselves (`rigs/<id>-describe.js`; in `generated/api.json` under `rigs`). `node tools/rig.mjs <id>` prints one in full; `--sheet` draws every part and held kind.', ''];
+  const out = ['', '### Rigs', '', 'The body rigs that describe themselves (`rigs/<id>-describe.js`; in `generated/api.json` under `rigs`). `rigs/humanoid-describe.js` is the one left (it goes with `rigs/humanoid.js`).', ''];
   out.push('| Rig | View | Frame | Directions | What it has | Described in |', '|---|---|---|---|---|---|');
   for (const r of api.rigs) out.push(`| \`${r.id}\` | ${r.view} | ${r.size.join(' x ')} | ${r.directions.join(', ')} | ${r.poses.length} poses, ${r.parts.length} parts, ${r.held.length} held kinds, ${r.hair.length} hair styles, ${r.sockets.length} sockets | \`${r.describedIn}\` |`);
   return out;

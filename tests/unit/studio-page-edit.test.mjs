@@ -7,16 +7,15 @@ import { studioTemplate, STUDIO_TEMPLATE_IDS } from '../../rigs/studio-templates
 import { validateDataSprite, framePose } from '../../engine/data-sprite.js';
 import { solveRig } from '../../rigs/bones.js';
 import { framePhase } from '../../rigs/keypose.js';
-import { hero } from '../../rigs/humanoid-studio.js';
 
 const valid = (d, what) => { const v = validateDataSprite(d); assert.equal(v.ok, true, `${what}: ${v.errors.join('; ')}`); return v.value; };
 const four = () => valid(studioTemplate('four-legs'), 'four legs');
 const close = (a, b, eps = 0.6) => assert.ok(Math.abs(a - b) <= eps, `${a} is about ${b}`);
 
-test('starting bodies: every template and the Hero, as a fresh draft named by the person', () => {
+test('starting bodies: every template (the Hero, a library body, is gone), as a fresh draft named by the person', () => {
   const starts = E.startingBodies();
   assert.deepEqual(starts.filter((s) => s.kind === 'template').map((s) => s.id), [...STUDIO_TEMPLATE_IDS]);
-  assert.ok(starts.some((s) => s.id === 'hero' && s.kind === 'library'));
+  assert.deepEqual(starts.map((s) => s.id), [...STUDIO_TEMPLATE_IDS], 'templates only: no library body to start from (build item R1)');
   assert.ok(starts.some((s) => s.view === 'top-down'), 'the top-down bodies are offered (Q4)');
   for (const s of starts) {
     const d = E.startFrom(s.id, 'Moss newt');
@@ -26,6 +25,7 @@ test('starting bodies: every template and the Hero, as a fresh draft named by th
     valid(d, s.id);
   }
   assert.equal(E.startFrom('nope', 'x'), null);
+  assert.equal(E.startFrom('hero', 'x'), null, 'the Hero preset is gone');
 });
 
 test('the bones as a tree, parents first, with their depth and everyday names', () => {
@@ -300,15 +300,6 @@ test('Look & name: sliders people get and parts that can be switched off', () =>
   assert.deepEqual(pv.parts[p.key].shapes, tailShapes);
   assert.equal(valid(E.setPartDefault(pv, p.key, false), 'off').parts[p.key].default, false);
   assert.ok(!(p.key in valid(E.removePart(pv, p.key), 'part gone').parts));
-});
-
-test('the Hero: his keys can be nudged field by field (the list-and-arrows way)', () => {
-  const d = valid(E.startFrom('hero', 'My hero'), 'hero');
-  const rows = E.libraryRows(d, 'walk', 0);
-  assert.ok(rows.some((r) => r.id === 'footF'));
-  const out = valid(E.nudgeLibrary(d, 'walk', 0, 'footF', 1, 0), 'foot nudged');
-  const k = out.clips.walk.keys[E.keyIndexAt(out, 'walk', 0)];
-  close(k.footF.x, hero().clips.walk.keys[0].footF.x + 1, 1e-6);
 });
 
 test('every change keeps every template valid (a smoke pass over the bodies)', () => {

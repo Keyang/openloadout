@@ -1,0 +1,830 @@
+{
+ "_about": "What the code sprites of the nine top-down people did with the Bounce and Stride sliders, recorded from their frozen copies (tests/fixtures/code-sprites/<id>.js at commit 7e328c3, rigs/topdown.js) before R2 deleted both. gait[slider][clip] = [at 0, at the default, at 1] of bob (the head's top row range over the clip, Bounce) or spread (how far apart the feet are, Stride); idle[v][clip] = per frame, the head's top row at Bounce v minus at the default; moved[slider][v][clip] = how many pixels of the clip change against the default, summed over frames; shifted[slider][v][clip] = the same for walk and run clips, transparent pixels all counted as equal (m7-topdown-arms). Read by tests/unit/m7-topdown-travel.test.mjs (gait, idle, moved) and m7-topdown-arms.test.mjs (shifted).",
+ "village-elder": {
+  "gait": {
+   "bounce": {
+    "walk_down": [1, 1, 2],
+    "walk_up": [1, 1, 2],
+    "walk_side": [0, 1, 2]
+   }
+  },
+  "idle": {
+   "0": {
+    "idle_down": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_up": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_side": [0, 0, 0, 0, 0, 0, 0, 0]
+   },
+   "1": {
+    "idle_down": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_up": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_side": [0, 0, 0, 1, 1, 1, 1, 1]
+   }
+  },
+  "moved": {
+   "bounce": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 20,
+     "walk_up": 18,
+     "walk_side": 241,
+     "talk": 0
+    },
+    "1": {
+     "idle_down": 526,
+     "idle_up": 560,
+     "idle_side": 579,
+     "walk_down": 628,
+     "walk_up": 666,
+     "walk_side": 235,
+     "talk": 0
+    }
+   }
+  },
+  "shifted": {
+   "bounce": {
+    "0": {
+     "walk_down": 20,
+     "walk_up": 18,
+     "walk_side": 241
+    },
+    "1": {
+     "walk_down": 628,
+     "walk_up": 666,
+     "walk_side": 235
+    }
+   }
+  }
+ },
+ "farm-kid": {
+  "gait": {
+   "bounce": {
+    "walk_down": [1, 2, 2],
+    "walk_up": [1, 2, 2],
+    "walk_side": [1, 2, 2],
+    "run_down": [1, 2, 2],
+    "run_up": [1, 2, 2],
+    "run_side": [1, 2, 2]
+   },
+   "stride": {
+    "walk_down": [3, 4, 4],
+    "walk_up": [3, 4, 4],
+    "walk_side": [11, 12, 12],
+    "run_down": [4, 4, 4],
+    "run_up": [4, 4, 4],
+    "run_side": [11, 13, 13]
+   }
+  },
+  "idle": {
+   "0": {
+    "idle_down": [0, 0, 0, -1, -1, -1, -1, -1],
+    "idle_up": [0, 0, 0, -1, -1, -1, -1, -1],
+    "idle_side": [0, 0, 0, -1, -1, -1, -1, -1]
+   },
+   "1": {
+    "idle_down": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_up": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_side": [0, 0, 0, 0, 0, 0, 0, 0]
+   }
+  },
+  "moved": {
+   "bounce": {
+    "0": {
+     "idle_down": 587,
+     "idle_up": 494,
+     "idle_side": 491,
+     "walk_down": 281,
+     "walk_up": 240,
+     "walk_side": 315,
+     "run_down": 680,
+     "run_up": 650,
+     "run_side": 771
+    },
+    "1": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 16,
+     "walk_up": 16,
+     "walk_side": 13,
+     "run_down": 328,
+     "run_up": 315,
+     "run_side": 344
+    }
+   },
+   "stride": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 38,
+     "walk_up": 48,
+     "walk_side": 926,
+     "run_down": 14,
+     "run_up": 711,
+     "run_side": 869
+    },
+    "1": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 24,
+     "walk_up": 24,
+     "walk_side": 91,
+     "run_down": 8,
+     "run_up": 8,
+     "run_side": 733
+    }
+   }
+  },
+  "shifted": {
+   "bounce": {
+    "0": {
+     "walk_down": 281,
+     "walk_up": 240,
+     "walk_side": 315,
+     "run_down": 680,
+     "run_up": 650,
+     "run_side": 771
+    },
+    "1": {
+     "walk_down": 16,
+     "walk_up": 16,
+     "walk_side": 13,
+     "run_down": 328,
+     "run_up": 315,
+     "run_side": 344
+    }
+   },
+   "stride": {
+    "0": {
+     "walk_down": 38,
+     "walk_up": 48,
+     "walk_side": 926,
+     "run_down": 14,
+     "run_up": 711,
+     "run_side": 869
+    },
+    "1": {
+     "walk_down": 24,
+     "walk_up": 24,
+     "walk_side": 91,
+     "run_down": 8,
+     "run_up": 8,
+     "run_side": 733
+    }
+   }
+  }
+ },
+ "hero-walker": {
+  "gait": {
+   "bounce": {
+    "walk_down": [1, 1, 2],
+    "walk_up": [1, 1, 2],
+    "walk_side": [1, 1, 2]
+   },
+   "stride": {
+    "walk_down": [3, 4, 5],
+    "walk_up": [3, 4, 5],
+    "walk_side": [10, 12, 14]
+   }
+  },
+  "idle": {
+   "0": {
+    "idle_down": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_up": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_side": [0, 0, 0, 0, 0, 0, 0, 0]
+   },
+   "1": {
+    "idle_down": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_up": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_side": [0, 0, 0, 1, 1, 1, 1, 1]
+   }
+  },
+  "moved": {
+   "bounce": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 179,
+     "walk_up": 145,
+     "walk_side": 256,
+     "attack_down": 0,
+     "attack_up": 0,
+     "attack_side": 0,
+     "hurt": 0,
+     "die": 0
+    },
+    "1": {
+     "idle_down": 1226,
+     "idle_up": 1052,
+     "idle_side": 949,
+     "walk_down": 534,
+     "walk_up": 473,
+     "walk_side": 483,
+     "attack_down": 0,
+     "attack_up": 0,
+     "attack_side": 0,
+     "hurt": 0,
+     "die": 0
+    }
+   },
+   "stride": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 156,
+     "walk_up": 106,
+     "walk_side": 1658,
+     "attack_down": 0,
+     "attack_up": 0,
+     "attack_side": 0,
+     "hurt": 0,
+     "die": 0
+    },
+    "1": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 176,
+     "walk_up": 193,
+     "walk_side": 239,
+     "attack_down": 0,
+     "attack_up": 0,
+     "attack_side": 0,
+     "hurt": 0,
+     "die": 0
+    }
+   }
+  },
+  "shifted": {
+   "bounce": {
+    "0": {
+     "walk_down": 179,
+     "walk_up": 145,
+     "walk_side": 256
+    },
+    "1": {
+     "walk_down": 534,
+     "walk_up": 473,
+     "walk_side": 483
+    }
+   },
+   "stride": {
+    "0": {
+     "walk_down": 156,
+     "walk_up": 106,
+     "walk_side": 1658
+    },
+    "1": {
+     "walk_down": 176,
+     "walk_up": 193,
+     "walk_side": 239
+    }
+   }
+  }
+ },
+ "mage-walker": {
+  "gait": {
+   "bounce": {
+    "walk_down": [1, 1, 2],
+    "walk_up": [1, 1, 2],
+    "walk_side": [1, 1, 2]
+   }
+  },
+  "idle": {
+   "0": {
+    "idle_down": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_up": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_side": [0, 0, 0, 0, 0, 0, 0, 0]
+   },
+   "1": {
+    "idle_down": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_up": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_side": [0, 0, 0, 1, 1, 1, 1, 1]
+   }
+  },
+  "moved": {
+   "bounce": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 64,
+     "walk_up": 48,
+     "walk_side": 15,
+     "cast": 0
+    },
+    "1": {
+     "idle_down": 1272,
+     "idle_up": 1156,
+     "idle_side": 1295,
+     "walk_down": 531,
+     "walk_up": 485,
+     "walk_side": 507,
+     "cast": 0
+    }
+   }
+  },
+  "shifted": {
+   "bounce": {
+    "0": {
+     "walk_down": 64,
+     "walk_up": 48,
+     "walk_side": 15
+    },
+    "1": {
+     "walk_down": 531,
+     "walk_up": 485,
+     "walk_side": 507
+    }
+   }
+  }
+ },
+ "merchant": {
+  "gait": {
+   "bounce": {}
+  },
+  "idle": {
+   "0": {
+    "idle_down": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_up": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_side": [0, 0, 0, 0, 0, 0, 0, 0]
+   },
+   "1": {
+    "idle_down": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_up": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_side": [0, 0, 0, 1, 1, 1, 1, 1]
+   }
+  },
+  "moved": {
+   "bounce": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "talk": 0,
+     "wave": 0
+    },
+    "1": {
+     "idle_down": 1432,
+     "idle_up": 1155,
+     "idle_side": 1086,
+     "talk": 96,
+     "wave": 258
+    }
+   }
+  },
+  "shifted": {
+   "bounce": {
+    "0": {},
+    "1": {}
+   }
+  }
+ },
+ "town-guard": {
+  "gait": {
+   "bounce": {
+    "walk_down": [1, 1, 2],
+    "walk_up": [1, 1, 2],
+    "walk_side": [1, 1, 2]
+   },
+   "stride": {
+    "walk_down": [3, 4, 5],
+    "walk_up": [3, 4, 5],
+    "walk_side": [10, 12, 14]
+   }
+  },
+  "idle": {
+   "0": {
+    "idle_down": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_up": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_side": [0, 0, 0, 0, 0, 0, 0, 0]
+   },
+   "1": {
+    "idle_down": [1, 0, 0, 0, 1, 1, 1, 1],
+    "idle_up": [1, 0, 0, 0, 1, 1, 1, 1],
+    "idle_side": [0, 0, 0, 1, 1, 1, 1, 1]
+   }
+  },
+  "moved": {
+   "bounce": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 131,
+     "walk_up": 88,
+     "walk_side": 126,
+     "block": 0
+    },
+    "1": {
+     "idle_down": 1215,
+     "idle_up": 1297,
+     "idle_side": 1243,
+     "walk_down": 538,
+     "walk_up": 566,
+     "walk_side": 673,
+     "block": 0
+    }
+   },
+   "stride": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 117,
+     "walk_up": 66,
+     "walk_side": 571,
+     "block": 0
+    },
+    "1": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 101,
+     "walk_up": 97,
+     "walk_side": 450,
+     "block": 0
+    }
+   }
+  },
+  "shifted": {
+   "bounce": {
+    "0": {
+     "walk_down": 131,
+     "walk_up": 88,
+     "walk_side": 126
+    },
+    "1": {
+     "walk_down": 538,
+     "walk_up": 566,
+     "walk_side": 673
+    }
+   },
+   "stride": {
+    "0": {
+     "walk_down": 117,
+     "walk_up": 66,
+     "walk_side": 571
+    },
+    "1": {
+     "walk_down": 101,
+     "walk_up": 97,
+     "walk_side": 450
+    }
+   }
+  }
+ },
+ "void-ranger": {
+  "gait": {
+   "bounce": {
+    "walk_down": [1, 1, 2],
+    "walk_up": [1, 1, 2],
+    "walk_side": [1, 1, 2]
+   },
+   "stride": {
+    "walk_down": [3, 4, 5],
+    "walk_up": [3, 4, 5],
+    "walk_side": [10, 12, 14]
+   }
+  },
+  "idle": {
+   "0": {
+    "idle_down": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_up": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_side": [0, 0, 0, 0, 0, 0, 0, 0]
+   },
+   "1": {
+    "idle_down": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_up": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_side": [0, 0, 0, 1, 1, 1, 1, 1]
+   }
+  },
+  "moved": {
+   "bounce": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 81,
+     "walk_up": 74,
+     "walk_side": 184,
+     "shoot_down": 0,
+     "shoot_up": 0,
+     "shoot_side": 0,
+     "dodge": 0,
+     "hurt": 0,
+     "die": 0
+    },
+    "1": {
+     "idle_down": 1114,
+     "idle_up": 1002,
+     "idle_side": 975,
+     "walk_down": 464,
+     "walk_up": 439,
+     "walk_side": 429,
+     "shoot_down": 0,
+     "shoot_up": 0,
+     "shoot_side": 0,
+     "dodge": 0,
+     "hurt": 0,
+     "die": 0
+    }
+   },
+   "stride": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 77,
+     "walk_up": 72,
+     "walk_side": 1261,
+     "shoot_down": 0,
+     "shoot_up": 0,
+     "shoot_side": 0,
+     "dodge": 0,
+     "hurt": 0,
+     "die": 0
+    },
+    "1": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 105,
+     "walk_up": 99,
+     "walk_side": 161,
+     "shoot_down": 0,
+     "shoot_up": 0,
+     "shoot_side": 0,
+     "dodge": 0,
+     "hurt": 0,
+     "die": 0
+    }
+   }
+  },
+  "shifted": {
+   "bounce": {
+    "0": {
+     "walk_down": 81,
+     "walk_up": 74,
+     "walk_side": 184
+    },
+    "1": {
+     "walk_down": 464,
+     "walk_up": 439,
+     "walk_side": 429
+    }
+   },
+   "stride": {
+    "0": {
+     "walk_down": 77,
+     "walk_up": 72,
+     "walk_side": 1261
+    },
+    "1": {
+     "walk_down": 105,
+     "walk_up": 99,
+     "walk_side": 161
+    }
+   }
+  }
+ },
+ "shield-trooper": {
+  "gait": {
+   "bounce": {
+    "walk_down": [1, 1, 2],
+    "walk_up": [1, 1, 2],
+    "walk_side": [1, 1, 2]
+   },
+   "stride": {
+    "walk_down": [3, 4, 5],
+    "walk_up": [3, 4, 5],
+    "walk_side": [10, 12, 14]
+   }
+  },
+  "idle": {
+   "0": {
+    "idle_down": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_up": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_side": [0, 0, 0, 0, 0, 0, 0, 0]
+   },
+   "1": {
+    "idle_down": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_up": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_side": [0, 0, 0, 1, 1, 1, 1, 1]
+   }
+  },
+  "moved": {
+   "bounce": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 78,
+     "walk_up": 95,
+     "walk_side": 121,
+     "shoot_down": 0,
+     "shoot_up": 0,
+     "shoot_side": 0,
+     "block": 0,
+     "hurt": 0,
+     "die": 0
+    },
+    "1": {
+     "idle_down": 962,
+     "idle_up": 1105,
+     "idle_side": 1115,
+     "walk_down": 456,
+     "walk_up": 504,
+     "walk_side": 504,
+     "shoot_down": 0,
+     "shoot_up": 0,
+     "shoot_side": 0,
+     "block": 0,
+     "hurt": 0,
+     "die": 0
+    }
+   },
+   "stride": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 63,
+     "walk_up": 82,
+     "walk_side": 1885,
+     "shoot_down": 0,
+     "shoot_up": 0,
+     "shoot_side": 0,
+     "block": 0,
+     "hurt": 0,
+     "die": 0
+    },
+    "1": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 56,
+     "walk_up": 145,
+     "walk_side": 191,
+     "shoot_down": 0,
+     "shoot_up": 0,
+     "shoot_side": 0,
+     "block": 0,
+     "hurt": 0,
+     "die": 0
+    }
+   }
+  },
+  "shifted": {
+   "bounce": {
+    "0": {
+     "walk_down": 78,
+     "walk_up": 95,
+     "walk_side": 121
+    },
+    "1": {
+     "walk_down": 456,
+     "walk_up": 504,
+     "walk_side": 504
+    }
+   },
+   "stride": {
+    "0": {
+     "walk_down": 63,
+     "walk_up": 82,
+     "walk_side": 1885
+    },
+    "1": {
+     "walk_down": 56,
+     "walk_up": 145,
+     "walk_side": 191
+    }
+   }
+  }
+ },
+ "rogue-walker": {
+  "gait": {
+   "bounce": {
+    "walk_down": [1, 1, 2],
+    "walk_up": [1, 1, 2],
+    "walk_side": [1, 1, 2],
+    "run_down": [1, 2, 2],
+    "run_up": [1, 2, 2],
+    "run_side": [1, 2, 2]
+   },
+   "stride": {
+    "walk_down": [3, 4, 5],
+    "walk_up": [3, 4, 5],
+    "walk_side": [10, 12, 14],
+    "run_down": [5, 6, 7],
+    "run_up": [4, 5, 6],
+    "run_side": [10, 12, 14]
+   }
+  },
+  "idle": {
+   "0": {
+    "idle_down": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_up": [0, 0, 0, 0, 0, 0, 0, 0],
+    "idle_side": [0, 0, 0, 0, 0, 0, 0, 0]
+   },
+   "1": {
+    "idle_down": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_up": [0, 0, 0, 1, 1, 1, 1, 1],
+    "idle_side": [0, 0, 0, 1, 1, 1, 1, 1]
+   }
+  },
+  "moved": {
+   "bounce": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 176,
+     "walk_up": 137,
+     "walk_side": 302,
+     "run_down": 586,
+     "run_up": 437,
+     "run_side": 493
+    },
+    "1": {
+     "idle_down": 1123,
+     "idle_up": 767,
+     "idle_side": 745,
+     "walk_down": 526,
+     "walk_up": 371,
+     "walk_side": 443,
+     "run_down": 1071,
+     "run_up": 847,
+     "run_side": 894
+    }
+   },
+   "stride": {
+    "0": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 173,
+     "walk_up": 127,
+     "walk_side": 1649,
+     "run_down": 1627,
+     "run_up": 41,
+     "run_side": 91
+    },
+    "1": {
+     "idle_down": 0,
+     "idle_up": 0,
+     "idle_side": 0,
+     "walk_down": 135,
+     "walk_up": 149,
+     "walk_side": 214,
+     "run_down": 84,
+     "run_up": 62,
+     "run_side": 1254
+    }
+   }
+  },
+  "shifted": {
+   "bounce": {
+    "0": {
+     "walk_down": 176,
+     "walk_up": 137,
+     "walk_side": 302,
+     "run_down": 586,
+     "run_up": 437,
+     "run_side": 493
+    },
+    "1": {
+     "walk_down": 526,
+     "walk_up": 371,
+     "walk_side": 443,
+     "run_down": 1071,
+     "run_up": 847,
+     "run_side": 894
+    }
+   },
+   "stride": {
+    "0": {
+     "walk_down": 173,
+     "walk_up": 127,
+     "walk_side": 1649,
+     "run_down": 1627,
+     "run_up": 41,
+     "run_side": 91
+    },
+    "1": {
+     "walk_down": 135,
+     "walk_up": 149,
+     "walk_side": 214,
+     "run_down": 84,
+     "run_up": 62,
+     "run_side": 1254
+    }
+   }
+  }
+ }
+}

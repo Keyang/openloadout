@@ -12,9 +12,7 @@ import { framePhase, frameOfPhase, snapKeys, clipPose } from '../../rigs/keypose
 import { framePose, drawOptions, directionRig, directionOf, TOPDOWN_DIRECTIONS } from '../../engine/data-sprite.js';
 import { STANDARD_CLIPS, CLIP_SYNONYMS, FRAME_SIZES, STUDIO_LIMITS, SOCKET_NAMES, RESERVED_IDS } from '../../catalog/studio-schema.js';
 import { studioTemplate, studioTemplates } from '../../rigs/studio-templates.js';
-import { hero, figureFor, POSE_FIELDS } from '../../rigs/humanoid-studio.js';
 import { slugOf } from './drafts.js';
-import { libraryHandles, dragLibrary, nudgeLibraryHandle } from './library-body.js';
 
 const RAD = Math.PI / 180;
 const cp = (v) => JSON.parse(JSON.stringify(v));
@@ -35,24 +33,20 @@ export function humanize(id) {
 
 // ---- starting bodies ----------------------------------------------------------------------------------------------
 
-/** The bodies a new draft can start from: every studio template (side view, then top-down) and the Hero from the library: [{ id, kind ('template' | 'library'), label, blurb, view, size, clips }]. */
+/** The bodies a new draft can start from: every studio template (side view, then top-down): [{ id, kind ('template'), label, blurb, view, size, clips }]. (The Hero, a library body, is gone: build item R1; a library sprite is opened as a copy in the studio's other editor.) */
 export function startingBodies() {
-  const t = studioTemplates().map((x) => ({ ...x, kind: 'template' }));
-  const h = hero();
-  return [...t, { id: 'hero', kind: 'library', label: 'Hero', blurb: 'The library\'s Hero, every animation ready to change.', view: 'side', size: [...h.size], clips: Object.keys(h.clips) }];
+  return studioTemplates().map((x) => ({ ...x, kind: 'template' }));
 }
 
-/** A new definition from a starting body's id ('hero' or a template id), named `name`, or null for an unknown id. Arguments: id, name, catalogIds (ids already in the library; the new id avoids them). */
+/** A new definition from a template's id, named `name`, or null for an unknown id. Arguments: id, name, catalogIds (ids already in the library; the new id avoids them). */
 export function startFrom(id, name, catalogIds = []) {
-  let d;
-  if (id === 'hero') d = hero();
-  else d = studioTemplate(id);
+  const d = studioTemplate(id);
   if (!d) return null;
-  d.made = { in: 'studio', from: id === 'hero' ? 'library:knight' : `template:${id}` };
+  d.made = { in: 'studio', from: `template:${id}` };
   return setName(d, name || d.name, catalogIds);
 }
 
-/** True for a definition whose body is a bone rig (false for a library body such as the Hero). */
+/** True for a definition whose body is a bone rig (every version 1 body is one now). */
 export const isRig = (def) => isObj(def?.body?.rig);
 
 /** True for a bone rig drawn in three directions (Contract 2: clips per direction). */
@@ -306,7 +300,7 @@ const clipOf = (def, clip) => (isObj(def?.clips) && typeof clip === 'string' && 
 export const hasClip = (def, name) => clipOf(def, name) !== null;
 const keyTol = (c) => Math.min(0.002, 0.25 / Math.max(1, c.loop === false ? c.frames - 1 : c.frames));
 
-/** The index of the key that sits on a frame of a clip, or -1. A key between frames (a library body's light keys) is on none. */
+/** The index of the key that sits on a frame of a clip, or -1. A key between frames is on none. */
 export function keyIndexAt(def, clip, frame) {
   const c = clipOf(def, clip);
   if (!c) return -1;
@@ -411,10 +405,7 @@ export function keyChanges(def, clip, frame) {
   if (i < 0) return [];
   const k = def.clips[clip].keys[i];
   const out = [];
-  if (!isRig(def)) {
-    for (const f of Object.keys(k)) if (LIBRARY_LABELS[f]) out.push(LIBRARY_LABELS[f]);
-    return [...new Set(out)];
-  }
+  if (!isRig(def)) return [];
   const rig = def.body.rig;
   if (k.root) out.push('Whole body');
   for (const c of rig.ik) if (isObj(k.ik) && k.ik[c.id]) out.push(c.label || humanize(c.id));
@@ -438,13 +429,12 @@ function solved(def, ctx) {
 /**
  * The handles of a frame, in frame pixels and in the order Tab moves through them: [{ id, kind, label, at: [x, y], from?: [x, y] }].
  * Body: the body's start ('root') and every bone's tip ('bone:<id>'). Move: the whole body ('root'), each two-bone
- * chain's end ('ik:<id>', a foot or a hand) and the tip of every other bone. Frames: the anchor ('pivot'). A library body has none.
+ * chain's end ('ik:<id>', a foot or a hand) and the tip of every other bone. Frames: the anchor ('pivot').
  * Arguments: def, ctx { mode ('body' | 'move' | 'frames'), clip, frame, facing (top-down Body only) }.
  */
 export function handles(def, ctx) {
   if (ctx.mode === 'frames') return isRig(def) ? [{ id: 'pivot', kind: 'pivot', label: 'Anchor', at: [...def.pivot] }] : [];
-  // a library body (the Hero): hips, hands, feet, head, upper body and the held thing on Move (app/studio/library-body.js, item S10)
-  if (!isRig(def)) return ctx.mode === 'move' ? libraryHandles(def, ctx.clip, ctx.frame ?? 0) : [];
+  if (!isRig(def)) return [];
   if (ctx.mode !== 'body' && !clipOf(def, ctx.clip)) return [];
   const { rig, J } = solved(def, ctx);
   const out = [];
@@ -485,7 +475,6 @@ export function dragHandle(def, ctx, id, point) {
   const [px, py] = point;
   if (!Number.isFinite(px) || !Number.isFinite(py)) return cp(def);
   if (id === 'pivot') return setPivot(def, [px, py]);
-  if (id.startsWith('lib:')) return ctx.mode === 'move' ? dragLibrary(def, ctx.clip, ctx.frame ?? 0, id, point) : cp(def);
   if (!isRig(def)) return cp(def);
   const { rig, pose, opt, J } = solved(def, ctx);
   const root = rig.bones.find((b) => b.parent == null);
@@ -537,7 +526,6 @@ function poseBone(def, ctx, b, cur, next) {
 
 /** Move a handle by whole pixels (the arrow keys, the arrow buttons): dragHandle to where it is plus [dx, dy]. */
 export function nudgeHandle(def, ctx, id, dx, dy) {
-  if (typeof id === 'string' && id.startsWith('lib:')) return ctx.mode === 'move' ? nudgeLibraryHandle(def, ctx.clip, ctx.frame ?? 0, id, dx, dy) : cp(def);
   const h = handles(def, ctx).find((x) => x.id === id);
   if (!h) return cp(def);
   if (id === 'pivot') return setPivot(def, [def.pivot[0] + dx, def.pivot[1] + dy]);
@@ -567,41 +555,6 @@ export function turnBone(def, ctx, boneId, deg) {
   const chain = rig.ik.find((c) => c.bones.includes(boneId));
   if (chain && isObj(framePose(def, ctx.clip, ctx.frame).ik) && framePose(def, ctx.clip, ctx.frame).ik[chain.id]) return cp(def);
   return poseBone(def, ctx, b, J.bones[boneId].deg, J.bones[boneId].deg + deg);
-}
-
-// ---- the Hero and other library bodies: a key's fields as rows with arrows ----------------------------------------
-
-const LIBRARY_LABELS = {
-  rootX: 'Whole body', lift: 'Lift', crouch: 'Crouch', lean: 'Lean', headTilt: 'Head tilt', item: 'What the hand holds', item2: 'What the other hand holds',
-  footF: 'Near foot', footB: 'Far foot', armF: 'Near arm', armB: 'Far arm', headTurn: 'Head turn', sway: 'Sway',
-};
-const LIBRARY_ROWS = ['rootX', 'lift', 'crouch', 'lean', 'headTilt', 'footF', 'footB', 'armF', 'armB', 'item'];
-
-/** The pose fields of a library body's frame as rows: [{ id, label, kind ('px' | 'angle' | 'point' | 'arm'), value, keyed }]. */
-export function libraryRows(def, clip, frame) {
-  if (isRig(def) || !clipOf(def, clip)) return [];
-  const pose = keyedPose(def, clip, frame);
-  const i = keyIndexAt(def, clip, frame);
-  const k = i >= 0 ? def.clips[clip].keys[i] : {};
-  return LIBRARY_ROWS.filter((f) => pose[f] !== undefined && pose[f] !== null).map((f) => ({ id: f, label: LIBRARY_LABELS[f], kind: POSE_FIELDS[f].kind, value: pose[f], keyed: k[f] !== undefined }));
-}
-
-/**
- * Nudge one pose field of a library body on a frame's key: a point (a foot) moves by [dx, dy] pixels, an arm turns at
- * the shoulder by dx * 5 degrees and bends at the elbow by dy * 5, an angle turns by dx * 5 degrees, a distance by dx px.
- * Arguments: def, clip, frame, field, dx, dy.
- */
-export function nudgeLibrary(def, clip, frame, field, dx, dy) {
-  const spec = POSE_FIELDS[field];
-  if (!spec || isRig(def) || !clipOf(def, clip)) return cp(def);
-  const v = keyedPose(def, clip, frame)[field];
-  let next;
-  if (spec.kind === 'point') next = { ...(isObj(v) ? v : { x: 0, y: 0 }), x: clamp((v?.x ?? 0) + dx, -64, 64), y: clamp((v?.y ?? 0) + dy, -64, 64) };
-  else if (spec.kind === 'arm') next = { a: clamp((v?.a ?? 0) + dx * 5, -720, 720), e: clamp((v?.e ?? 0) + dy * 5, -720, 720) };
-  else if (spec.kind === 'angle') next = clamp((Number(v) || 0) + dx * 5, -720, 720);
-  else if (spec.kind === 'px') next = clamp((Number(v) || 0) + dx, -64, 64);
-  else return cp(def);
-  return setKeyValue(def, clip, frame, [field], next);
 }
 
 // ---- clips --------------------------------------------------------------------------------------------------------
@@ -676,8 +629,6 @@ export function addClip(def, name, { label, copyFrom } = {}) {
     const keys = src ? snapKeys(cp(d.clips[src].keys ?? []), shape).keys : [];
     const dir = n.includes('_') ? n.split('_')[1] : null;
     d.clips[n] = { label: dir ? `${base} (${dir})` : base, frames: std.frames, fps: std.fps, loop: std.loop, keys };
-    // a library body's copy is made from the same pose as its source, so a change to the body moves it too (item S10)
-    if (src && !isRig(d) && typeof d.clips[src].from === 'string') d.clips[n].from = d.clips[src].from;
   }
   return { def: d, names };
 }
@@ -771,7 +722,7 @@ export function setGrounded(def, grounded) {
   return d;
 }
 
-/** The frame sizes a definition may have: the style guide's for a bone rig, the library's one for a library body. */
+/** The frame sizes a definition may have: the style guide's for a bone rig, else only its own. */
 export const frameSizes = (def) => (isRig(def) ? FRAME_SIZES.map((s) => [...s]) : [[...def.size]]);
 
 /** Change a bone rig's frame size: the body moves with the bottom middle of the frame, and stands on the new ground row. */
@@ -887,18 +838,12 @@ export function colourSlots(def) {
   return Object.entries(def.colours ?? {}).map(([id, value]) => ({ id, label: humanize(id), value }));
 }
 
-/** Set a colour slot's colour (#rrggbb); anything that is not a colour changes nothing. A library body's figure follows. */
+/** Set a colour slot's colour (#rrggbb); anything that is not a colour changes nothing. */
 export function setColour(def, slot, hex) {
   const d = cp(def);
   if (!HEX.test(String(hex))) return d;
   const c = String(hex).toLowerCase();
-  if (isRig(d)) {
-    if (!d.body.rig.colours.some((s) => s.id === slot)) return d;
-  } else {
-    if (!Object.hasOwn(d.colours ?? {}, slot)) return d;
-    const { keys, keysFor, ...figure } = figureFor(d, { [slot]: c });
-    d.body.figure = figure;
-  }
+  if (!isRig(d) || !d.body.rig.colours.some((s) => s.id === slot)) return d;
   d.colours = { ...(d.colours ?? {}), [slot]: c };
   return d;
 }
@@ -937,7 +882,7 @@ export function removeControl(def, key) {
 /** Add a part people can switch off, made of some shapes: { def, key } or { def, error }. Arguments: def, { label, shapes }. */
 export function addPart(def, { label, shapes }) {
   const d = cp(def);
-  if (!isRig(d)) return { def: d, error: 'This body\'s parts come from the library.' };
+  if (!isRig(d)) return { def: d, error: 'This body has no shapes to make a part of.' };
   const ids = (shapes ?? []).filter((s) => d.body.rig.shapes.some((x) => x.id === s));
   if (!ids.length) return { def: d, error: 'Pick a bone that has shapes on it first.' };
   if (Object.keys(d.parts ?? {}).length >= STUDIO_LIMITS.parts) return { def: d, error: `A sprite can have at most ${STUDIO_LIMITS.parts} parts.` };

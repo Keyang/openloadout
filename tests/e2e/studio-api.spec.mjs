@@ -22,7 +22,7 @@ test('an agent makes a Four legs creature with window.loadout.studio: create, ch
   await page.evaluate(() => { try { localStorage.removeItem('loadout-studio-v1'); } catch { /* nothing kept */ } });
 
   const members = await page.evaluate(() => Object.keys(window.loadout.studio).sort());
-  expect(members).toEqual(['advice', 'bake', 'create', 'file', 'get', 'list', 'remove', 'render', 'set', 'starts', 'toBag', 'validate']);
+  expect(members).toEqual(['advice', 'create', 'file', 'get', 'list', 'remove', 'render', 'set', 'starts', 'toBag', 'validate']);
 
   const run = await page.evaluate(async () => {
     const s = window.loadout.studio;
@@ -46,7 +46,8 @@ test('an agent makes a Four legs creature with window.loadout.studio: create, ch
   });
 
   expect(run.starts.ok).toBe(true);
-  expect(run.starts.starts.map((x) => x.from)).toEqual(expect.arrayContaining(['template:four-legs', 'library:knight']));
+  expect(run.starts.starts.map((x) => x.from)).toEqual(expect.arrayContaining(['template:four-legs']));
+  expect(run.starts.starts.some((x) => x.from.startsWith('library:') || x.body === 'library body'), 'no library body to start from (build item R1)').toBe(false);
   expect(run.created.ok, JSON.stringify(run.created.errors)).toBe(true);
   expect(run.created.draft).toBe('moss-beast');
   expect(run.created.saved).toBe(true);

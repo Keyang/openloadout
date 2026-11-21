@@ -6,7 +6,7 @@
 import { el, header, saveBlob } from '../ui.js';
 import { validateDataSprite } from '../../engine/data-sprite.js';
 import { assetById } from '../catalog.js';
-import { draftIdFor, slugOf } from './drafts.js';
+import { draftIdFor, slugOf, LIBRARY_BODY_GONE } from './drafts.js';
 import { startingBodies, startFrom, setName, hasClip } from './edit.js';
 import { drawFrame } from './draw.js';
 import { checkDraft } from './v2-check.js';
@@ -39,6 +39,42 @@ function picture(def, room) {
 }
 
 const VIEW_WORD = { side: 'Side view', 'top-down': 'Top-down, three ways', front: 'Front view', none: 'Any view' };
+
+/** The note a saved draft of the removed library-body path carries, in everyday words (LIBRARY_BODY_GONE). */
+const GONE_NOTE = LIBRARY_BODY_GONE.replace(/^This sprite used a library body/, 'This draft used a library body');
+
+/** What a saved draft that used a library body offers: its library sprite (when it began as one), its JSON, Remove. Arguments: g (drafts.gone's row), drafts, { say, after (called once it is removed) }. */
+function goneActions(g, drafts, { say, after }) {
+  return el('div', { class: 'st-draft-acts' },
+    g.from ? el('a', { class: 'btn btn-sm btn-primary', href: `#/sprite/${g.from}`, 'data-act': 'open-library-sprite' }, `Open ${g.from} in the library`) : el('a', { class: 'btn btn-sm btn-primary', href: '#/browse', 'data-act': 'open-library-sprite' }, 'Browse the library'),
+    el('button', { type: 'button', class: 'btn btn-sm', 'data-act': 'download-gone', onclick: () => {
+      saveBlob(new Blob([JSON.stringify(g.definition, null, 2)], { type: 'application/json' }), `${g.id}.json`);
+      say(`${g.id}.json is downloaded.`);
+    } }, 'Download what is saved'),
+    el('button', { type: 'button', class: 'btn btn-sm', 'data-act': 'remove-gone', 'aria-label': `Remove ${g.name}`, onclick: () => {
+      const r = drafts.remove(g.id);
+      if (!r.ok) { say(r.error); return; }
+      after();
+    } }, 'Remove'));
+}
+
+/**
+ * The page for a saved draft that used a library body (a path that is removed, build item R1): not damaged, not
+ * opened for editing, and said so in plain words with what to do instead. Returns the page's teardown.
+ * Arguments: app, { id, gone (drafts.gone(id)), drafts }.
+ */
+export function gonePage(app, { id, gone, drafts }) {
+  document.title = 'Needs a copy · Studio · Loadout';
+  const status = el('p', { class: 'studio-say', role: 'status', 'aria-live': 'polite' });
+  app.replaceChildren(header('studio'), el('main', { class: 'v2 home notice', 'data-gone-draft': id },
+    el('h1', { class: 'h2' }, `${gone.name} needs a copy`),
+    el('p', { class: 'lede', 'data-note': 'library-body-gone' }, GONE_NOTE),
+    el('p', { class: 'quiet' }, 'The draft is still saved on this computer and nothing in it was changed. Library sprites are data now: open the library sprite, and the studio edits a copy of it.'),
+    goneActions(gone, drafts, { say: (...t) => status.replaceChildren(...t), after: () => { location.hash = '#/studio'; } }),
+    status,
+    el('p', {}, el('a', { class: 'link', href: '#/studio' }, 'Go to the studio'))));
+  return () => {};
+}
 
 /**
  * Draws the studio's first page and returns its teardown. Arguments: app, { drafts (app/studio/drafts.js), kept, query }.
@@ -73,7 +109,7 @@ export function homePage(app, { drafts, kept, query }) {
       grid.append(el('button', { type: 'button', class: 'st-start', 'data-start': s.id, onclick: () => create(setName(v.value, s.label, taken(s.label)), 'new') },
         el('span', { class: 'tile st-start-pic' }, v.ok ? picture(v.value, 150) : null),
         el('span', { class: 'st-start-name' }, s.label),
-        el('span', { class: 'st-start-tag' }, s.kind === 'library' ? 'From the library' : VIEW_WORD[s.view] ?? 'Side view')));
+        el('span', { class: 'st-start-tag' }, VIEW_WORD[s.view] ?? 'Side view')));
     }
     pick.append(v2StartsSection({ drafts, say }));
   }
@@ -135,9 +171,20 @@ export function homePage(app, { drafts, kept, query }) {
 
   // ---- the drafts ----
   const list = el('div', { class: 'st-drafts' });
+  const goneGrid = el('div', { class: 'st-drafts' });
+  const goneList = el('section', { class: 'st-list st-gone', 'aria-labelledby': 'st-gone-h', hidden: true }, el('h2', { class: 'h4', id: 'st-gone-h' }, 'Drafts that need a copy'), goneGrid);
   const draftsHead = el('h2', { class: 'h4', id: 'st-drafts-h' });
   const listBox = el('section', { class: 'st-list', 'aria-labelledby': 'st-drafts-h' }, draftsHead, list);
+  function drawGone() {
+    const items = drafts.gone();
+    goneList.hidden = !items.length || !!drafts.problem();
+    goneGrid.replaceChildren(...items.map((g) => el('article', { class: 'draft card', 'data-gone-draft': g.id },
+      el('div', { class: 'card-meta' }, el('span', { class: 'card-title' }, g.name), el('span', { class: 'card-tag' }, el('span', {}, `Saved ${ago(g.savedAt)}`))),
+      el('p', { class: 'quiet small', 'data-note': 'library-body-gone' }, GONE_NOTE),
+      goneActions(g, drafts, { say, after: () => { drawGone(); drawDrafts(); say(`${g.name} removed.`); } }))));
+  }
   function drawDrafts() {
+    drawGone();
     const all = drafts.list();
     draftsHead.textContent = all.length ? `Your drafts (${all.length})` : 'Your drafts';
     const broken = drafts.broken();
@@ -170,7 +217,8 @@ export function homePage(app, { drafts, kept, query }) {
       kept ? null : el('p', { class: 'not-kept', role: 'note' }, el('strong', {}, 'This browser is not saving for this site. '), 'What you make here is gone when the tab closes: download the file before you leave.'),
       status),
     pick,
-    listBox);
+    listBox,
+    goneList);
   app.replaceChildren(header('studio'), main);
   drawTrouble();
   drawDrafts();

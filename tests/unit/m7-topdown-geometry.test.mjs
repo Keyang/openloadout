@@ -5,8 +5,11 @@
 // slider short of the code's range on six of them: each from a base baked at the biggest headgear and the longest
 // weapon, where the code rig crouches the body or moves it aside to keep them in the frame.
 //
+// R2 deleted the code sprites (rigs/topdown.js went with them) and this test with them; it is back against the recorded
+// frames of tests/fixtures/code-frames/ (tests/helpers/code-frames.mjs), the data sprite drawn live.
+//
 // For each of the nine and each clip, the box of everything it draws over all its frames is compared with the code
-// sprite's (tests/fixtures/code-sprites/, read through tests/helpers/library.mjs codeSprite):
+// sprite's:
 //   1. at the defaults, every side of every clip's box within 1 px;
 //   2. at Height low and high (the rest at the defaults), the top and bottom rows of the standing clips within 1 px;
 // except where KNOWN says how far and why: what data cannot do yet, each in the batch's report. A change that moves one
@@ -15,7 +18,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { ROOT, loadDataSprite } from '../../tools/lib/assets.mjs';
-import { codeSprite } from '../helpers/library.mjs';
+import { codeFrames } from '../helpers/code-frames.mjs';
 import { cleanParams, defaultParams, renderFrame } from '../../engine/sprite.js';
 
 const IDS = ['village-elder', 'farm-kid', 'hero-walker', 'mage-walker', 'merchant', 'town-guard', 'void-ranger', 'shield-trooper', 'rogue-walker'];
@@ -56,7 +59,9 @@ function clipBox(s, clip, set = {}) {
   }
   return [x0, y0, x1, y1];
 }
-const pair = async (id) => [await codeSprite(id), await loadDataSprite(ROOT, path.join(ROOT, 'sprites', `${id}.json`))];
+const pair = async (id) => [codeFrames(id), await loadDataSprite(ROOT, path.join(ROOT, 'sprites', `${id}.json`))];
+/** The recorded code sprite's box of a clip at Height `height` (undefined: the defaults). */
+const codeBox = (code, clip, height) => code.box(height === undefined ? '' : `height=${height}`, clip);
 /** Is box b further than allowed from a on any of these sides (allowed: 1 px, or KNOWN's for this id and clip, which must be needed). */
 const off = (a, b, sides = [0, 1, 2, 3]) => Math.max(...sides.map((i) => Math.abs(a[i] - b[i])));
 function far(id, key, a, b, sides) {
@@ -72,7 +77,7 @@ for (const id of IDS) {
     const [code, data] = await pair(id);
     const bad = [];
     for (const clip of Object.keys(code.clips)) {
-      const a = clipBox(code, clip), b = clipBox(data, clip);
+      const a = codeBox(code, clip), b = clipBox(data, clip);
       if (far(id, clip, a, b)) bad.push(`${clip}: ${say(a, b)}`);
     }
     assert.deepEqual(bad, [], `${id}: ${bad.length} clips are off`);
@@ -82,7 +87,7 @@ for (const id of IDS) {
     const [code, data] = await pair(id);
     const bad = [];
     for (const clip of ['idle_down', 'idle_up', 'idle_side']) for (const height of [0, 1]) {
-      const a = clipBox(code, clip, { height }), b = clipBox(data, clip, { height });
+      const a = codeBox(code, clip, height), b = clipBox(data, clip, { height });
       if (far(id, `${clip} height ${height}`, a, b, [1, 3])) bad.push(`${clip} height ${height}: ${say(a, b)}`);
     }
     assert.deepEqual(bad, [], `${id}: ${bad.length} are off`);

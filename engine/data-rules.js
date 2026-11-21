@@ -4,7 +4,7 @@
 // on, a hat in the trim colour only when it is the wide hat. A definition says that by naming one of these rules, the
 // same way it names a rig; the rule is framework code, so nothing in the definition ever runs.
 //
-// A paint expression (a value of `body.paint`, field "part.field" of the figure: { "look.bottom": ... }) is one of:
+// A paint expression (a colour rule of a data sprite: the library-body path that painted a figure's fields from the settings is gone, R1) is one of:
 //   "#rrggbb"                      that colour
 //   "<key>"                        the current value of a colour slot of the sprite (its colour control)
 //   { "rule": "<name>", ... }      a rule of COLOUR_RULES with its arguments (each argument is described there):
@@ -62,9 +62,6 @@ const arg = (kind, more = {}) => Object.freeze({ kind, ...more });
 
 /** The colour a paint expression gives when it cannot be read (it never can, once catalog/studio-schema.js has passed it). No arguments: a '#rrggbb'. */
 export const FALLBACK = '#ff00ff';
-
-/** The blocks of a side-view figure that rigs/humanoid-figure.js reads with defaults when they are absent (body, motion, look, hair): a control's `sets` may bring one in; any other part it sets (or paint paints) must be in the stored figure. No arguments: a frozen list. */
-export const FIGURE_BLOCKS = Object.freeze(['body', 'motion', 'look', 'hair']);
 
 /** How deep paint expressions may nest inside each other (a rule's argument is an expression). No arguments: a number. */
 export const PAINT_DEPTH = 6;
@@ -216,43 +213,4 @@ function evaluate(e, v, depth) {
     case 'choose': return evaluate(whenMatches(isObj(e.when) || Array.isArray(e.when) ? e.when : { '': [] }, v) ? e.then : e.else, v, depth + 1);
     default: return FALLBACK;
   }
-}
-
-// The colours a frozen paint (a data sprite's definition is frozen) gives, kept per settings: figureFor runs on every
-// frame and every socket query, and a paint near the size cap costs milliseconds to work out (review F1, issue 3). A
-// paint that can still change is worked out every time.
-const PAINTED = new WeakMap(), FROZEN_PAINT = new WeakSet();
-const PAINTED_KEPT = 64;
-function paintedColours(paint, values) {
-  const work = () => Object.entries(paint).map(([path, expr]) => [path, paintColour(expr, values)]);
-  if (!FROZEN_PAINT.has(paint)) { if (!deepFrozen(paint)) return work(); FROZEN_PAINT.add(paint); }
-  let key;
-  try { key = JSON.stringify(Object.keys(values).sort().map((k) => [k, values[k]])); } catch { return work(); }
-  let per = PAINTED.get(paint);
-  if (!per) PAINTED.set(paint, per = new Map());
-  let got = per.get(key);
-  if (!got) {
-    got = work();
-    if (per.size >= PAINTED_KEPT) per.delete(per.keys().next().value);
-    per.set(key, got);
-  }
-  return got;
-}
-const deepFrozen = (v) => v === null || typeof v !== 'object' || (Object.isFrozen(v) && Object.values(v).every(deepFrozen));
-
-/**
- * Returns a copy of a figure with its colours painted at these settings: each "part.field" of `paint` set to its
- * expression's colour (paintColour), only on parts the figure has (painting never adds a part). The figure given is not
- * changed; a frozen paint's colours are worked out once per settings (each call still gets its own copy).
- * Arguments: figure (plain data, as rigs/humanoid-figure.js reads it), paint ({ "part.field": expression }), values (the settings).
- */
-export function paintFigure(figure, paint, values = {}) {
-  const out = JSON.parse(JSON.stringify(figure ?? {}));
-  if (!isObj(paint)) return out;
-  for (const [path, colour] of paintedColours(paint, isObj(values) ? values : {})) {
-    const dot = path.indexOf('.'), part = path.slice(0, dot), field = path.slice(dot + 1);
-    if (dot < 1 || !field || !isObj(out[part]) || !Object.hasOwn(out, part)) continue;
-    out[part][field] = colour;
-  }
-  return out;
 }

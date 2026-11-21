@@ -1,14 +1,6 @@
 // Framework additions made with batch P06 (platformer enemies: spear-goblin, thorn-beetle).
 //
-// rigs/crawler.js (new module): the side-view rig for low many-legged bodies
-//   clipsFor, POSES        the standard clips: idle, walk, attack, block, hurt, die
-//   dims                   body measurements from plain numbers
-//   gait, step             which legs move together, and the path of one walking foot
-//   pose                   where the body is and what every foot does
-//   solve, place           the body's place and turn, every leg joint; shapes moved and turned with the body
-//   fit                    keeps a pose with a long horn inside the frame
-//   drawLegs, sockets, headShift
-//   domeHalf, domeIn, domePoint   a domed shell and points on its surface
+// (rigs/crawler.js, the side-view rig for low many-legged bodies, was also added with this batch; R2 deleted it and its tests.)
 // engine/creature.js: hornPath, hornIn (a curved tapering horn, tusk or claw)
 // rigs/humanoid.js: club, dagger, EXTRA_ITEMS, itemSizeOf, drawItem (more held items); thrustTrail;
 //   hood, hoodReach, skullcap (headgear); pointedEar, nose, NOSES (face parts)
@@ -16,182 +8,19 @@
 //   rigs/humanoid.js: tunic (a ragged skirt and rope belt for the torso hook), boneTopknot, boneTopknotRise (headgear),
 //     noseTip (where a nose ends), itemClearOf (tips a carried item forward until it passes clear of some points)
 //   engine/creature.js: CREATURE_EYES, creatureEye (the standard "Eyes" choice of a creature), feelerIn (a hair-thin feeler)
+// R2: the tests of rigs/crawler.js are deleted (docs/data-sprites.md section 5); those of engine/creature.js and of the
+// side-view rig (rigs/humanoid.js, still there until R2b) stay.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { PI } from '../../engine/motion.js';
 import { ramp } from '../../engine/color.js';
 import { hornPath, hornIn } from '../../engine/creature.js';
-import * as C from '../../rigs/crawler.js';
 import * as H from '../../rigs/humanoid.js';
 
 const near = (a, b, e = 1e-6) => assert.ok(Math.abs(a - b) <= e, `${a} vs ${b}`);
 const lit = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);
 const paint = (test, w = 48, h = 48) => new Surface(w, h).fill(0, 0, w, h, test, '#ffffff');
-
-// ---- rigs/crawler.js ----------------------------------------------------------------
-
-test('crawler clipsFor gives the style guide clips in the order asked, and refuses a clip it has no pose for', () => {
-  const c = C.clipsFor(['idle', 'walk', 'attack', 'block', 'hurt', 'die'], (p) => p.speed);
-  assert.deepEqual(Object.keys(c), ['idle', 'walk', 'attack', 'block', 'hurt', 'die']);
-  assert.deepEqual(Object.values(c).map((x) => x.frames), [8, 8, 8, 6, 4, 8]);
-  assert.deepEqual(Object.values(c).map((x) => x.loop), [true, true, false, false, false, false]);
-  near(c.walk.fps({ speed: 0.5 }), 10 * 1.05);
-  assert.ok(c.walk.fps({ speed: 1 }) > c.walk.fps({ speed: 0 }));
-  assert.throws(() => C.clipsFor(['fly']), /no standard clip "fly"/);
-  assert.deepEqual(C.POSES, ['idle', 'walk', 'attack', 'block', 'hurt', 'die']);
-  assert.deepEqual(C.PIVOT, [24, 42]);
-});
-
-test('crawler dims: hips and resting feet for every pair, front first, feet splayed beyond the hips', () => {
-  const d = C.dims({ length: 24, height: 12, legs: 4, pairs: 3 });
-  assert.equal(d.hips.length, 3); assert.equal(d.feet.length, 3);
-  assert.ok(d.hips[0] > d.hips[1] && d.hips[1] > d.hips[2], 'front pair first');
-  assert.ok(d.feet[0] > d.hips[0] && d.feet[2] < d.hips[2], 'the end pairs stand out beyond their hips');
-  assert.ok(2 * d.bone > d.rise + 1, 'a leg is longer than the drop from hip to ground, so the knee bends');
-  assert.equal(C.dims({ pairs: 4 }).hips.length, 4);
-  assert.equal(C.dims({ cx: 20 }).cx, 20);
-});
-
-test('gait: neighbouring legs alternate, so six legs move as two groups of three', () => {
-  const groups = [[], []];
-  for (let side = 0; side < 2; side++) for (let i = 0; i < 3; i++) groups[C.gait(i, side) === 0 ? 0 : 1].push(`${side}${i}`);
-  assert.deepEqual(groups, [['00', '02', '11'], ['01', '10', '12']]);
-});
-
-test('step: the foot touches down in front at u = 0, stays on the ground for the duty share, then lifts and swings forward', () => {
-  const o = { stride: 3, lift: 2, duty: 0.5 };
-  assert.deepEqual(C.step(0, o), { x: 3, y: 0 });
-  assert.equal(C.step(0.25, o).y, 0);
-  near(C.step(0.5, o).x, -3);
-  assert.ok(C.step(0.75, o).y > 1.9, 'highest half-way through the swing');
-  assert.deepEqual(C.step(1.25, o), C.step(0.25, o), 'only the fraction of the phase counts');
-});
-
-test('pose walk: one group of feet lands on frame 0 and the other on frame 4; the loop closes', () => {
-  const d = C.dims();
-  const at = (f) => C.pose('walk', f / 8, {}, d);
-  // near legs 0 and 2 and far leg 1 share a phase
-  const P0 = at(0), P4 = at(4);
-  for (const i of [0, 2, 4]) { assert.equal(P0.feet[i].y, 0); assert.ok(P0.feet[i].x > 0, 'just landed in front'); }
-  for (const i of [1, 3, 5]) { assert.equal(P4.feet[i].y, 0); assert.ok(P4.feet[i].x > 0); }
-  assert.ok(at(2).feet[1].y > 0.5 || at(3).feet[1].y > 0.5, 'the other group is in the air in between');
-  assert.ok(P0.drop > at(2).drop, 'the body dips as feet land');
-  const P1 = C.pose('walk', 0.999999, {}, d);
-  P1.feet.forEach((f, i) => { near(f.x, P0.feet[i].x, 1e-3); near(f.y, P0.feet[i].y, 1e-3); });
-  near(P1.drop, P0.drop, 1e-3);
-});
-
-test('pose: idle breathes and blinks; attack draws back then lunges furthest on frame 4; hurt and die start white', () => {
-  const d = C.dims();
-  assert.ok(C.pose('idle', 0.5, {}, d).drop >= 1, 'breathing moves the body a pixel or more');
-  assert.equal(C.pose('idle', 0.8, {}, d).blink, true);
-  const a = (f) => C.pose('attack', f / 7, {}, d);
-  near(a(0).x, 0); near(a(7).x, 0);
-  assert.ok(a(2).x < -2, 'wind-up away from the target'); assert.ok(a(2).pitch > 0, 'head down in the wind-up');
-  assert.ok(a(4).x >= 4.9 && a(4).x >= a(3).x && a(4).x >= a(5).x, 'furthest reach on frame 4');
-  assert.ok(Math.abs(C.pose('attack', 4 / 7, { swing: 0.5 }, d).x - a(4).x / 2) < 1e-9, 'swing scales the lunge');
-  assert.equal(C.pose('hurt', 0, {}, d).flash, true); assert.equal(C.pose('hurt', 1, {}, d).flash, false);
-  near(C.pose('hurt', 1, {}, d).x, 0);                    // hurt ends on the idle pose
-  assert.equal(C.pose('die', 0, {}, d).flash, true);
-});
-
-test('pose block: folded up and on the ground from frame 1 to frame 4, back on the idle pose at the end', () => {
-  const d = C.dims({ legs: 4 });
-  for (const f of [1, 2, 3, 4]) {
-    const P = C.pose('block', f / 5, {}, d);
-    near(P.tuck, 1); near(P.hide, 1); near(P.drop, 4);
-  }
-  const end = C.pose('block', 1, {}, d);
-  near(end.tuck, 0); near(end.drop, 0); near(end.x, 0);
-  const J = C.solve(C.pose('block', 0.4, {}, d), d);
-  for (const L of J.legs) assert.ok(Math.hypot(L.foot[0] - L.hip[0], L.foot[1] - L.hip[1]) < 2.5, 'tucked feet lie by their hips, under the body');
-});
-
-test('pose die: ends on its back with the head drawn in and the legs curled, and is flat on its back from frame 4', () => {
-  const d = C.dims();
-  const end = C.pose('die', 1, {}, d);
-  near(end.roll, PI); near(end.hide, 1); near(end.curl, 1); near(end.free, 1); assert.equal(end.lift, 0);
-  near(C.pose('die', 4 / 7, {}, d).roll, PI, 1e-3);
-  assert.ok(C.pose('die', 2 / 7, {}, d).lift > 4, 'it is knocked into the air to go over');
-});
-
-test('solve: upright the feet stand on the ground row and the body is carried above them; at() and place() agree', () => {
-  const d = C.dims({ length: 22, height: 10, legs: 4 });
-  const J = C.solve(C.pose('idle', 0, {}, d), d);
-  assert.equal(J.legs.length, 6);
-  assert.deepEqual(J.legs.map((L) => L.side), ['near', 'near', 'near', 'far', 'far', 'far']);
-  for (const L of J.legs) { near(L.foot[1], C.GROUND - 0.5, 0.01); assert.ok(L.knee[1] <= C.GROUND - 1); }
-  near(J.origin[1], C.GROUND - 4 - 5);
-  assert.equal(J.flip, 0);
-  assert.deepEqual(J.at(0, 0), J.origin);
-  near(J.at(5, 0)[0], J.origin[0] + 5);
-  // a test for one local point lands where at() says it does
-  const dot = (px, py) => Math.hypot(px - 6, py + 2) < 1.2;
-  const g = paint(C.place(J, [dot])), b = g.bounds(), q = J.at(6, -2);
-  assert.ok(q[0] > b.x0 && q[0] < b.x1 + 1 && q[1] > b.y0 && q[1] < b.y1 + 1);
-});
-
-test('solve: on its back the body is turned right over, rests on the ground, and nothing is under it', () => {
-  const d = C.dims({ length: 22, height: 10, legs: 4 });
-  for (let f = 0; f < 8; f++) {
-    const J = C.solve(C.pose('die', f / 7, {}, d), d);
-    for (const [x, y] of [[11, 5], [-11, 5], [6.6, -5], [-6.6, -5]]) assert.ok(J.at(x, y)[1] <= C.GROUND + 1e-6, `frame ${f}: the body is in the ground`);
-    for (const L of J.legs) assert.ok(L.foot[1] <= C.GROUND && L.knee[1] <= C.GROUND, `frame ${f}: a leg is in the ground`);
-  }
-  const J = C.solve(C.pose('die', 1, {}, d), d);
-  near(J.flip, 1);
-  assert.ok(J.at(0, -5)[1] > J.at(0, 5)[1], 'the back is below the belly');
-  near(J.at(0, -5)[1], C.GROUND, 0.01);
-  assert.ok(J.at(5, 0)[0] < J.origin[0], 'it went over backward: the front now points the other way');
-  for (const L of J.legs) assert.ok(L.foot[1] < J.origin[1], 'the legs are in the air');
-});
-
-test('fit: a long horn in front shortens the lunge instead of leaving the frame; a pose that fits is left alone', () => {
-  const d = C.dims({ length: 22, cx: 24 });
-  const P = C.fit(C.pose('attack', 4 / 7, {}, d), d, { front: 20 });
-  assert.ok(C.solve(P, d).at(20, 0)[0] <= C.SIZE[0] - 3 + 1e-9);
-  const free = C.pose('idle', 0, {}, d), same = C.fit(C.pose('idle', 0, {}, d), d, { front: 12 });
-  assert.deepEqual(same, free);
-  const back = C.fit(C.pose('hurt', 0.33, {}, C.dims({ cx: 14 })), C.dims({ cx: 14 }), { back: 12 });
-  assert.ok(C.solve(back, C.dims({ cx: 14 })).at(-12, 0)[0] >= 2 - 1e-9);
-});
-
-test('drawLegs paints only the side asked for, down to the ground row and not below it', () => {
-  const d = C.dims();
-  const J = C.solve(C.pose('idle', 0, {}, d), d);
-  const nearSide = C.drawLegs(new Surface(48, 48), J, d, 'near', ramp('#7a4f33')), both = C.drawLegs(C.drawLegs(new Surface(48, 48), J, d, 'near', '#7a4f33'), J, d, 'far', '#7a4f33');
-  assert.ok(lit(nearSide) >= 18 && lit(both) > lit(nearSide));
-  assert.equal(nearSide.bounds().y1, C.GROUND - 1);
-  assert.equal(both.bounds().y1, C.GROUND - 1);
-});
-
-test('sockets and headShift: the head socket faces the way the body does, and moves back with a drawn-in head', () => {
-  const d = C.dims({ length: 20, height: 10 });
-  const P = C.pose('idle', 0, {}, d), J = C.solve(P, d), S = C.sockets(J, P, d);
-  near(S.head.x, J.origin[0] + 10); near(S.head.angle, PI / 2); near(S.back.angle, PI);
-  near(S.back.y, J.origin[1] - 5); assert.equal(S.feet.y, C.GROUND);
-  assert.equal(C.headShift(P, d), 0);
-  const B = C.pose('block', 0.4, {}, d), JB = C.solve(B, d);
-  near(C.headShift(B, d), -4);
-  near(C.sockets(JB, B, d).head.x, JB.origin[0] + 10 - 4);
-  near(C.sockets(J, P, d, { head: [12, -3] }).head.y, J.origin[1] - 3);
-  const D = C.pose('die', 1, {}, d);
-  near(Math.sin(C.sockets(C.solve(D, d), D, d).head.angle), -1, 1e-6);      // on its back it faces the other way
-});
-
-test('domeHalf, domeIn and domePoint: a dome with its peak where asked, standing on its base line', () => {
-  assert.equal(C.domeHalf(0), 0); assert.equal(C.domeHalf(1), 0);
-  near(C.domeHalf(0.45), 1); near(C.domeHalf(0.3, { peak: 0.3 }), 1);
-  assert.ok(C.domeHalf(0.1, { full: 1 }) > C.domeHalf(0.1, { full: 0 }), 'a fuller dome is boxier');
-  const g = paint(C.domeIn(10, 34, 30, 12));
-  assert.deepEqual(g.bounds(), { x0: 10, y0: 18, x1: 33, y1: 29 });
-  const q = C.domePoint(10, 34, 30, 12, 0.45);
-  near(q.x, 10 + 24 * 0.45); near(q.y, 18, 0.01); near(q.nx, 0, 0.05); near(q.ny, -1, 0.01);
-  const rear = C.domePoint(10, 34, 30, 12, 0.1), front = C.domePoint(10, 34, 30, 12, 0.9);
-  assert.ok(rear.nx < -0.3 && front.nx > 0.3 && rear.ny < 0 && front.ny < 0, 'the way out leans back at the rear and forward at the front');
-  near(Math.hypot(rear.nx, rear.ny), 1);
-});
 
 // ---- engine/creature.js ---------------------------------------------------------------
 

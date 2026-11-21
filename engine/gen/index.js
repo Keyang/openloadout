@@ -1,6 +1,6 @@
 // The site's named-generator registry, filled (docs/data-sprites.md section 3.1). Import this module, not registry.js,
-// to get every generator: each family module below registers its generators when it loads, one line each, as
-// engine/library-bodies.js lists the library bodies. A new family is one module engine/gen/<family>.js and one line here.
+// to get every generator: each family module below registers its generators when it loads, one line each. A new
+// family is one module engine/gen/<family>.js and one line here.
 //
 //   import { runGenerator, checkCall, describeGenerators } from '../engine/gen/index.js';
 //   runGenerator({ gen: 'twinkle', v: 1, at: [16, 16], size: 2, paint: 'gold', core: 'shine' })   // -> { ok, primitives, errors, cost }

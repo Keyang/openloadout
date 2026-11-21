@@ -1,5 +1,5 @@
 // What the studio's Move and Frames tabs add for every body (docs/studio.md sections 3 and 5; item S10):
-//   - keys between frames (the Hero's swing light: bake() keys the phases the light looks back to), found, named and
+//   - keys between frames (the light of a swing looks back between frames), found, named and
 //     removed; the timeline shows each as a thin tick between two frames, never in a frame's key list;
 //   - Mirror legs where the body has two sides: the near and far (or left and right) legs swap on one frame;
 //   - Sounds on this frame: the clip's cue list (`sounds`: { sound, frame, preset?, volume? }), chosen from the
@@ -40,8 +40,7 @@ export function lightKeys(def, clip) {
 const SWINGS = new Set(['attack', 'punch', 'thrust', 'stab', 'steal']);
 /** What the keys between a clip's frames are for, in words: 'Swing light' for a swing, a punch or a stab (the light of the blow looks back between frames), else 'Keys between frames'. */
 export function lightLabel(def, clip) {
-  const c = clipOf(def, clip);
-  return c && (SWINGS.has(c.from) || (!c.from && SWINGS.has(clip))) ? 'Swing light' : 'Keys between frames';
+  return clipOf(def, clip) && SWINGS.has(clip) ? 'Swing light' : 'Keys between frames';
 }
 
 /** Take out every key of a clip that sits between frames; the frames' own keys stay. */
@@ -81,42 +80,35 @@ function pairsOf(list) {
 
 /**
  * The legs of a body that have a partner on the other side: { chains: [[a, b]] (a bone rig's foot chains), bones:
- * [[a, b]] (a bone rig's leg bones), fields: [[a, b]] (a library body's pose fields: the near and far foot) }.
+ * [[a, b]] (a bone rig's leg bones) }.
  * Arguments: def, clip (a top-down rig's direction comes from it).
  */
 export function legPairs(def, clip) {
-  if (!isObj(def?.body)) return { chains: [], bones: [], fields: [] };
-  if (!isRig(def)) return { chains: [], bones: [], fields: [['footF', 'footB']] };
+  if (!isObj(def?.body) || !isRig(def)) return { chains: [], bones: [] };
   const rig = rigFor(def, clip);
   const chains = pairsOf(rig.ik.map((c) => c.id));
   const inChain = new Set(rig.ik.flatMap((c) => c.bones));
   const legs = rig.bones.filter((b) => inChain.has(b.id) || LEG.test(b.id) || LEG.test(b.label ?? ''));
   const chainIds = new Set(rig.ik.filter((c) => chains.some((p) => p.includes(c.id))).flatMap((c) => c.bones));
-  return { chains, bones: pairsOf(legs.map((b) => b.id)).filter(([a, b]) => !(chainIds.has(a) && chainIds.has(b))), fields: [] };
+  return { chains, bones: pairsOf(legs.map((b) => b.id)).filter(([a, b]) => !(chainIds.has(a) && chainIds.has(b))) };
 }
 
 /** Whether the body has two sides whose legs can swap (Mirror legs is offered then). */
 export function canMirror(def, clip) {
   const p = legPairs(def, clip ?? Object.keys(def?.clips ?? {})[0]);
-  return p.chains.length + p.bones.length + p.fields.length > 0;
+  return p.chains.length + p.bones.length > 0;
 }
 
 /**
- * Mirror the legs on one frame: the pose of each leg swaps with its partner's (a library body's near and far foot; a
- * bone rig's paired foot targets, and how far its paired leg bones turn from their own rest). The frame's key holds
+ * Mirror the legs on one frame: the pose of each leg swaps with its partner's (a bone rig's paired foot targets, and
+ * how far its paired leg bones turn from their own rest). The frame's key holds
  * the result (made when there is none). Arguments: def, clip, frame.
  */
 export function mirrorLegs(def, clip, frame) {
   if (!clipOf(def, clip) || !canMirror(def, clip)) return cp(def);
   const pose = keyedPose(def, clip, frame);
-  const { chains, bones, fields } = legPairs(def, clip);
+  const { chains, bones } = legPairs(def, clip);
   let d = cp(def);
-  for (const [a, b] of fields) {
-    const va = pose[a], vb = pose[b];
-    if (va === undefined && vb === undefined) continue;
-    d = setKeyValue(d, clip, frame, [a], cp(vb ?? va));
-    d = setKeyValue(d, clip, frame, [b], cp(va ?? vb));
-  }
   if (isRig(def)) {
     const rig = rigFor(def, clip);
     for (const [a, b] of chains) {

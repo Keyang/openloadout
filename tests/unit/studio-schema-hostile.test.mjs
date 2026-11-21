@@ -200,7 +200,7 @@ test('fuzz: a thousand random mutations of the newt never throw and always answe
 });
 
 test('the value of a valid definition validates again to itself (a fixed point)', () => {
-  for (const name of ['newt', 'waving-hero', 'maximal', 'hostile-proto']) {
+  for (const name of ['newt', 'maximal', 'hostile-proto']) {
     const a = validateStudio(text(name));
     assert.equal(a.ok, true, `${name}: ${a.errors.join('\n')}`);
     const b = validateStudio(a.value);

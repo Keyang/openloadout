@@ -1,44 +1,21 @@
 // The studio panel's part 2 (docs/studio.md sections 3 to 6; items S10 and S12): what the four tabs of app/studio/panes.js
-// add. Body: a library body's proportions, how it moves and its attach points. Move: Mirror legs, the keys between
-// frames (the swing light) with a way to remove them, "Start this clip over from" a pose of the body. Frames: Sounds on
+// add. Move: Mirror legs, the keys between frames (the swing light) with a way to remove them. Frames: Sounds on
 // this frame (the library's sound effects by name, with play), this frame's pixel warnings, the fill band. Look & name:
 // the advice ("What the library would ask": the quality bar in everyday words, in a background worker, never blocking)
 // and the pixel-art warnings, each a button that selects what it is about. Every change goes through E.commit.
 import { el } from '../ui.js';
 import { row, head, btn, icon, select, fieldId } from './bits.js';
-import * as L from './library-body.js';
 import * as C from './clip-tools.js';
 import * as A from './advice.js';
 import * as X from './edit.js';
 
-// ---- Body: a library body ------------------------------------------------------------------------------------------
-
-/** A slider from 0 to 1 that commits when let go (each change moves every animation, so not on every step). */
+/** A slider from 0 to 1 that commits when let go (not on every step). */
 function slider({ id, label, value, min, max, step = 0.05, onchange, k }) {
   const p = (v) => `${((v - min) / (max - min || 1)) * 100}%`;
   const input = el('input', { id, type: 'range', min, max, step, value: String(value), 'aria-label': label, 'data-k': k ?? id, style: `--p:${p(value)}` });
   input.addEventListener('input', () => input.style.setProperty('--p', p(Number(input.value))));
   input.addEventListener('change', () => { const n = Number(input.value); if (Number.isFinite(n) && n !== value) onchange(n); });
   return input;
-}
-
-/** The Body tab of a library body: its proportions and how it moves (each moves every animation), how it stands, and its attach points. Arguments: E (the editor). */
-export function libraryBodyPane(E) {
-  const { def } = E.S;
-  const out = [head('Proportions'), el('p', { class: 'pane-note' }, 'Changes to the body move every animation; what you posed by hand moves with it.')];
-  for (const p of L.proportionsOf(def)) {
-    const id = fieldId(`prop-${p.id}`);
-    out.push(row(p.label, [el('span', { class: 'st-end' }, p.lo), slider({ id, label: p.label, value: p.value, min: p.min, max: p.max, k: `prop-${p.id}`, onchange: (v) => E.commit(L.setProportion(def, p.id, v), `${p.label} changed: every animation moved with it.`) }), el('span', { class: 'st-end' }, p.hi)],
-      { forId: id, cls: 'st-prop' }));
-  }
-  if (L.stanceMatters(def)) {
-    const sid = fieldId('stance');
-    out.push(row('Stands', select({ id: sid, k: 'stance', label: 'How it stands', value: L.stanceOf(def), options: L.STANCES, onchange: (v) => E.commit(L.setStance(def, v), 'It stands another way now: every animation moved with it.') }), { forId: sid }));
-  }
-  out.push(head('Attach points'));
-  out.push(el('p', { class: 'pane-note' }, 'Where a game hangs things on it: a sword in the hand, a hat on the head. This body places them itself on every frame; they are drawn on the picture.'));
-  out.push(el('div', { class: 'chips' }, L.librarySockets(def).map((p) => el('span', { class: 'chip st-point', 'data-point': p.id }, p.label))));
-  return out;
 }
 
 // ---- Move ---------------------------------------------------------------------------------------------------------
@@ -50,7 +27,7 @@ export function mirrorButton(E) {
   return [btn('Mirror legs', () => E.commit(C.mirrorLegs(def, clip, frame), `Legs mirrored on frame ${frame + 1}: near and far swapped.`), { 'data-k': 'mirror-legs', title: 'Swap the near and far legs on this frame' })];
 }
 
-/** What Move adds under the key: the keys between frames (said once, with Remove) and, for a library body, "Start this clip over from". */
+/** What Move adds under the key: the keys between frames (said once, with Remove). */
 export function moveExtras(E) {
   const { def, clip } = E.S;
   const out = [];
@@ -61,17 +38,6 @@ export function moveExtras(E) {
       el('span', { class: 'light-text' }, el('strong', {}, `${C.lightLabel(def, clip)}: ${light.length} key${light.length === 1 ? '' : 's'} between frames`),
         el('span', { class: 'quiet' }, '. They sit between frames, where the light of the blow looks back to; the thin ticks on the timeline.')),
       btn('Remove', () => E.commit(C.removeLightKeys(def, clip), `${C.lightLabel(def, clip)} keys removed. Undo brings them back.`), { 'data-k': 'remove-light' })));
-  }
-  if (L.isLibrary(def)) {
-    const ch = L.startOverChoices(def, clip);
-    const id = fieldId('from');
-    let pick = ch.value;
-    const s = select({ id, k: 'start-from', label: 'Start this animation over from', value: ch.value, options: ch.options, onchange: (v) => { pick = v; } });
-    out.push(row('Start over from', [s, btn('Start over', () => {
-      const r = L.startOver(E.S.def, clip, pick);
-      if (r.error) { E.say(r.error); return; }
-      E.commit(r.def, `${E.S.def.clips[clip].label || X.humanize(clip)} started over from the body's ${L.poseWords(pick)}: ${r.keys} keys${r.light ? `, ${r.light} of them between frames for the light` : ''}.`);
-    }, { 'data-k': 'start-over' })], { forId: id, note: 'Its keys become the body\'s own move again. Frames, speed and sounds stay.' }));
   }
   return out;
 }

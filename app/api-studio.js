@@ -37,11 +37,8 @@ import { checkFull as validateDataSprite } from './studio/v2-check.js';
 import { v2StartList, v2StartFrom, libraryStart, preloadPieces, renderV2, fileV2 } from './studio/v2-api.js';
 import { renderFrame, cleanParams, clipFps } from '../engine/sprite.js';
 import { Surface } from '../engine/surface.js';
-import { STUDIO_LIMITS } from '../catalog/studio-schema.js';
+import { STUDIO_LIMITS, usedLibraryBody, LIBRARY_BODY_GONE } from '../catalog/studio-schema.js';
 import { studioTemplates, studioTemplate } from '../rigs/studio-templates.js';
-import { hero, bakeClips, bake as bakeKeys, drawSprite } from '../rigs/humanoid-studio.js';
-import { POSES } from '../rigs/humanoid.js';
-import { MOVES } from '../rigs/humanoid-figure.js';
 import { solveRig, drawBoneLines } from '../rigs/bones.js';
 import { createDraftStore, unreadableMessage, StoreRefused, STORE_LIMITS, STUDIO_KEY as KEY } from './studio-store.js';
 
@@ -61,16 +58,12 @@ export const STUDIO_API_LIMITS = Object.freeze({
 export const NOT_KEPT = 'Not kept after this tab closes: this browser is not saving for this site (a private window, or saving for sites is switched off). Download the file (studio_file) before you leave.';
 
 const DRAFT_RE = /^[a-z][a-z0-9-]{0,39}$/;
-const CLIP_RE = /^[a-z][a-zA-Z0-9_-]{0,39}$/;
 const BAG_KEY_RE = /^[A-Za-z0-9_-]{1,40}$/;
-const POSE_NAMES = [...POSES, ...MOVES];
-const LIBRARY = { knight: { label: 'Hero', make: hero } };
 
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const messageOf = (e) => String((e && e.message) || e).slice(0, 300);
 const say = (v) => (v === null ? 'null' : v === undefined ? 'nothing' : Array.isArray(v) ? 'a list' : typeof v === 'string' ? JSON.stringify(v.length > 40 ? `${v.slice(0, 40)}…` : v) : typeof v === 'function' ? 'a function' : typeof v === 'object' ? 'an object' : `the ${typeof v} ${String(v)}`);
 const plain = (v) => (v === undefined ? null : JSON.parse(JSON.stringify(v, (k, x) => (typeof x === 'number' && !Number.isFinite(x) ? null : ArrayBuffer.isView(x) ? undefined : x))));
-const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
 /** An error whose message is for the caller, passed on as it is. */
 class Problem extends Error {
@@ -182,7 +175,7 @@ export async function encodePng(w, h, rgba, { stream = true } = {}) {
 // ---- the studio ---------------------------------------------------------------------------------------------------
 
 /**
- * Builds window.loadout.studio: { starts, create, list, get, set, validate, bake, render, advice, toBag, file, remove }.
+ * Builds window.loadout.studio: { starts, create, list, get, set, validate, render, advice, toBag, file, remove }.
  * Arguments: env { window (the page; gives storage, the library's ids and sounds), storage and kept (instead of the window's),
  * now (the clock for savedAt), known (async () => { catalogIds, soundIds } or null), sounds (async () => Map of sound id -> patch, for advice),
  * bag (async () => the app/bag.js module, or something with its cleanDefinition and bag), limits (to lower STUDIO_API_LIMITS in tests) }.
@@ -262,6 +255,7 @@ export function createStudio(env = {}) {
     const { drafts } = readWhole();
     if (!Object.hasOwn(drafts, name)) throw noDraft(name, drafts);
     const c = checkStored(drafts[name]);
+    if (!c.ok && usedLibraryBody(drafts[name].definition)) throw new Problem([`The draft "${name}" ${LIBRARY_BODY_GONE.replace(/^This sprite /, '')} Remove it (studio_remove), or start a copy of the library sprite (studio_create from "library:<id>").`]);
     if (!c.ok) throw new Problem([`The draft "${name}" is damaged: what is saved no longer passes the checks, so it is not used. Set it again (studio_set) or remove it (studio_remove).`, ...c.errors]);
     return { name, drafts, entry: drafts[name], value: c.value, warnings: c.warnings };
   }
@@ -317,14 +311,7 @@ export function createStudio(env = {}) {
   }
 
   // ---- the starting bodies ----
-  let libraryStarts = null;
-  const starts = () => {
-    libraryStarts ??= Object.entries(LIBRARY).map(([id, L]) => {
-      const d = L.make();
-      return { from: `library:${id}`, label: L.label, blurb: d.blurb, body: 'library body', view: d.meta.view, size: [...d.size], clips: Object.keys(d.clips) };
-    });
-    return [...studioTemplates().map((t) => ({ from: `template:${t.id}`, label: t.label, blurb: t.blurb, body: 'bone rig', view: t.view, size: [...t.size], clips: [...t.clips] })), ...libraryStarts.map((s) => ({ ...s, size: [...s.size], clips: [...s.clips] })), ...v2StartList()];
-  };
+  const starts = () => [...studioTemplates().map((t) => ({ from: `template:${t.id}`, label: t.label, blurb: t.blurb, body: 'bone rig', view: t.view, size: [...t.size], clips: [...t.clips] })), ...v2StartList()];
   /** The definition to start from, and its canonical name. */
   function startFrom(from) {
     const all = () => starts().map((s) => s.from).join(', ');
@@ -335,11 +322,8 @@ export function createStudio(env = {}) {
     if (t !== null) {
       const d = studioTemplate(t);
       if (d) return { d, from: `template:${t}` };
-    } else {
-      const id = from.slice(8);
-      if (Object.hasOwn(LIBRARY, id)) return { d: LIBRARY[id].make(), from: `library:${id}` };
     }
-    throw new Problem(`There is nothing called ${say(from)} to start from. The starts are: ${all()}.`);
+    throw new Problem(`There is nothing called ${say(from)} to start from. The starts are: ${all()}. A library sprite is started as a copy with "library:<id>" (the library's id of the sprite).`);
   }
   /** A draft key and sprite id from a name: lowercase words joined by dashes, free in the drafts and the library. */
   async function newId(name, drafts) {
@@ -369,18 +353,13 @@ export function createStudio(env = {}) {
     const [fw, fh] = value.size, W = frames.length * fw * scale, H = fh * scale;
     if (W * H > limits.pixels) throw new Problem(`That picture would be ${W} by ${H} pixels, more than the ${limits.pixels.toLocaleString('en')} pixels one picture may have. Ask for one frame, or a smaller scale.`);
 
-    // the sprite: dataSprite for every body it draws; a library body it does not draw yet is drawn by the rig's own studio renderer
+    // the sprite: dataSprite draws every body
     const made = makeDataSprite(value);
-    const library = !made.ok && value.body?.library !== undefined;
-    if (!made.ok && !library) throw new Problem(made.errors, { warnings: made.warnings });
-    const sprite = made.ok ? made.sprite : null;
-    let p = {};
-    if (sprite) {
-      p = cleanParams(sprite, o.params ?? {});
-      for (const k of Object.keys(o.params ?? {})) if (!Object.hasOwn(sprite.params, k)) warnings.push(`"${k}" is not one of this sprite's controls and was ignored. Its controls are: ${Object.keys(sprite.params).join(', ')}.`);
-    } else p = plain(o.params ?? {});
+    if (!made.ok) throw new Problem(made.errors, { warnings: made.warnings });
+    const sprite = made.sprite;
+    const p = cleanParams(sprite, o.params ?? {});
+    for (const k of Object.keys(o.params ?? {})) if (!Object.hasOwn(sprite.params, k)) warnings.push(`"${k}" is not one of this sprite's controls and was ignored. Its controls are: ${Object.keys(sprite.params).join(', ')}.`);
     const rig = value.body?.rig ?? null;
-    if (o.bones && !rig) warnings.push('The skeleton is drawn for bone rigs only; this sprite has a library body, so the picture has no bones drawn over it.');
 
     const px = new Uint32Array(W * H);
     let opaque = 0;
@@ -388,8 +367,7 @@ export function createStudio(env = {}) {
       const f = frames[n];
       let g;
       try {
-        if (sprite) g = renderFrame(sprite, clip, f, p);
-        else { g = new Surface(fw, fh); drawSprite(g, value, { clip, frame: f, p }); }
+        g = renderFrame(sprite, clip, f, p);
       } catch (e) { throw new Problem(`Clip "${clip}", frame ${f} could not be drawn: ${messageOf(e)}`); }
       // the frame, enlarged, and the skeleton over it
       let big = { w: fw * scale, h: fh * scale, data: new Uint32Array(fw * scale * fh * scale) };
@@ -410,7 +388,7 @@ export function createStudio(env = {}) {
         for (let x = 0; x < row.length; x++) if (row[x]) opaque++;
       }
     }
-    const fps = sprite ? clipFps(sprite, clip, p) : value.clips[clip].fps;
+    const fps = clipFps(sprite, clip, p);
     return { clip, frame: one ? o.frame : null, frames: frames.length, W, H, scale, fps, opaque, rgba: new Uint8Array(px.buffer), warnings };
   }
 
@@ -421,8 +399,8 @@ export function createStudio(env = {}) {
     create: async (fromOrOptions, nameIn) => {
       const opts = isObj(fromOrOptions) ? fromOrOptions : { from: fromOrOptions, name: nameIn };
       const from = own(opts, 'from'), name = own(opts, 'name');
-      // a library data sprite starts as a copy (DQ5); the Hero preset (LIBRARY) and pages with no site to read from are as before
-      const lib = typeof from === 'string' && !Object.hasOwn(LIBRARY, from.slice(8)) && (env.libraryText || win) ? await libraryStart(from, { read: env.libraryText, taken: [...Object.keys(read().drafts), ...((await known()).catalogIds ?? [])] }) : null;
+      // a library data sprite starts as a copy (DQ5); pages with no site to read from only have the templates
+      const lib = typeof from === 'string' && (env.libraryText || win) ? await libraryStart(from, { read: env.libraryText, taken: [...Object.keys(read().drafts), ...((await known()).catalogIds ?? [])] }) : null;
       if (lib?.error) throw new Problem(lib.error);
       const s = lib ?? startFrom(from);
       if (name !== undefined && name !== null && typeof name !== 'string') throw new Problem(`name is what the sprite is called, as text of at most ${STUDIO_LIMITS.nameChars} characters ("Moss beast"). Got ${say(name)}.`);
@@ -464,27 +442,6 @@ export function createStudio(env = {}) {
       return { ok: v.ok, errors: v.errors, warnings: [...v.warnings, ...(problem ? [problem] : [])], value: v.value };
     },
 
-    bake: async (draft, clip, from) => {
-      const d = draftOf(draft);
-      if (d.value.body?.library === undefined) throw new Problem('bake works on library bodies (the Hero): it turns one of the body\'s own poses into keys. This draft is a bone rig, whose clips are keys you write directly: change them with studio_set.');
-      if (typeof clip !== 'string' || !CLIP_RE.test(clip)) throw new Problem(`clip is the name of the clip to bake into, an existing one or a new one: lowercase letters, digits and dashes ("walk", "wave"). Got ${say(clip)}.`);
-      const had = Object.hasOwn(d.value.clips, clip) ? d.value.clips[clip] : null;
-      const pose = from ?? had?.from;
-      if (typeof pose !== 'string' || !POSE_NAMES.includes(pose)) throw new Problem(`from is the body's pose to take the keys from: one of ${POSE_NAMES.join(', ')}. Got ${say(from)}${had ? '' : ` (and the draft has no clip "${clip}" yet, so there is no pose to start it over from)`}.`);
-      const figure = d.value.body.figure;
-      let baked;
-      try {
-        if (had) baked = bakeClips(figure, { [clip]: { ...had, from: pose } })[clip];
-        else {
-          const keys = bakeKeys(figure, clip, { from: pose, between: false });
-          const n = keys.length, loop = n > 1 ? keys[n - 1].t < 1 : true;
-          baked = bakeClips(figure, { [clip]: { label: cap(clip), frames: n, fps: 10, loop, from: pose } })[clip];
-        }
-      } catch (e) { throw new Problem(`The pose "${pose}" could not be baked into "${clip}": ${messageOf(e)}`); }
-      const r = await keep(d.name, { ...d.value, clips: { ...d.value.clips, [clip]: baked } });
-      return { ...r, clip: r.definition.clips[clip] };
-    },
-
     render: async (what, options) => {
       if (options !== undefined && options !== null && !isObj(options)) throw new Problem(`options must be an object such as { clip: "walk", frame: 0, scale: 4, bones: true }, or left out. Got ${say(options)}.`);
       const o = {};
@@ -498,7 +455,7 @@ export function createStudio(env = {}) {
     advice: async (what) => {
       const { value } = await definitionOf(what);
       const made = makeDataSprite(value);
-      if (!made.ok) throw new Problem(value.body?.library !== undefined ? ['Advice for a library body (the Hero) is not ready yet: it needs the library body inside engine/data-sprite.js (studio item S4b). Render it with studio_render meanwhile.'] : made.errors);
+      if (!made.ok) throw new Problem(made.errors);
       const [{ checkSprite }, { validateMeta }] = await Promise.all([import('../quality/sprite.js'), import('../catalog/schema.js')]);
       let soundIndex = null;
       try {

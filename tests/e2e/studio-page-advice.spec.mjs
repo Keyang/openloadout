@@ -76,31 +76,6 @@ test('a shape too thin to draw is marked on its row, listed at once, and its lin
   await expect(page.locator(`.shape-row[data-shape="${limb.id}"] select`)).toBeFocused();
 });
 
-test('the Hero\'s swing leaves a stray pixel: marked on the frame, said under This frame, and its line opens that frame', async ({ page }) => {
-  await newFrom(page, 'hero');
-  await tab(page, 'Move').click();
-  await page.getByLabel('Animation', { exact: true }).selectOption('attack');
-  const marked = page.locator('.timeline .frame.has-advice');
-  await expect(marked).toHaveCount(1);
-  await expect(marked).toHaveAttribute('data-frame', '4');
-  await expect(marked).toHaveAttribute('aria-label', /on (its|their) own/);
-  await tab(page, 'Frames').click();
-  await page.locator('.timeline [data-frame="4"]').click();
-  await expect(page.locator('.st-advice[data-advice="stray"]')).toContainText('Frame 5 of Attack');
-  await page.locator('.timeline [data-frame="0"]').click();
-  await expect(page.locator('.st-advice[data-advice="stray"]')).toHaveCount(0);
-  // the advice list: checked in the worker (seconds for the Hero), the stray line opens frame 5 of Attack
-  await tab(page, 'Look & name').click();
-  await page.locator('[data-act="advice"]').click();
-  const line = page.locator('.adv[data-advice="stray"] .adv-btn');
-  await expect(line).toHaveCount(1, { timeout: 60_000 });
-  await expect(line).toContainText('Attack');
-  await line.click();
-  await expect(tab(page, 'Frames')).toHaveAttribute('aria-selected', 'true');
-  await expect(page.getByLabel('Animation', { exact: true })).toHaveValue('attack');
-  await expect(page.locator('.timeline [data-frame="4"]')).toHaveAttribute('aria-current', 'true');
-});
-
 test('the fill band is said under the frame size on Frames, for a body that fits it', async ({ page }) => {
   await newFrom(page, 'four-legs');
   await tab(page, 'Frames').click();

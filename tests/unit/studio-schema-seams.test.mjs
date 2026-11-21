@@ -1,15 +1,12 @@
-// catalog/studio-schema.js where it meets other modules: the default pivot (rigs/bones.js groundOf, rigs/humanoid.js
-// PIVOT), meta that feeds the catalogue, the value budget, bone lengths for IK (engine/motion.js ik2), shared tables.
+// catalog/studio-schema.js where it meets other modules: the default pivot (rigs/bones.js groundOf), meta that feeds the catalogue, the value budget, bone lengths for IK (engine/motion.js ik2), shared tables.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import * as S from '../../catalog/studio-schema.js';
 import { groundOf } from '../../rigs/bones.js';
-import * as H from '../../rigs/humanoid.js';
 
 const load = (name) => JSON.parse(fs.readFileSync(new URL(`../fixtures/studio/${name}.json`, import.meta.url), 'utf8'));
 const newt = () => load('newt');
-const hero = () => load('waving-hero');
 const errs = (r) => r.errors.join('\n').toLowerCase();
 const warnText = (r) => r.warnings.join('\n').toLowerCase();
 
@@ -30,14 +27,6 @@ test('the default pivot x is the style guide\'s for the sizes it lists, else the
   assert.deepEqual(S.STUDIO_PIVOTS['64x64'], [28, 58]);
   assert.deepEqual(S.STUDIO_PIVOTS['64x48'], [28, 43]);
   assert.deepEqual(S.STUDIO_PIVOTS['32x32'], [16, 28]);
-});
-
-test('a library body with no pivot is anchored where rigs/humanoid.js anchors it', () => {
-  const d = hero(); delete d.pivot;
-  const r = S.validateStudioSprite(d);
-  assert.equal(r.ok, true, r.errors.join('\n'));
-  assert.deepEqual(r.value.pivot, [...H.PIVOT]);
-  assert.deepEqual(S.LIBRARY_PIVOT, [...H.PIVOT]);
 });
 
 test('a bone rig with no pivot gets the default of its size; a thing that does not stand gets the frame centre', () => {

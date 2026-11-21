@@ -1,8 +1,10 @@
 // Studio definitions: the formats and their validator (docs/studio.md, sections 2 and 6; docs/architecture.md, Contract 14).
-// A studio sprite is one JSON object (`loadout-sprite`) whose body is either a bone rig (`loadout-rig`, all data) or a
-// library body (a code rig with a data layer; the first is the side-view person of rigs/humanoid-figure.js). Nothing in a
-// definition is ever run: framework code draws it. So this file is the wall: every definition from the studio, from
-// storage, from a link or from a file goes through validateStudio() before anything is drawn.
+// A studio sprite is one JSON object (`loadout-sprite`, version 1) whose body is a bone rig (`loadout-rig`, all data).
+// Nothing in a definition is ever run: framework code draws it. So this file is the wall: every definition from the
+// studio, from storage, from a link or from a file goes through validateStudio() before anything is drawn. (A version 1
+// definition used to have a second kind of body, a "library body": a code rig with a data layer. That path is removed,
+// build item R1 of docs/data-sprites.md: a definition that still names one is refused with LIBRARY_BODY_GONE, and
+// usedLibraryBody() lets the studio say so instead of treating the saved draft as damaged.)
 //
 // What the wall guarantees (each is tested in tests/unit/studio-schema-*.test.mjs):
 //   - plain data only: no functions, getters, class instances, symbols, loops of objects, undefined in lists;
@@ -30,14 +32,7 @@
 //     it). The style guide's advice applies to the action. Direction names, `directions` and meta view "top-down" need
 //     a top-down body.
 //
-// LIBRARY BODIES (studio item F2; docs/studio.md 2.3, "Library bodies: one module each"). This file names no library
-// body. body.library is looked up in LIBRARY_REGISTRY (every body engine/library-bodies.js lists; opts.bodies, a
-// registry made by engine/library-body.js libraryBodies(), replaces it for tests and tools), and the body's descriptor
-// says what its figure may hold (a spec), what a control may set (settings, aliases), what body.paint may paint
-// (colours), its parts, sockets, key fields and poses, its frame sizes (a definition picks one with `size`; the first is
-// the default) and pivots, and its view (a "top-down" body may have direction clips). FIGURE_SETTINGS and the other
-// humanoid tables below are rigs/body-humanoid.js's, passed on under their old names. `made.in` is "studio" (made in
-// the studio) or "library" (a library sprite converted from its code file: from "code:<id>").
+// `made.in` is "studio" (made in the studio) or "library" (a library sprite converted from its code file: from "code:<id>").
 //
 // Every function returns { ok, errors, warnings, value } and never throws. errors block drawing and the bag; warnings are
 // advice (or say what was cleaned). value is the cleaned copy (plain JSON) when ok, else null.
@@ -46,11 +41,6 @@
 import { validateMeta, META_FIELDS, SPRITE_TYPES, SPRITE_ROLES, VIEWS, LICENSES, THEMES, GAME_TYPES } from './schema.js';
 import { MATERIAL_IDS } from '../engine/materials.js';
 import { groundOf } from '../rigs/bones.js';
-import { COLOUR_RULES, PAINT_DEPTH } from '../engine/data-rules.js';
-// library bodies (studio item F2): each is one module listed in engine/library-bodies.js; this file never names one
-import { libraryBodies, isLibraryBodies } from '../engine/library-body.js';
-import * as LISTED_BODIES from '../engine/library-bodies.js';
-import { HUMANOID_BODY } from '../rigs/body-humanoid.js';
 
 // ---- the tables ---------------------------------------------------------------------------------------------------
 
@@ -87,13 +77,10 @@ export const STUDIO_LIMITS = Object.freeze({
   fps: 30,
   scale: Object.freeze([0.25, 4]),     // what a slider may scale a bone or shape by
   stretch: Object.freeze([0.5, 1.5]),  // what a key may stretch a bone by
-  libraryPx: 64,           // a library pose's distances (lift, foot targets), pixels either way
   options: 24,             // values of one choice control (and old values in its `was`)
   swatches: 16,            // colours a colour control offers
   whenAlternatives: 8,     // objects in one `when` given as a list (any one enough)
   versions: 24,            // ready-made versions of one sprite
-  paint: 48,               // figure colours a library body paints from the settings (body.paint)
-  paintNodes: 256,         // rules and colours in all of body.paint (each is worked out once per settings; review F1, issue 3)
 });
 const L = STUDIO_LIMITS;
 
@@ -186,28 +173,19 @@ export function directionRig(rig, direction) {
   return out;
 }
 
-/** The registry of library bodies a definition may name (body.library): every body engine/library-bodies.js lists, each one module (studio item F2). */
-export const LIBRARY_REGISTRY = libraryBodies(LISTED_BODIES);
-
-/** The library bodies a definition may name; each has a renderer in the framework (its module, listed in engine/library-bodies.js). */
-export const LIBRARY_BODIES = LIBRARY_REGISTRY.names;
+/** What a version 1 definition that names a library body (`body.library`) is told: the path is gone (build item R1); a saved draft of one opens as this note, not as damage. */
+export const LIBRARY_BODY_GONE = 'This sprite used a library body, which is gone: open the library sprite and edit a copy.';
 
 /**
- * Returns a library body's descriptor by its name (engine/library-body.js), or null when there is none.
- * Arguments: name (what body.library says), opts ({ bodies }: a registry made by libraryBodies(), used instead of LIBRARY_REGISTRY; for tests and tools that add a body).
+ * Whether a definition names a library body (`body: { library: ... }`), read without running anything (a getter is never
+ * called): the saved drafts of the removed library-body path, which the studio shows with LIBRARY_BODY_GONE.
+ * Arguments: def (a definition, any value).
  */
-export function libraryBody(name, opts = {}) {
-  return registryOf(opts).get(name);
+export function usedLibraryBody(def) {
+  const own = (o, k) => { try { const d = o !== null && typeof o === 'object' ? Object.getOwnPropertyDescriptor(o, k) : null; return d && 'value' in d ? d.value : undefined; } catch { return undefined; } };
+  const body = own(def, 'body');
+  return body !== null && typeof body === 'object' && !Array.isArray(body) && own(body, 'library') !== undefined;
 }
-
-/** The registry a check uses: opts.bodies when it is one libraryBodies() made, else LIBRARY_REGISTRY. */
-const registryOf = (opts) => (isLibraryBodies(opts?.bodies) ? opts.bodies : LIBRARY_REGISTRY);
-
-/** The frame of the humanoid library body (rigs/humanoid.js SIZE); other bodies have their own sizes (their descriptor's `sizes`). */
-export const LIBRARY_SIZE = Object.freeze([...HUMANOID_BODY.sizes[0]]);
-
-/** The anchor of the humanoid library body: rigs/humanoid.js PIVOT ([CX, GROUND], the style guide's [28, 58]). */
-export const LIBRARY_PIVOT = Object.freeze([...HUMANOID_BODY.pivots['64x64']]);
 
 // The style guide's pivot x for a body that stands in a frame of each size (section 1, "Frame sizes": characters and
 // creatures first, since a studio body is one of them); a size it does not list stands in the middle.
@@ -226,15 +204,6 @@ export function defaultPivot(size, grounded = true) {
 
 /** The default pivot (standing) of every frame size, keyed "WxH": what defaultPivot() gives. */
 export const STUDIO_PIVOTS = Object.freeze(Object.fromEntries(FRAME_SIZES.map(([w, h]) => [`${w}x${h}`, Object.freeze(defaultPivot([w, h]))])));
-
-/** The parts of a humanoid figure a sprite may let people switch off (rigs/body-humanoid.js; rigs/humanoid-figure.js; the cape: rigs/humanoid-studio.js). */
-export const LIBRARY_PARTS = HUMANOID_BODY.parts;
-
-/** The fields of figure.body a humanoid library body's slider may set by their short names (height, build, head), each 0..1. */
-export const LIBRARY_BODY_FIELDS = Object.freeze(Object.keys(HUMANOID_BODY.aliases));
-
-// What a key of a humanoid library body may hold (moved to rigs/body-humanoid.js in studio item F2; passed on here).
-export { HUMANOID_POSE_FIELDS, HUMANOID_MOVE_FIELDS } from '../rigs/body-humanoid.js';
 
 /** The pattern of a name inside a definition (bones, shapes, slots, parts, clips, keys of controls): a lowercase letter, then letters, digits and dashes, at most 40. */
 export const ID_PATTERN = /^[a-z][a-zA-Z0-9-]{0,39}$/;
@@ -930,88 +899,13 @@ export function validateStudioRig(input, opts = {}) {
   }
 }
 
-// ---- the library body's figure (its spec: the body's descriptor, engine/library-body.js) ---------------------------
-
-/** One field of a figure against its kind (engine/library-body.js FIGURE_FIELD): the cleaned value, or undefined after an error or when absent. */
-function figureField(C, place, k, v, t) {
-  if (t === 'colour') return hex(C, place, k, v);
-  if (t === 'bool') return bool(C, place, k, v);
-  if (t[0] === 'num') return num(C, place, k, v, t[1], t[2]);
-  if (t[0] === 'enum') {
-    if (typeof v !== 'string' || !t[1].includes(v)) { C.err(`${place}: ${k} ${q(v)} is not known; use one of ${listOf(t[1])}`); return undefined; }
-    return v;
-  }
-  // map: { key: one of the values }, keys like clip names (the person's moves: clip name -> pose)
-  const [, keyWhat, valueWhat, values] = t;
-  if (!isObj(v)) { C.err(`${place}: ${k} must be an object of ${keyWhat}: ${valueWhat} name`); return undefined; }
-  const out = {};
-  for (const [key, x] of Object.entries(v)) {
-    if (!idOf(C, `${place}, ${k}`, key, { what: keyWhat })) continue;
-    if (typeof x !== 'string' || !values.includes(x)) { C.err(`${place}, ${k}: ${q(x)} for ${q(key)} is not a ${valueWhat} of the body; use one of ${listOf(values)}`); continue; }
-    out[key] = x;
-  }
-  return out;
-}
-
-/** body.figure of a library body, checked against its body's figure spec (fields at the top and blocks of fields), then by the body's own checkFigure. */
-function checkFigure(C, f, pre, lib) {
-  const where = `${pre}figure`;
-  if (f === undefined) return {};
-  if (!isObj(f)) { C.err(`${where}: must be an object (${lib.figureHelp}); got ${say(f)}`); return null; }
-  knownOnly(C, where, f, Object.keys(lib.figure));
-  const out = {};
-  for (const [part, spec] of Object.entries(lib.figure)) {
-    const v = f[part];
-    if (v === undefined) continue;
-    if (!isObj(spec)) { const x = figureField(C, where, part, v, spec); if (x !== undefined) out[part] = x; continue; }
-    const place = `${where}, ${part}`;
-    if (!isObj(v)) { C.err(`${place}: must be an object with ${listOf(Object.keys(spec))}; got ${say(v)}`); continue; }
-    knownOnly(C, place, v, Object.keys(spec));
-    const o = {};
-    for (const [k, t] of Object.entries(spec)) {
-      if (v[k] === undefined) continue;
-      const x = figureField(C, place, k, v[k], t);
-      if (x !== undefined) o[k] = x;
-    }
-    out[part] = o;
-  }
-  if (lib.checkFigure) {
-    try { lib.checkFigure(out, { err: (m) => C.err(`${where}: ${String(m).slice(0, 300)}`), warn: (m) => C.warn(`${where}: ${String(m).slice(0, 300)}`) }); } catch (e) { C.err(`${where}: the body could not check it: ${String(e?.message ?? e).slice(0, 120)}`); }
-  }
-  return out;
-}
-
-// ---- what a library body's controls may set and paint (studio item F1) -------------------------------------------
-//
-// A control of a library body sets ONE field of the figure (`sets`: "part.field", a fixed vocabulary: the body's
-// `settings`, never a free path): a slider a number field within that field's own range, a choice a word field with
-// values the field takes. The figure's colours are painted from the settings by `body.paint` ({ "part.field":
-// expression }, the body's `colours`), whose rules are the fixed registry of engine/data-rules.js (Contract 14 rule 2: a
-// definition names framework functions, it never holds code). Each body's lists are its descriptor's (studio item F2).
-
-/** The fields of the side-view person's figure a library body's control may set (`sets`), by "part.field" (and "stance"): { kind: number (min, max) | word (values) }. The older bare names height, build and head mean body.height, body.build and body.head. No arguments: a frozen object (rigs/body-humanoid.js settings). */
-export const FIGURE_SETTINGS = HUMANOID_BODY.settings;
-
-/** The colour fields of the side-view person's figure a library body may paint from its settings (`body.paint` keys), as "part.field". No arguments: a frozen list (rigs/body-humanoid.js colours). */
-export const FIGURE_COLOURS = HUMANOID_BODY.colours;
-
-/** The attach points every frame of the side-view person has (rigs/humanoid-figure.js sockets); `muzzle` too when the figure has `thrown`. No arguments: a frozen list. */
-export const FIGURE_SOCKETS = Object.freeze(HUMANOID_BODY.socketNames({}));
-
-/** A `sets` as the "part.field" it names: a short name of the body (the person's height) is its alias (body.height). */
-const setsPath = (s, lib) => (lib && typeof s === 'string' && Object.hasOwn(lib.aliases, s) ? lib.aliases[s] : s);
-
-/** The fields of a body's settings of one kind ('number' or 'word'), for messages. */
-const settingsOfKind = (lib, kind) => Object.keys(lib.settings).filter((k) => lib.settings[k].kind === kind);
-
 /** True when a value is one a control of the key table (kind, values, min, max) can take. */
 function fits(d, v) {
-  if (d.kind === 'choice') return d.values.includes(v);
   if (d.kind === 'toggle') return typeof v === 'boolean';
   if (d.kind === 'range') return typeof v === 'number' && Number.isFinite(v) && v >= d.min && v <= d.max;
   return typeof v === 'string' && HEX_RE.test(v);
 }
-const shown = (d) => (d.kind === 'choice' ? `one of ${someOf(d.values.map((v) => q(v)))}` : d.kind === 'toggle' ? 'true or false' : d.kind === 'range' ? `a number from ${d.min} to ${d.max}` : 'a colour "#rrggbb"');
+const shown = (d) => (d.kind === 'toggle' ? 'true or false' : d.kind === 'range' ? `a number from ${d.min} to ${d.max}` : 'a colour "#rrggbb"');
 
 /**
  * A `when` (on a control, a sound cue or a pick rule): { key: [values] } or a list of such (any one enough), each key a
@@ -1043,12 +937,11 @@ function checkWhen(C, place, w, table, self = null) {
   return one(w);
 }
 
-/** Refuses controls that need themselves through their `when` and the parts they belong to (engine/sprite.js refuses them too, by throwing). */
-function checkLoops(C, controls, parts) {
+/** Refuses controls that need themselves through their `when` (engine/sprite.js refuses them too, by throwing). */
+function checkLoops(C, controls) {
   const deps = new Map();
   const add = (k, d) => { if (!deps.has(k)) deps.set(k, []); if (!deps.get(k).includes(d)) deps.get(k).push(d); };
   for (const c of controls) for (const alt of [].concat(c.when ?? [])) for (const k of Object.keys(alt)) add(c.key, k);
-  for (const p of Object.values(parts)) if (Array.isArray(p.params)) for (const k of p.params.slice(1)) add(k, p.params[0]);
   const done = new Set();
   const walk = (k, trail) => {
     if (trail.includes(k)) { C.err(`Controls: when makes a loop: ${[...trail.slice(trail.indexOf(k)), k].map(q).join(' needs ')}`); return false; }
@@ -1060,82 +953,7 @@ function checkLoops(C, controls, parts) {
   for (const k of deps.keys()) if (!walk(k, [])) return;
 }
 
-/** One paint expression (engine/data-rules.js): a colour, a colour slot's key, or { rule, ...arguments } of COLOUR_RULES. Returns the cleaned copy, or undefined after an error. */
-function checkPaintExpr(C, place, e, colourKeys, table, depth = 0) {
-  if (depth > PAINT_DEPTH) { C.err(`${place}: rules are nested too deep (more than ${PAINT_DEPTH} inside each other)`); return undefined; }
-  if (typeof e === 'string') {
-    if (HEX_RE.test(e)) return e.toLowerCase();
-    if (colourKeys.has(e)) return e;
-    C.err(`${place}: ${q(e)} is not a colour of the sprite (${someOf([...colourKeys])}) or a colour "#rrggbb"`);
-    return undefined;
-  }
-  if (!isObj(e)) { C.err(`${place}: give a colour "#rrggbb", a colour of the sprite, or { "rule": ... }; got ${say(e)}`); return undefined; }
-  if (typeof e.rule !== 'string' || !Object.hasOwn(COLOUR_RULES, e.rule)) { C.err(`${place}: rule ${q(e.rule)} is not one the framework has; use one of ${listOf(Object.keys(COLOUR_RULES))} (engine/data-rules.js)`); return undefined; }
-  const spec = COLOUR_RULES[e.rule].args, where = `${place} (${e.rule})`;
-  knownOnly(C, where, e, ['rule', ...Object.keys(spec)]);
-  const out = { rule: e.rule };
-  let ok = true;
-  for (const [name, a] of Object.entries(spec)) {
-    const v = e[name];
-    if (v === undefined) { if (!a.optional) { C.err(`${where}: ${name} is missing`); ok = false; } continue; }
-    let x;
-    if (a.kind === 'colour') x = checkPaintExpr(C, `${where}, ${name}`, v, colourKeys, table, depth + 1);
-    else if (a.kind === 'number') x = num(C, where, name, v, a.min, a.max);
-    else if (a.kind === 'word') { if (a.values.includes(v)) x = v; else C.err(`${where}: ${name} must be one of ${listOf(a.values)}; got ${say(v)}`); }
-    else if (a.kind === 'when') x = checkWhen(C, where, v, table);
-    else if (a.kind === 'colours') {
-      const xs = list(C, where, v, a.most, { min: 1, what: name });
-      if (xs) {
-        const each = xs.map((item, i) => {
-          if (a.pairs && Array.isArray(item)) {
-            if (item.length !== 2) { C.err(`${where}: ${name} ${i + 1} must be a colour or [colour, least]; got ${say(item)}`); return undefined; }
-            const c = checkPaintExpr(C, `${where}, ${name} ${i + 1}`, item[0], colourKeys, table, depth + 1), least = num(C, where, `${name} ${i + 1} least`, item[1], 0, 1, { need: true });
-            return c === undefined || least === undefined ? undefined : [c, least];
-          }
-          return checkPaintExpr(C, `${where}, ${name} ${i + 1}`, item, colourKeys, table, depth + 1);
-        });
-        if (each.every((y) => y !== undefined)) x = each;
-      }
-    }
-    if (x === undefined) ok = false;
-    else out[name] = x;
-  }
-  return ok ? out : undefined;
-}
-
-/** How many rules and colours a paint expression holds (a rule, each colour or key, each item of a list), counted before it is checked; stops counting past the cap. */
-function paintNodes(e, seen = 0) {
-  if (seen > L.paintNodes) return seen;
-  if (Array.isArray(e)) return e.reduce((n, x) => n + paintNodes(x, seen + n), 0);
-  if (!isObj(e)) return 1;
-  let n = 1;
-  for (const [k, v] of Object.entries(e)) if (k !== 'rule' && k !== 'when' && (isObj(v) || Array.isArray(v) || typeof v === 'string')) { n += paintNodes(v, seen + n); if (seen + n > L.paintNodes) break; }
-  return n;
-}
-
-/** body.paint of a library body: { "part.field": expression }, each field a colour field of the figure. */
-function checkPaint(C, raw, figure, colourKeys, table, lib) {
-  const place = 'Body: paint';
-  if (!isObj(raw)) { C.err(`${place}: must be an object of "part.field": colour (engine/data-rules.js); got ${say(raw)}`); return undefined; }
-  const keys = Object.keys(raw);
-  if (keys.length > L.paint) { C.err(`${place}: has ${keys.length} fields; the most is ${L.paint}`); return undefined; }
-  const nodes = keys.reduce((n, k) => n + paintNodes(raw[k]), 0);
-  if (nodes > L.paintNodes) { C.err(`${place}: has ${nodes} rules and colours in all; the most is ${L.paintNodes}`); return undefined; }
-  const out = {};
-  for (const path of keys) {
-    if (!lib.colours.includes(path)) {
-      C.err(`${place}: ${q(path)} is not a colour field of the figure; this library body paints ${someOf(lib.colours, 12)}`);
-      continue;
-    }
-    const part = path.split('.')[0];
-    if (!isObj(figure?.[part])) C.warn(`${place}: ${q(path)}: the figure has no ${part}, so nothing is painted there`);
-    const x = checkPaintExpr(C, `${place} ${q(path)}`, raw[path], colourKeys, table);
-    if (x !== undefined) out[path] = x;
-  }
-  return out;
-}
-
-/** Ready-made versions (Contract 1): [{ name, params }], each name once, each setting one the sprite's controls take (an old value a choice's `was` still takes, too). */
+/** Ready-made versions (Contract 1): [{ name, params }], each name once, each setting one the sprite's controls take. */
 function checkVersions(C, raw, table) {
   const xs = list(C, 'Versions', raw, L.versions, { what: 'versions' });
   if (!xs) return undefined;
@@ -1154,8 +972,7 @@ function checkVersions(C, raw, table) {
     for (const [k, x] of Object.entries(p)) {
       const d = table.get(k);
       if (!d) { C.err(`${place}: sets ${q(k)}, which is not one of the sprite's controls`); continue; }
-      const old = d.kind === 'choice' && typeof x === 'string' && d.was && Object.hasOwn(d.was, x);
-      if (!old && !fits(d, x)) { C.err(`${place}: sets ${q(k)} to ${say(x)}, which it can never be; it takes ${shown(d)}`); continue; }
+      if (!fits(d, x)) { C.err(`${place}: sets ${q(k)} to ${say(x)}, which it can never be; it takes ${shown(d)}`); continue; }
       params[k] = d.kind === 'colour' ? x.toLowerCase() : x;
     }
     out.push({ name, params });
@@ -1166,10 +983,9 @@ function checkVersions(C, raw, table) {
 // ---- the sprite ---------------------------------------------------------------------------------------------------
 
 const SPRITE_FIELDS = ['format', 'version', 'id', 'name', 'blurb', 'meta', 'body', 'size', 'pivot', 'grounded', 'colours', 'controls', 'parts', 'clips', 'preview', 'made', 'versions'];
-const CONTROL_FIELDS = ['key', 'label', 'lo', 'hi', 'min', 'max', 'default', 'scales', 'sets'];
-const CLIP_FIELDS = ['label', 'frames', 'fps', 'loop', 'keys', 'frameEdits', 'sounds', 'from'];
+const CONTROL_FIELDS = ['key', 'label', 'lo', 'hi', 'min', 'max', 'default', 'scales'];
+const CLIP_FIELDS = ['label', 'frames', 'fps', 'loop', 'keys', 'frameEdits', 'sounds'];
 const RIG_KEY_FIELDS = ['t', 'ease', 'root', 'bones', 'ik', 'stretch', 'show', 'hide'];
-// a library body's key fields are its descriptor's (keyFields): ['t', 'ease', ...Object.keys(lib.keyFields)]
 const EDIT_FIELDS = ['nudge', 'show', 'hide', 'flash'];
 const SOUND_FIELDS = ['sound', 'frame', 'preset', 'volume', 'when'];
 
@@ -1213,9 +1029,8 @@ function checkMeta(C, m, viewOfBody) {
   return out;
 }
 
-// What each kind of control may hold (studio item F1 added kind, step, group, when, and the choice and colour kinds).
+// What each kind of control may hold (studio item F1 added kind, step, group, when and the colour kind).
 const SLIDER_FIELDS = [...CONTROL_FIELDS, 'kind', 'step', 'group', 'when'];
-const CHOICE_FIELDS = ['key', 'kind', 'label', 'options', 'default', 'sets', 'map', 'was', 'group', 'when'];
 const COLOUR_CONTROL_FIELDS = ['key', 'kind', 'label', 'swatches', 'material', 'group', 'when'];
 
 /** group, and `when` kept as given for checking once every control is known (checkSprite). */
@@ -1223,59 +1038,6 @@ function extras(C, place, c, o) {
   const g = text(C, place, 'group', c.group, L.wordChars);
   if (g !== undefined) o.group = g;
   if (c.when !== undefined) o.when = c.when;
-}
-
-/** A choice control (library bodies): options, a default among them, the word field of the figure it sets (an option may stand for another value of it: map), old values (was). */
-function checkChoice(C, place, c, lib) {
-  knownOnly(C, place, c, CHOICE_FIELDS);
-  if (!lib) { C.err(`${place}: a choice is for library bodies (it sets a field of the figure); a bone rig's controls are sliders`); return null; }
-  const o = { key: idOf(C, place, c.key, { what: 'key' }), kind: 'choice', label: text(C, place, 'label', c.label, L.nameChars, { need: true }) };
-  const target = typeof c.sets === 'string' && Object.hasOwn(lib.settings, setsPath(c.sets, lib)) ? lib.settings[setsPath(c.sets, lib)] : undefined;
-  if (c.sets === undefined) C.err(`${place}: sets is missing; a choice sets a word field of the figure (${someOf(settingsOfKind(lib, 'word'))})`);
-  else if (!target || target.kind !== 'word') C.err(`${place}: sets ${q(c.sets)} is not a word field of the figure; a choice sets one of ${someOf(settingsOfKind(lib, 'word'), 12)}`);
-  else o.sets = c.sets;
-  const xs = list(C, place, c.options, L.options, { min: 2, what: 'options' });
-  if (!xs) return o;
-  // map: { option: the field's value it stands for }, for an option named otherwise than the figure names it
-  const map = isObj(c.map) ? c.map : {};
-  if (c.map !== undefined && !isObj(c.map)) C.err(`${place}: map must be an object of option: value of ${c.sets}; got ${say(c.map)}`);
-  const optionValues = xs.map((x) => (isObj(x) ? x.value : x));
-  for (const [k, v] of Object.entries(map)) {
-    if (!optionValues.includes(k)) C.err(`${place}: map names ${q(k)}, which is not one of its options`);
-    else if (target?.kind === 'word' && !target.values.includes(v)) C.err(`${place}: map gives ${q(k)} the value ${say(v)}, which ${c.sets} never takes; it takes ${someOf(target.values.map((x) => q(x)), 12)}`);
-  }
-  if (Object.keys(map).length && !C.errors.some((e) => e.startsWith(`${place}: map`))) o.map = { ...map };
-  const values = [];
-  o.options = [];
-  for (const x of xs) {
-    const value = isObj(x) ? x.value : x;
-    if (typeof value !== 'string' || !value.trim() || value.length > L.idChars || BAD_CHARS.test(value)) { C.err(`${place}: an option must be a word of at most ${L.idChars} characters, or { value, label }; got ${say(x)}`); continue; }
-    if (values.includes(value)) { C.err(`${place}: the option ${q(value)} is listed twice`); continue; }
-    const field = Object.hasOwn(map, value) ? map[value] : value;
-    if (target?.kind === 'word' && !target.values.includes(field)) { C.err(`${place}: the option ${q(value)} is not a value of ${c.sets}; it takes ${someOf(target.values.map((v) => q(v)), 12)} (or give it a map)`); continue; }
-    values.push(value);
-    if (isObj(x)) {
-      knownOnly(C, `${place}, option ${q(value)}`, x, ['value', 'label']);
-      const lab = text(C, `${place}, option ${q(value)}`, 'label', x.label, L.nameChars, { need: true });
-      if (lab !== undefined) o.options.push({ value, label: lab });
-    } else o.options.push(value);
-  }
-  if (c.default === undefined) o.default = values[0];
-  else if (!values.includes(c.default)) C.err(`${place}: default ${say(c.default)} is not one of its options (${someOf(values.map((v) => q(v)))})`);
-  else o.default = c.default;
-  if (c.was !== undefined) {
-    if (!isObj(c.was) || Object.keys(c.was).length > L.options) C.err(`${place}: was must be an object of old value: option, at most ${L.options}; got ${say(c.was)}`);
-    else {
-      o.was = {};
-      for (const [old, now] of Object.entries(c.was)) {
-        if (old.length > L.idChars || BAD_CHARS.test(old)) { C.err(`${place}: was: the old value ${q(old)} must be a word of at most ${L.idChars} characters`); continue; }
-        if (!values.includes(now)) { C.err(`${place}: was maps ${q(old)} to ${say(now)}, which is not one of its options`); continue; }
-        o.was[old] = now;
-      }
-    }
-  }
-  extras(C, place, c, o);
-  return o;
 }
 
 /** A colour control: the look of one colour slot's control (label, swatches, material, group, when), placed where it stands in the list. */
@@ -1297,11 +1059,11 @@ function checkColourControl(C, place, c, colourKeys) {
   return o;
 }
 
-function checkControls(C, d, facts, lib, colourKeys = new Set()) {
+function checkControls(C, d, facts, colourKeys = new Set()) {
   const out = [];
   const xs = list(C, 'Controls', d.controls, L.controls, { what: 'controls' }) ?? [];
   let speed = false;
-  const setBy = new Map(), styled = new Set();
+  const styled = new Set();
   xs.forEach((c, i) => {
     const place = `Control ${typeof c?.key === 'string' ? q(c.key) : i + 1}`;
     if (!isObj(c)) { C.err(`${place}: must be an object with ${listOf(CONTROL_FIELDS)}`); return; }
@@ -1317,7 +1079,7 @@ function checkControls(C, d, facts, lib, colourKeys = new Set()) {
       out.push(o);
       return;
     }
-    if (c.kind !== undefined && !['slider', 'choice', 'colour'].includes(c.kind)) { C.err(`${place}: kind ${q(c.kind)} is not known; use "slider" (the default), "choice" or "colour"`); return; }
+    if (c.kind !== undefined && !['slider', 'colour'].includes(c.kind)) { C.err(`${place}: kind ${q(c.kind)} is not known; use "slider" (the default) or "colour"`); return; }
     if (c.kind === 'colour') {
       const o = checkColourControl(C, place, c, colourKeys);
       if (!o) return;
@@ -1326,20 +1088,11 @@ function checkControls(C, d, facts, lib, colourKeys = new Set()) {
       out.push(o);
       return;
     }
-    if (c.kind === 'choice') {
-      const o = checkChoice(C, place, c, lib);
-      if (!o) return;
-      if (o.sets) { if (setBy.has(o.sets)) C.err(`${place}: ${o.sets} is set twice (by ${q(setBy.get(o.sets))} and ${q(o.key)}); a field is set by one control`); else setBy.set(o.sets, o.key); }
-      out.push(o);
-      return;
-    }
     knownOnly(C, place, c, SLIDER_FIELDS);
     const o = { key: idOf(C, place, c.key, { what: 'key' }), label: text(C, place, 'label', c.label, L.nameChars, { need: true }) };
     if (c.kind === 'slider') o.kind = 'slider';
     for (const f of ['lo', 'hi']) { const t = text(C, place, f, c[f], L.wordChars); if (t !== undefined) o[f] = t; }
-    // a library slider sets one number field of the figure, within that field's range (the body fields: 0..1)
-    const target = lib && typeof c.sets === 'string' && Object.hasOwn(lib.settings, setsPath(c.sets, lib)) ? lib.settings[setsPath(c.sets, lib)] : null;
-    const [lo, hi] = lib ? (target?.kind === 'number' ? [target.min, target.max] : [0, 1]) : L.scale;
+    const [lo, hi] = L.scale;
     o.min = num(C, place, 'min', c.min, lo, hi, { need: true });
     o.max = num(C, place, 'max', c.max, lo, hi, { need: true });
     if (c.step !== undefined) {
@@ -1349,30 +1102,17 @@ function checkControls(C, d, facts, lib, colourKeys = new Set()) {
     }
     if (o.min !== undefined && o.max !== undefined) {
       if (o.min >= o.max) C.err(`${place}: min (${o.min}) must be less than max (${o.max})`);
-      else o.default = num(C, place, 'default', c.default ?? Math.min(o.max, Math.max(o.min, lib ? 0.5 : 1)), o.min, o.max);
+      else o.default = num(C, place, 'default', c.default ?? Math.min(o.max, Math.max(o.min, 1)), o.min, o.max);
     }
-    if (lib) {
-      const short = Object.keys(lib.aliases), long = settingsOfKind(lib, 'number').filter((k) => !Object.values(lib.aliases).includes(k));
-      if (c.scales !== undefined) C.err(`${place}: a library body's slider sets a field of the figure (sets: ${someOf([...short, ...long], 12)}), not scales`);
-      if (!target || target.kind !== 'number') C.err(`${place}: sets ${q(c.sets)} is not a number field of the figure; use one of ${someOf([...short, ...long], 12)}`);
-      else {
-        o.sets = c.sets;
-        const path = setsPath(c.sets, lib);
-        if (setBy.has(path)) C.err(`${place}: ${path} is set twice (by ${q(setBy.get(path))} and ${q(o.key)}); a field is set by one control`);
-        else setBy.set(path, o.key);
-      }
-    } else {
-      if (c.sets !== undefined) C.warn(`${place}: sets is for library bodies; dropped`);
-      const s = c.scales;
-      const how = 'needs scales: { bones: [bone ids] } or { shapes: [shape ids] }';
-      if (!isObj(s) || Object.keys(s).length !== 1 || !['bones', 'shapes'].includes(Object.keys(s)[0])) C.err(`${place}: ${how}; got ${say(s)}`);
-      else {
-        const [what] = Object.keys(s);
-        const known = what === 'bones' ? facts.bones : facts.shapes;
-        const ids = refs(C, place, what, s[what], known, `a ${what === 'bones' ? 'bone' : 'shape'} of the body`, what === 'bones' ? L.bones : L.shapes);
-        if (ids && !ids.length) C.err(`${place}: ${how}; the list is empty`);
-        else if (ids) o.scales = { [what]: ids };
-      }
+    const s = c.scales;
+    const how = 'needs scales: { bones: [bone ids] } or { shapes: [shape ids] }';
+    if (!isObj(s) || Object.keys(s).length !== 1 || !['bones', 'shapes'].includes(Object.keys(s)[0])) C.err(`${place}: ${how}; got ${say(s)}`);
+    else {
+      const [what] = Object.keys(s);
+      const known = what === 'bones' ? facts.bones : facts.shapes;
+      const ids = refs(C, place, what, s[what], known, `a ${what === 'bones' ? 'bone' : 'shape'} of the body`, what === 'bones' ? L.bones : L.shapes);
+      if (ids && !ids.length) C.err(`${place}: ${how}; the list is empty`);
+      else if (ids) o.scales = { [what]: ids };
     }
     extras(C, place, c, o);
     out.push(o);
@@ -1380,110 +1120,41 @@ function checkControls(C, d, facts, lib, colourKeys = new Set()) {
   return { controls: out, speed };
 }
 
-/**
- * A part of a library body in the form of Contract 3 (studio item F1): any name, { label, params: [selector, ...its
- * own controls], none, socket }. The selector is a choice; none is one of its options or a list of them; socket is an
- * attach point the body gives. A control is in one part at most.
- */
-function checkContractPart(C, place, name, p, ctl, owned, figure, lib) {
-  knownOnly(C, place, p, ['label', 'params', 'none', 'socket']);
-  const o = { label: text(C, place, 'label', p.label, L.nameChars, { need: true }) };
-  const xs = list(C, place, p.params, L.controls, { min: 1, what: 'params' });
-  if (!xs) return o;
-  const params = [];
-  for (const k of xs) {
-    if (typeof k !== 'string' || !ctl.has(k)) { C.err(`${place}: ${say(k)} in params is not one of the sprite's controls`); continue; }
-    if (owned.has(k)) { C.err(`${place}: the control ${q(k)} is in two parts (${q(owned.get(k))} and ${q(name)}); a control belongs to one part`); continue; }
-    if (!params.includes(k)) params.push(k);
-  }
-  for (const k of params) owned.set(k, name);
-  o.params = params;
-  const sel = ctl.get(params[0]);
-  if (!sel || sel.kind !== 'choice') { C.err(`${place}: its first control ${q(params[0])} must be a choice: it picks which ${name}, or none`); return o; }
-  if (p.none !== undefined) {
-    const nones = Array.isArray(p.none) ? p.none : [p.none];
-    const bad = nones.filter((v) => !sel.values.includes(v));
-    if (!nones.length) C.err(`${place}: none is an empty list; name the options that take the part off, or leave none out`);
-    else if (bad.length) C.err(`${place}: none ${bad.map(say).join(', ')} is not an option of ${q(params[0])}`);
-    else o.none = Array.isArray(p.none) ? [...p.none] : p.none;
-  }
-  if (p.socket !== undefined) {
-    const sockets = lib.socketNames(figure ?? {});
-    if (!sockets.includes(p.socket)) C.err(`${place}: socket ${say(p.socket)} is not an attach point of the body; it has ${listOf(sockets)}${sockets.includes('muzzle') ? '' : lib.socketsNote}`);
-    else o.socket = p.socket;
-  }
-  return o;
-}
-
-function checkParts(C, d, facts, lib, ctl = new Map(), figure = null) {
+function checkParts(C, d, facts) {
   const out = {};
   if (d.parts === undefined) return out;
-  if (!isObj(d.parts)) { C.err(`Parts: must be an object of name: { label, ${lib ? '' : 'shapes, '}default }; got ${say(d.parts)}`); return out; }
+  if (!isObj(d.parts)) { C.err(`Parts: must be an object of name: { label, shapes, default }; got ${say(d.parts)}`); return out; }
   const names = Object.keys(d.parts);
   if (names.length > L.parts) { C.err(`Parts: has ${names.length} parts; the most is ${L.parts}`); return out; }
-  const owner = new Map(), owned = new Map();
+  const owner = new Map();
   for (const name of names) {
     const place = `Part ${q(name)}`;
     if (!idOf(C, place, name, { what: 'part name' })) continue;
     const p = d.parts[name];
-    if (lib && isObj(p) && p.params !== undefined) { out[name] = checkContractPart(C, place, name, p, ctl, owned, figure, lib); continue; }
-    if (lib && !lib.parts.includes(name)) { C.err(`${place}: is not a part of the library body; use one of ${listOf(lib.parts)}, or list its controls (params, the choice that picks it first)`); continue; }
-    if (!isObj(p)) { C.err(`${place}: must be an object with label${lib ? '' : ', shapes'} and default`); continue; }
-    knownOnly(C, place, p, lib ? ['label', 'default'] : ['label', 'shapes', 'default']);
+    if (!isObj(p)) { C.err(`${place}: must be an object with label, shapes and default`); continue; }
+    knownOnly(C, place, p, ['label', 'shapes', 'default']);
     const o = { label: text(C, place, 'label', p.label, L.nameChars, { need: true }) };
-    if (!lib) {
-      const own = refs(C, place, 'shapes', p.shapes ?? [], facts.shapes, 'a shape of the body', L.shapes) ?? [];
-      for (const s of facts.shapes.values()) if (s.part === name && !own.includes(s.id)) own.push(s.id);
-      for (const s of own) {
-        if (owner.has(s) && owner.get(s) !== name) C.err(`Shape ${q(s)}: is in two parts (${q(owner.get(s))} and ${q(name)}); a shape belongs to one part`);
-        else owner.set(s, name);
-      }
-      o.shapes = own;
+    const own = refs(C, place, 'shapes', p.shapes ?? [], facts.shapes, 'a shape of the body', L.shapes) ?? [];
+    for (const s of facts.shapes.values()) if (s.part === name && !own.includes(s.id)) own.push(s.id);
+    for (const s of own) {
+      if (owner.has(s) && owner.get(s) !== name) C.err(`Shape ${q(s)}: is in two parts (${q(owner.get(s))} and ${q(name)}); a shape belongs to one part`);
+      else owner.set(s, name);
     }
+    o.shapes = own;
     o.default = bool(C, place, 'default', p.default) ?? true;
     out[name] = o;
   }
-  if (!lib) for (const s of facts.shapes.values()) if (s.part && !Object.hasOwn(out, s.part) && !RESERVED.has(s.part)) C.err(`Shape ${q(s.id)}: its part ${q(s.part)} is not one of the sprite's parts; add the part or remove it from the shape`);
+  for (const s of facts.shapes.values()) if (s.part && !Object.hasOwn(out, s.part) && !RESERVED.has(s.part)) C.err(`Shape ${q(s.id)}: its part ${q(s.part)} is not one of the sprite's parts; add the part or remove it from the shape`);
   return out;
 }
 
-function checkKey(C, place, k, facts, lib, frame) {
+function checkKey(C, place, k, facts) {
   if (!isObj(k)) { C.err(`${place}: must be an object with t and what the key changes`); return null; }
-  knownOnly(C, place, k, lib ? ['t', 'ease', ...Object.keys(lib.keyFields)] : RIG_KEY_FIELDS);
+  knownOnly(C, place, k, RIG_KEY_FIELDS);
   const o = { t: num(C, place, 't', k.t, 0, 1, { need: true }) };
   if (k.ease !== undefined) {
     if (!EASES.includes(k.ease)) C.err(`${place}: ease must be one of ${listOf(EASES)}; got ${say(k.ease)}`);
     else o.ease = k.ease;
-  }
-  if (lib) {
-    for (const [f, spec] of Object.entries(lib.keyFields)) {
-      const v = k[f], kind = spec.kind;
-      if (v === undefined) continue;
-      if (v === null && spec.none) { o[f] = null; continue; }
-      if (kind === 'flag') { const b = bool(C, place, f, v); if (b !== undefined) o[f] = b; continue; }
-      if (kind === 'word') {
-        if (!spec.values.includes(v)) C.err(`${place}: ${f} must be one of ${listOf(spec.values)}${spec.none ? ' or null' : ''}; got ${say(v)}`);
-        else o[f] = v;
-        continue;
-      }
-      if (kind === 'count') { const x = num(C, place, f, typeof v === 'number' && Number.isFinite(v) ? whole(C, place, f, v) : v, spec.min, spec.max); if (x !== undefined) o[f] = x; continue; }
-      if (kind === 'point' || kind === 'arm') {
-        const [a, b] = kind === 'point' ? ['x', 'y'] : ['a', 'e'];
-        const lim = kind === 'point' ? Math.max(L.libraryPx, facts.W, facts.H) : L.angle;
-        // a foot may also say `up`: its knee bends up (a leg lying on the ground, rigs/humanoid.js die)
-        const extra = kind === 'point' && isObj(v) && v.up !== undefined ? 1 : 0;
-        if (!isObj(v) || Object.keys(v).length !== 2 + extra || v[a] === undefined || v[b] === undefined) { C.err(`${place}: ${f} must be { ${a}, ${b} }${kind === 'point' ? ' (and up: true or false)' : ''}; got ${say(v)}`); continue; }
-        const x = num(C, place, `${f}.${a}`, v[a], -lim, lim, { need: true }), y = num(C, place, `${f}.${b}`, v[b], -lim, lim, { need: true });
-        const up = extra ? bool(C, place, `${f}.up`, v.up) : undefined;
-        if (x !== undefined && y !== undefined && (!extra || up !== undefined)) o[f] = extra ? { [a]: x, [b]: y, up } : { [a]: x, [b]: y };
-        continue;
-      }
-      const px = Math.max(L.libraryPx, facts.W, facts.H);   // a body bigger than 64 px may move further
-      const [lo, hi] = kind === 'px' ? [-px, px] : kind === 'angle' ? [-L.angle, L.angle] : kind === 'signed' ? [-1, 1] : [0, 1];
-      const x = num(C, place, f, v, lo, hi);
-      if (x !== undefined) o[f] = x;
-    }
-    return o;
   }
   const { W, H } = facts;
   if (k.root !== undefined) { const r = pair(C, place, 'root', k.root, [-W, W], [-H, H]); if (r) o.root = r; }
@@ -1516,10 +1187,10 @@ function showHide(C, place, k, o, facts) {
   if (o.show && o.hide) for (const id of o.show) if (o.hide.includes(id)) C.err(`${place}: shape ${q(id)} is in both show and hide`);
 }
 
-function checkClip(C, name, c, facts, lib) {
+function checkClip(C, name, c, facts) {
   const place = `Clip ${q(name)}`;
   if (!isObj(c)) { C.err(`${place}: must be an object with ${listOf(CLIP_FIELDS)}; got ${say(c)}`); return null; }
-  knownOnly(C, place, c, lib ? CLIP_FIELDS : CLIP_FIELDS.filter((f) => f !== 'from'));
+  knownOnly(C, place, c, CLIP_FIELDS);
   // a top-down body's direction clip (walk_down): the style guide's advice is for its action, its label says both
   const m = facts.view === 'top-down' ? DIR_CLIP_RE.exec(name) : null;
   const action = m ? m[1] : name, dir = m ? m[2] : null;
@@ -1537,7 +1208,7 @@ function checkClip(C, name, c, facts, lib) {
 
   // keys
   const ks = list(C, place, c.keys, L.keysPerClip, { what: 'keys' }) ?? [];
-  let keys = ks.map((k, i) => checkKey(C, `${place}, key ${i + 1}`, k, facts, lib)).filter(Boolean);
+  let keys = ks.map((k, i) => checkKey(C, `${place}, key ${i + 1}`, k, facts)).filter(Boolean);
   const sorted = [...keys].sort((a, b) => (a.t ?? 0) - (b.t ?? 0));
   if (sorted.some((k, i) => k !== keys[i])) { C.warn(`${place}: keys were not in order of t; put in order`); keys = sorted; }
   for (let i = 1; i < keys.length; i++) {
@@ -1557,8 +1228,7 @@ function checkClip(C, name, c, facts, lib) {
         knownOnly(C, ep, e, EDIT_FIELDS);
         const x = {};
         if (e.nudge !== undefined) { const nd = pair(C, ep, 'nudge', e.nudge, [-facts.W, facts.W], [-facts.H, facts.H], { wholePx: true }); if (nd) x.nudge = nd; }
-        if (lib && (e.show !== undefined || e.hide !== undefined)) C.err(`${ep}: show and hide are for bone rigs; a library body shows its parts with its pose flags`);
-        else showHide(C, ep, e, x, facts);
+        showHide(C, ep, e, x, facts);
         const fl = bool(C, ep, 'flash', e.flash);
         if (fl !== undefined) x.flash = fl;
         o.frameEdits[f] = x;
@@ -1590,25 +1260,19 @@ function checkClip(C, name, c, facts, lib) {
     });
   }
 
-  if (c.from !== undefined) {
-    if (!lib) C.warn(`${place}: from is for library bodies (the pose the keys were made from); dropped`);
-    else if (!lib.poses.includes(c.from)) C.err(`${place}: from ${q(c.from)} is not a pose of the library body; ${lib.poses.length ? `use one of ${listOf(lib.poses)}` : 'it has no formula poses, so leave from out'}`);
-    else o.from = c.from;
-  }
-
   // advice from style guide 4
   if (Object.hasOwn(CLIP_SYNONYMS, action)) { const s = CLIP_SYNONYMS[action]; C.warn(`${place}: the style guide calls this clip "${s}"; name it ${dir ? `${s}_${dir}` : s} and keep the label ${q(o.label)}`); }
   if (std) {
     if (frames !== std.frames) C.warn(`${place}: the style guide's ${action} has ${std.frames} frames; this one has ${frames}`);
     if (o.loop !== std.loop) C.warn(`${place}: the style guide's ${action} ${std.loop ? 'loops' : 'plays once (no loop)'}`);
   }
-  if ((action === 'hurt' || action === 'die') && !(o.frameEdits?.['0']?.flash || (lib && keys.some((k) => k.t === 0 && k.flash)))) {
+  if ((action === 'hurt' || action === 'die') && !o.frameEdits?.['0']?.flash) {
     C.warn(`${place}: the style guide starts ${action} on a white flash; turn on the white flash on frame 0`);
   }
   return o;
 }
 
-function checkClips(C, d, facts, lib) {
+function checkClips(C, d, facts) {
   if (!isObj(d.clips)) { C.err(`Clips: give at least one clip, as an object of name: clip; got ${say(d.clips)}`); return null; }
   const names = Object.keys(d.clips);
   if (!names.length) { C.err('Clips: give at least one clip (idle is the usual first)'); return null; }
@@ -1624,7 +1288,7 @@ function checkClips(C, d, facts, lib) {
       const other = `${m[1]}-${m[2]}`;
       if (names.includes(other)) C.err(`Clip ${q(name)}: there is also a clip ${q(other)}; a name may be written only one way (use ${q(name)})`);
     } else if (!idOf(C, `Clip ${q(name)}`, name, { what: 'clip name' })) continue;
-    const c = checkClip(C, name, d.clips[name], facts, lib);
+    const c = checkClip(C, name, d.clips[name], facts);
     if (c) { out[name] = c; total += c.frames; }
   }
   if (total > L.frames) C.err(`Clips: have ${total} frames in all; the most is ${L.frames}`);
@@ -1664,30 +1328,15 @@ function checkSprite(C, d) {
   out.blurb = text(C, where, 'blurb', d.blurb, L.blurbChars, { empty: true }) ?? '';
 
   // body
-  let facts = null, lib = false;
+  let facts = null;
   const b = d.body;
-  if (!isObj(b)) C.err(`Body: must be { rig: {...} } or { library: "humanoid", figure: {...} }; got ${say(b)}`);
-  else if (b.rig !== undefined && b.library !== undefined) C.err('Body: give either rig or library, not both');
-  else if (b.rig === undefined && b.library === undefined) C.err('Body: give either rig (a bone rig) or library (a body from the library)');
-  else if (b.rig !== undefined) {
+  if (!isObj(b)) C.err(`Body: must be { rig: {...} }; got ${say(b)}`);
+  else if (b.library !== undefined) C.err(`Body: ${LIBRARY_BODY_GONE}`);
+  else if (b.rig === undefined) C.err('Body: give rig (a bone rig)');
+  else {
     knownOnly(C, 'Body', b, ['rig']);
     const r = checkRig(C, b.rig, 'Body: ');
     if (r) { out.body = { rig: r.rig }; facts = r.facts; }
-  } else {
-    // a library body: its descriptor (engine/library-body.js) says what the figure, controls, parts, keys and poses
-    // may be, which frame sizes it draws at and where it stands; `lib` is that descriptor from here on (studio item F2)
-    knownOnly(C, 'Body', b, ['library', 'figure', 'paint']);
-    const reg = registryOf(C.opts);
-    if (!reg.has(b.library)) C.err(`Body: library ${q(b.library)} is not a library body; the library bodies are ${listOf(reg.names)}`);
-    else {
-      lib = reg.get(b.library);
-      const fig = checkFigure(C, b.figure, 'Body: ', lib);
-      if (fig) out.body = { library: b.library, figure: fig };
-      const none = new Map();
-      // the frame: the size the definition gives when the body draws at it, else the body's first
-      const [W0, H0] = lib.sizes.find(([w, h]) => Array.isArray(d.size) && d.size[0] === w && d.size[1] === h) ?? lib.sizes[0];
-      facts = { W: W0, H: H0, slots: none, bones: none, shapes: none, ik: none, chainOf: none, points: none, view: lib.view };
-    }
   }
   out.meta = checkMeta(C, d.meta, facts?.view);
   if (out.meta === undefined) delete out.meta;
@@ -1696,9 +1345,9 @@ function checkSprite(C, d) {
 
   // size, pivot, grounded
   out.size = [W, H];
-  if (d.size !== undefined && !(Array.isArray(d.size) && d.size[0] === W && d.size[1] === H)) C.warn(`size comes from the body (${lib && lib.sizes.length > 1 ? `one of ${lib.sizes.map((s) => sizeName(s)).join(', ')}; kept ${sizeName([W, H])}` : sizeName([W, H])}); the given size ${say(d.size)} was dropped`);
+  if (d.size !== undefined && !(Array.isArray(d.size) && d.size[0] === W && d.size[1] === H)) C.warn(`size comes from the body (${sizeName([W, H])}); the given size ${say(d.size)} was dropped`);
   out.grounded = d.grounded === undefined ? true : bool(C, where, 'grounded', d.grounded);
-  if (d.pivot === undefined) out.pivot = lib && Object.hasOwn(lib.pivots, `${W}x${H}`) ? [...lib.pivots[`${W}x${H}`]] : defaultPivot([W, H], out.grounded !== false);
+  if (d.pivot === undefined) out.pivot = defaultPivot([W, H], out.grounded !== false);
   else {
     const p = pair(C, 'pivot', 'pivot', d.pivot, [0, W], [0, H], { wholePx: true });
     if (p) out.pivot = p;
@@ -1710,60 +1359,49 @@ function checkSprite(C, d) {
   else {
     const given = d.colours ?? {};
     const keys = Object.keys(given);
-    if (lib && keys.length > L.colours) C.err(`Colours: has ${keys.length}; the most is ${L.colours}`);
-    else for (const k of keys) {
-      if (!lib && !facts.slots.has(k)) { C.err(`Colour ${q(k)}: is not a colour slot of the body (${listOf([...facts.slots.keys()])})`); continue; }
-      if (lib && !idOf(C, 'Colours', k, { what: 'colour name' })) continue;
+    for (const k of keys) {
+      if (!facts.slots.has(k)) { C.err(`Colour ${q(k)}: is not a colour slot of the body (${listOf([...facts.slots.keys()])})`); continue; }
       const h = hex(C, `Colour ${q(k)}`, 'value', given[k], { need: true });
       if (h) out.colours[k] = h;
     }
-    if (!lib) for (const [id, s] of facts.slots) if (!Object.hasOwn(out.colours, id) && s.default) out.colours[id] = s.default;
+    for (const [id, s] of facts.slots) if (!Object.hasOwn(out.colours, id) && s.default) out.colours[id] = s.default;
   }
 
   // controls and parts, and every key once
-  const colourKeys = new Set(lib ? Object.keys(out.colours) : [...facts.slots].filter(([, s]) => !s.detail).map(([id]) => id));
-  const { controls, speed } = checkControls(C, d, facts, lib, colourKeys);
+  const colourKeys = new Set([...facts.slots].filter(([, s]) => !s.detail).map(([id]) => id));
+  const { controls, speed } = checkControls(C, d, facts, colourKeys);
   out.controls = controls;
-  // a control that sets a field of a part the stored figure has not changes nothing (rigs/humanoid-studio.js never adds a
-  // part, as body.paint never does); the blocks read with defaults (the body's blocks) are the exception (review F1, issue 4)
-  if (lib) for (const c of controls) {
-    const path = typeof c.sets === 'string' ? setsPath(c.sets, lib) : '', part = path.includes('.') ? path.split('.')[0] : null;
-    if (part && !lib.blocks.includes(part) && !isObj(out.body?.figure?.[part])) C.warn(`Control ${q(c.key)}: sets ${q(path)}, but the figure has no ${part}, so it changes nothing; add ${part} to body.figure`);
-  }
-  // every control by its key, as `when`, parts and versions read them: { kind: colour | range | choice | toggle, ... }
+  // every control by its key, as `when`, parts and versions read them: { kind: colour | range | toggle, ... }
   const table = new Map([...colourKeys].map((k) => [k, { kind: 'colour' }]));
   for (const c of controls) {
     if (c.kind === 'colour' || !c.key) continue;
-    if (c.kind === 'choice') table.set(c.key, { kind: 'choice', values: (c.options ?? []).map((x) => (isObj(x) ? x.value : x)), was: c.was });
-    else table.set(c.key, { kind: 'range', min: c.standard ? 0 : c.min, max: c.standard ? 1 : c.max });
+    table.set(c.key, { kind: 'range', min: c.standard ? 0 : c.min, max: c.standard ? 1 : c.max });
   }
-  out.parts = checkParts(C, d, facts, lib, table, out.body?.figure);
+  out.parts = checkParts(C, d, facts);
   const owners = new Map();
   const claim = (key, by) => {
     if (!key) return;
     if (owners.has(key)) C.err(`The key ${q(key)} is used twice (by ${owners.get(key)} and ${by}); every control needs its own key`);
     else owners.set(key, by);
   };
-  if (lib) for (const k of Object.keys(out.colours)) claim(k, `colour ${q(k)}`);
-  else for (const [id, s] of facts.slots) if (!s.detail) claim(id, `colour slot ${q(id)}`);
+  for (const [id, s] of facts.slots) if (!s.detail) claim(id, `colour slot ${q(id)}`);
   for (const c of controls) if (c.kind !== 'colour') claim(c.key, `control ${q(c.key)}`);
-  // a part with params (Contract 3) is picked by its own choice; an on/off part is a control keyed by its name
-  for (const [p, x] of Object.entries(out.parts)) if (!x.params) { claim(p, `part ${q(p)}`); if (!table.has(p)) table.set(p, { kind: 'toggle' }); }
+  // an on/off part is a control keyed by its name
+  for (const p of Object.keys(out.parts)) { claim(p, `part ${q(p)}`); if (!table.has(p)) table.set(p, { kind: 'toggle' }); }
   if (owners.size > L.controls) C.err(`The sprite has ${owners.size} controls in all (colours, sliders, parts, speed); the most is ${L.controls}`);
 
-  // `when` on controls (and, in the clips, on sounds), loops through `when` and parts, the figure's paint, versions
+  // `when` on controls (and, in the clips, on sounds), loops through `when`, versions
   C.keyTable = table;
   for (const c of controls) {
     if (c.when === undefined) continue;
     const w = checkWhen(C, `Control ${q(c.key)}`, c.when, table, c.key);
     if (w === undefined) delete c.when; else c.when = w;
   }
-  checkLoops(C, controls, out.parts);
-  if (lib && b.paint !== undefined) { const paint = checkPaint(C, b.paint, out.body?.figure, colourKeys, table, lib); if (paint) out.body.paint = paint; }
+  checkLoops(C, controls);
   if (d.versions !== undefined) { const v = checkVersions(C, d.versions, table); if (v) out.versions = v; }
 
   // clips, preview, made
-  const clips = checkClips(C, d, facts, lib);
+  const clips = checkClips(C, d, facts);
   if (clips) {
     out.clips = clips;
     if (!speed && Object.values(clips).some((c) => c.frames > 1)) C.warn('Controls: there is no speed control; add { "key": "speed", "standard": "speed" } so people can set how fast it moves');

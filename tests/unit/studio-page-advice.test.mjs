@@ -9,7 +9,6 @@ import * as A from '../../app/studio/advice.js';
 import * as X from '../../app/studio/edit.js';
 import { acceptChange } from '../../app/studio/keep.js';
 import { Surface } from '../../engine/surface.js';
-import { hero } from '../../rigs/humanoid-studio.js';
 import { drawFrame } from '../../app/studio/draw.js';
 import { validateDataSprite } from '../../engine/data-sprite.js';
 
@@ -40,7 +39,7 @@ test('a shape too thin to draw is named, with what to do, and points at its shap
   assert.ok(A.thinShapes(v).some((x) => x.shape === cap.id));
   // a dot is a detail: one pixel is right for it
   assert.ok(!A.thinShapes(v).some((x) => v.body.rig.shapes.find((s) => s.id === x.shape).kind === 'dot'));
-  assert.deepEqual(A.thinShapes(valid(hero(), 'hero')), [], 'a library body has no shapes of its own');
+  assert.deepEqual(A.thinShapes({ ...v, body: {} }), [], 'a definition with no bone rig has no shapes of its own');
 });
 
 test('stray single pixels: a drawn pixel with nothing drawn beside it', () => {
@@ -72,8 +71,8 @@ test('speckle: a few pixels that show on one frame only, with nothing near them 
 test('frame warnings: every frame of an animation looked at; each says which frame', () => {
   const d = start('four-legs');
   assert.deepEqual(A.frameWarnings(d, 'walk').filter((w) => w.kind !== 'speckle'), []);
-  // a pixel on its own in every frame (a bone rig inks every shape, so a drawer that adds one stands in for the light
-  // a library body draws after its outline, a spark or a glint)
+  // a pixel on its own in every frame (a bone rig inks every shape, so a drawer that adds one stands in for a
+  // spark or a glint drawn after the outline)
   const v = d;
   const w = A.frameWarnings(v, 'idle', { draw: lonely });
   const stray = w.filter((x) => x.kind === 'stray');
@@ -136,7 +135,7 @@ test('the quality bar\'s findings in everyday words, with what they are about', 
   assert.ok(odd.text.length > 10);
 });
 
-test('the bar as advice: never blocking, findings sorted asks first, a library body too', async () => {
+test('the bar as advice: never blocking, findings sorted asks first', async () => {
   const d = start('blob');
   const r = await A.barAdvice(d, { sounds: null });
   assert.equal(r.ok, true);
@@ -146,7 +145,7 @@ test('the bar as advice: never blocking, findings sorted asks first, a library b
   assert.match(r.note, /bag/i);
   // a sprite with findings still goes through every check the page makes
   assert.equal(acceptChange(d).ok, true);
-  const h = await A.barAdvice(valid(hero(), 'hero'), { sounds: null });
+  const h = await A.barAdvice(start('four-legs'), { sounds: null });
   assert.equal(h.ok, true);
   // a definition that cannot be drawn says why, in words
   const bad = await A.barAdvice({ format: 'loadout-sprite' }, { sounds: null });

@@ -19,7 +19,7 @@ import { ROOT, spriteIds, findSpriteFile, loadSpriteFile } from '../../tools/lib
 
 export { ROOT };
 
-/** Where frozen copies of code sprites live: the code file as it was before its redraw, imports pointing at ../../../ (a file in the fixed data form is kept word for word). */
+/** Where frozen copies of code sprites live: the code file as it was before its redraw, imports pointing at ../../../. */
 export const FROZEN_DIR = path.join(ROOT, 'tests', 'fixtures', 'code-sprites');
 
 const one = new Map();
@@ -99,23 +99,13 @@ export function codeSpriteSource(id) {
 
 /**
  * A code sprite for a test about the framework its code uses (a rig, a helper module): the frozen copy
- * tests/fixtures/code-sprites/<id>.js when there is one, else the library's sprites/<id>.js. A frozen copy of a file in
- * the fixed data form (a studio file or a converted library file, docs/studio.md 2.4) is kept word for word, so it is
- * read with catalog/data-file.js and made with engine/data-sprite.js dataSprite, exactly what importing it does.
+ * tests/fixtures/code-sprites/<id>.js when there is one, else the library's sprites/<id>.js. (A frozen copy of a file in
+ * the fixed data form, which needed engine/data-sprite.js to build it, is gone with the library bodies, build item R1.)
  * Throws when neither exists: freeze the code file (copy it there, imports to ../../../) before redrawing it.
  */
 export async function codeSprite(id) {
   const file = codeSpriteFile(id);
   if (!file) throw new Error(`sprites/${id}.js is gone and tests/fixtures/code-sprites/${id}.js is not there: freeze the code file before redrawing it`);
-  if (file.startsWith(FROZEN_DIR + path.sep)) {
-    const text = fs.readFileSync(file, 'utf8');
-    const DF = await import('../../catalog/data-file.js');
-    if (DF.claimsStudioForm(text) || text.split('\n')[0] === DF.LIBRARY_HEADER) {
-      const r = DF.readDataFile(text, { file: `tests/fixtures/code-sprites/${id}.js` });
-      if (!r.ok) throw new Error(`tests/fixtures/code-sprites/${id}.js: ${r.errors.join('; ')}`);
-      return (await import('../../engine/data-sprite.js')).dataSprite(r.value);
-    }
-  }
   return (await import(pathToFileURL(file).href)).default;
 }
 
@@ -147,16 +137,10 @@ export function codeSpriteAsFile(id) {
 
 /**
  * The module of a code sprite (codeSpriteFile, frozen copy first), for a test that also needs its named exports
- * (knight.js weaponReach). A frozen copy in the fixed data form cannot be imported from tests/fixtures/ (its import
- * '../engine/data-sprite.js' is kept word for word); the form allows it one export, default, so its module is
- * { default: codeSprite(id) }. Throws as codeSprite does.
+ * (knight.js weaponReach). Throws as codeSprite does.
  */
 export async function codeSpriteModule(id) {
   const file = codeSpriteFile(id);
   if (!file) throw new Error(`sprites/${id}.js is gone and tests/fixtures/code-sprites/${id}.js is not there: freeze the code file before redrawing it`);
-  if (file.startsWith(FROZEN_DIR + path.sep)) {
-    const DF = await import('../../catalog/data-file.js'), text = fs.readFileSync(file, 'utf8');
-    if (DF.claimsStudioForm(text) || text.split('\n')[0] === DF.LIBRARY_HEADER) return Object.freeze({ __proto__: null, default: await codeSprite(id) });
-  }
   return import(pathToFileURL(file).href);
 }

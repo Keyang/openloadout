@@ -1,35 +1,42 @@
 // The studio page, part 2: what the Move and Frames tabs add for every body (docs/studio.md sections 3 and 5; item
-// S10): the keys between frames (the Hero's swing light) shown and removable, Mirror legs where the body has two
+// S10): the keys between frames (a swing's light) shown and removable, Mirror legs where the body has two
 // sides, and Sounds on this frame chosen from the library's sound effects by name.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as C from '../../app/studio/clip-tools.js';
 import * as X from '../../app/studio/edit.js';
-import { hero } from '../../rigs/humanoid-studio.js';
 import { validateDataSprite } from '../../engine/data-sprite.js';
 import { framePhase } from '../../rigs/keypose.js';
 
 const valid = (d, what) => { const v = validateDataSprite(d); assert.equal(v.ok, true, `${what}: ${v.errors.join('; ')}`); return v.value; };
-const theHero = () => valid(hero(), 'the hero');
 const start = (id) => valid(X.startFrom(id, 'Test'), id);
 
-test('keys between frames: the Hero\'s swing light, each between the two frames it sits between', () => {
-  const d = theHero();
+/** A bone rig's attack with keys between its frames, as a swing's light makes them (docs/studio.md 3: 14 keys for 8 frames in the Hero's; here 3 between). */
+const withLight = () => {
+  const d = start('two-legs');
+  d.clips.attack.keys.push({ t: 0.1, bones: {} }, { t: 0.4, bones: {} }, { t: 0.65, bones: {} });
+  d.clips.attack.keys.sort((a, b) => a.t - b.t);
+  return valid(d, 'with light');
+};
+
+test('keys between frames: a swing\'s light, each between the two frames it sits between', () => {
+  const d = withLight();
   const light = C.lightKeys(d, 'attack');
-  assert.equal(light.length, 6, 'docs/studio.md 3: 14 keys for 8 frames');
+  assert.equal(light.length, 3);
   const c = d.clips.attack;
   for (const k of light) {
     assert.equal(k.before, k.after + 1);
     assert.ok(k.t > framePhase(c, k.after) && k.t < framePhase(c, k.before), `${k.t} lies between frames ${k.after} and ${k.before}`);
   }
   assert.equal(C.lightLabel(d, 'attack'), 'Swing light');
+  assert.equal(C.lightLabel(d, 'walk'), 'Keys between frames');
   assert.deepEqual(C.lightKeys(d, 'walk'), []);
   assert.deepEqual(C.lightKeys(d, 'nope'), []);
   // the frames' own keys are not among them
-  assert.equal(X.keyFrames(d, 'attack').size, 8);
+  assert.equal(X.keyFrames(d, 'attack').size, 5);
   // removed: only the frames' keys stay
   const r = valid(C.removeLightKeys(d, 'attack'), 'no light');
-  assert.equal(r.clips.attack.keys.length, 8);
+  assert.equal(r.clips.attack.keys.length, 5);
   assert.deepEqual(C.lightKeys(r, 'attack'), []);
   // a frame-count change merges them into frames (snapKeys): none stay between frames
   const six = X.setFrames(d, 'attack', 6).def;
@@ -37,20 +44,8 @@ test('keys between frames: the Hero\'s swing light, each between the two frames 
 });
 
 test('Mirror legs: offered where the body has two sides', () => {
-  assert.equal(C.canMirror(theHero()), true);
   for (const id of ['two-legs', 'four-legs', 'crawler', 'topdown-person', 'topdown-beast']) assert.equal(C.canMirror(start(id)), true, id);
   for (const id of ['blob', 'blank', 'flyer']) assert.equal(C.canMirror(start(id)), false, id);
-});
-
-test('Mirror legs on the Hero: near and far foot swap on this frame only', () => {
-  const d = theHero();
-  const k = d.clips.walk.keys[0];
-  const r = valid(C.mirrorLegs(d, 'walk', 0), 'mirrored');
-  assert.deepEqual(r.clips.walk.keys[0].footF, k.footB);
-  assert.deepEqual(r.clips.walk.keys[0].footB, k.footF);
-  assert.deepEqual(r.clips.walk.keys[1], d.clips.walk.keys[1]);
-  // twice is as it was
-  assert.deepEqual(C.mirrorLegs(r, 'walk', 0).clips.walk.keys[0], d.clips.walk.keys[0]);
 });
 
 test('Mirror legs on a bone rig: the paired feet swap targets, paired leg bones swap how far they turn from rest', () => {
@@ -88,7 +83,7 @@ test('Mirror legs on a bone rig: the paired feet swap targets, paired leg bones 
 });
 
 test('Sounds on this frame: added by name, given how it sounds and how loud, removed', () => {
-  const d = theHero();
+  const d = start('two-legs');
   assert.deepEqual(C.cuesAt(d, 'walk', 0).map((c) => c.sound), ['footstep-gravel']);
   assert.deepEqual(C.cuesAt(d, 'walk', 1), []);
   const a = C.addCue(d, 'walk', 1, 'jump', 'Big leap');

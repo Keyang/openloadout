@@ -60,7 +60,6 @@ test('librarySprites is every file in sprites/, code and data files, each under 
 // ---- frozen code sprites, for tests about the framework ----------------------------------------------------------
 
 const FROZEN = fs.readdirSync(FROZEN_DIR).filter((f) => f.endsWith('.js')).map((f) => f.slice(0, -3)).sort();
-const isDataForm = (text) => /^\/\/ (Made in the Loadout studio|Converted from code to data for the Loadout library)\./.test(text);
 
 test('every frozen copy loads as a sprite with the id of its file name; a code copy imports only ../../../engine and ../../../rigs', async () => {
   assert.ok(FROZEN.length >= 30, `${FROZEN.length} frozen copies`);
@@ -70,29 +69,11 @@ test('every frozen copy loads as a sprite with the id of its file name; a code c
     const def = await codeSprite(id);
     assert.equal(def.id, id, `${id}: the sprite's id`);
     assert.equal(typeof def.render, 'function', id);
-    if (isDataForm(text)) continue;
     assert.match(text, /^\/\/ FROZEN COPY, not a sprite:/, `${id}: says what it is on its first line`);
     const from = [...text.matchAll(/^(?:import|export)[^;]*?from '([^']+)'/gm)].map((m) => m[1]);
     assert.ok(from.length >= 1, `${id}: imports the framework`);
     for (const f of from) assert.match(f, /^\.\.\/\.\.\/\.\.\/(engine|rigs)\//, `${id}: ${f}`);
   }
-});
-
-test('codeSprite of a frozen copy in the fixed data form is the sprite the file makes when imported', async (t) => {
-  const wrappers = FROZEN.filter((id) => isDataForm(fs.readFileSync(path.join(FROZEN_DIR, `${id}.js`), 'utf8')));
-  assert.ok(wrappers.length >= 2, `${wrappers.join(', ')}`);
-  let compared = 0;
-  for (const id of wrappers) {
-    const frozen = await codeSprite(id);
-    const lib = path.join(ROOT, 'sprites', `${id}.js`);
-    // while the library's file is the same text, importing it gives the same pictures
-    if (!fs.existsSync(lib) || fs.readFileSync(lib, 'utf8') !== fs.readFileSync(path.join(FROZEN_DIR, `${id}.js`), 'utf8')) continue;
-    const imported = (await import(pathToFileURL(lib).href)).default, p = defaultParams(imported);
-    assert.deepEqual(Object.keys(frozen.clips), Object.keys(imported.clips), id);
-    for (const clip of Object.keys(imported.clips)) assert.ok(same(renderFrame(frozen, clip, 0, p), renderFrame(imported, clip, 0, p)), `${id} ${clip}`);
-    compared++;
-  }
-  t.diagnostic(`${compared} compared with the library's file`);
 });
 
 test('codeSprite: a code file with no frozen copy is read from sprites/; with neither, it says to freeze the file first', async () => {
@@ -118,17 +99,9 @@ test('codeSpriteModule hands over named exports; codeSpriteAsFile puts the impor
   assert.match(text, /from '\.\.\/rigs\//);
 });
 
-test('codeSpriteModule of a frozen copy in the fixed data form is its one export, default, the sprite codeSprite makes', async () => {
-  // its word-for-word import '../engine/data-sprite.js' does not resolve from tests/fixtures/ (B9c review round 2, issue 3)
-  const wrappers = FROZEN.filter((id) => isDataForm(fs.readFileSync(path.join(FROZEN_DIR, `${id}.js`), 'utf8')));
-  assert.ok(wrappers.includes('rogue-battler'), wrappers.join(', '));
-  for (const id of wrappers) {
-    const m = await codeSpriteModule(id);
-    assert.deepEqual(Object.keys(m), ['default'], `${id}: a file in the data form exports only its sprite`);
-    assert.equal(m.default.id, id);
-    const made = await codeSprite(id), p = defaultParams(made);
-    for (const clip of Object.keys(made.clips)) assert.ok(same(renderFrame(m.default, clip, 0, p), renderFrame(made, clip, 0, p)), `${id} ${clip}`);
-  }
+test('no frozen copy is in the fixed data form: the two that were (rogue-battler, road-bandit) went with the library-body path (build item R1)', () => {
+  assert.ok(!FROZEN.includes('rogue-battler') && !FROZEN.includes('road-bandit'));
+  for (const id of FROZEN) assert.match(fs.readFileSync(path.join(FROZEN_DIR, `${id}.js`), 'utf8'), /^\/\/ FROZEN COPY, not a sprite:/, `${id}: a code copy, said on its first line`);
 });
 
 // ---- frozen copies stay as they were frozen ----------------------------------------------------------------------
@@ -150,12 +123,12 @@ test('every frozen copy is pinned by its SHA-256 in SHA256SUMS, and no copy has 
 });
 
 test('codeSpritesWhere finds the code on a rig, the frozen copy first, one per id', () => {
-  const onRig = codeSpritesWhere(/rigs\/topdown(-[\w-]+)?\.js/);
-  assert.ok(onRig.length >= 9, `${onRig.length}`);
+  const onRig = codeSpritesWhere(/rigs\/humanoid\.js/);   // the one code rig left after R2 (it goes with its five copies, when engine/data-rules.js stops importing apart from the figure module)
+  assert.ok(onRig.length >= 5, `${onRig.length}`);
   assert.equal(new Set(onRig.map((s) => s.id)).size, onRig.length);
-  const hero = onRig.find((s) => s.id === 'hero-walker');
-  assert.ok(hero, 'hero-walker is on the rig');
-  assert.equal(hero.file, path.join(FROZEN_DIR, 'hero-walker.js'));
+  const hero = onRig.find((s) => s.id === 'knight');
+  assert.ok(hero, 'knight is on the rig');
+  assert.equal(hero.file, path.join(FROZEN_DIR, 'knight.js'));
   for (const s of onRig) assert.equal(s.file, codeSpriteFile(s.id));
 });
 

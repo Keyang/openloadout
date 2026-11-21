@@ -9,7 +9,6 @@ import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { col, INK } from '../../engine/color.js';
 import { renderFrame, defaultParams, cleanParams } from '../../engine/sprite.js';
-import { HAIR_STYLES } from '../../rigs/topdown.js';
 import { librarySprite } from '../helpers/library.mjs';
 import {
   PORTRAIT_SIZE, PORTRAIT_PIVOT, PORTRAIT_FRAMES, TALK_FRAMES, TALK_FPS, FACE_MOODS, FACE_AGES, FACE_HAIR, FACE_HEADGEAR, FACE_BEARDS, FACE_COLLARS, FACE_CARRIED,
@@ -29,8 +28,8 @@ test('a portrait is 48x48 with its pivot in the middle, and the lists are frozen
   assert.deepEqual([...PORTRAIT_PIVOT], [24, 24]);
   for (const list of [PORTRAIT_SIZE, PORTRAIT_PIVOT, PORTRAIT_FRAMES, FACE_MOODS, FACE_AGES, FACE_HAIR, FACE_HEADGEAR, FACE_BEARDS, FACE_COLLARS, FACE_CARRIED]) assert.ok(Object.isFrozen(list));
   assert.deepEqual([...PORTRAIT_FRAMES], ['none', 'round', 'square']);
-  // the hair styles of the body rigs are all here, under the same names
-  for (const style of HAIR_STYLES) assert.ok(FACE_HAIR.includes(style), `the rigs' hair style "${style}"`);
+  // the hair styles of the body rigs are all here, under the same names (the top-down rig's, which R2 deleted, as they were)
+  for (const style of ['short', 'long', 'spiky', 'ponytail', 'bald']) assert.ok(FACE_HAIR.includes(style), `the rigs' hair style "${style}"`);
 });
 
 test('faceClips makes <who>-<mood> clips of one frame, person by person, and a 4-frame talk clip at a fixed speed', () => {

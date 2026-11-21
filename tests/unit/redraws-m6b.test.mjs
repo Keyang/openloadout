@@ -1,6 +1,8 @@
 // Migration batch M6b (docs/data-sprites.md sections 7 and 9; the third review of M6): the six side-view characters
 // redrawn as data on base:person-side keep what the review found lost, each held against its frozen code copy
-// (tests/fixtures/code-sprites/, codeSprite):
+// (tests/fixtures/code-sprites/, codeSprite; the rogue and the bandit were library bodies, a path that is removed with its
+// frozen copies in build item R1, so only the other four are held against code: tests/unit/redraws-library-body-silhouettes.test.mjs
+// holds those two to the silhouettes the library-body path drew):
 //   - the Motion sliders are back (Contract 15 rule 10, Keyang's DQ3): Bounce and Stride on the knight, the wizard, the
 //     rogue, the goblin and the bandit, Rattle (wobble) on the bone soldier, each moving the clips as the code's moved them
 //     (a clip `travel`, build item F5)
@@ -21,7 +23,8 @@ import { librarySprite, codeSprite, ROOT } from '../helpers/library.mjs';
 
 const IDS = ['knight', 'wizard', 'spear-goblin', 'bone-soldier', 'rogue-battler', 'road-bandit'];
 const DATA = Object.fromEntries(await Promise.all(IDS.map(async (id) => [id, await librarySprite(id)])));
-const CODE = Object.fromEntries(await Promise.all(IDS.map(async (id) => [id, await codeSprite(id)])));
+const CODE_IDS = IDS.filter((id) => id !== 'rogue-battler' && id !== 'road-bandit');   // the two library-body sprites have no code copy any more (build item R1)
+const CODE = Object.fromEntries(await Promise.all(CODE_IDS.map(async (id) => [id, await codeSprite(id)])));
 const look = (s, over = {}) => cleanParams(s, { ...defaultParams(s), ...over });
 const frames = (s, clip) => Array.from({ length: s.clips[clip].frames }, (_, f) => f);
 const tones = (hex) => { const r = ramp(hex); return [r.light, r.base, r.dark, r.deep].map((x) => col(x)); };
@@ -61,9 +64,9 @@ test('every Motion slider of the code sprite is a control again, as the code had
   for (const id of IDS) {
     const def = DATA[id].definition;
     for (const k of MOTION[id]) {
-      const d = DATA[id].params[k], c = CODE[id].params[k];
+      const d = DATA[id].params[k], c = CODE[id]?.params[k] ?? { def: 0.5 };   // the two library-body sprites: a Motion slider's default is its middle
       assert.ok(d, `${id}: ${k} kept`);
-      for (const f of ['kind', 'label', 'lo', 'hi', 'def', 'min', 'max', 'step', 'group']) assert.equal(d[f], c[f], `${id} ${k} ${f}`);
+      if (CODE[id]) for (const f of ['kind', 'label', 'lo', 'hi', 'def', 'min', 'max', 'step', 'group']) assert.equal(d[f], c[f], `${id} ${k} ${f}`);
       const travelled = Object.values(def.clips).filter((cl) => (cl.travel ?? []).some((e) => e.by?.from === k));
       assert.ok(travelled.length >= (k === 'stride' ? 1 : 2), `${id}: ${k} moves ${travelled.length} clips`);
       // at the slider's middle a travel draws exactly as without it (its table has 1 at the default)
@@ -73,7 +76,7 @@ test('every Motion slider of the code sprite is a control again, as the code had
 });
 
 test('at each end of Bounce and Stride the walk, run and idle move as the code sprite\'s do', () => {
-  for (const id of IDS.filter((x) => MOTION[x].includes('bounce'))) {
+  for (const id of CODE_IDS.filter((x) => MOTION[x].includes('bounce'))) {
     const s = DATA[id], c = CODE[id];
     for (const clip of ['idle', 'walk', 'run'].filter((x) => s.clips[x])) {
       for (const [key, what, close] of [['bounce', 'travel', 0.7], ['stride', 'spread', 2.01]]) {
@@ -91,9 +94,9 @@ test('at each end of Bounce and Stride the walk, run and idle move as the code s
   }
 });
 
-test('the hops (jump, victory, the bandit\'s steal) leave the ground higher with Bounce, as the code\'s do', () => {
+test('the hops (jump, victory) leave the ground higher with Bounce, as the code\'s do', () => {
   const top = (s, clip, over) => Math.min(...frames(s, clip).map((f) => renderFrame(s, clip, f, look(s, over)).bounds().y1));
-  for (const [id, clip] of [['knight', 'jump'], ['knight', 'victory'], ['wizard', 'jump'], ['wizard', 'victory'], ['rogue-battler', 'jump'], ['road-bandit', 'steal']]) {
+  for (const [id, clip] of [['knight', 'jump'], ['knight', 'victory'], ['wizard', 'jump'], ['wizard', 'victory']]) {
     const s = DATA[id], c = CODE[id];
     // the feet's highest row (the lowest pixel's least y) over the clip: higher at Bounce 1 than at 0, as in the code
     const d0 = top(s, clip, { bounce: 0 }), d1 = top(s, clip, { bounce: 1 }), c0 = top(c, clip, { bounce: 0 }), c1 = top(c, clip, { bounce: 1 });
@@ -115,7 +118,7 @@ test('Rattle shakes the skeleton\'s bones as the code\'s Rattle does', () => {
 });
 
 test('at the ends of every Motion slider each keeps its code sprite\'s silhouette', () => {
-  for (const id of IDS) for (const k of MOTION[id]) for (const v of [0, 1]) {
+  for (const id of CODE_IDS) for (const k of MOTION[id]) for (const v of [0, 1]) {
     const o = meanOverlap(id, { [k]: v });
     assert.ok(o >= 0.74, `${id} ${k} ${v}: the silhouettes overlap ${o.toFixed(3)} on average`);
   }
@@ -130,7 +133,7 @@ test('the hand point turns with the Hold angle as the code\'s socket does, in ev
   // drawn weapon turned (M6's mean over every frame at the low end, 20 and the high end: 0.15 to 0.40 radians). Measured
   // as the turn from Hold angle 0, which leaves aside where the poses differ at 0. Lying down, the code lays the weapon
   // on the ground whatever the Hold angle (rigs/humanoid.js fit), where data turns it into the ground cut
-  for (const id of IDS) {
+  for (const id of CODE_IDS) {
     const s = DATA[id], c = CODE[id], key = s.params.staffAngle ? 'staffAngle' : 'weaponAngle';
     let n = 0, sum = 0, worst = 0, where = '';
     for (const v of [s.params[key].min, 20, s.params[key].max].filter((x) => x <= s.params[key].max)) {
@@ -160,7 +163,7 @@ test('the hand point is on the drawn weapon: it turns with the weapon the hand h
 
 test('the goblin\'s thrust and the rogue\'s stab stay level whatever the Hold angle, as the code\'s do', () => {
   // review 3, issue 3: the goblin jabbed its spear down at the ground at Hold angle 40 and across its mouth at -10
-  for (const [id, levelled] of [['spear-goblin', [1, 2, 3, 4, 5, 6]], ['rogue-battler', [2, 3, 4, 5]]]) {
+  for (const [id, levelled] of [['spear-goblin', [1, 2, 3, 4, 5, 6]]]) {
     const s = DATA[id], c = CODE[id];
     for (const v of [-10, 20, 40]) for (const f of frames(s, 'attack')) {
       const d = handAngle(s, 'attack', f, { weaponAngle: v }), k = handAngle(c, 'attack', f, { weaponAngle: v });
@@ -176,23 +179,6 @@ test('the goblin\'s thrust and the rogue\'s stab stay level whatever the Hold an
     const o = frames(s, 'attack').reduce((m, f) => m + overlap(renderFrame(c, 'attack', f, look(c, all(c, v))), renderFrame(s, 'attack', f, look(s, all(s, v)))), 0) / s.clips.attack.frames;
     assert.ok(o >= 0.66, `spear-goblin attack with every slider ${v ? 'high' : 'low'}: overlap ${o.toFixed(3)}`);
     assert.ok(meanOverlap('spear-goblin', all(s, v)) >= 0.68, `spear-goblin with every slider ${v ? 'high' : 'low'}`);
-  }
-});
-
-test('the rogue at its defaults: the hood frames a face the code\'s size, and the scarf wraps the chin and neck', () => {
-  // review 3, issue 5: the data rogue showed a larger face of skin and a brown band at the chin
-  const s = DATA['rogue-battler'], c = CODE['rogue-battler'];
-  for (const [clip, f] of [['idle', 0], ['idle', 4], ['walk', 0], ['walk', 4], ['run', 2], ['victory', 0]]) {
-    const count = (x) => {
-      const p = look(x), g = renderFrame(x, clip, f, p), h = frameSockets(x, clip, f, p).head;
-      const skin = new Set(tones(p.skin)), scarf = new Set(tones('#94a0b2'));
-      let sk = 0, sc = 0;
-      for (let i = 0; i < g.data.length; i++) { const px = i % g.w, py = Math.floor(i / g.w); if (Math.abs(px - h.x) > 8 || py < h.y - 2 || py > h.y + 16) continue; if (skin.has(g.data[i])) sk++; if (scarf.has(g.data[i])) sc++; }
-      return { sk, sc };
-    };
-    const a = count(c), b = count(s);
-    assert.ok(Math.abs(b.sk - a.sk) <= 5, `${clip} ${f}: ${b.sk} pixels of skin round the face; the code ${a.sk}`);
-    assert.ok(b.sc >= a.sc, `${clip} ${f}: ${b.sc} pixels of scarf round the chin and neck; the code ${a.sc}`);
   }
 });
 

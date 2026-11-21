@@ -8,8 +8,7 @@ import { CLOTH, SKIN, METAL, HAIR } from '../../engine/sprite.js';
 import { EASES } from '../../rigs/keypose.js';
 import * as X from './edit.js';
 import { row, head, btn, icon, stepper, toggle, select, text, menuButton, fieldId } from './bits.js';
-import { libraryBodyPane, mirrorButton, moveExtras, soundsSection, frameAdvice, fillNote, thinMark, adviceSection } from './more-panes.js';
-import { libraryChanged } from './library-body.js';
+import { mirrorButton, moveExtras, soundsSection, frameAdvice, fillNote, thinMark, adviceSection } from './more-panes.js';
 
 const EASE_WORDS = { smooth: 'Smooth', linear: 'Steady', in: 'Speeds up', out: 'Slows down', hold: 'Holds still' };
 const ARROWS = [['←', 'left', -1, 0], ['↑', 'up', 0, -1], ['↓', 'down', 0, 1], ['→', 'right', 1, 0]];
@@ -45,12 +44,8 @@ function clipPicker(E, extra = []) {
 export function bodyPane(E) {
   const { def, sel } = E.S;
   const made = String(def.made?.from ?? '');
-  const startedFrom = X.startingBodies().find((s) => made === `template:${s.id}` || (s.id === 'hero' && made.startsWith('library:')));
+  const startedFrom = X.startingBodies().find((s) => made === `template:${s.id}`);
   const out = [el('p', { class: 'pane-note' }, startedFrom ? `Started from ${startedFrom.label}. ` : '', el('a', { class: 'link', href: '#/studio' }, 'Start another'))];
-  if (!X.isRig(def)) {
-    out.push(...libraryBodyPane(E));      // item S10: proportions, how it moves, attach points
-    return out;
-  }
   out.push(el('p', { class: 'st-phone' }, 'Easier on a bigger screen. Here, pick a bone and use the arrows.'));
   if (X.isTopDown(def)) {
     out.push(row('Facing', el('span', { class: 'seg', role: 'group', 'aria-label': 'Facing' }, ['side', 'down', 'up'].map((f) => el('button', { type: 'button', 'aria-pressed': String((E.S.facing ?? 'side') === f), 'data-k': `facing-${f}`, onclick: () => E.setFacing(f) }, X.humanize(f))))));
@@ -141,31 +136,14 @@ export function movePane(E) {
   }
   out.push(el('div', { class: 'st-actions' }, acts));
   out.push(...moveExtras(E));      // item S10: keys between frames, start this clip over
-  if (X.isRig(def)) {
-    const keyed = new Set();
-    if (key) {
-      if (key.root) keyed.add('root');
-      for (const id of Object.keys(key.ik ?? {})) keyed.add(`ik:${id}`);
-      for (const id of Object.keys(key.bones ?? {})) keyed.add(`bone:${id}`);
-    }
-    out.push(head('What you can move'), el('p', { class: 'pane-note' }, 'Drag on the picture, or pick one here and use the arrows. A dot marks what this frame\'s key changes.'));
-    out.push(handleRows(E, X.handles(def, E.ctx()), keyed));
-  } else {
-    out.push(head('What you can move'), el('p', { class: 'pane-note' }, 'Drag on the picture, or pick one here and use the arrows. Move a hand and the arm follows. A dot marks what this frame\'s key changes.'));
-    out.push(handleRows(E, X.handles(def, E.ctx()), new Set(libraryChanged(def, clip, frame))));
-    out.push(head('The numbers'), el('p', { class: 'pane-note' }, 'The same pose as numbers, each a little at a time.'));
-    out.push(el('div', { class: 'handle-list' }, X.libraryRows(def, clip, frame).map((r) => {
-      const two = r.kind === 'point' || r.kind === 'arm';
-      const value = r.kind === 'point' ? `${Math.round(r.value.x)}, ${Math.round(r.value.y)}` : r.kind === 'arm' ? `${Math.round(r.value.a)}°, ${Math.round(r.value.e)}°` : r.kind === 'angle' ? `${Math.round(r.value)}°` : `${Math.round(r.value)} px`;
-      const arrows = r.kind === 'arm'
-        ? [icon('↺', `Swing ${r.label} back`, () => E.nudgeLib(r.id, -1, 0)), icon('↻', `Swing ${r.label} forward`, () => E.nudgeLib(r.id, 1, 0)), icon('⤵', `Bend ${r.label} less`, () => E.nudgeLib(r.id, 0, -1)), icon('⤴', `Bend ${r.label} more`, () => E.nudgeLib(r.id, 0, 1))]
-        : two ? ARROWS.map(([g, word, dx, dy]) => icon(g, `Move ${r.label} ${word}`, () => E.nudgeLib(r.id, dx, dy)))
-          : [icon('←', `Less ${r.label.toLowerCase()}`, () => E.nudgeLib(r.id, -1, 0)), icon('→', `More ${r.label.toLowerCase()}`, () => E.nudgeLib(r.id, 1, 0))];
-      return el('div', { class: 'handle-row lib-row', 'data-field': r.id },
-        el('span', { class: 'handle-name' }, el('span', { class: 'dot' + (r.keyed ? '' : ' off'), 'aria-hidden': 'true' }), el('span', { class: 'handle-label' }, r.label), el('span', { class: 'quiet num' }, ` ${value}`)),
-        el('span', { class: 'handle-arrows' }, arrows));
-    })));
+  const keyed = new Set();
+  if (key) {
+    if (key.root) keyed.add('root');
+    for (const id of Object.keys(key.ik ?? {})) keyed.add(`ik:${id}`);
+    for (const id of Object.keys(key.bones ?? {})) keyed.add(`bone:${id}`);
   }
+  out.push(head('What you can move'), el('p', { class: 'pane-note' }, 'Drag on the picture, or pick one here and use the arrows. A dot marks what this frame\'s key changes.'));
+  out.push(handleRows(E, X.handles(def, E.ctx()), keyed));
   return out;
 }
 

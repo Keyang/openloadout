@@ -16,7 +16,7 @@ Counts are of committed files at 05:00 on 2026-11-20 (commit `6773968`). The bui
 | Bundle files (`bundles/*.json`) | 6: three kits and three small starter bundles |
 | Pieces (`pieces/*.json`, shared drawing data) | 14: 3 interface skins, the top-down person's 2 bases, 7 parts and 2 held things |
 | Named generators (`engine/gen/`) | 64 versions of 59 generators in 12 families |
-| Tests | 381 unit test files and 54 browser test files. Last full runs in `docs/progress.md`: unit 4,570 of 4,586 (2026-11-20 05:00, on exactly commit `87a4e2c`; the log names two failures: the top-down pieces' missing pins, fixed in that commit, and a font file absent from the clean export, which passes in the real folder), browser 634 of 638 (2026-11-20 about 03:59; the 4 were tests of another session's page redesign, fixed in `ed76fd8`) |
+| Tests | 477 unit test files and 61 browser test files, counted in the working folder after build items R1 and R2 (R1, the library-body removal, took out 13 unit files and 1 browser file and added 4 and 2; the committed counts at `87a4e2c` were 381 and 54). Last full runs in `docs/progress.md`: unit 4,570 of 4,586 (2026-11-20 05:00, on exactly commit `87a4e2c`; the log names two failures: the top-down pieces' missing pins, fixed in that commit, and a font file absent from the clean export, which passes in the real folder), browser 634 of 638 (2026-11-20 about 03:59; the 4 were tests of another session's page redesign, fixed in `ed76fd8`) |
 
 **Option B: every sprite becomes data** (Keyang, 2026-11-19 18:10; Contract 15 in `docs/architecture.md`, the design and its build plan in `docs/data-sprites.md`). Where it stands:
 
@@ -24,7 +24,7 @@ Counts are of committed files at 05:00 on 2026-11-20 (commit `6773968`). The bui
 |---|---|
 | Sprites that are data | 3 of 229 |
 | Kinds of sprite the framework can draw as data | Characters and creatures (bone rigs), props, pickups, icons, interface pieces, backgrounds, effects and projectiles (7 of about 27 effect behaviours), tilesets (3 of 13 ported; the other 10 in progress) |
-| Shared bodies (bases) | The top-down person (from `rigs/topdown.js`); the side-view person in progress; 11 more to come |
+| Shared bodies (bases) | The top-down person and its variants (baked from `rigs/topdown.js`, which R2 deleted) and the side-view person (`base:person-side`), as base pieces in `pieces/`; the creatures and robots became generators (`creature.*`, `robot.*`) |
 | Made through `window.loadout` | Data only; the sandbox for program text is deleted |
 | Not started | The studio for every kind (the studio works for bone rigs today), the migration of the 226 code sprites, deleting the old code |
 
@@ -80,7 +80,7 @@ Pages are addresses after `#/`. Every page keeps its settings in the address, so
 
 ## How an asset is made
 
-Loadout has two layers. The **framework** is the code every asset is written with: drawing (`engine/`), body rigs (`rigs/`), sound and music synthesis (`sound/`), the quality bar (`quality/`) and the looks (`engine/theme.js`, `sound/theme.js`). An **asset** is one file: `sprites/<id>.json` is a sprite's definition (data that names shapes, pixel stamps, shared pieces and the framework's named generators; no code), and `sounds/<id>.json` is a sound or music patch. 226 older sprites are still `sprites/<id>.js` programs until they are redrawn as data. Nothing else is stored; there is no list to edit, because the build finds assets by scanning the folders.
+Loadout has two layers. The **framework** is the code every asset is written with: drawing (`engine/`), the bone-rig renderer and key poses (`rigs/`), sound and music synthesis (`sound/`), the quality bar (`quality/`) and the looks (`engine/theme.js`, `sound/theme.js`). An **asset** is one file: `sprites/<id>.json` is a sprite's definition (data that names shapes, pixel stamps, shared pieces and the framework's named generators; no code), and `sounds/<id>.json` is a sound or music patch. 226 older sprites are still `sprites/<id>.js` programs until they are redrawn as data. Nothing else is stored; there is no list to edit, because the build finds assets by scanning the folders.
 
 The rule: code that any other asset could use goes into the framework, not into the asset file. A maker who finds something missing adds a new function or module, with a one-line comment and a test, and does not change what existing functions do (`docs/architecture.md`, Contract 11; `docs/framework-api.md`).
 
@@ -107,7 +107,6 @@ Both checkers run the quality bar (`docs/quality-bar.md`). Errors fail an asset;
 | `tools/scene.mjs` | Renders a scene from several tilesets, with props, looks and frames, from a JSON file |
 | `tools/gen.mjs` | Lists the named generators a data sprite can use; `<gen> --sheet` draws one across its arguments |
 | `tools/piece.mjs` | Lists the shared pieces (`pieces/`) with their slots and arguments; `<piece> --sheet` draws one |
-| `tools/rig.mjs` | Lists what a body rig has (poses, parts, held things, sockets) as tables and contact sheets |
 | `tools/bundles-from-plans.mjs` | Writes `bundles/<id>.json` for each kit plan whose assets all exist; `--check` writes nothing. A new kit is new files only: its plan `bundles/specs/<id>.plan.json` (name, game type, the sentence for its page, palette, asset lists) and its assets. The top of the tool says how, including the one code step when a kit brings a new palette |
 | `tools/compose/` | The music kit's command line (`kit.mjs`) and one generator per track that writes its patch (`thornwood_overworld.mjs`, `hearthvale_village.mjs`, `hearthvale_battle.mjs`, `derelict_run.mjs`, `derelict_boss.mjs`, `battle_theme.py`); `verify_music.mjs` lists the notes sounding in each bar; `render_ramp.mjs` renders a loop while one slider climbs |
 | `tools/search-eval.mjs` | Measures search on the test set in `tests/fixtures/search/` and writes `docs/search-eval.md` |
@@ -121,8 +120,8 @@ Safety, in two sentences: a sprite made at run time is data (a definition, never
 ## Tests
 
 ```bash
-npm test                              # unit tests: node --test tests/unit/*.test.mjs (381 committed files)
-npm run e2e                           # browser tests: Playwright, Chromium (54 files)
+npm test                              # unit tests: node --test tests/unit/*.test.mjs (477 files in the working folder after R1 and R2)
+npm run e2e                           # browser tests: Playwright, Chromium (61 files in the working folder after R1 and R2)
 npx playwright test tests/e2e/journey.spec.mjs   # one file
 ```
 

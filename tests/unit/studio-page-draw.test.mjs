@@ -2,6 +2,7 @@
 // dragged (no validation on every move), so that drawing must be exactly what the sprite draws (engine/data-sprite.js).
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import { spriteFor, drawFrame, drawRest, libraryFile, sheetOf } from '../../app/studio/draw.js';
 import { startFrom } from '../../app/studio/edit.js';
 import { STUDIO_TEMPLATE_IDS } from '../../rigs/studio-templates.js';
@@ -28,18 +29,10 @@ test('the rest pose draws something, and a top-down body draws each way it faces
   assert.notEqual(Buffer.compare(Buffer.from(pics[0].data.buffer), Buffer.from(pics[1].data.buffer)), 0);
 });
 
-test('the Hero (a library body) is drawn too', () => {
-  const d = validateDataSprite(startFrom('hero', 'My hero')).value;
-  const s = spriteFor(d);
-  assert.equal(s.ok, true, s.errors?.join('; '));
-  const g = drawFrame(d, 'walk', 0);
-  assert.equal(g.w, 64);
-  assert.ok(g.data.some((v) => v !== 0));
-  const rest = drawRest(d);
-  assert.ok(rest.data.some((v) => v !== 0));
-});
-
-test('spriteFor reports a definition that does not pass, never throws', () => {
+test('spriteFor reports a definition that does not pass (a library body among them), never throws', () => {
+  const lib = spriteFor(JSON.parse(fs.readFileSync(new URL('../fixtures/studio/waving-hero.json', import.meta.url), 'utf8')));
+  assert.equal(lib.ok, false);
+  assert.match(lib.errors.join('\n'), /library body, which is gone/);
   const r = spriteFor({ format: 'loadout-sprite', version: 1, id: 'Bad Id' });
   assert.equal(r.ok, false);
   assert.ok(r.errors.length > 0);

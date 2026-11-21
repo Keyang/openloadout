@@ -36,17 +36,8 @@
 //     validateDataSprite() is validateStudioSprite() with its messages capped at MAX_MESSAGES each, and the wall of
 //     Contract 14 rule 6 (plain data only, nothing run, 64 KB) is that file's, for the whole definition.
 //
-// LIBRARY BODIES ({ library: "<name>", figure }; docs/studio.md 2.3, "Library bodies: one module each"; studio item
-// F2) are drawn only through their body's descriptor (engine/library-body.js), found by name in the registry
-// (catalog/studio-schema.js LIBRARY_REGISTRY, every body engine/library-bodies.js lists; opts.bodies replaces it):
-// render() calls body.draw(g, definition, { clip, frame, t, p }) and sockets() calls body.socketsAt(definition, { clip,
-// t, p }). This file names no body. The side-view person (rigs/body-humanoid.js) draws through rigs/humanoid-studio.js
-// drawSprite and spriteSockets, which apply the Hero's parts, figureFor (sliders, colours, parts, keysFor) and the frame
-// edits. Controls: one color() per colour slot keyed by the slot id (label, material and swatches from the body's
-// `slots`, by the slot's name; any other slot is cloth), one range() per slider and one choice() per choice keyed by
-// its key, one toggle() per on/off part keyed by the part name (a Contract 3 part with the socket the body's
-// `partSockets` gives it: the person's held -> hand, headgear and mask -> head, cape and pack -> back), and the standard
-// speed. Size: the definition's (one of the body's sizes); sockets: whatever the body's socketsAt gives.
+// LIBRARY BODIES are gone (build item R1, docs/data-sprites.md section 5): a version 1 definition with
+// `body: { library }` no longer validates (catalog/studio-schema.js LIBRARY_BODY_GONE), so it is never built here.
 //
 // VERSION 2 (docs/data-sprites.md sections 2 and 4.1, build item B6; Contract 15). dataSprite and makeDataSprite read
 // `version` first: a version 2 definition takes the pipeline below, anything else the version 1 path above, unchanged.
@@ -118,7 +109,7 @@
 
 import { defineSprite, range, choice, color, toggle, SKIN, CLOTH, METAL } from './sprite.js';
 import { lerp } from './motion.js';
-import { validateStudioSprite, parseStudioJson, libraryBody, TOPDOWN_DIRECTIONS, directionOf, directionRig } from '../catalog/studio-schema.js';
+import { validateStudioSprite, parseStudioJson, TOPDOWN_DIRECTIONS, directionOf, directionRig } from '../catalog/studio-schema.js';
 import { compileKeys, sampleKeys, framePhase, frameOfPhase } from '../rigs/keypose.js';
 import { drawRig, solveRig, rigPoints, drawResolvedRig, resolvedRigList, resolvedRigPoints } from '../rigs/bones.js';
 import { validateSprite, parseSpriteJson } from '../catalog/sprite-schema.js';
@@ -267,9 +258,6 @@ const sliderControl = (c) => range(c.label, c.default, { min: c.min, max: c.max,
 /** group and `when` of a control, as engine/sprite.js takes them (copies: the definition is frozen). */
 const more = (c) => ({ ...(c.group !== undefined ? { group: c.group } : {}), ...(c.when !== undefined ? { when: JSON.parse(JSON.stringify(c.when)) } : {}) });
 
-/** A choice of the definition's controls (library bodies, studio item F1) as a choice() control: options as written (a word, or { value, label }), `was` for old values. */
-const choiceControl = (c) => choice(c.label, c.default, c.options.map((o) => (typeof o === 'string' ? o : { value: o.value, label: o.label })), { ...more(c), ...(c.was !== undefined ? { was: { ...c.was } } : {}) });
-
 /** A colour slot's control, with what a colour control of the definition says about it (label, swatches, material, group, when; studio item F1) over what the slot gives. */
 function colourControl(hex, fallback, own) {
   const [label, material, swatches] = fallback;
@@ -278,7 +266,7 @@ function colourControl(hex, fallback, own) {
 }
 
 /**
- * What every studio sprite has, bone rig or library body: id, name, blurb, kind, meta, size, pivot, grounded, the clips
+ * What every studio sprite has: id, name, blurb, kind, meta, size, pivot, grounded, the clips
  * (fps a function of the Speed slider when there is one: fps * lerp(0.65, 1.45, speed)), each clip's sounds, preview
  * and the frozen definition (where it came from is definition.made; the sprite has no `made`, which means a worker sprite).
  */
@@ -307,63 +295,9 @@ function baseOf(definition, speed) {
   };
 }
 
-// A library body's colour slots are named, not described: the label, material (Contract 7) and swatches its body's
-// `slots` give that name (the person's skin, hair and metal); any other slot is cloth, labelled from its name. Where an
-// on/off part hangs (Contract 3) is the body's `partSockets`.
-
-/**
- * Builds the sprite of a library body: drawn and given sockets only through its body's descriptor (draw, socketsAt).
- * Controls in this order: the colour slots that have no colour control, then the definition's controls as listed (a
- * colour control puts its slot's colour there), then one toggle per on/off part. A part with params (studio item F1) is
- * a Contract 3 part as written (params, none, socket); an on/off part hangs from its usual socket.
- */
-function buildLibrary(definition, body) {
-  const params = {};
-  const own = new Map(definition.controls.filter((c) => c.kind === 'colour').map((c) => [c.key, c]));
-  const slotColour = (slot) => {
-    const hex = definition.colours[slot];
-    const named = Object.hasOwn(body.slots, slot) ? body.slots[slot] : null;
-    const [label, material, list] = named ? [named.label, named.material, named.swatches] : [slot.charAt(0).toUpperCase() + slot.slice(1), 'cloth', CLOTH];
-    return colourControl(hex, [label, material, [hex, ...list.filter((c) => c !== hex)].slice(0, 8)], own.get(slot));
-  };
-  for (const slot of Object.keys(definition.colours)) if (!own.has(slot)) params[slot] = slotColour(slot);
-  let speed = false;
-  for (const c of definition.controls) {
-    if (c.standard === 'speed') { speed = true; params.speed = speedControl(c); continue; }
-    if (c.kind === 'colour') params[c.key] = slotColour(c.key);
-    else if (c.kind === 'choice') params[c.key] = choiceControl(c);
-    else params[c.key] = sliderControl(c);
-  }
-  const parts = {};
-  for (const [name, part] of Object.entries(definition.parts)) {
-    if (Array.isArray(part.params)) {
-      parts[name] = { label: part.label, params: [...part.params], ...(part.none !== undefined ? { none: Array.isArray(part.none) ? [...part.none] : part.none } : {}), ...(part.socket ? { socket: part.socket } : {}) };
-      continue;
-    }
-    params[name] = toggle(part.label, part.default !== false);
-    parts[name] = { label: part.label, params: [name], ...(Object.hasOwn(body.partSockets, name) ? { socket: body.partSockets[name] } : {}) };
-  }
-  return defineSprite({
-    ...baseOf(definition, speed),
-    params,
-    parts,
-    render(g, { clip, t, frame, p }) {
-      body.draw(g, definition, { clip, frame, t, p });
-    },
-    sockets(clip, t, p) {
-      return body.socketsAt(definition, { clip, t, p }) ?? {};
-    },
-  });
-}
-
-/** Builds the defineSprite result from a cleaned definition (validateDataSprite's value): a bone rig, or a library body (found in the registry; opts.bodies replaces it). */
-function build(def, opts = {}) {
+/** Builds the defineSprite result from a cleaned definition (validateDataSprite's value): a bone rig. */
+function build(def) {
   const definition = deepFreeze(JSON.parse(JSON.stringify(def)));
-  if (definition.body?.library !== undefined) {
-    const body = libraryBody(definition.body.library, opts);
-    if (!body) throw new Error(`studio sprite ${definition.id}: there is no library body ${JSON.stringify(definition.body.library)}`);
-    return buildLibrary(definition, body);
-  }
   const rig = definition.body.rig;
   const topDown = rig.view === 'top-down';
   const views = topDown ? Object.fromEntries(TOPDOWN_DIRECTIONS.map((d) => [d, deepFreeze(directionRig(rig, d))])) : null;
@@ -1049,7 +983,7 @@ function idHint(input) {
 /**
  * Turns a definition (`loadout-sprite` version 1 or 2, an object or JSON text; version 2 takes the pipeline of VERSION 2
  * in the header, with opts { generators, pieces, strict, soundIds, catalogIds }) into a sprite, as defineSprite does for a sprite
- * file: validated, then drawn by framework code (a bone rig by rigs/bones.js, a library body by its body's module, engine/library-bodies.js).
+ * file: validated, then drawn by framework code (a bone rig by rigs/bones.js).
  * Throws an Error naming what is wrong (the validator's errors) for a definition that does not pass. The default export of a library file.
  * Arguments: input (the definition), opts (as validateDataSprite takes them).
  */
@@ -1061,7 +995,7 @@ export function dataSprite(input, opts = {}) {
   }
   const v = validateDataSprite(input, opts);
   if (!v.ok) throw new Error(`studio sprite ${idHint(input)}: ${v.errors.slice(0, 12).join('; ')}${v.errors.length > 12 ? `; and ${v.errors.length - 12} more` : ''}`);
-  return build(v.value, opts);
+  return build(v.value);
 }
 
 /**
@@ -1082,7 +1016,7 @@ export function makeDataSprite(input, opts = {}) {
   const v = validateDataSprite(input, opts);
   if (!v.ok) return { ok: false, errors: v.errors, warnings: v.warnings, sprite: null };
   try {
-    return { ok: true, errors: [], warnings: v.warnings, sprite: build(v.value, opts) };
+    return { ok: true, errors: [], warnings: v.warnings, sprite: build(v.value) };
   } catch (e) {
     return { ok: false, errors: [String(e?.message ?? e)], warnings: v.warnings, sprite: null };
   }

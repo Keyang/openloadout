@@ -1,19 +1,15 @@
-// The piece versions migration batch M7b made, rebuilt from the repo alone (M7b review 2, issue 3: a piece made by a
-// script in a session's scratch folder could not be made again). Each is rebuilt here from what it was made from and
-// compared with the file, byte for byte:
-//   held:topdown-polearm@4  rigs/topdown.js townItem's halberd and pike as shapes in the reachF bone's frame, lengths
-//                           bound to the length argument (polearm() says how): drawn at the bone's angle, so the blade
-//                           and spike stay crisp as the pole tilts (M7b review 3, issue 4). @1 to @3 were pixel
-//                           read-backs taken with the pole pointing down and turned with the bone; never released and
-//                           named by nothing, they were removed with their pins;
+// The piece versions migration batch M7b made, as pinned data (M7b review 2, issue 3: a piece made by a script in a
+// session's scratch folder could not be made again; R2 deleted the rigs and bakers that made them, so they are pinned).
+//   held:topdown-polearm@4  the halberd and pike as shapes in the reachF bone's frame, lengths bound to the length
+//                           argument; @1 to @3 were pixel read-backs, never released and named by nothing, removed with
+//                           their pins;
 //   part:topdown-belt@2     part:topdown-belt@1 with its colour as given (key c: belt), not its shadow tone.
-// held:topdown-magic@2 (a pixel read-back, rebuilt here until M7c) was replaced by held:topdown-magic@3, made in
-// tests/unit/m7-topdown-held.test.mjs with the other held things drawn at the bone's angle, and removed with its pin.
-// Also held: every piece version M7 made is named by something (docs/data-sprites.md 3.1: an old version stays only
-// until no asset names it; M7 review 3 and M7b review 3, issue 2: 0.9 MB of never-released versions nothing named), and
-// no top-down pin is left without its file.
+// held:topdown-magic@2 (a pixel read-back) was replaced by held:topdown-magic@3 and removed with its pin.
+// Held here: the rebuilds of the polearm and belt from what they were made from, byte for byte; every piece version M7
+// made is named by something (docs/data-sprites.md 3.1: an old version stays only until no asset names it; 0.9 MB of
+// never-released versions nothing named were removed after review 3); no top-down pin is left without its file.
 // M7_PIECES=write node --test tests/unit/m7-topdown-pieces.test.mjs writes a missing file of these (never over one).
-// pieceText is tools/bake-topdown.mjs's: if it changes how it writes, this rebuild and the baker's part ways.
+// R2: pieceText was tools/bake-topdown.mjs's, and the baker's own rebuild of base:person-topdown-trooper@3 went with the baker.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -131,9 +127,7 @@ const KEPT = Object.freeze({
   'base:person-topdown-trooper@2': 'replaced by @3 (M7c review issue 3: the baton raised), which holds every clip of it byte for byte',
 });
 
-test('base:person-topdown-trooper@3 is tools/bake-topdown-m7.mjs trooperV3: version 2 byte for byte, its idle and walk again under picked names, and the baton clips', async () => {
-  const { trooperV3 } = await import('../../tools/bake-topdown-m7.mjs');
-  assert.equal(read('base-person-topdown-trooper.v3.json'), pieceText(await trooperV3()));
+test('base:person-topdown-trooper@3 is version 2 byte for byte, its idle and walk again under picked names, and the baton clips', async () => {
   const v2 = JSON.parse(read('base-person-topdown-trooper.v2.json')), v3 = JSON.parse(read('base-person-topdown-trooper.v3.json'));
   assert.deepEqual(v3.body.rig, v2.body.rig);
   for (const c of Object.keys(v2.body.clips)) assert.deepEqual(v3.body.clips[c], v2.body.clips[c], c);

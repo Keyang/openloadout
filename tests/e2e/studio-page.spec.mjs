@@ -324,10 +324,11 @@ test('Delete removes the shape in hand; a bone only when its handle is picked, t
   await expect.poll(async () => (await draft(page)).body.rig.bones.some((b) => b.id === parent.id)).toBe(true);
 });
 
-test('the Hero and a top-down body can be started from', async ({ page }) => {
-  await newFrom(page, 'hero');
-  await tab(page, 'Move').click();
-  await expect(page.locator('.lib-row').first()).toBeVisible();
+test('a top-down body can be started from; the Hero (a library body) is not offered any more (build item R1)', async ({ page }) => {
+  await open(page);
+  await page.getByRole('button', { name: 'Make a new one' }).click();
+  await expect(page.locator('[data-start="topdown-person"]')).toBeVisible();
+  await expect(page.locator('[data-start="hero"]')).toHaveCount(0);
   await newFrom(page, 'topdown-person');
   await tab(page, 'Move').click();
   await expect(page.getByLabel('Animation', { exact: true })).toContainText('Walk (down)');

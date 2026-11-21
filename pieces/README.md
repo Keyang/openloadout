@@ -56,9 +56,9 @@ A definition always names the version it was made with. At most 24 different pie
 
 ## The top-down person (B16b): `base:person-topdown`, `base:person-topdown-walker`, `part:topdown-*`, `held:topdown-*`
 
-Made by `tools/bake-topdown.mjs` from `rigs/topdown.js` (temporary, like `tools/bake-rig.mjs`); never edit these
-files by hand: change the baker and run `node tools/bake-topdown.mjs --write`, then `node tools/bake-topdown.mjs`
-(every clip against the code rig). Names: the top-down family's parts and held things are `part:topdown-<name>` and
+Made by `tools/bake-topdown.mjs` from `rigs/topdown.js`. **Both were deleted in R2 (2026-11-21)**: these files are
+pinned data now, no baker rebuilds them and no test compares them with a code rig. A released version never changes
+(Contract 15 rule 5): a change is a new version of the piece. Names: the top-down family's parts and held things are `part:topdown-<name>` and
 `held:topdown-<name>`, apart from the side-view family's (`part:hair`, `held:sword` ..., B16a).
 
 **Bases.** `base:person-topdown` holds every standard clip of the code rig: `idle`, `walk`, `run`, `attack` (with
@@ -106,9 +106,10 @@ node), v across (right on a node; on the hip bone, which points up, v is to the 
 such a frame are written the same way round: `r: [along u, along v]`, so `[vertical, horizontal]` on a node.
 `extends.paint` maps the base's slots (`skin`, `top`, `bottom`, `boots`, `topFar`, `bottomFar`) to the sprite's.
 
-### Migration batch M7: the nine top-down people (`tools/bake-topdown-m7.mjs`, temporary)
+### Migration batch M7: the nine top-down people (`tools/bake-topdown-m7.mjs`, deleted in R2)
 
-Made by `tools/bake-topdown-m7.mjs` from `rigs/topdown.js`, `rigs/topdown-riot.js` and `rigs/topdown-sneak.js` (it
+**R2 (2026-11-21) deleted the baker and the rigs it read: everything in this section is pinned data now, and the `node
+tools/bake-topdown-m7.mjs ...` commands below are history, kept to say how each file was made.** Made by `tools/bake-topdown-m7.mjs` from `rigs/topdown.js`, `rigs/topdown-riot.js` and `rigs/topdown-sneak.js` (it
 loads a copy of `tools/bake-topdown.mjs` with three hooks; that file is unchanged). `node tools/bake-topdown-m7.mjs
 --write` writes version 1 of its pieces and bases, `--lying` the version 2 pieces below; neither rewrites a file, and
 no mode writes a version in the baker's `REPLACED` list (versions replaced before release; see "Replaced before

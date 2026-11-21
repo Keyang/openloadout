@@ -1,42 +1,35 @@
 // catalog/sprite-schema.js (build item B1, docs/data-sprites.md section 2): every version 1 definition stays valid and
 // is read exactly as catalog/studio-schema.js reads it; a v1 bone-rig sprite with its version raised to 2 is a valid v2
-// definition too ("v2 extends v1 additively"); a v1 library body is not (library bodies go, Contract 15).
+// definition too ("v2 extends v1 additively"); a v1 library body is not, in either version: library bodies are gone
+// (Contract 15; build item R1), and the two seeded v1 drafts that used one (tests/fixtures/studio/f1-rogue.json and
+// waving-hero.json) are refused with the words that tell a person what to do.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { validateSprite, SPRITE_FORMATS } from '../../catalog/sprite-schema.js';
 import { validateStudio } from '../../catalog/studio-schema.js';
 import { studioTemplate, STUDIO_TEMPLATE_IDS } from '../../rigs/studio-templates.js';
-import { readDataFile } from '../../catalog/data-file.js';
 import { stubRegistry } from '../fixtures/v2/registry.mjs';
-import { codeSpriteSource } from '../helpers/library.mjs';
 
 const read = (p) => JSON.parse(fs.readFileSync(new URL(`../fixtures/${p}`, import.meta.url), 'utf8'));
 const V1 = {
   'studio/newt': read('studio/newt.json'),
   'studio/newt-rig-doc': read('studio/newt-rig-doc.json'),
   'studio/maximal': read('studio/maximal.json'),
-  'studio/waving-hero': read('studio/waving-hero.json'),
-  'studio/f1-rogue': read('studio/f1-rogue.json'),
   'data-sprite/beetle-topdown': read('data-sprite/beetle-topdown.json'),
   ...Object.fromEntries(STUDIO_TEMPLATE_IDS.map((id) => [`template/${id}`, studioTemplate(id)])),
 };
-// the two converted library files (version 1), from their frozen copies (tests/helpers/library.mjs): the migration redraws
-// the library's as version 2 data files (docs/data-sprites.md section 7), and this test is about version 1
-for (const id of ['rogue-battler', 'road-bandit']) {
-  const text = codeSpriteSource(id);
-  V1[`library/${id}`] = readDataFile(text).value;
-}
+// saved version 1 drafts that used a library body (the removed path): seeded, never valid
+const LIBRARY_BODY_DRAFTS = { 'studio/waving-hero': read('studio/waving-hero.json'), 'studio/f1-rogue': read('studio/f1-rogue.json') };
 const opts = { generators: stubRegistry() };
 const clone = (x) => JSON.parse(JSON.stringify(x));
-const isLibrary = (d) => d.format === 'loadout-sprite' && d.body?.library !== undefined;
 
 test('the formats this file reads: version 2 of both', () => {
   assert.deepEqual({ ...SPRITE_FORMATS }, { 'loadout-sprite': 2, 'loadout-rig': 2 });
 });
 
 test('every version 1 definition passes and is cleaned exactly as catalog/studio-schema.js cleans it', () => {
-  assert.ok(Object.keys(V1).length >= 15, 'the fixtures, the templates and the two library files');
+  assert.ok(Object.keys(V1).length >= 12, 'the fixtures and the templates');
   for (const [name, d] of Object.entries(V1)) {
     const want = validateStudio(clone(d));
     const got = validateSprite(clone(d), opts);
@@ -71,7 +64,6 @@ test('version 1 keeps its own rules: what v1 refuses, v1 still refuses, with the
 
 test('every v1 bone-rig sprite and rig with its version raised to 2 is a valid version 2 definition', () => {
   for (const [name, d] of Object.entries(V1)) {
-    if (isLibrary(d)) continue;
     const v2 = clone(d);
     v2.version = 2;
     const r = validateSprite(v2, opts);
@@ -90,12 +82,18 @@ test('every v1 bone-rig sprite and rig with its version raised to 2 is a valid v
   }
 });
 
-test('a v1 library body raised to version 2 is refused in plain words: library bodies are not in version 2', () => {
-  const d = clone(V1['library/rogue-battler']);
-  d.version = 2;
-  const r = validateSprite(d, opts);
-  assert.equal(r.ok, false);
-  assert.match(r.errors.join('\n'), /library bod/i);
+test('a v1 library body, as saved or raised to version 2, is refused in plain words: library bodies are gone', () => {
+  for (const [name, saved] of Object.entries(LIBRARY_BODY_DRAFTS)) {
+    const v1 = validateSprite(clone(saved), opts);
+    assert.equal(v1.ok, false, name);
+    assert.match(v1.errors.join('\n'), /used a library body, which is gone: open the library sprite and edit a copy/, name);
+    assert.deepEqual(v1.errors, validateStudio(clone(saved)).errors, `${name}: the version 1 check says the same`);
+    const d = clone(saved);
+    d.version = 2;
+    const r = validateSprite(d, opts);
+    assert.equal(r.ok, false, name);
+    assert.match(r.errors.join('\n'), /library bod/i, name);
+  }
 });
 
 test('a version the site does not read yet is refused, never guessed', () => {

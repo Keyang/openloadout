@@ -12,18 +12,19 @@
 //
 // Each case holds one hash per frame of every clip, of its pixels and of its attach points (sprite.sockets, rounded to
 // 1e-6, each angle taken into -PI..PI). The records were written from the frozen code sprites (tests/fixtures/code-sprites/<id>.js) before the code
-// files were deleted: C3_PIXELS_WRITE=1 node --test tests/unit/redraws-c3.test.mjs writes a missing one (never overwrites).
+// files were deleted. R2 deleted the frozen copies with the rigs they imported (rigs/creature-topdown.js, guard-bot.js,
+// kiosk.js, mech-walker.js), so a record can no longer be written again: these four are pinned, and a change to what a robot
+// draws is a change to a record that says why.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { ROOT, librarySprite, librarySpriteFile, codeSprite } from '../helpers/library.mjs';
+import { ROOT, librarySprite, librarySpriteFile } from '../helpers/library.mjs';
 import { casesKey, caseHash } from '../helpers/redraw-pixels.mjs';
 import { cleanParams, defaultParams } from '../../engine/sprite.js';
 
 const IDS = ['scout-drone', 'security-bot', 'vendor-bot', 'warden-mech'];
 const DIR = path.join(ROOT, 'tests', 'fixtures', 'redraw-pixels-c3');
-const WRITE = process.env.C3_PIXELS_WRITE === '1';
 const OFF_SWATCH = ['#c4c8d2', '#e8e2cf', '#1c2230', '#3f7f6a'];
 
 /** The cases a C3 record holds, [{ clip, frame, params }] in a fixed order (see the head of this file). */
@@ -60,13 +61,6 @@ function socketHash(sprite, c) {
 for (const id of IDS) {
   test(`${id}: the data file draws every recorded case as its code sprite did, with the same attach points`, { timeout: 1_200_000 }, async () => {
     const file = path.join(DIR, `${id}.json`);
-    if (WRITE && !fs.existsSync(file)) {
-      const code = await codeSprite(id), cases = c3Cases(code, id);
-      const rec = { id, recorded: new Date().toISOString().slice(0, 10), from: `tests/fixtures/code-sprites/${id}.js (sprites/${id}.js before its redraw)`, cases: cases.length, casesKey: casesKey(cases),
-        frames: cases.map((c) => caseHash(code, c)).join(' '), sockets: cases.map((c) => socketHash(code, c)).join(' ') };
-      fs.mkdirSync(DIR, { recursive: true });
-      fs.writeFileSync(file, JSON.stringify(rec, null, 1) + '\n');
-    }
     const rec = JSON.parse(fs.readFileSync(file, 'utf8'));
     assert.equal(librarySpriteFile(id), `sprites/${id}.json`, `${id} is a data file`);
     const sprite = await librarySprite(id), cases = c3Cases(sprite, id);

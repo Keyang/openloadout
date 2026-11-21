@@ -11,10 +11,11 @@ const load = (name) => JSON.parse(fixture(name));
 
 test('exports the validator, the parser and the tables the studio builds from', () => {
   for (const f of ['validateStudio', 'validateStudioSprite', 'validateStudioRig', 'parseStudioJson']) assert.equal(typeof S[f], 'function', f);
-  for (const k of ['STUDIO_LIMITS', 'FRAME_SIZES', 'STANDARD_CLIPS', 'CLIP_SYNONYMS', 'EASES', 'SHAPE_KINDS', 'SOCKET_NAMES', 'HUMANOID_POSE_FIELDS', 'LIBRARY_BODIES', 'LIBRARY_PARTS', 'ID_PATTERN', 'SPRITE_ID_PATTERN', 'RESERVED_IDS']) assert.ok(S[k] !== undefined, k);
+  for (const k of ['STUDIO_LIMITS', 'FRAME_SIZES', 'STANDARD_CLIPS', 'CLIP_SYNONYMS', 'EASES', 'SHAPE_KINDS', 'SOCKET_NAMES', 'LIBRARY_BODY_GONE', 'ID_PATTERN', 'SPRITE_ID_PATTERN', 'RESERVED_IDS']) assert.ok(S[k] !== undefined, k);
   assert.deepEqual([...S.EASES], ['smooth', 'linear', 'in', 'out', 'hold']);
   assert.deepEqual([...S.SHAPE_KINDS], ['limb', 'capsule', 'ellipse', 'poly', 'dot']);
-  assert.equal(S.LIBRARY_BODIES[0], 'humanoid', 'the side-view person is the first library body; others are added by their builders (studio item F2)');
+  assert.equal(typeof S.usedLibraryBody, 'function');
+  for (const gone of ['LIBRARY_REGISTRY', 'LIBRARY_BODIES', 'libraryBody', 'LIBRARY_PARTS', 'LIBRARY_SIZE', 'LIBRARY_PIVOT', 'HUMANOID_POSE_FIELDS', 'HUMANOID_MOVE_FIELDS', 'FIGURE_SETTINGS', 'FIGURE_COLOURS', 'FIGURE_SOCKETS']) assert.equal(S[gone], undefined, `${gone} went with the library bodies (build item R1)`);
 });
 
 test('the caps are the design\'s, and the shared ones equal LIMITS of app/api-actions.js', () => {
@@ -82,14 +83,12 @@ test('the newt passes from its JSON text too, and validateStudio picks the forma
   assert.match(c.errors.join('\n'), /loadout-sprite/);
 });
 
-test('the library-body example (a hero with a new wave) passes', () => {
+test('the library-body example (a hero with a new wave) is refused: a saved draft of the removed path (build item R1)', () => {
   const r = S.validateStudioSprite(load('waving-hero'));
-  assert.deepEqual(r.errors, []);
-  assert.equal(r.ok, true);
-  assert.deepEqual(r.value.size, [64, 64]);
-  assert.equal(r.value.body.library, 'humanoid');
-  assert.equal(r.value.body.figure.held.kind, 'sword');
-  assert.deepEqual(r.value.clips.wave.keys[1].armF, { a: 160, e: 30 });
+  assert.equal(r.ok, false);
+  assert.equal(r.value, null);
+  assert.deepEqual(r.errors, [`Body: ${S.LIBRARY_BODY_GONE}`], 'one error, in plain words: nothing else in it is judged');
+  assert.equal(S.usedLibraryBody(load('waving-hero')), true);
 });
 
 test('a maximal definition (every count at its cap) fits in 64 KB and passes', () => {
@@ -136,12 +135,6 @@ test('materials are checked against engine/materials.js', () => {
   const r = S.validateStudioRig(rig);
   assert.equal(r.ok, false);
   assert.match(r.errors.join('\n'), /material/);
-});
-
-test('the humanoid pose fields are the design\'s list', () => {
-  const F = S.HUMANOID_POSE_FIELDS;
-  for (const k of ['rootX', 'lift', 'crouch', 'lean', 'headTilt', 'item', 'item2', 'sway', 'glow', 'lie', 'headTurn', 'pull', 'fling', 'air', 'out', 'level2', 'footF', 'footB', 'armF', 'armB', 'blink', 'flash', 'mouth', 'fire']) assert.ok(F[k], k);
-  assert.equal(Object.keys(F).length, 24);
 });
 
 test('never throws, whatever it is given', () => {

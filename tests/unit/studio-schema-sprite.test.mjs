@@ -6,7 +6,7 @@ import { validateStudioSprite, STUDIO_LIMITS as L } from '../../catalog/studio-s
 
 const load = (name) => JSON.parse(fs.readFileSync(new URL(`../fixtures/studio/${name}.json`, import.meta.url), 'utf8'));
 const newt = () => load('newt');
-const hero = () => load('waving-hero');
+const hero = () => load('waving-hero');      // a saved draft of the removed library-body path (build item R1): refused
 
 function rejects(def, opts, ...fragments) {
   if (typeof opts === 'string') { fragments.unshift(opts); opts = {}; }
@@ -64,17 +64,17 @@ test('meta: checked by catalog/schema.js; gaps are advice on a draft and errors 
   const junk = newt(); junk.meta.secret = 'x'; assert.equal(warns(junk, 'secret').value.meta.secret, undefined);
 });
 
-test('body: a rig or a library body, not both and not neither', () => {
-  const both = newt(); both.body.library = 'humanoid'; both.body.figure = {}; rejects(both, 'body');
+test('body: a rig, not a library body (gone), not both and not neither', () => {
+  const both = newt(); both.body.library = 'humanoid'; both.body.figure = {}; rejects(both, 'body', 'library body');
   const neither = newt(); neither.body = {}; rejects(neither, 'body');
-  const lib = hero(); lib.body.library = 'quadruped'; rejects(lib, 'humanoid');
+  const lib = hero(); rejects(lib, 'library body, which is gone');
+  const named = hero(); named.body.library = 'quadruped'; rejects(named, 'library body, which is gone');
   const rig = newt(); rig.body.rig.version = 9; rejects(rig, 'newer');
   const rigBad = newt(); rigBad.body.rig.bones[1].parent = 'neck'; rejects(rigBad, 'neck');
 });
 
 test('size comes from the body; pivot inside the frame, whole pixels; grounded true or false', () => {
   const s = newt(); s.size = [64, 64]; assert.deepEqual(warns(s, 'size').value.size, [48, 48]);
-  const h = hero(); h.size = [48, 48]; assert.deepEqual(warns(h, 'size').value.size, [64, 64]);
   const p = newt(); p.pivot = [100, -5]; assert.deepEqual(warns(p, 'kept as').value.pivot, [48, 0]);
   const w = newt(); w.pivot = [24.5, 42]; assert.deepEqual(warns(w, 'whole').value.pivot, [25, 42]);
   const bad = newt(); bad.pivot = [24]; rejects(bad, 'pivot');
@@ -85,12 +85,11 @@ test('size comes from the body; pivot inside the frame, whole pixels; grounded t
 test('colours: a value per slot of the rig, #rrggbb', () => {
   const u = newt(); u.colours.fur = '#ffffff'; rejects(u, 'fur', 'colour slot');
   const h = newt(); h.colours.skin = 'red'; rejects(h, '#rrggbb');
-  const l = hero(); l.colours = { skin: '#ffffff' }; assert.deepEqual(passes(l).value.colours, { skin: '#ffffff' });
 });
 
 // ---- controls ---------------------------------------------------------------------------------------------
 
-test('controls: a scale of named bones or shapes, a standard speed, or (library) a body field', () => {
+test('controls: a scale of named bones or shapes, or a standard speed', () => {
   const b = newt(); b.controls[1].scales = { bones: ['wing'] }; rejects(b, 'wing', 'not a bone');
   const s = newt(); s.controls[2].scales = { shapes: ['horn'] }; rejects(s, 'horn', 'not a shape');
   const both = newt(); both.controls[1].scales = { bones: ['tail1'], shapes: ['torso'] }; rejects(both, 'scales');
@@ -99,7 +98,6 @@ test('controls: a scale of named bones or shapes, a standard speed, or (library)
   const none = newt(); delete none.controls[1].scales; rejects(none, 'scales');
   const sp = newt(); sp.controls[0] = { key: 'speed', standard: 'turbo' }; rejects(sp, 'standard');
   const spk = newt(); spk.controls[0] = { key: 'fast', standard: 'speed' }; rejects(spk, 'speed');
-  const set = hero(); set.controls[1].sets = 'wingspan'; rejects(set, 'wingspan');
   const setOnRig = newt(); setOnRig.controls[1] = { key: 'h', label: 'H', min: 0, max: 1, default: 0.5, sets: 'height' }; rejects(setOnRig, 'scales');
 });
 
@@ -135,7 +133,6 @@ test('parts: a label, shapes of the rig, a default; every shape.part names a par
   const orphan = newt(); delete orphan.parts.frill; rejects(orphan, 'frill', 'part');
   const two = newt(); two.parts.spots = { label: 'Spots', shapes: ['frill'], default: true }; rejects(two, 'frill', 'two parts');
   const def = newt(); delete def.parts.frill.default; assert.equal(passes(def).value.parts.frill.default, true);
-  const lib = hero(); lib.parts.wings = { label: 'Wings', default: true }; rejects(lib, 'wings');
 });
 
 // ---- clips ------------------------------------------------------------------------------------------------
@@ -195,27 +192,6 @@ test('bone-rig keys: root, bones, ik, stretch, show and hide, each resolved and 
   const from = newt(); from.clips.walk.from = 'walk'; assert.equal(warns(from, 'from').value.clips.walk.from, undefined);
 });
 
-test('library-body keys: the pose fields, numbers clamped, pairs and flags of the right shape', () => {
-  const u = hero(); u.clips.wave.keys[0].wings = 3; assert.equal(warns(u, 'wings').value.clips.wave.keys[0].wings, undefined);
-  const arm = hero(); arm.clips.wave.keys[1].armF = { a: 160 }; rejects(arm, 'armF');
-  const foot = hero(); foot.clips.wave.keys[1].footF = [1, 2]; rejects(foot, 'footF');
-  const flag = hero(); flag.clips.idle.keys[2].blink = 'yes'; rejects(flag, 'blink');
-  const lean = hero(); lean.clips.wave.keys[0].lean = 5000; assert.equal(warns(lean, 'kept as').value.clips.wave.keys[0].lean, 720);
-  const share = hero(); share.clips.wave.keys[0].glow = 3; assert.equal(warns(share, 'kept as').value.clips.wave.keys[0].glow, 1);
-  const bones = hero(); bones.clips.wave.keys[0].bones = { head: 3 }; warns(bones, 'bones');
-  const from = hero(); from.clips.wave.from = 'moonwalk'; rejects(from, 'moonwalk');
-});
-
-test('library figure: known parts with values of the right kind', () => {
-  const k = hero(); k.body.figure.held.kind = 'banana'; rejects(k, 'banana');
-  const c = hero(); c.body.figure.look.skin = 'pink'; rejects(c, '#rrggbb');
-  const st = hero(); st.body.figure.stance = 'dancing'; rejects(st, 'dancing');
-  const n = hero(); n.body.figure.body.height = 7; assert.equal(warns(n, 'kept as').value.body.figure.body.height, 1);
-  const x = hero(); x.body.figure.render = 'code'; assert.equal(warns(x, 'render').value.body.figure.render, undefined);
-  const mv = hero(); mv.body.figure.moves.wave = 'fly'; rejects(mv, 'fly');
-  const hs = hero(); hs.body.figure.hair.style = 'mohawk'; rejects(hs, 'mohawk');
-});
-
 test('frameEdits: a frame of the clip, nudge in whole pixels, show and hide shapes, flash', () => {
   const out = newt(); out.clips.hurt.frameEdits['9'] = { flash: true };
   assert.equal(warns(out, 'frame 9').value.clips.hurt.frameEdits['9'], undefined);
@@ -224,7 +200,6 @@ test('frameEdits: a frame of the clip, nudge in whole pixels, show and hide shap
   const big = newt(); big.clips.hurt.frameEdits['0'].nudge = [99, 0]; assert.deepEqual(warns(big, 'kept as').value.clips.hurt.frameEdits['0'].nudge, [48, 0]);
   const s = newt(); s.clips.hurt.frameEdits['1'] = { show: ['wing'] }; rejects(s, 'wing');
   const f = newt(); f.clips.hurt.frameEdits['0'].flash = 'white'; rejects(f, 'flash');
-  const lib = hero(); lib.clips.wave.frameEdits['2'].show = ['eye']; rejects(lib, 'show');
 });
 
 test('sounds: an id, a frame of the clip, an optional preset and volume', () => {

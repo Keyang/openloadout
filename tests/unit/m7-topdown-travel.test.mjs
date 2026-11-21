@@ -1,7 +1,7 @@
 // The Bounce and Stride sliders of the nine top-down redraws of migration batch M7 (M7b, after M7's third review: all
 // nine had dropped Bounce, seven Stride, which Contract 15 rule 10 forbids). Build item F5 lets a clip's `travel` scale
 // how far its keys move by a setting, so each redraw keeps the code sprite's keys, defaults and ranges, and its idle,
-// walk and run clips move further or less as the code rig's did (rigs/topdown.js pose: Bounce the breath, the dip and
+// walk and run clips move further or less as the code rig's did (rigs/topdown.js pose, deleted by R2: Bounce the breath, the dip and
 // the hop, Stride how far the feet travel). Held here:
 //   1. the controls are the code sprite's (key, kind, default, range, step, group, labels), from its redraw record;
 //   2. every travel table passes through 1 at the slider's default, so the defaults draw exactly as before (a table by
@@ -18,12 +18,16 @@
 //      larger where the code's grows, smaller where it shrinks, and not flat where the code's changes. Measured with
 //      nothing held and no shield or pack (each choice with a "none" option set to it), so a weapon's butt or a shield
 //      by the feet is not taken for a foot.
+// R2: the code sprites and their rig are gone. What items 3 to 5 compared against them is recorded, per sprite, slider and
+// clip, in tests/fixtures/m7-topdown-motion.json (taken from the frozen copies at commit 7e328c3 before they were deleted:
+// the head's bob and the feet's spread at each slider end, the idle breath per frame, how many pixels a clip moves). The
+// data sprite is measured live with the same functions as before and compared with that record. Proved by a break: all
+// the walk and run travel tables of sprites/hero-walker.json reversed fail the item 5 test.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ROOT, loadDataSprite } from '../../tools/lib/assets.mjs';
-import { codeSprite } from '../helpers/library.mjs';
 import { cleanParams, defaultParams, renderPixels } from '../../engine/sprite.js';
 
 const IDS = ['village-elder', 'farm-kid', 'hero-walker', 'mage-walker', 'merchant', 'town-guard', 'void-ranger', 'shield-trooper', 'rogue-walker'];
@@ -34,6 +38,7 @@ const MOVES = { bounce: /^(idle|walk|run)_/, stride: /^(walk|run)_/ };
 const STILL = {};
 /** Clips besides MOVES' whose code reads a slider, per sprite: the merchant's gestures start from the idle pose at t = 0 (rigs/topdown.js gesture), which reads Bounce (M7c). */
 const READS = { merchant: { bounce: /^(talk|wave)$/ } };
+const motion = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'm7-topdown-motion.json'), 'utf8'));
 const record = (id) => JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'redraws', `${id}.json`), 'utf8'));
 const def = (id) => JSON.parse(fs.readFileSync(path.join(ROOT, 'sprites', `${id}.json`), 'utf8'));
 const data = (id) => loadDataSprite(ROOT, path.join(ROOT, 'sprites', `${id}.json`));
@@ -77,7 +82,7 @@ test('every travel table passes through 1 at its slider\'s default, so the defau
 
 for (const id of IDS) {
   test(`${id}: at each end of its motion sliders the clips the code moves move, inside the frame and with both boots`, async () => {
-    const s = await data(id), code = await codeSprite(id), r = record(id), bad = [];
+    const s = await data(id), r = record(id), rec = motion[id], bad = [];
     const ref = Object.keys(s.clips).find((c) => /^idle_down$/.test(c));
     // the boots' colours: those of the two lowest drawn rows of the standing pose, outline left out
     const g0 = pixels(s, ref, 0, {}), b0 = box(g0), INK = 0xff331b23;   // the outline, #231b33 as renderPixels writes it
@@ -85,12 +90,11 @@ for (const id of IDS) {
     for (let y = b0[3] - 2; y <= b0[3]; y++) for (let x = 0; x < g0.w; x++) { const v = g0.data[y * g0.w + x]; if (v >>> 24 && v !== INK) bootCols.add(v); }
     const boots = (g) => g.data.reduce((n, v) => n + (bootCols.has(v) ? 1 : 0), 0);
     for (const k of MOTION.filter((m) => r.params[m])) for (const v of [0, 1]) for (const [clip, c] of Object.entries(s.clips)) {
-      let moved = false, codeMoved = 0;
+      let moved = false;
+      const codeMoved = rec.moved[k][v][clip] ?? 0;   // the code sprite's, recorded
       for (let f = 0; f < c.frames; f++) {
         const g = pixels(s, clip, f, { [k]: v }), g1 = pixels(s, clip, f, {});
         if (g.data.some((p, i) => p !== g1.data[i])) moved = true;
-        const h = pixels(code, clip, f, { [k]: v }), h1 = pixels(code, clip, f, {});
-        codeMoved += h.data.reduce((n, p, i) => n + (p !== h1.data[i] ? 1 : 0), 0);
         const [x0, y0, x1, y1] = box(g);
         if (MOVES[k].test(clip) && (x0 <= 0 || y0 <= 0 || x1 >= g.w - 1 || y1 >= g.h - 1)) bad.push(`${k}=${v} ${clip} f${f}: touches the frame's edge`);
         if (MOVES[k].test(clip) && boots(g) < 0.5 * boots(g1)) bad.push(`${k}=${v} ${clip} f${f}: ${boots(g)} boot pixels, ${boots(g1)} at the defaults`);
@@ -103,11 +107,11 @@ for (const id of IDS) {
   });
 
   test(`${id}: Bounce at both ends breathes as the code sprite does in idle (the head's top row, frame by frame, within 1 px)`, async () => {
-    const code = await codeSprite(id), s = await data(id), bad = [];
-    for (const v of [0, 1]) for (const clip of ['idle_down', 'idle_up', 'idle_side']) for (let f = 0; f < code.clips[clip].frames; f++) {
+    const s = await data(id), bad = [];
+    for (const v of [0, 1]) for (const clip of ['idle_down', 'idle_up', 'idle_side']) for (let f = 0; f < motion[id].idle[v][clip].length; f++) {
       const top = (sp, set) => box(pixels(sp, clip, f, set))[1];
-      // against each one's own defaults, so a redraw's standing offset (held by m7-topdown-geometry) does not count twice
-      const dc = top(code, { bounce: v }) - top(code, {}), dd = top(s, { bounce: v }) - top(s, {});
+      // against each one's own defaults, so a redraw's standing offset does not count twice
+      const dc = motion[id].idle[v][clip][f], dd = top(s, { bounce: v }) - top(s, {});
       if (Math.abs(dc - dd) > 1) bad.push(`bounce=${v} ${clip} f${f}: the code's head moves ${dc} px, the redraw's ${dd}`);
     }
     assert.deepEqual(bad, [], `${id}: ${bad.length} frames`);
@@ -149,11 +153,10 @@ const SEEN = { bounce: 'bob', stride: 'spread' };
 
 for (const id of IDS) {
   test(`${id}: walk and run at each end of Bounce and Stride bob and stride as the code sprite's do, the same way and within 1 px`, async () => {
-    const code = await codeSprite(id), s = await data(id), r = record(id), bad = [];
-    const mc = middleOf(code), md = middleOf(s);
-    for (const k of MOTION.filter((m) => r.params[m])) for (const clip of Object.keys(code.clips).filter((c) => /^(walk|run)_/.test(c))) {
+    const s = await data(id), r = record(id), bad = [], md = middleOf(s);
+    for (const k of MOTION.filter((m) => r.params[m])) for (const clip of Object.keys(motion[id].gait[k])) {
       const m = SEEN[k], at = (sp, mid, v) => gait(sp, clip, v === null ? {} : { [k]: v }, mid)[m];
-      const c = [0, null, 1].map((v) => at(code, mc, v)), d = [0, null, 1].map((v) => at(s, md, v));
+      const c = motion[id].gait[k][clip], d = [0, null, 1].map((v) => at(s, md, v));
       const say = `${k} ${clip}: ${m} at 0 / default / 1 is ${d.join(' / ')}, the code's ${c.join(' / ')}`;
       if (c.some((x, i) => Math.abs(x - d[i]) > 1)) bad.push(`${say} (more than 1 px off)`);
       else if (Math.sign(c[2] - c[0]) !== Math.sign(d[2] - d[0]) && c[2] !== c[0]) bad.push(`${say} (${d[2] === d[0] ? 'flat' : 'the other way'})`);

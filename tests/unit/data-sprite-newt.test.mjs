@@ -305,11 +305,14 @@ test('data-sprite: makeDataSprite never throws: { ok, errors, warnings, sprite }
   }
 });
 
-test('data-sprite: a library body (the side-view person) is drawn since S4b (tests/unit/data-sprite-library.test.mjs)', () => {
+test('data-sprite: a library body (a saved draft of the removed path, build item R1) is refused by every entry point, in plain words', () => {
   const hero = load('waving-hero');
   const v = DS.validateDataSprite(hero);
-  assert.equal(v.ok, true, v.errors.join('\n'));
+  assert.equal(v.ok, false);
+  assert.match(v.errors.join('\n'), /library body, which is gone: open the library sprite and edit a copy/);
   const r = DS.makeDataSprite(hero);
-  assert.equal(r.ok, true, r.errors.join('\n'));
-  assert.equal(DS.dataSprite(hero).id, 'waving-hero');
+  assert.equal(r.ok, false);
+  assert.equal(r.sprite, null);
+  assert.deepEqual(r.errors, v.errors);
+  assert.throws(() => DS.dataSprite(hero), /waving-hero.*library body, which is gone/);
 });

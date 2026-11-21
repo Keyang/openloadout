@@ -15,9 +15,9 @@ through `tests/helpers/library.mjs`:
 Rules:
 
 - A copy is the library file word for word with its imports moved from `../` to `../../../` and a "FROZEN COPY"
-  comment on top. A file in the fixed data form (a converted library file such as `rogue-battler.js`, first line its
-  header) is kept word for word, imports included; `codeSprite` reads it with `catalog/data-file.js` and makes it
-  with `engine/data-sprite.js`, which is what importing it does.
+  comment on top. (The two copies that were in the fixed data form, `rogue-battler.js` and `road-bandit.js`, library
+  bodies drawn through `engine/library-body.js`, went with that path in build item R1; the silhouettes they drew are
+  `tests/fixtures/library-bodies/silhouettes.json`.)
 - Never edit a copy. A test that needs a changed drawing tests the library asset instead. `SHA256SUMS` pins every
   copy (the `shasum -a 256` format; `shasum -a 256 -c SHA256SUMS` checks it by hand), and
   `tests/unit/tests-migration-ready.test.mjs` fails when a copy changed, has no line, or a line has no copy. A batch
@@ -28,9 +28,15 @@ Rules:
   (`codeSpriteAsFile` does the same for one file), the frozen copy first, as `codeSprite` reads it.
 - **When a copy goes:** a frozen copy is deleted together with the last framework test that reads it, in the removal
   items R1 to R4 (docs/data-sprites.md section 5). Until then this folder is a caller of the code rigs and drawing
-  helpers its copies import (`rigs/humanoid.js`, `rigs/topdown*.js`, `engine/fx.js`, `engine/tiles.js`, `engine/ui*.js`,
+  helpers its copies import (`rigs/humanoid.js`, `engine/fx.js`, `engine/tiles.js`, `engine/ui*.js`,
   ...): a check that lists a module's importers before removing it counts `tests/fixtures/code-sprites/` too, and
   removing a module means deleting the copies that import it and the framework tests that read them, in the same item.
+  **R2 (2026-11-21)** did that for every code rig but the side-view one: 14 copies went (the nine top-down people, `scout-drone`,
+  `moss-golem`, `security-bot`, `vendor-bot`, `warden-mech`), each with its `SHA256SUMS` line. What a test compared with
+  one of them is held by a record instead where it could be: `tests/fixtures/redraw-pixels/moss-golem.json` and
+  `redraw-pixels-c3/<id>.json` (pixels), `redraw-sockets/moss-golem.json` and the `sockets` of the c3 records (attach points),
+  `redraw-boxes/<id>.json` (the boxes of the nine top-down people). The five copies left on `rigs/humanoid.js` (`bone-soldier`,
+  `knight`, `spear-goblin`, `thicket-imp`, `wizard`) go with `rigs/humanoid.js` (it waits for `engine/data-rules.js` to stop taking `apart` from `rigs/humanoid-figure.js`).
 
 ## The guard and what it cannot see
 

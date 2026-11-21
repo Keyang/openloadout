@@ -11,6 +11,16 @@
 //   - each port's heaviest call runs within its cost (as gen-e1-safety and gen-e2-safety: 0.05 ms a unit plus 2 ms)
 //   - each points motion moves its nodes to where the code's sockets() put the points, turned to the code's angle
 // The motions' own goldens are held by gen-motion-layout-contract.test.mjs (pinned with GEN_GOLDEN_WRITE=1).
+// R2 (the code rigs went): the golem's code sprite imported rigs/bigbody.js, so its frozen copy is gone. What it drew is held
+// by two records, both taken from the frozen copy at commit 7e328c3 before it went: tests/fixtures/redraw-frames/moss-golem.json
+// (one hash per frame of the code sprite at every look of the pixel test below, 2,046 frames: defaults, each slider at both
+// ends, every choice, switch and two off-swatch colours, all sliders low, all high) and tests/fixtures/redraw-sockets/moss-golem.json
+// (its attach points at every case, one hash each). Both the one-port sprite and the library file are held to the frame
+// hashes, so a change to the golem's port, to its library file's bindings (Bulk and Arms swapped) or to a slider's reach
+// (Wear 1 chipping later) fails here, as it failed against the code before R2. library-redraws-pixels holds the file to
+// tests/fixtures/redraw-pixels/moss-golem.json as well, at the looks it varies (Size, choices, toggles, swatches), not at
+// the other sliders; the goldens harness above pins the port at three cases and can be re-recorded with GEN_GOLDEN_WRITE=1,
+// so it is not a comparison with the old code. Proved by breaks: see R2's report.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as registry from '../../engine/gen/index.js';
@@ -19,12 +29,35 @@ import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
 import { dataSprite } from '../../engine/data-sprite.js';
 import { renderPixels, cleanParams, defaultParams } from '../../engine/sprite.js';
 import { stampPixels } from '../../engine/gen/args.js';
-import { codeSprite, librarySprite, librarySpriteFile } from '../helpers/library.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import { ROOT, codeSprite, librarySprite, librarySpriteFile } from '../helpers/library.mjs';
+import { casesKey } from '../helpers/redraw-pixels.mjs';
 
 const PORTS = ['bat', 'slime', 'wolf', 'crow-scout', 'spore-hopper', 'moss-golem'];
 // a port's argument whose old setting's name is a call field (glow): the setting it stands for
 const OLD_NAME = { spores: 'glow', shine: 'glow' };
 const MOVING_POINTS = ['crow-scout', 'spore-hopper', 'moss-golem'];
+/** Creatures whose code sprite is gone (R2): the library file stands in for it where pixels are compared, the record where sockets are. */
+const NO_CODE = new Set(['moss-golem']);
+const specimen = (id) => (NO_CODE.has(id) ? librarySprite(id) : codeSprite(id));
+const frameRecord = (id) => JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'redraw-frames', `${id}.json`), 'utf8'));
+/** A frame as one hash: FNV-1a over its width, height and pixels (as the record was written). */
+function frameHash(g) {
+  let h = 0x811c9dc5;
+  h = Math.imul(h ^ g.w, 0x01000193); h = Math.imul(h ^ g.h, 0x01000193);
+  for (let i = 0; i < g.data.length; i++) h = Math.imul(h ^ (g.data[i] >>> 0), 0x01000193);
+  return (h >>> 0).toString(16).padStart(8, '0');
+}
+const socketRecord = (id) => JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'redraw-sockets', `${id}.json`), 'utf8'));
+/** A sprite's attach points at one case as one hash: each point rounded to 1e-6, its angle taken into -PI..PI (as the record was written). */
+function socketsHash(s) {
+  const norm = (a) => { let x = a % (2 * Math.PI); if (x <= -Math.PI + 1e-9) x += 2 * Math.PI; if (x > Math.PI + 1e-9) x -= 2 * Math.PI; return +x.toFixed(6) + 0; };
+  const text = JSON.stringify(Object.keys(s).sort().map((k) => [k, +s[k].x.toFixed(6) + 0, +s[k].y.toFixed(6) + 0, norm(s[k].angle ?? 0)]));
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) { h ^= text.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+  return (h >>> 0).toString(16).padStart(8, '0');
+}
 
 // the paint arguments of each port: the code sprite's colour controls, by the same keys
 const paintsOf = (entry) => Object.fromEntries(Object.entries(entry.args).filter(([, t]) => t.type === 'paint').map(([k]) => [k, k]));
@@ -126,18 +159,34 @@ const same = (a, b) => a.w === b.w && a.h === b.h && a.data.every((v, i) => v ==
 // slots, parts, `when`s and clips as written; review C1 round 1, issue 1: the pixel records vary only Size, choices,
 // toggles and swatches, so a library file whose Flap read Bob passed every other test).
 for (const id of PORTS) {
-  test(`creature.${id}@1 and sprites/${id}.json draw what sprites/${id}.js drew, every clip and frame, at every slider end, choice and two off-swatch colours`, { timeout: 900_000 }, async () => {
+  test(NO_CODE.has(id) ? `creature.${id}@1 and sprites/${id}.json draw what sprites/${id}.js drew (recorded frame hashes), every clip and frame, at every slider end, choice and two off-swatch colours` : `creature.${id}@1 and sprites/${id}.json draw what sprites/${id}.js drew, every clip and frame, at every slider end, choice and two off-swatch colours`, { timeout: 900_000 }, async () => {
     assert.equal(librarySpriteFile(id), `sprites/${id}.json`, `${id}: the library file is the data file`);
-    const code = await codeSprite(id), port = onePort(code, id), lib = await librarySprite(id);
+    const code = await specimen(id), port = onePort(code, id), lib = await librarySprite(id);
+    const golden = NO_CODE.has(id) ? frameRecord(id) : null;
     const bad = [];
-    for (const over of looks(code)) {
+    let n = 0;
+    if (golden) {
+      const canon = (o) => JSON.stringify(Object.keys(o).sort().map((k) => [k, o[k]]));
+      assert.deepEqual(looks(lib).map(canon).sort(), golden.looks.map(canon).sort(), `${id}: the library file has the code sprite's controls (the looks of the record)`);
+      assert.deepEqual(Object.fromEntries(Object.entries(lib.clips).map(([c, x]) => [c, x.frames])), golden.clips, `${id}: the clips and frame counts of the record`);
+      assert.equal(golden.cases, golden.hashes.split(' ').length);
+    }
+    const want = golden?.hashes.split(' ');
+    for (const over of golden ? golden.looks : looks(code)) {
       const pc = cleanParams(code, { ...defaultParams(code), ...over }), pp = cleanParams(port, { ...defaultParams(port), ...over }), pl = cleanParams(lib, { ...defaultParams(lib), ...over });
       for (const [clip, c] of Object.entries(code.clips)) for (let f = 0; f < c.frames; f++) {
-        const want = renderPixels(code, clip, f, pc);
-        if (!same(want, renderPixels(port, clip, f, pp))) bad.push(`port ${clip} ${f} ${JSON.stringify(over)}`);
-        if (!same(want, renderPixels(lib, clip, f, pl))) bad.push(`sprites/${id}.json ${clip} ${f} ${JSON.stringify(over)}`);
+        if (golden) {
+          const h = want[n++];
+          if (frameHash(renderPixels(port, clip, f, pp)) !== h) bad.push(`port ${clip} ${f} ${JSON.stringify(over)}`);
+          if (frameHash(renderPixels(lib, clip, f, pl)) !== h) bad.push(`sprites/${id}.json ${clip} ${f} ${JSON.stringify(over)}`);
+          continue;
+        }
+        const wantPx = renderPixels(code, clip, f, pc);
+        if (!same(wantPx, renderPixels(port, clip, f, pp))) bad.push(`port ${clip} ${f} ${JSON.stringify(over)}`);
+        if (!same(wantPx, renderPixels(lib, clip, f, pl))) bad.push(`sprites/${id}.json ${clip} ${f} ${JSON.stringify(over)}`);
       }
     }
+    if (golden) assert.equal(n, golden.cases, `${id}: every recorded frame compared`);
     assert.deepEqual(bad.slice(0, 12), [], `${bad.length} frames differ`);
   });
 }
@@ -151,7 +200,23 @@ test('each library creature\'s sockets() are the code\'s, every clip and frame, 
   const bad = [];
   let frames = 0;
   for (const id of PORTS) {
-    const code = await codeSprite(id), lib = await librarySprite(id);
+    const code = NO_CODE.has(id) ? null : await codeSprite(id), lib = await librarySprite(id);
+    if (!code) {
+      // the golem: its code is gone; the library file's sockets are held to the hashes recorded from the code
+      const rec = socketRecord(id).library, cases = [];
+      // the looks as the record has them, whatever order the library file lists its controls in
+      const canon = (o) => JSON.stringify(Object.keys(o).sort().map((k) => [k, o[k]]));
+      assert.deepEqual(looks(lib).map(canon).sort(), rec.looks.map(canon).sort(), `${id}: the same looks (its controls are the code's)`);
+      for (const over of rec.looks) for (const [clip, c] of Object.entries(lib.clips)) for (let f = 0; f < c.frames; f++) cases.push({ clip, frame: f, params: over });
+      assert.equal(cases.length, rec.cases, `${id}: the cases its clips give`);
+      const want = rec.hashes.split(' ');
+      cases.forEach((k, i) => {
+        const c = lib.clips[k.clip], t = c.loop !== false ? k.frame / c.frames : k.frame / (c.frames - 1);
+        frames++;
+        if (socketsHash(lib.sockets?.(k.clip, t, cleanParams(lib, { ...defaultParams(lib), ...k.params })) ?? {}) !== want[i]) bad.push(`${id} ${k.clip} ${k.frame} ${JSON.stringify(k.params)}: the points are not the code's (recorded)`);
+      });
+      continue;
+    }
     for (const over of looks(code)) for (const [clip, c] of Object.entries(code.clips)) for (let f = 0; f < c.frames; f++) {
       const t = c.loop !== false ? f / c.frames : f / (c.frames - 1);
       const want = code.sockets?.(clip, t, cleanParams(code, { ...defaultParams(code), ...over })) ?? {};
@@ -218,14 +283,20 @@ test('every creature port at its heaviest runs within its cost', () => {
 test('each points motion puts its nodes where the code\'s sockets() put the points, at the code\'s angle', async () => {
   const norm = (a) => { let x = a % (2 * Math.PI); if (x <= -Math.PI) x += 2 * Math.PI; if (x > Math.PI) x -= 2 * Math.PI; return x; };
   for (const id of MOVING_POINTS) {
-    const code = await codeSprite(id), entry = generator(`creature.${id}.points`, 1);
+    const code = await specimen(id), entry = generator(`creature.${id}.points`, 1);
+    const recorded = NO_CODE.has(id) ? socketRecord(id).motion : null, seen = [], cases = [];
     const sets = [{}, ...Object.keys(entry.args).filter((k) => k !== 'at').flatMap((k) => (entry.args[k].type === 'word' ? entry.args[k].values.map((v) => ({ [k]: v })) : [{ [k]: entry.args[k].lo }, { [k]: entry.args[k].hi }]))];
     for (const over of sets) for (const [clip, c] of Object.entries(code.clips)) for (let f = 0; f < c.frames; f++) {
       const t = c.loop ? f / c.frames : f / (c.frames - 1);
       const p = cleanParams(code, { ...defaultParams(code), ...over });
-      const want = code.sockets(clip, t, p);
+      const want = recorded ? null : code.sockets(clip, t, p);
       const args = Object.fromEntries(Object.keys(entry.args).filter((k) => k !== 'at').map((k) => [k, p[k]]));
       const moves = entry.run(Object.freeze({ at: entry.args.at.default, ...args }), Object.freeze({ t, frame: f, frames: c.frames, loop: c.loop !== false, clip, size: [...code.size] }));
+      if (recorded) {   // the golem: the motion's points as one hash, against the code's recorded
+        cases.push({ clip, frame: f, params: over });
+        seen.push(socketsHash(Object.fromEntries(moves.map((m) => [m.node, { x: m.move[0], y: m.move[1], angle: Math.atan2(-Math.sin(m.turn * Math.PI / 180), Math.cos(m.turn * Math.PI / 180)) }]))));
+        continue;
+      }
       assert.deepEqual(moves.map((m) => m.node).sort(), Object.keys(want).sort(), `${id} ${clip} ${f}: one node a point`);
       for (const m of moves) {
         const s = want[m.node];
@@ -233,6 +304,13 @@ test('each points motion puts its nodes where the code\'s sockets() put the poin
         const turned = Math.atan2(-Math.sin(m.turn * Math.PI / 180), Math.cos(m.turn * Math.PI / 180));
         assert.ok(Math.abs(norm(turned - s.angle)) < 1e-9, `${id} ${clip} ${f} ${m.node}: angle`);
       }
+    }
+    if (recorded) {
+      assert.equal(cases.length, recorded.cases, `${id}: the cases its motion and clips give`);
+      assert.equal(casesKey(cases), recorded.casesKey, `${id}: the same cases in the same order`);
+      const want = recorded.hashes.split(' '), bad = [];
+      seen.forEach((h, i) => { if (h !== want[i]) bad.push(`${cases[i].clip} ${cases[i].frame} ${JSON.stringify(cases[i].params)}`); });
+      assert.deepEqual(bad.slice(0, 8), [], `${id}: ${bad.length} of ${cases.length} frames' points are not where the code's sockets() put them (recorded)`);
     }
   }
 });

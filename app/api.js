@@ -21,7 +21,7 @@ export const CALLS = [
   'make.sprite', 'make.sound', 'check', 'render',
   'bag.add', 'bag.items', 'bag.remove', 'bag.update', 'bag.clear', 'bag.link', 'bag.setLook', 'bag.download',
   'go',
-  'studio.starts', 'studio.create', 'studio.list', 'studio.get', 'studio.set', 'studio.validate', 'studio.bake', 'studio.render', 'studio.advice', 'studio.toBag', 'studio.file', 'studio.remove',
+  'studio.starts', 'studio.create', 'studio.list', 'studio.get', 'studio.set', 'studio.validate', 'studio.render', 'studio.advice', 'studio.toBag', 'studio.file', 'studio.remove',
 ];
 
 let loading = null, real = null, inner = null;

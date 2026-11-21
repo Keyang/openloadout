@@ -3,21 +3,31 @@
 // drawing they share (the top-down creature rig, engine/warmachine.js, engine/groundbot.js, engine/mech.js,
 // engine/breaking.js, engine/rock.js) ported once under engine/gen/ports/c3/.
 //
+// R2 (the code rigs went): the four code sprites imported rigs/creature-topdown.js, guard-bot.js, kiosk.js and
+// mech-walker.js, so their frozen copies are gone and this file no longer compares anything with the old code.
+// Everywhere below `code` is the library data sprite (librarySprite). The pixel test below is therefore a consistency
+// check, not a code comparison: the library file draws through this same port (one call per part), so the test shows
+// that the port, called once per clip with the arguments PORTS[id].args works out from the settings, draws what the
+// library file's calls draw, and that the points motion moves each node to the library sprite's sockets. A change to the
+// port itself moves both sides alike and is NOT caught here; it is caught by tests/unit/redraws-c3.test.mjs, which holds
+// the library sprites to the old code's recorded pixels and attach points (tests/fixtures/redraw-pixels-c3/<id>.json;
+// proved by a break: one muzzle socket of guard-bot moved 1 px fails redraws-c3 and not this file).
+//
 // What is held here, about the framework (the library sprites are held by tests/unit/redraws-c3.test.mjs):
 //   - each passes the goldens harness (tests/helpers/gen-harness.mjs): pinned output, determinism, cost, loop closure,
 //     every argument at and past its limits;
-//   - each draws, through a data sprite that names it once per clip, exactly the pixels its frozen code sprite
-//     (tests/fixtures/code-sprites/<id>.js) draws, at every frame of every clip, at the defaults, every option of every
+//   - each draws, through a data sprite that names it once per clip, exactly the pixels its library sprite
+//     (sprites/<id>.json) draws (consistency of the arguments, see above), at every frame of every clip, at the defaults, every option of every
 //     choice, every slider at both ends, and body colours off the swatches (a pale one as bright as the steel fittings, a
 //     dark one, one between): the colours the code worked out from a colour are colour rules now (ifLight, faceTone,
 //     standOut, ramp, tone, mix), and only colours off the swatches show a rule that is wrong;
-//   - its points motion (robot.<id>.points@1) moves each point's node to the code sprite's sockets at every frame;
+//   - its points motion (robot.<id>.points@1) moves each point's node to the library sprite's sockets at every frame;
 //   - its heaviest call found here runs within its cost (as tests/unit/gen-e2-safety.test.mjs holds E2's ports).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import * as registry from '../../engine/gen/index.js';
 import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
-import { codeSprite } from '../helpers/library.mjs';
+import { librarySprite } from '../helpers/library.mjs';
 import { dataSprite } from '../../engine/data-sprite.js';
 import { renderPixels, cleanParams, defaultParams } from '../../engine/sprite.js';
 
@@ -74,7 +84,7 @@ const generatorOf = (id) => registry.generator(PORTS[id].gen, 1);
 
 for (const id of Object.keys(PORTS)) {
   test(`${PORTS[id].gen}@1 passes the goldens harness`, { timeout: 600_000 }, async () => {
-    const code = await codeSprite(id), entry = generatorOf(id);
+    const code = await librarySprite(id), entry = generatorOf(id);
     assert.ok(entry, `${PORTS[id].gen}@1 is registered`);
     const base = cleanParams(code, defaultParams(code)), clips = Object.keys(code.clips);
     const last = clips.at(-1), mid = clips[Math.floor(clips.length / 2)];
@@ -86,8 +96,8 @@ for (const id of Object.keys(PORTS)) {
     ] });
   });
 
-  test(`${PORTS[id].gen}@1 draws its code sprite pixel for pixel, at every frame and setting tried, and gives its sockets`, { timeout: 900_000 }, async () => {
-    const code = await codeSprite(id), motion = registry.generator(`${PORTS[id].gen}.points`, 1);
+  test(`${PORTS[id].gen}@1 drawn through a one-call data sprite draws what sprites/${id}.json draws, at every frame and setting tried, and gives its sockets (consistency, not a code comparison)`, { timeout: 900_000 }, async () => {
+    const code = await librarySprite(id), motion = registry.generator(`${PORTS[id].gen}.points`, 1);
     assert.ok(motion, `${PORTS[id].gen}.points@1 is registered`);
     const bad = [], badPoints = [];
     let n = 0;
@@ -102,14 +112,16 @@ for (const id of Object.keys(PORTS)) {
         const { body: _pb, accent: _pa, lights: _pl, ...settings } = PORTS[id].args(p);
         // the layout runs a motion through its entry (a motion's moves are not primitives the registry counts)
         const moves = motion.run(Object.freeze({ at: PORTS[id].origin, ...settings }), Object.freeze({ clip, t, frame: f, frames: c.frames, loop: c.loop !== false, size: [...code.size] }));
-        const got = Object.fromEntries(moves.map((m) => [m.node, [+m.move[0].toFixed(6), +m.move[1].toFixed(6), +(-m.turn * Math.PI / 180).toFixed(6)]]));
-        const exp = Object.fromEntries(Object.entries(want).map(([k, v]) => [k, [+v.x.toFixed(6), +v.y.toFixed(6), +(v.angle ?? 0).toFixed(6)]]));
+        // an angle as the direction it is: PI and -PI are one way (the library file's node turned to -PI where the motion says PI)
+        const dir = (a) => { let x = a % (2 * Math.PI); if (x <= -Math.PI + 1e-9) x += 2 * Math.PI; if (x > Math.PI + 1e-9) x -= 2 * Math.PI; return +x.toFixed(6) + 0; };
+        const got = Object.fromEntries(moves.map((m) => [m.node, [+m.move[0].toFixed(6), +m.move[1].toFixed(6), dir(-m.turn * Math.PI / 180)]]));
+        const exp = Object.fromEntries(Object.entries(want).map(([k, v]) => [k, [+v.x.toFixed(6), +v.y.toFixed(6), dir(v.angle ?? 0)]]));
         if (JSON.stringify(got) !== JSON.stringify(exp)) badPoints.push(`${clip} f${f}`);
       }
     }
     assert.ok(n > 100, `${n} frames compared`);
-    assert.deepEqual(bad.slice(0, 6), [], `${id}: ${bad.length} of ${n} frames differ from the code sprite`);
-    assert.deepEqual(badPoints.slice(0, 6), [], `${id}: ${badPoints.length} frames' attach points differ from the code sprite's sockets`);
+    assert.deepEqual(bad.slice(0, 6), [], `${id}: ${bad.length} of ${n} frames differ from the library sprite`);
+    assert.deepEqual(badPoints.slice(0, 6), [], `${id}: ${badPoints.length} frames' attach points differ from the library sprite's sockets`);
   });
 }
 

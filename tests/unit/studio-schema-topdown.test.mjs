@@ -10,7 +10,6 @@ import { types } from 'node:util';
 import * as S from '../../catalog/studio-schema.js';
 import * as DS from '../../engine/data-sprite.js';
 import * as T from '../../rigs/studio-templates.js';
-import { hero } from '../../rigs/humanoid-studio.js';
 
 const read = (p) => JSON.parse(fs.readFileSync(new URL(p, import.meta.url), 'utf8'));
 const beetle = read('../fixtures/data-sprite/beetle-topdown.json');
@@ -70,9 +69,6 @@ test('studio-schema top-down: directions, direction clips and meta view top-down
   assert.match(S.validateStudioSprite(c).errors.join('\n'), /"walk_down".*top-down body/);
   const m = clone(newt); m.meta.view = 'top-down';
   assert.match(S.validateStudioSprite(m).errors.join('\n'), /meta: view "top-down".*top-down body/);
-  // a library body is seen from the side
-  const h = hero(); h.clips.walk_down = h.clips.walk;
-  assert.match(S.validateStudioSprite(h).errors.join('\n'), /"walk_down".*top-down body/);
 });
 
 test('studio-schema top-down: style guide advice applies to the action of a direction clip', () => {
@@ -172,7 +168,7 @@ test('studio-schema top-down: engine/data-sprite.js passes the top-down helpers 
 test('studio-schema top-down: validateDataSprite says what validateStudioSprite says, for every kind of definition', () => {
   const evil = clone(beetle);
   Object.defineProperty(evil.body.rig.directions.up, 'shapes', { get() { throw new Error('ran'); }, enumerable: true });
-  const inputs = [newt, beetle, hero(), read('../fixtures/studio/waving-hero.json'), ...T.STUDIO_TEMPLATE_IDS.map((id) => T.studioTemplate(id)),
+  const inputs = [newt, beetle, read('../fixtures/studio/waving-hero.json'), ...T.STUDIO_TEMPLATE_IDS.map((id) => T.studioTemplate(id)),
     JSON.stringify(beetle), evil, { ...newt, clips: {} }, null, '{', 'x'.repeat(70 * 1024)];
   for (const input of inputs) {
     const a = DS.validateDataSprite(input), b = S.validateStudioSprite(input);

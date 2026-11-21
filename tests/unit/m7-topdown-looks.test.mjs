@@ -6,8 +6,9 @@
 //
 // Second review of M7 (issues 7 and 8): counting colours did not hold either claim. The light test passed with every
 // `glow: true` turned off (the outline then wraps the slash, the flare and the orb), and the die test passed with a
-// helmet drawn anywhere in the frame. So the light is also drawn with `glow` off and must change, and in every turned
-// die frame the worn things' colours are held to where the code sprite draws them (tests/fixtures/code-sprites/).
+// helmet drawn anywhere in the frame. So the light is also drawn with `glow` off and must change. (It also held, in every
+// turned die frame, the worn things' colours to where the code sprite draws them; R2 deleted that check with the frozen
+// copies, so a die frame is now held to "headgear and hair stay on", not to the code's positions.)
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -15,7 +16,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { ROOT, loadDataSprite } from '../../tools/lib/assets.mjs';
 import { cleanParams, defaultParams, renderFrame } from '../../engine/sprite.js';
-import { codeSprite } from '../helpers/library.mjs';
 
 const sprites = new Map();
 async function sprite(id) {
@@ -112,32 +112,3 @@ test('the light is drawn after the outline: drawn before it instead, the outline
   }
 });
 
-/** The box of a frame's pixels in these colours ('#rrggbb'): [x0, y0, x1, y1], or null. */
-function colourBox(s, clip, f, colours, set = {}) {
-  const g = renderFrame(s, clip, f, cleanParams(s, { ...defaultParams(s), ...set })), want = new Set(colours);
-  let x0 = Infinity, y0 = Infinity, x1 = -1, y1 = -1;
-  for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) {
-    const v = g.data[y * g.w + x];
-    if (!(v >>> 24) || !want.has(hexOf(v))) continue;
-    x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y);
-  }
-  return x1 < 0 ? null : [x0, y0, x1, y1];
-}
-
-test('in every turned die frame the worn things lie where the code sprite draws them', async () => {
-  // [id, colours of the worn thing, settings, px allowed]: the hero's helmet and hair are 3 px off, as its base is
-  // (base:person-topdown-sword@1 is keyed fitted to the longest weapon; m7-topdown-geometry.test.mjs KNOWN)
-  const cases = [
-    ['hero-walker', ['#c2c9d6'], {}, 3], ['hero-walker', ['#9a6a3e'], { headgear: 'none', hairStyle: 'long' }, 3],
-    ['void-ranger', ['#5fe0f0'], {}, 1], ['shield-trooper', ['#e2473f'], { headgear: 'mask' }, 2],
-  ];
-  for (const [id, colours, set, px] of cases) {
-    const code = await codeSprite(id), s = await sprite(id);
-    for (const f of DIE_LYING) {
-      const a = colourBox(code, 'die', f, colours, set), b = colourBox(s, 'die', f, colours, set);
-      assert.ok(a && b, `${id} die ${f} ${JSON.stringify(set)}: both draw it`);
-      const d = Math.max(...a.map((v, i) => Math.abs(v - b[i])));
-      assert.ok(d <= px, `${id} die ${f} ${JSON.stringify(set)}: ${colours} at ${JSON.stringify(b)}, the code's at ${JSON.stringify(a)} (${d} px)`);
-    }
-  }
-});

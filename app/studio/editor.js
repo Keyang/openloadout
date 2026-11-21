@@ -354,7 +354,6 @@ export function editorPage(app, { id, entry, drafts, kept, query, studio = siteS
     setFacing: (f) => { S.facing = f; S.sel = { ...S.sel, handle: null }; drawAll(); },
     nudge: (hid, dx, dy) => { S.sel = { ...S.sel, handle: hid, bone: hid.startsWith('bone:') ? hid.slice(5) : S.sel.bone }; commit(X.nudgeHandle(S.def, ctx(), hid, dx, dy)); focusRow(hid); },
     turn: (bone, deg) => { commit(X.turnBone(S.def, ctx(), bone, deg)); focusRow(`bone:${bone}`); },
-    nudgeLib: (field, dx, dy) => commit(X.nudgeLibrary(S.def, S.clip, S.frame, field, dx, dy)),
     addBone: () => {
       const r = X.addBone(S.def, S.sel.bone ?? S.def.body.rig.bones[0].id);
       if (r.error) return say(r.error);

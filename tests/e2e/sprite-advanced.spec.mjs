@@ -226,13 +226,13 @@ test('a sprite whose file is still code (sprites/<id>.js) has no Advanced button
 
 test('the address cannot open another draft: a version 1 draft, another sprite\'s copy, __proto__ all give this sprite\'s own copy', async ({ page }) => {
   await fresh(page, 'coin');
-  // a version 1 studio draft that says it came from the library's coin (the old studio's Hero start says library:knight),
+  // a version 1 studio draft that says it came from the library's coin (the old studio's Hero start said library:knight; that library body is gone, build item R1, so the draft is a Two legs bone rig that says so),
   // newer than anything else, and a version 2 copy of the crate
   const seeded = await page.evaluate(async () => {
     const { createDrafts } = await import('/app/studio/drafts.js');
     const { startFrom } = await import('/app/studio/edit.js');
     const drafts = createDrafts(localStorage);
-    const hero = startFrom('hero', 'Hero');
+    const hero = startFrom('two-legs', 'Hero');
     hero.made = { in: 'studio', from: 'library:coin' };
     const crate = await (await fetch('/sprites/coin.json')).json();
     crate.id = 'crate-copy'; crate.name = 'Crate (copy)'; crate.made = { in: 'studio', from: 'library:crate' };
@@ -310,11 +310,11 @@ test('a character (a bone rig) opens too, on a copy; Undo steps back a change', 
   const knight = cat.assets.find((a) => a.id === 'knight');
   test.skip(!knight?.src?.endsWith('.json'), 'the catalogue names knight.js: build the site to open a character');
   await fresh(page, 'knight');
-  // the old studio's Hero start (a version 1 draft, made.from library:knight) is there and newer: it is not the copy
+  // a version 1 draft (the old studio's Hero start, made.from library:knight, as a Two legs bone rig now) is there and newer: it is not the copy
   expect(await page.evaluate(async () => {
     const { createDrafts } = await import('/app/studio/drafts.js');
     const { startFrom } = await import('/app/studio/edit.js');
-    return createDrafts(localStorage).put('hero', startFrom('hero', 'Hero')).ok;
+    return createDrafts(localStorage).put('hero', Object.assign(startFrom('two-legs', 'Hero'), { made: { in: 'studio', from: 'library:knight' } })).ok;
   })).toBe(true);
   const heroBefore = await page.evaluate(() => JSON.stringify(JSON.parse(localStorage.getItem('loadout-studio-v1')).drafts.hero));
   await openAdvanced(page);
