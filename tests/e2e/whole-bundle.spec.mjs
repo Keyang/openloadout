@@ -14,7 +14,9 @@
 // The named look is chosen from the looks the site has (engine/theme.js): one that changes colours, sound and music.
 // Run with: npx playwright test tests/e2e/whole-bundle.spec.mjs
 import { test, expect as baseExpect, openRoute, waitForDrawn, canvasStats, setRange, downloadFrom } from '../helpers/test.mjs';
-import { readCatalogue, readPatches, catalogueOf, recordPlayed, heardAfter, playReady, playState, packageOf, sameBytes } from '../helpers/acceptance.mjs';
+import { ROOT, readCatalogue, readPatches, catalogueOf, recordPlayed, heardAfter, playReady, playState, packageOf, sameBytes } from '../helpers/acceptance.mjs';
+import { playerless } from '../helpers/kits.mjs';
+import { loadPlans } from '../../tools/lib/assets.mjs';
 import { THEME_PRESETS, PALETTES, normalizeTheme, defaultTheme } from '../../engine/theme.js';
 import { shelvesOf } from '../../app/shelves.js';
 
@@ -41,6 +43,10 @@ const ORIGINAL = NAMED.find((p) => !differs(p.theme.colour, PLAIN.colour) && !di
 // 0.31 over the bundles, the rest being the sky and the ground, held as what they are), and at least this much of it
 // is another colour than without the look (measured: 0.99 to 1).
 const PLAY_SHARE = 0.05, PLAY_CHANGED = 0.6;
+// A kit with no player by design (its plan says view "none": a fixed screen) has a playground that is mostly its dark
+// backdrop: measured 2026-11-21 on the falling-block puzzle at 0.041 under the Candy look.
+const PLAY_SHARE_PLAYERLESS = 0.03;
+const PLAYERLESS = new Set(loadPlans(ROOT).filter(({ plan }) => playerless(plan)).map(({ id }) => id));
 const paletteOf = (look) => new Set((PALETTES.find((p) => p.name === look.theme.colour.palette)?.colours ?? []).map((c) => parseInt(c.slice(1), 16)));
 
 const lookButton = (scope, look) => scope.getByRole('button', { name: look.name, exact: true });
@@ -303,7 +309,7 @@ for (const listed of LISTED) {
       // stays grass, skin stays skin (Contract 7; tests/e2e/looks.spec.mjs and tests/unit/looks-materials.test.mjs hold
       // that side). So a good part of the scene is in the set's colours, not all of it (the sky and the ground are most
       // of it); further down, without the look none of it is, and most of the scene's pixels are another colour.
-      if (palette.size) expect(playedStyled.share, `how much of the playground scene is in the ${LOOK.name} colours`).toBeGreaterThanOrEqual(PLAY_SHARE);
+      if (palette.size) expect(playedStyled.share, `how much of the playground scene is in the ${LOOK.name} colours`).toBeGreaterThanOrEqual(PLAYERLESS.has(listed.id) ? PLAY_SHARE_PLAYERLESS : PLAY_SHARE);
     }
     await page.getByRole('link', { name: 'Back to your bag' }).click();
     await expect(page.locator('.bag-item')).toHaveCount(ids.length);
