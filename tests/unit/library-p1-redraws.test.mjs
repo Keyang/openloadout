@@ -235,8 +235,10 @@ test('each loads through the build\'s loader as data and stays in its kits', asy
   }
   const kits = loadBundles(ROOT);
   const holding = (id) => kits.filter((b) => (b.sprites ?? []).includes(id)).map((b) => b.id).sort();
-  assert.deepEqual(holding('coin').filter((k) => k.startsWith('kit-')), ['kit-platformer-fantasy', 'kit-rpg-fantasy']);
-  assert.deepEqual(holding('crate').filter((k) => k.startsWith('kit-')), ['kit-platformer-fantasy']);
+  // the kits the sprite was in before its redraw still hold it; a kit made later may reuse it too, so more kits are fine
+  const stays = (id, was) => { const now = holding(id).filter((k) => k.startsWith('kit-')); assert.deepEqual(was.filter((k) => !now.includes(k)), [], `${id} left a kit it was in (now in ${now.join(', ')})`); };
+  stays('coin', ['kit-platformer-fantasy', 'kit-rpg-fantasy']);
+  stays('crate', ['kit-platformer-fantasy']);
 });
 
 test('icons-food draws the same as the B8 fixture with the newest icon pens (inside an icon set\'s fit they agree)', async () => {

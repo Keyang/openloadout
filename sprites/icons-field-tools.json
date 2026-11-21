@@ -185,7 +185,7 @@
    "params": {}
   },
   {
-   "name": "Gold on a hex plate",
+   "name": "Gold on hex plates",
    "params": {
     "backing": "hex",
     "metal": "#f2c230"
