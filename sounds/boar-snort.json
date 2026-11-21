@@ -1,0 +1,48 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "boar-snort",
+  "name": "Boar snort",
+  "category": "impact",
+  "description": "A made-up wild pig's voice: a short rattling snort through the nose, or a thin hard squeal. Change its pitch, length, squeal, grit and rattle.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/voice",
+    "themes": ["fantasy", "forest"],
+    "gameTypes": ["top-down-rpg", "turn-based-rpg", "roguelike-action"],
+    "words": ["boar", "pig", "hog", "snort", "grunt", "squeal", "oink", "animal", "beast", "creature", "charge", "hurt", "angry"],
+    "license": "draft"
+  },
+  "duration": "length + 0.02",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 80, "max": 260, "default": 140, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.2, "max": 0.7, "default": 0.35, "scale": "log" },
+    { "id": "rise", "label": "Squeal", "unit": "semitones", "min": -5, "max": 12, "default": 2, "step": 1 },
+    { "id": "grit", "label": "Grit", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "flutter", "label": "Rattle", "min": 0, "max": 1, "default": 0.6 }
+  ],
+  "nodes": [
+    { "id": "pv", "type": "rand", "lo": 0.96, "hi": 1.04 },
+    { "id": "fv", "type": "rand", "lo": 0.94, "hi": 1.06 },
+    { "id": "bend", "type": "env", "points": [[0, "pitch"], ["length * 0.75", "pitch * semi(rise)", "exp"]] },
+    { "id": "prog", "type": "env", "points": [[0, 0], ["length * 0.6", 1]] },
+    { "id": "sq", "type": "expr", "expr": "clamp(rise / 12, 0, 1) * prog" },
+    { "id": "throat", "type": "osc", "wave": "pulse", "width": 0.3, "freq": "bend * pv" },
+    { "id": "wob", "type": "osc", "freq": "(33 + flutter * 8) * fv" },
+    { "id": "chop", "type": "expr", "expr": "1 - (1 - pow(1 - flutter, 1.6)) * (1 - sq * 0.9) * 0.97 * (0.5 - 0.5 * tanh(wob * 2.5))" },
+    { "id": "rasp", "type": "shaper", "in": "throat", "drive": "1 + grit * 3 + sq * 2", "mode": "tanh" },
+    { "id": "nose1", "type": "filter", "mode": "bp", "in": "rasp", "freq": "700 * (1 + sq * 0.5)", "q": 3 },
+    { "id": "nose2", "type": "filter", "mode": "bp", "in": "rasp", "freq": "1500 * (1 + sq * 0.6)", "q": 4 },
+    { "id": "air", "type": "noise", "color": "pink" },
+    { "id": "breath", "type": "filter", "mode": "bp", "in": "air", "freq": 1100, "q": 0.8 },
+    { "id": "voice", "type": "expr", "expr": "(nose1 * (1 - sq * 0.6) + nose2 * (0.35 + grit * 0.7 + sq * 0.6) + rasp * 0.08 + breath * (0.5 + grit * 0.5) * (1 - sq * 0.7)) * chop" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "voice", "freq": "1400 + grit * 5000" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 40 },
+    { "id": "amp", "type": "env", "points": [[0, 0], [0.005, 1], ["length * 0.55", 0.8], ["length", 0, 1.6]] }
+  ],
+  "out": "clean * amp",
+  "presets": {
+    "Snort": {},
+    "Charge": { "length": 0.55, "rise": 5, "flutter": 0.9 },
+    "Squeal": { "pitch": 230, "rise": 12, "length": 0.45, "flutter": 0.2, "grit": 0.7 }
+  }
+}

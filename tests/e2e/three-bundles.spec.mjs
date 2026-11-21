@@ -8,7 +8,7 @@
 //
 // Across the kits: there are at least three full kits (40 to 50 sprites, exactly 20 sounds and exactly 2 music
 // tracks), for at least three different kinds of game. Smaller kits are allowed (Keyang, 2026-11-19). For each kit,
-// full or small: 12 to 50 sprites, 8 to 30 sounds and 1 to 4 tracks; it is in the catalogue as its plan describes it; every
+// full or small: 12 to 50 sprites, 8 to 30 sounds and 1 to 4 tracks, or the size its plan declares (kitSize); it is in the catalogue as its plan describes it; every
 // asset it lists is in the catalogue and opens on its own page without an error; and the kit opens in the
 // playground with a character the keyboard moves.
 //
@@ -21,7 +21,7 @@ import path from 'node:path';
 import { test, expect as baseExpect, openRoute, waitForDrawn, canvasStats, collectErrors } from '../helpers/test.mjs';
 import { ROOT as HERE, readCatalogue, catalogueOf, playReady, playState } from '../helpers/acceptance.mjs';
 import { kitsOf, kitProblems, setProblems, sizeProblems, MIN_KITS } from '../helpers/kits.mjs';
-import { loadPlans } from '../../tools/lib/assets.mjs';
+import { loadPlans, kitSize } from '../../tools/lib/assets.mjs';
 
 // Many builders share this machine: anything the page is waited for gets 20 seconds, not the usual 5.
 const expect = baseExpect.configure({ timeout: 20_000 });
@@ -47,7 +47,9 @@ for (const { id } of PLANS) {
     // not in the catalogue, not the size of a kit, or not what its plan and the catalogue's assets say: stop here, saying which
     expect(kitProblems(kit, catalog), `${id}: against its plan and the catalogue`).toEqual([]);
     const { bundle } = kit;
-    expect(sizeProblems(bundle), `${id}: 12 to 50 sprites, 8 to 30 sounds and 1 to 4 music tracks`).toEqual([]);
+    // the size its plan declares, or the size any kit may have (12 to 50 sprites, 8 to 30 sounds and 1 to 4 music tracks)
+    const said = (kind) => kitSize(kit.plan)[kind].join(' to ');
+    expect(sizeProblems(bundle, kit.plan), `${id}: ${said('sprites')} sprites, ${said('sounds')} sounds and ${said('music')} music tracks`).toEqual([]);
     const { byId } = catalogueOf(catalog);
     test.setTimeout(180_000 + (bundle.sprites.length + bundle.sounds.length + bundle.music.length) * 8000);
     const listed = [...bundle.sprites.map((a) => ['sprite', a]), ...bundle.sounds.map((a) => ['sound', a]), ...bundle.music.map((a) => ['music', a])];

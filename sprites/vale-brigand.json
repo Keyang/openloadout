@@ -1,0 +1,4970 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "vale-brigand",
+ "name": "Brigand (map)",
+ "blurb": "A hooded road brigand as seen on the map, walking and swinging a hatchet in four directions. Change the build, hood, cape, weapon and colours.",
+ "meta": {
+  "type": "character",
+  "role": "characters/enemy",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "roguelike-action"
+  ],
+  "view": "top-down",
+  "words": [
+   "bandit",
+   "brigand",
+   "thief",
+   "robber",
+   "outlaw",
+   "enemy",
+   "hood",
+   "axe",
+   "ambush",
+   "attack",
+   "walk",
+   "road"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  48,
+  48
+ ],
+ "pivot": [
+  24,
+  42
+ ],
+ "grounded": false,
+ "preview": "walk_down",
+ "styles": [
+  "pixel"
+ ],
+ "versions": [
+  {
+   "name": "Road brigand",
+   "params": {}
+  },
+  {
+   "name": "Helmeted raider",
+   "params": {
+    "headgear": "helmet",
+    "weapon": "sword",
+    "outfit": "#c9423a",
+    "metal": "#c2c9d6"
+   }
+  },
+  {
+   "name": "Bare-fisted thug",
+   "params": {
+    "weapon": "none",
+    "headgear": "none",
+    "cape": "none",
+    "build": 1,
+    "hairStyle": "short"
+   }
+  },
+  {
+   "name": "Forest outlaw",
+   "params": {
+    "outfit": "#4f9d57",
+    "trim": "#e6c96a",
+    "cape": "plain",
+    "capeLength": 1.2
+   }
+  },
+  {
+   "name": "Tall cutpurse",
+   "params": {
+    "height": 1,
+    "build": 0.2,
+    "outfit": "#2f8f9d",
+    "trim": "#5a5f7a",
+    "weaponLength": 0.65
+   }
+  }
+ ],
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "hair",
+   "label": "Hair",
+   "default": "#5a3a22",
+   "material": "plant",
+   "swatches": [
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0",
+    "#e670b0"
+   ]
+  },
+  {
+   "id": "outfit",
+   "label": "Tunic",
+   "default": "#8e3a4a",
+   "material": "cloth",
+   "swatches": [
+    "#8e3a4a",
+    "#c9423a",
+    "#2f8f9d",
+    "#7a4fc4",
+    "#4f9d57",
+    "#357a4c"
+   ]
+  },
+  {
+   "id": "trim",
+   "label": "Hood, cape and boots",
+   "default": "#9a6a3e",
+   "material": "cloth",
+   "swatches": [
+    "#9a6a3e",
+    "#5a5f7a",
+    "#e6c96a",
+    "#f0ead8",
+    "#c8553a"
+   ]
+  },
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#a8806a",
+   "material": "metal",
+   "swatches": [
+    "#a8806a",
+    "#c2c9d6",
+    "#a8a4a0",
+    "#f2c230"
+   ]
+  },
+  {
+   "id": "bottom",
+   "derive": {
+    "rule": "tone",
+    "of": "outfit",
+    "by": -0.6
+   },
+   "material": "cloth"
+  },
+  {
+   "id": "belt",
+   "derive": {
+    "rule": "bandTone",
+    "of": "trim",
+    "under": [
+     "outfit"
+    ]
+   },
+   "material": "cloth"
+  },
+  {
+   "id": "cloak",
+   "derive": {
+    "rule": "hueTone",
+    "of": "trim",
+    "tone": "dark"
+   },
+   "material": "cloth"
+  },
+  {
+   "id": "wood",
+   "default": "#9a6a3e",
+   "material": "wood",
+   "detail": true
+  },
+  {
+   "id": "haft",
+   "derive": {
+    "rule": "tone",
+    "of": "wood",
+    "by": -0.35
+   },
+   "material": "wood"
+  },
+  {
+   "id": "gold",
+   "default": "#f2c230",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "hip",
+     "spine",
+     "thiF",
+     "thiB",
+     "shnF",
+     "shnB",
+     "legF",
+     "legB",
+     "legIF",
+     "legIB"
+    ],
+    "by": [
+     0.82,
+     1.18
+    ]
+   }
+  },
+  {
+   "key": "build",
+   "kind": "range",
+   "label": "Build",
+   "lo": "Slim",
+   "hi": "Stocky",
+   "default": 0.7,
+   "scales": {
+    "bones": [
+     "shoulderF",
+     "shoulderB"
+    ],
+    "by": [
+     0.6,
+     1.3
+    ]
+   }
+  },
+  {
+   "key": "hairStyle",
+   "kind": "choice",
+   "label": "Hair",
+   "options": [
+    "spiky",
+    "short",
+    "long",
+    "ponytail"
+   ],
+   "default": "spiky",
+   "when": {
+    "headgear": [
+     "helmet",
+     "none"
+    ]
+   }
+  },
+  {
+   "key": "weapon",
+   "kind": "choice",
+   "label": "Weapon",
+   "options": [
+    "axe",
+    "sword",
+    "none"
+   ],
+   "default": "axe"
+  },
+  {
+   "key": "weaponLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "hood",
+    "helmet",
+    "none"
+   ],
+   "default": "hood"
+  },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "cape",
+   "kind": "choice",
+   "label": "Cape",
+   "options": [
+    "tattered",
+    "plain",
+    "none"
+   ],
+   "default": "tattered"
+  },
+  {
+   "key": "capeLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.3,
+   "max": 1.8,
+   "step": 0.05,
+   "default": 0.6
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin"
+  },
+  {
+   "key": "hair",
+   "kind": "colour",
+   "label": "Hair",
+   "when": {
+    "headgear": [
+     "helmet",
+     "none"
+    ]
+   }
+  },
+  {
+   "key": "outfit",
+   "kind": "colour",
+   "label": "Tunic"
+  },
+  {
+   "key": "trim",
+   "kind": "colour",
+   "label": "Hood, cape and boots"
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal",
+   "when": [
+    {
+     "weapon": [
+      "axe",
+      "sword"
+     ]
+    },
+    {
+     "headgear": [
+      "helmet"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "stride",
+   "kind": "range",
+   "label": "Stride",
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "weapon": {
+   "label": "Weapon",
+   "params": [
+    "weapon",
+    "weaponLength"
+   ],
+   "none": "none",
+   "socket": "hand",
+   "shapes": [
+    "axe",
+    "sword"
+   ]
+  },
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear",
+    "headgearSize"
+   ],
+   "none": "none",
+   "socket": "head",
+   "shapes": [
+    "hood",
+    "helmet"
+   ]
+  },
+  "cape": {
+   "label": "Cape",
+   "params": [
+    "cape",
+    "capeLength"
+   ],
+   "none": "none",
+   "socket": "back",
+   "shapes": [
+    "cape"
+   ]
+  }
+ },
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-topdown-sword",
+    "v": 1,
+    "paint": {
+     "top": "outfit",
+     "bottom": "bottom",
+     "boots": "trim",
+     "topFar": "outfit.dark",
+     "bottomFar": "bottom.dark"
+    },
+    "clips": []
+   },
+   "shapes": [
+    {
+     "id": "cuffB-down",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim"
+     },
+     "z": 60.5,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "cuffF-down",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim"
+     },
+     "z": 62.5,
+     "when": {
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "cuffB-up",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim"
+     },
+     "z": 32.5,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "cuffF-up",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim"
+     },
+     "z": 35.5,
+     "when": {
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "cuffB-side",
+     "kind": "stamp",
+     "on": "fistB",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim.dark"
+     },
+     "z": 6.5,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "cuffF-side",
+     "kind": "stamp",
+     "on": "fistF",
+     "at": [
+      -1,
+      0
+     ],
+     "rows": [
+      "ccc"
+     ],
+     "key": {
+      "c": "trim"
+     },
+     "z": 72.5,
+     "when": {
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "cape",
+     "kind": "use",
+     "use": "part:topdown-cape",
+     "v": 2,
+     "on": "chest",
+     "z": 0,
+     "paint": {
+      "cloth": "cloak",
+      "clasp": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "cape",
+       "pick": {
+        "tattered": "tattered",
+        "plain": "plain",
+        "none": "plain"
+       }
+      },
+      "length": {
+       "from": "capeLength",
+       "map": [
+        [
+         0.3,
+         0.3
+        ],
+        [
+         1.8,
+         1.8
+        ]
+       ]
+      }
+     },
+     "when": {
+      "cape": [
+       "tattered",
+       "plain"
+      ]
+     }
+    },
+    {
+     "id": "capeTips",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      7,
+      -9.5
+     ],
+     "rows": [
+      "daa............aad",
+      "daa............aad",
+      ".da............ad.",
+      ".d.............a..",
+      "...............d.."
+     ],
+     "key": {
+      "a": "cloak",
+      "d": "cloak.dark"
+     },
+     "z": 0.5,
+     "when": {
+      "direction": [
+       "down"
+      ],
+      "cape": [
+       "tattered"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 0.5,
+        "below": 0.775
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-plain-0p3",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "aaaaaa",
+      "aaaaaa"
+     ],
+     "key": {
+      "a": "cloak.dark"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "plain"
+      ],
+      "capeLength": [
+       {
+        "below": 0.4
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-plain-0p5",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "bbbbbb",
+      "aaaaaa",
+      "aaaaaa"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "plain"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 0.4,
+        "below": 0.6
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-plain-0p7",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "aaaaaa",
+      "aaaaaa"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "plain"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 0.6,
+        "below": 0.775
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-plain-0p85",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "abbbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "plain"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 0.775,
+        "below": 0.925
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-plain-1",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "abbbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "plain"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 0.925,
+        "below": 1.075
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-plain-1p15",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "abbbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "plain"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 1.075,
+        "below": 1.225
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-plain-1p3",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "abbbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "plain"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 1.225,
+        "below": 1.4
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-plain-1p5",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "abbbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "plain"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 1.4,
+        "below": 1.575
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-plain-1p65",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "abbbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "plain"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 1.575
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-tattered-0p3",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "aaaaaa",
+      ".aaaa."
+     ],
+     "key": {
+      "a": "cloak.dark"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "tattered"
+      ],
+      "capeLength": [
+       {
+        "below": 0.4
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-tattered-0p5",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "babbbb",
+      "aaabbb",
+      "aaaaa.",
+      ".aaa.."
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "tattered"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 0.4,
+        "below": 0.6
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-tattered-0p7",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "aabbbb",
+      "aaabbb",
+      "aaabab",
+      ".aaaa.",
+      ".aaa.."
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "tattered"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 0.6,
+        "below": 0.775
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-tattered-0p85",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "aabbab",
+      "aaabbb",
+      "aaabbb"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "tattered"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 0.775,
+        "below": 0.925
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-tattered-1",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "aabbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "tattered"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 0.925,
+        "below": 1.075
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-tattered-1p15",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "abbbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "tattered"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 1.075,
+        "below": 1.225
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-tattered-1p3",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "abbbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "tattered"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 1.225,
+        "below": 1.4
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-tattered-1p5",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "abbbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "tattered"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 1.4,
+        "below": 1.575
+       }
+      ]
+     }
+    },
+    {
+     "id": "capeBack-tattered-1p65",
+     "kind": "stamp",
+     "on": "chest",
+     "at": [
+      2,
+      -2.5
+     ],
+     "rows": [
+      "bbbbbb",
+      "abbbbb",
+      "abbbbb",
+      "abbbab",
+      "abbbab",
+      "abbbab"
+     ],
+     "key": {
+      "a": "cloak.dark",
+      "b": "cloak"
+     },
+     "z": 38,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "cape": [
+       "tattered"
+      ],
+      "capeLength": [
+       {
+        "atLeast": 1.575
+       }
+      ]
+     }
+    },
+    {
+     "id": "hem",
+     "kind": "use",
+     "use": "part:topdown-hem",
+     "v": 1,
+     "on": "waist",
+     "z": 40,
+     "paint": {
+      "trim": "trim"
+     }
+    },
+    {
+     "id": "belt",
+     "kind": "use",
+     "use": "part:topdown-belt",
+     "v": 2,
+     "on": "waist",
+     "z": 41,
+     "paint": {
+      "belt": "belt"
+     },
+     "when": [
+      {
+       "direction": [
+        "down",
+        "side"
+       ]
+      },
+      {
+       "cape": [
+        "none"
+       ]
+      },
+      {
+       "capeLength": [
+        {
+         "below": 0.6
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "hair",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "spiky": "spiky",
+        "short": "short",
+        "long": "long",
+        "ponytail": "ponytail"
+       }
+      },
+      "hatted": {
+       "from": "headgear",
+       "pick": {
+        "hood": true,
+        "helmet": true,
+        "none": false
+       }
+      }
+     },
+     "when": {
+      "headgear": [
+       "helmet",
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "hairCrown-up",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -5,
+      -3.5
+     ],
+     "rows": [
+      ".hhhh.h",
+      "h......"
+     ],
+     "key": {
+      "h": "hair.light"
+     },
+     "z": 58,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "headgear": [
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "hood",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "mask-down",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      2,
+      -4.5
+     ],
+     "rows": [
+      "mmmmmmmmm",
+      "mmmmmmmmm",
+      "mmmmmmmmm",
+      ".mmmmmmm."
+     ],
+     "key": {
+      "m": "outfit.dark"
+     },
+     "z": 53.5,
+     "when": {
+      "direction": [
+       "down"
+      ],
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "mask-side",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      2,
+      1.5
+     ],
+     "rows": [
+      "mmmmm",
+      "mmmm.",
+      "mmm..",
+      "mm..."
+     ],
+     "key": {
+      "m": "outfit.dark"
+     },
+     "z": 53.5,
+     "when": {
+      "direction": [
+       "side"
+      ],
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodRim-down",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -2,
+      -5.5
+     ],
+     "rows": [
+      "d",
+      "d",
+      "d",
+      "d",
+      "d",
+      "d"
+     ],
+     "key": {
+      "d": "trim.dark"
+     },
+     "z": 57,
+     "when": {
+      "direction": [
+       "down"
+      ],
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodRim-side",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -2,
+      0.5
+     ],
+     "rows": [
+      "d",
+      "d",
+      "d",
+      "d",
+      "d",
+      "d",
+      "d",
+      "d"
+     ],
+     "key": {
+      "d": "trim.dark"
+     },
+     "z": 57,
+     "when": {
+      "direction": [
+       "side"
+      ],
+      "headgear": [
+       "hood"
+      ],
+      "headgearSize": [
+       {
+        "atLeast": 0.9
+       }
+      ]
+     }
+    },
+    {
+     "id": "hoodRim-side-small",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -2,
+      1.5
+     ],
+     "rows": [
+      "d",
+      "d",
+      "d",
+      "d",
+      "d",
+      "d",
+      "d",
+      "d"
+     ],
+     "key": {
+      "d": "trim.dark"
+     },
+     "z": 57,
+     "when": {
+      "direction": [
+       "side"
+      ],
+      "headgear": [
+       "hood"
+      ],
+      "headgearSize": [
+       {
+        "below": 0.9
+       }
+      ]
+     }
+    },
+    {
+     "id": "hoodTip-down",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -10,
+      -2.5
+     ],
+     "rows": [
+      "..a..",
+      "..ad.",
+      ".aaad"
+     ],
+     "key": {
+      "a": "trim",
+      "d": "trim.dark"
+     },
+     "z": 50.5,
+     "when": {
+      "direction": [
+       "down"
+      ],
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodTip-up",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -10,
+      -2.5
+     ],
+     "rows": [
+      "..a..",
+      ".daa.",
+      "daaa."
+     ],
+     "key": {
+      "a": "trim",
+      "d": "trim.dark"
+     },
+     "z": 50.5,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodTip-side",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      -9,
+      -7.5
+     ],
+     "rows": [
+      ".da....",
+      ".daaa..",
+      "..da...",
+      ".d....."
+     ],
+     "key": {
+      "a": "trim",
+      "d": "trim.dark"
+     },
+     "z": 50.5,
+     "when": {
+      "direction": [
+       "side"
+      ],
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodEdge-up",
+     "kind": "stamp",
+     "on": "head",
+     "at": [
+      7,
+      -2.5
+     ],
+     "rows": [
+      "d...dd",
+      "....d.",
+      "...d.."
+     ],
+     "key": {
+      "d": "trim.dark"
+     },
+     "z": 57,
+     "when": {
+      "direction": [
+       "up"
+      ],
+      "headgear": [
+       "hood"
+      ],
+      "cape": [
+       "tattered",
+       "plain"
+      ]
+     }
+    },
+    {
+     "id": "helmet",
+     "kind": "use",
+     "use": "part:topdown-helmet",
+     "v": 2,
+     "on": "head",
+     "z": 50,
+     "paint": {
+      "metal": "metal",
+      "plume": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      }
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "sword",
+     "kind": "use",
+     "use": "held:topdown-weapon",
+     "v": 1,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "metal",
+      "wood": "haft",
+      "hilt": "gold"
+     },
+     "args": {
+      "kind": "sword",
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.15
+        ],
+        [
+         1.35,
+         14.85
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "axe",
+     "kind": "use",
+     "use": "held:topdown-weapon",
+     "v": 1,
+     "on": "reachF",
+     "z": 60,
+     "paint": {
+      "metal": "metal",
+      "wood": "haft",
+      "hilt": "gold"
+     },
+     "args": {
+      "kind": "axe",
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.5
+        ],
+        [
+         1.35,
+         13.5
+        ]
+       ]
+      }
+     },
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "axeEye-down",
+     "kind": "line",
+     "on": "reachF",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         1.5
+        ],
+        [
+         1.35,
+         8.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.5
+        ],
+        [
+         1.35,
+         13.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "haft",
+     "z": 61.199999999999996,
+     "when": {
+      "weapon": [
+       "axe"
+      ],
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "axeEdge-down",
+     "kind": "line",
+     "on": "reachF",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         1.2000000000000002
+        ],
+        [
+         1.35,
+         8.2
+        ]
+       ]
+      },
+      4.7
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.8
+        ],
+        [
+         1.35,
+         13.8
+        ]
+       ]
+      },
+      4.7
+     ],
+     "paint": "metal.light",
+     "z": 61.3,
+     "when": {
+      "weapon": [
+       "axe"
+      ],
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "swordEdge-down",
+     "kind": "line",
+     "on": "reachF",
+     "from": [
+      2.5,
+      -0.5
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.15
+        ],
+        [
+         1.35,
+         13.85
+        ]
+       ]
+      },
+      -0.5
+     ],
+     "paint": "metal.light",
+     "z": 61.3,
+     "when": {
+      "weapon": [
+       "sword"
+      ],
+      "direction": [
+       "down"
+      ]
+     }
+    },
+    {
+     "id": "axeEye-up",
+     "kind": "line",
+     "on": "reachF",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         1.5
+        ],
+        [
+         1.35,
+         8.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.5
+        ],
+        [
+         1.35,
+         13.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "haft",
+     "z": 1.2,
+     "when": {
+      "weapon": [
+       "axe"
+      ],
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "axeEdge-up",
+     "kind": "line",
+     "on": "reachF",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         1.2000000000000002
+        ],
+        [
+         1.35,
+         8.2
+        ]
+       ]
+      },
+      4.7
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.8
+        ],
+        [
+         1.35,
+         13.8
+        ]
+       ]
+      },
+      4.7
+     ],
+     "paint": "metal.light",
+     "z": 1.3,
+     "when": {
+      "weapon": [
+       "axe"
+      ],
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "swordEdge-up",
+     "kind": "line",
+     "on": "reachF",
+     "from": [
+      2.5,
+      -0.5
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.15
+        ],
+        [
+         1.35,
+         13.85
+        ]
+       ]
+      },
+      -0.5
+     ],
+     "paint": "metal.light",
+     "z": 1.3,
+     "when": {
+      "weapon": [
+       "sword"
+      ],
+      "direction": [
+       "up"
+      ]
+     }
+    },
+    {
+     "id": "axeEye-side",
+     "kind": "line",
+     "on": "reachF",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         1.5
+        ],
+        [
+         1.35,
+         8.5
+        ]
+       ]
+      },
+      0
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.5
+        ],
+        [
+         1.35,
+         13.5
+        ]
+       ]
+      },
+      0
+     ],
+     "paint": "haft",
+     "z": 65.2,
+     "when": {
+      "weapon": [
+       "axe"
+      ],
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "axeEdge-side",
+     "kind": "line",
+     "on": "reachF",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         1.2000000000000002
+        ],
+        [
+         1.35,
+         8.2
+        ]
+       ]
+      },
+      -4.7
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.8
+        ],
+        [
+         1.35,
+         13.8
+        ]
+       ]
+      },
+      -4.7
+     ],
+     "paint": "metal.light",
+     "z": 65.3,
+     "when": {
+      "weapon": [
+       "axe"
+      ],
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "swordEdge-side",
+     "kind": "line",
+     "on": "reachF",
+     "from": [
+      2.5,
+      0.5
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.15
+        ],
+        [
+         1.35,
+         13.85
+        ]
+       ]
+      },
+      0.5
+     ],
+     "paint": "metal.light",
+     "z": 65.3,
+     "when": {
+      "weapon": [
+       "sword"
+      ],
+      "direction": [
+       "side"
+      ]
+     }
+    },
+    {
+     "id": "dieTip",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -23.5,
+      -8.5
+     ],
+     "rows": [
+      "..........aaaaaaa.....",
+      "........aaaaaaaaa.....",
+      ".......aaaaaaaaaaa....",
+      "......baaaaaaaaaaaa...",
+      "......baaaaaaaaaaaa...",
+      "......baaaaaaaaaaaa...",
+      ".....baaaaaaaaaaaa....",
+      ".....babcaaaaacbaa....",
+      ".....bbaaaaaaaaaaa....",
+      ".....dbbaaaaaaaaad....",
+      ".eeeddbbabbbaaadd.....",
+      ".aaaddfbbbbbbbffdd....",
+      ".aaad.fdddddddffdd....",
+      ".fff..fdddddddffeee...",
+      "......fdddddddd.aaa...",
+      ".....fdddddddd.aaa....",
+      ".....eeeeeeeee........",
+      ".....ghh...ghh........",
+      ".....ghh...ghh........",
+      "....ggg...ggg.........",
+      "....iii...iii.........",
+      "....iii...iii.........",
+      "....jjj...jjj........."
+     ],
+     "key": {
+      "a": "skin",
+      "b": "skin.dark",
+      "c": "ink",
+      "d": "outfit",
+      "e": "trim",
+      "f": "outfit.dark",
+      "g": "bottom.dark",
+      "h": "bottom",
+      "i": "trim",
+      "j": "trim.dark"
+     },
+     "variants": {
+      "f2": [
+       "..........aaaaaaa.....",
+       "........aaaaaaaaa.....",
+       ".......aaaaaaaaaaa....",
+       "......baaaaaaaaaaaa...",
+       "......baaaaaaaaaaaa...",
+       "......baaaaaaaaaaaa...",
+       ".....baaaaaaaaaaaa....",
+       ".....babcaaaaacbaa....",
+       ".....bbaaaaaaaaaaa....",
+       ".....dbbaaaaaaaaad....",
+       ".eeeddbbabbbaaadd.....",
+       ".aaaddfbbbbbbbffdd....",
+       ".aaad.fdddddddffdd....",
+       ".fff..fdddddddffeee...",
+       "......fdddddddd.aaa...",
+       ".....fdddddddd.aaa....",
+       ".....eeeeeeeee........",
+       ".....ghh...ghh........",
+       ".....ghh...ghh........",
+       "....ggg...ggg.........",
+       "....iii...iii.........",
+       "....iii...iii.........",
+       "....jjj...jjj........."
+      ],
+      "f3": [
+       "......................",
+       "......................",
+       "......................",
+       "......................",
+       "..............aaaaaaa.",
+       "............aaaaaaaaa.",
+       "...........aaaaaaaaaaa",
+       ".........baaaaaaaaaaaa",
+       ".........baaaaaaaaaaaa",
+       "........baaaaaaaaaaaa.",
+       "........baaaaaaaaaaaa.",
+       ".......babcaaaaacbaa..",
+       ".......bbaaaaaaaaaaa..",
+       "....eeedbbaaaaaaaaad..",
+       "...aaadfbbabbbaaafdd..",
+       "...aaa..fbbbbbbbffdd..",
+       ".......fdddddddffdd...",
+       ".......fdddddddffeee..",
+       "......eeeeeeeee.aaa...",
+       "......ggg...ggg.aaa...",
+       ".....iii...iii........",
+       ".....iii...iii........",
+       "....jjj...jjj........."
+      ]
+     },
+     "z": 1,
+     "hidden": true
+    },
+    {
+     "id": "dieLie",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -9.5,
+      -0.5
+     ],
+     "rows": [
+      "..............................",
+      "...........aab................",
+      "...........aabccc.............",
+      "...........aabccccc..aaaaaa...",
+      ".............ddddcc.aaaaaaaa..",
+      "effghhhhhhbccddddddaaaiaaaaaa.",
+      "effghhhhhhbcccccddiaaajaaaaaaa",
+      "effgggggggbccccccciaaaaaaaaaaa",
+      "..........bccccccciiaaaaaaaaaa",
+      "..........bccccccciiaaaaaaaaaa",
+      "effghhhhhhbccccccciiaaaaaaaaaa",
+      "effghhhhhhbccccccciaaaaaaaaaaa",
+      "effgggggggbcccccddiiaajaaaaaaa",
+      "..........bdddddccciiaiaaaaaa.",
+      "..............ccccc.iiaaaaaa..",
+      "............aabcccd..iiiiii...",
+      "............aabcd.............",
+      "............aab..............."
+     ],
+     "key": {
+      "a": "skin",
+      "b": "trim",
+      "c": "outfit",
+      "d": "outfit.dark",
+      "e": "trim.dark",
+      "f": "trim",
+      "g": "bottom.dark",
+      "h": "bottom",
+      "i": "skin.dark",
+      "j": "ink"
+     },
+     "variants": {
+      "f4": [
+       "..............................",
+       "...........aab................",
+       "...........aabccc.............",
+       "...........aabccccc..aaaaaa...",
+       ".............ddddcc.aaaaaaaa..",
+       "effghhhhhhbccddddddaaaiaaaaaa.",
+       "effghhhhhhbcccccddiaaajaaaaaaa",
+       "effgggggggbccccccciaaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciaaaaaaaaaaa",
+       "effgggggggbcccccddiiaajaaaaaaa",
+       "..........bdddddccciiaiaaaaaa.",
+       "..............ccccc.iiaaaaaa..",
+       "............aabcccd..iiiiii...",
+       "............aabcd.............",
+       "............aab..............."
+      ],
+      "f5": [
+       "..............................",
+       "..........daab................",
+       "..........daabcc..............",
+       "..........daabccccc..aaaaaa...",
+       ".............ddddcc.aaaaaaaa..",
+       "effghhhhhhbccddddddaaaiaaaaaa.",
+       "effghhhhhhbcccccddiaaajaaaaaaa",
+       "effgggggggbccccccciaaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciaaaaaaaaaaa",
+       "effgggggggbccccdddiiaajaaaaaaa",
+       "..........bddddcccciiaiaaaaaa.",
+       "...........aabccccc.iiaaaaaa..",
+       "...........aabccddd..iiiiii...",
+       "...........aabd...............",
+       ".............................."
+      ],
+      "f6": [
+       "..............................",
+       "...........aab................",
+       "...........aabccc.............",
+       "...........aabccccc..aaaaaa...",
+       ".............ddddcc.aaaaaaaa..",
+       "effghhhhhhbccddddddaaaiaaaaaa.",
+       "effghhhhhhbcccccddiaaajaaaaaaa",
+       "effgggggggbccccccciaaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciaaaaaaaaaaa",
+       "effgggggggbcccccddiiaajaaaaaaa",
+       "..........bdddddccciiaiaaaaaa.",
+       ".............cccccc.iiaaaaaa..",
+       "...........daabcccd..iiiiii...",
+       "...........daabdd.............",
+       "...........daab..............."
+      ],
+      "f7": [
+       "..............................",
+       "..............................",
+       "..........aabcc...............",
+       "..........aabcccccc..aaaaaa...",
+       "..........aabddcccc.aaaaaaaa..",
+       "effghhhhhhbddddddddaaaiaaaaaa.",
+       "effghhhhhhbcccddddiaaajaaaaaaa",
+       "effgggggggbccccccciaaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "..........bccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciiaaaaaaaaaa",
+       "effghhhhhhbccccccciaaaaaaaaaaa",
+       "effgggggggbcccddddiiaajaaaaaaa",
+       "..........bdddccccciiaiaaaaaa.",
+       "..........aabcccccc.iiaaaaaa..",
+       "..........aabcccddd..iiiiii...",
+       "..........aabdd...............",
+       ".............................."
+      ]
+     },
+     "z": 1,
+     "hidden": true
+    },
+    {
+     "id": "capeLie2",
+     "kind": "use",
+     "use": "part:topdown-cape",
+     "v": 2,
+     "on": "root",
+     "z": 2,
+     "hidden": true,
+     "paint": {
+      "cloth": "cloak",
+      "clasp": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "cape",
+       "pick": {
+        "tattered": "tattered",
+        "plain": "plain",
+        "none": "plain"
+       }
+      },
+      "length": {
+       "from": "capeLength",
+       "map": [
+        [
+         0.3,
+         0.3
+        ],
+        [
+         1,
+         1
+        ],
+        [
+         1.8,
+         1.3
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "cape": [
+       "tattered",
+       "plain"
+      ]
+     }
+    },
+    {
+     "id": "capeLie3",
+     "kind": "use",
+     "use": "part:topdown-cape",
+     "v": 2,
+     "on": "root",
+     "z": 2,
+     "hidden": true,
+     "paint": {
+      "cloth": "cloak",
+      "clasp": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "cape",
+       "pick": {
+        "tattered": "tattered",
+        "plain": "plain",
+        "none": "plain"
+       }
+      },
+      "length": {
+       "from": "capeLength",
+       "map": [
+        [
+         0.3,
+         0.3
+        ],
+        [
+         1,
+         1
+        ],
+        [
+         1.8,
+         1.3
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "cape": [
+       "tattered",
+       "plain"
+      ]
+     }
+    },
+    {
+     "id": "capeLie",
+     "kind": "use",
+     "use": "part:topdown-cape",
+     "v": 2,
+     "on": "root",
+     "z": 2,
+     "hidden": true,
+     "paint": {
+      "cloth": "cloak",
+      "clasp": "gold"
+     },
+     "args": {
+      "kind": {
+       "from": "cape",
+       "pick": {
+        "tattered": "tattered",
+        "plain": "plain",
+        "none": "plain"
+       }
+      },
+      "length": {
+       "from": "capeLength",
+       "map": [
+        [
+         0.3,
+         0.3
+        ],
+        [
+         1,
+         1
+        ],
+        [
+         1.8,
+         1.3
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "cape": [
+       "tattered",
+       "plain"
+      ]
+     }
+    },
+    {
+     "id": "hairLie2",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "root",
+     "z": 4,
+     "hidden": true,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "spiky": "spiky",
+        "short": "short",
+        "long": "long",
+        "ponytail": "ponytail"
+       }
+      },
+      "hatted": {
+       "from": "headgear",
+       "pick": {
+        "hood": true,
+        "helmet": true,
+        "none": false
+       }
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "headgear": [
+       "helmet",
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "hairLie3",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "root",
+     "z": 4,
+     "hidden": true,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "spiky": "spiky",
+        "short": "short",
+        "long": "long",
+        "ponytail": "ponytail"
+       }
+      },
+      "hatted": {
+       "from": "headgear",
+       "pick": {
+        "hood": true,
+        "helmet": true,
+        "none": false
+       }
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "headgear": [
+       "helmet",
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "hairLie",
+     "kind": "use",
+     "use": "part:topdown-hair",
+     "v": 2,
+     "on": "root",
+     "z": 4,
+     "hidden": true,
+     "paint": {
+      "hair": "hair"
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "spiky": "spiky",
+        "short": "short",
+        "long": "long",
+        "ponytail": "ponytail"
+       }
+      },
+      "hatted": {
+       "from": "headgear",
+       "pick": {
+        "hood": true,
+        "helmet": true,
+        "none": false
+       }
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "headgear": [
+       "helmet",
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "maskLie2",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -15.5,
+      -1.5
+     ],
+     "rows": [
+      "mmmmmmmmmm",
+      "mmmmmmmmmm",
+      ".mmmmmmm.."
+     ],
+     "key": {
+      "m": "outfit.dark"
+     },
+     "z": 5,
+     "hidden": true,
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "maskLie3",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -11.5,
+      0.5
+     ],
+     "rows": [
+      "mmmmmmmmmm",
+      "mmmmmmmmmm",
+      ".mmmmmmm.."
+     ],
+     "key": {
+      "m": "outfit.dark"
+     },
+     "z": 5,
+     "hidden": true,
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "maskLie",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -4.5,
+      17.5
+     ],
+     "rows": [
+      ".mm",
+      "mmm",
+      "mmm",
+      "mmm",
+      "mmm",
+      "mmm",
+      "mmm",
+      "mmm",
+      ".mm"
+     ],
+     "key": {
+      "m": "outfit.dark"
+     },
+     "z": 5,
+     "hidden": true,
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodLie2",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "helmetLie2",
+     "kind": "use",
+     "use": "part:topdown-helmet",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "metal": "metal",
+      "plume": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "f2"
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "hoodLie3",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "helmetLie3",
+     "kind": "use",
+     "use": "part:topdown-helmet",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "metal": "metal",
+      "plume": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "f3"
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "hoodLie",
+     "kind": "use",
+     "use": "part:topdown-hood",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "cloth": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodTipLie2",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -27.5,
+      2.5
+     ],
+     "rows": [
+      "..a..",
+      "..ad.",
+      ".aaad"
+     ],
+     "key": {
+      "a": "trim",
+      "d": "trim.dark"
+     },
+     "z": 6.5,
+     "hidden": true,
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodTipLie3",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -23.5,
+      6.5
+     ],
+     "rows": [
+      "..a..",
+      "..ad.",
+      ".aaad"
+     ],
+     "key": {
+      "a": "trim",
+      "d": "trim.dark"
+     },
+     "z": 6.5,
+     "hidden": true,
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodTipLie",
+     "kind": "stamp",
+     "on": "root",
+     "at": [
+      -2.5,
+      30.5
+     ],
+     "rows": [
+      "a..",
+      "aaa",
+      "ad.",
+      "d.."
+     ],
+     "key": {
+      "a": "trim",
+      "d": "trim.dark"
+     },
+     "z": 6.5,
+     "hidden": true,
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "helmetLie",
+     "kind": "use",
+     "use": "part:topdown-helmet",
+     "v": 2,
+     "on": "root",
+     "z": 6,
+     "hidden": true,
+     "paint": {
+      "metal": "metal",
+      "plume": "trim"
+     },
+     "args": {
+      "size": {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1.35,
+         1.35
+        ]
+       ]
+      },
+      "pose": "lie"
+     },
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-down-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        10.8743
+       ],
+       [
+        1,
+        14
+       ],
+       [
+        1.35,
+        14
+       ]
+      ]
+     },
+     "a0": 141.5655,
+     "a1": 234.143,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-down-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        7.8743
+       ],
+       [
+        1,
+        11.3904
+       ],
+       [
+        1.35,
+        13
+       ]
+      ]
+     },
+     "a0": 164.4838,
+     "a1": 204.6509,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-down-5-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        6.403
+       ],
+       [
+        1,
+        8.9025
+       ],
+       [
+        1.35,
+        8.9025
+       ]
+      ]
+     },
+     "a0": 113.0415,
+     "a1": 169.035,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-down-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        10.289
+       ],
+       [
+        1,
+        13.0722
+       ],
+       [
+        1.35,
+        14.2092
+       ]
+      ]
+     },
+     "a0": 141.5655,
+     "a1": 235.3186,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-down-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        7.289
+       ],
+       [
+        1,
+        10.0722
+       ],
+       [
+        1.35,
+        11.7092
+       ]
+      ]
+     },
+     "a0": 164.4838,
+     "a1": 205.4738,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-down-5-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        5.8386
+       ],
+       [
+        1,
+        7.771
+       ],
+       [
+        1.35,
+        9.0844
+       ]
+      ]
+     },
+     "a0": 113.0415,
+     "a1": 170.3967,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-up-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        9.1474
+       ],
+       [
+        1,
+        12
+       ],
+       [
+        1.35,
+        12
+       ]
+      ]
+     },
+     "a0": -58.4877,
+     "a1": 43.9826,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-up-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        6.1474
+       ],
+       [
+        1,
+        9.7979
+       ],
+       [
+        1.35,
+        12.5
+       ]
+      ]
+     },
+     "a0": -35.5694,
+     "a1": 11.5226,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-up-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        8.5447
+       ],
+       [
+        1,
+        11.8395
+       ],
+       [
+        1.35,
+        12.1426
+       ]
+      ]
+     },
+     "a0": -58.4877,
+     "a1": 45.6018,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-up-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        5.5447
+       ],
+       [
+        1,
+        8.8395
+       ],
+       [
+        1.35,
+        11.1426
+       ]
+      ]
+     },
+     "a0": -35.5694,
+     "a1": 12.6561,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-side-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        14.1142
+       ],
+       [
+        1,
+        15
+       ],
+       [
+        1.35,
+        15
+       ]
+      ]
+     },
+     "a0": -159.0834,
+     "a1": 1.1922,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-side-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        11.1142
+       ],
+       [
+        1,
+        13
+       ],
+       [
+        1.35,
+        13
+       ]
+      ]
+     },
+     "a0": -109.2819,
+     "a1": -21.7261,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-side-5-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        7.0229
+       ],
+       [
+        1,
+        10.833
+       ],
+       [
+        1.35,
+        12.1641
+       ]
+      ]
+     },
+     "a0": -45.2145,
+     "a1": 26.8638,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-sword-side-5-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        4.0229
+       ],
+       [
+        1,
+        7.833
+       ],
+       [
+        1.35,
+        11.6641
+       ]
+      ]
+     },
+     "a0": -21.8721,
+     "a1": 3.9455,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-side-4-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        13.4642
+       ],
+       [
+        1,
+        15
+       ],
+       [
+        1.35,
+        15
+       ]
+      ]
+     },
+     "a0": -158.1873,
+     "a1": 1.1922,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-side-4-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        10.4642
+       ],
+       [
+        1,
+        13
+       ],
+       [
+        1.35,
+        13
+       ]
+      ]
+     },
+     "a0": -108.6546,
+     "a1": -21.7261,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-side-5-0",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        6.3845
+       ],
+       [
+        1,
+        9.8403
+       ],
+       [
+        1.35,
+        12.191
+       ]
+      ]
+     },
+     "a0": -46.1784,
+     "a1": 26.8638,
+     "thick": 2,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slash-axe-side-5-1",
+     "kind": "arc",
+     "on": "cuffF",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        3.3845
+       ],
+       [
+        1,
+        6.8403
+       ],
+       [
+        1.35,
+        10.691
+       ]
+      ]
+     },
+     "a0": -22.5469,
+     "a1": 3.9455,
+     "thick": 1,
+     "paint": "shine",
+     "glow": true,
+     "z": 95,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle_down": {
+   "label": "Idle (down)",
+   "from": "idle_down",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_up": {
+   "label": "Idle (up)",
+   "from": "idle_up",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "idle_side": {
+   "label": "Idle (side)",
+   "from": "idle_side",
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "first",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.59,
+        1
+       ],
+       [
+        0.6,
+        2
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_down": {
+   "label": "Walk (down)",
+   "from": "walk_down",
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Dirt path",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Dirt path",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.45
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_up": {
+   "label": "Walk (up)",
+   "from": "walk_up",
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Dirt path",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Dirt path",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.8
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.shnF",
+      "bones.thiB",
+      "bones.toeB"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.toeF",
+      "bones.shnB",
+      "stretch.legF",
+      "stretch.legB"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk_side": {
+   "label": "Walk (side)",
+   "from": "walk_side",
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Dirt path",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Dirt path",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "stretch.hip"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.3
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.7
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.2
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.thiF",
+      "bones.shnF",
+      "bones.toeF",
+      "bones.thiB",
+      "bones.shnB",
+      "bones.toeB",
+      "bones.legF",
+      "stretch.legF",
+      "bones.legB",
+      "stretch.legB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.9
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.8
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.elbF",
+      "bones.wriF",
+      "bones.cuffF",
+      "bones.handF",
+      "bones.rimAF",
+      "stretch.armF",
+      "stretch.rimAF",
+      "bones.armB",
+      "bones.elbB",
+      "bones.wriB",
+      "bones.cuffB",
+      "bones.handB",
+      "bones.rimAB",
+      "stretch.armB",
+      "stretch.rimAB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.spine"
+     ],
+     "about": 0,
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.5
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "attack_down": {
+   "label": "Attack (down)",
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "axe": "swing-axe-down",
+     "sword": "swing-down",
+     "none": "punch-down"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "frame": 3,
+     "preset": "Heavy blade",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "axe",
+       "sword"
+      ]
+     }
+    },
+    {
+     "sound": "whoosh",
+     "frame": 3,
+     "preset": "Quick swipe",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "none"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "4": {
+     "show": [
+      "slash-sword-down-4-0",
+      "slash-sword-down-4-1",
+      "slash-axe-down-4-0",
+      "slash-axe-down-4-1"
+     ]
+    },
+    "5": {
+     "show": [
+      "slash-sword-down-5-0",
+      "slash-axe-down-5-0"
+     ]
+    }
+   }
+  },
+  "attack_up": {
+   "label": "Attack (up)",
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "axe": "swing-axe-up",
+     "sword": "swing-up",
+     "none": "punch-up"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "frame": 3,
+     "preset": "Heavy blade",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "axe",
+       "sword"
+      ]
+     }
+    },
+    {
+     "sound": "whoosh",
+     "frame": 3,
+     "preset": "Quick swipe",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "none"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "4": {
+     "show": [
+      "slash-sword-up-4-0",
+      "slash-sword-up-4-1",
+      "slash-axe-up-4-0",
+      "slash-axe-up-4-1"
+     ],
+     "nudge": [
+      0,
+      1
+     ]
+    },
+    "5": {
+     "nudge": [
+      0,
+      1
+     ]
+    }
+   }
+  },
+  "attack_side": {
+   "label": "Attack (side)",
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "axe": "swing-axe-side",
+     "sword": "swing-side",
+     "none": "punch-side"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "frame": 3,
+     "preset": "Heavy blade",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "axe",
+       "sword"
+      ]
+     }
+    },
+    {
+     "sound": "whoosh",
+     "frame": 3,
+     "preset": "Quick swipe",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "none"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "4": {
+     "show": [
+      "slash-sword-side-4-0",
+      "slash-sword-side-4-1",
+      "slash-axe-side-4-0",
+      "slash-axe-side-4-1"
+     ]
+    },
+    "5": {
+     "show": [
+      "slash-sword-side-5-0",
+      "slash-sword-side-5-1",
+      "slash-axe-side-5-0",
+      "slash-axe-side-5-1"
+     ]
+    }
+   }
+  },
+  "hurt": {
+   "from": "hurt",
+   "sounds": [
+    {
+     "sound": "punch",
+     "frame": 0,
+     "preset": "Light jab",
+     "volume": 0.9
+    }
+   ]
+  },
+  "die": {
+   "from": "die",
+   "sounds": [
+    {
+     "sound": "punch",
+     "frame": 0,
+     "preset": "Heavy body blow",
+     "volume": 1
+    }
+   ],
+   "frameEdits": {
+    "2": {
+     "hide": [
+      "cape",
+      "hair",
+      "hood",
+      "helmet",
+      "hem",
+      "belt",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side",
+      "mask-down",
+      "mask-side",
+      "capeTips",
+      "hoodRim-down",
+      "hoodRim-side",
+      "hoodRim-side-small",
+      "hoodTip-down",
+      "hoodTip-up",
+      "hoodTip-side",
+      "hoodEdge-up"
+     ],
+     "show": [
+      "capeLie2",
+      "hairLie2",
+      "hoodLie2",
+      "helmetLie2",
+      "maskLie2",
+      "hoodTipLie2"
+     ]
+    },
+    "3": {
+     "hide": [
+      "cape",
+      "hair",
+      "hood",
+      "helmet",
+      "hem",
+      "belt",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side",
+      "mask-down",
+      "mask-side",
+      "capeTips",
+      "hoodRim-down",
+      "hoodRim-side",
+      "hoodRim-side-small",
+      "hoodTip-down",
+      "hoodTip-up",
+      "hoodTip-side",
+      "hoodEdge-up"
+     ],
+     "show": [
+      "capeLie3",
+      "hairLie3",
+      "hoodLie3",
+      "helmetLie3",
+      "maskLie3",
+      "hoodTipLie3"
+     ]
+    },
+    "4": {
+     "hide": [
+      "cape",
+      "hair",
+      "hood",
+      "helmet",
+      "hem",
+      "belt",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side",
+      "mask-down",
+      "mask-side",
+      "capeTips",
+      "hoodRim-down",
+      "hoodRim-side",
+      "hoodRim-side-small",
+      "hoodTip-down",
+      "hoodTip-up",
+      "hoodTip-side",
+      "hoodEdge-up"
+     ],
+     "show": [
+      "capeLie",
+      "hairLie",
+      "hoodLie",
+      "helmetLie",
+      "maskLie",
+      "hoodTipLie"
+     ]
+    },
+    "5": {
+     "hide": [
+      "cape",
+      "hair",
+      "hood",
+      "helmet",
+      "hem",
+      "belt",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side",
+      "mask-down",
+      "mask-side",
+      "capeTips",
+      "hoodRim-down",
+      "hoodRim-side",
+      "hoodRim-side-small",
+      "hoodTip-down",
+      "hoodTip-up",
+      "hoodTip-side",
+      "hoodEdge-up"
+     ],
+     "show": [
+      "capeLie",
+      "hairLie",
+      "hoodLie",
+      "helmetLie",
+      "maskLie",
+      "hoodTipLie"
+     ]
+    },
+    "6": {
+     "hide": [
+      "cape",
+      "hair",
+      "hood",
+      "helmet",
+      "hem",
+      "belt",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side",
+      "mask-down",
+      "mask-side",
+      "capeTips",
+      "hoodRim-down",
+      "hoodRim-side",
+      "hoodRim-side-small",
+      "hoodTip-down",
+      "hoodTip-up",
+      "hoodTip-side",
+      "hoodEdge-up"
+     ],
+     "show": [
+      "capeLie",
+      "hairLie",
+      "hoodLie",
+      "helmetLie",
+      "maskLie",
+      "hoodTipLie"
+     ]
+    },
+    "7": {
+     "hide": [
+      "cape",
+      "hair",
+      "hood",
+      "helmet",
+      "hem",
+      "belt",
+      "cuffB-down",
+      "cuffF-down",
+      "cuffB-up",
+      "cuffF-up",
+      "cuffB-side",
+      "cuffF-side",
+      "mask-down",
+      "mask-side",
+      "capeTips",
+      "hoodRim-down",
+      "hoodRim-side",
+      "hoodRim-side-small",
+      "hoodTip-down",
+      "hoodTip-up",
+      "hoodTip-side",
+      "hoodEdge-up"
+     ],
+     "show": [
+      "capeLie",
+      "hairLie",
+      "hoodLie",
+      "helmetLie",
+      "maskLie",
+      "hoodTipLie"
+     ]
+    }
+   }
+  }
+ }
+}

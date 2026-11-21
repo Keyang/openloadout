@@ -1,0 +1,45 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "stairs-steps",
+ "name": "Stairs",
+ "category": "movement",
+ "description": "A run of soft footsteps on a stone stair, fading as they go away. Change how many steps, the time between them, whether they go down or up, the pitch and the brightness.",
+ "meta": {
+  "type": "sfx",
+  "role": "world/door",
+  "themes": ["fantasy", "dungeon"],
+  "gameTypes": ["top-down-rpg", "turn-based-rpg"],
+  "words": ["stairs", "staircase", "steps", "footsteps", "descend", "climb", "floor", "exit", "enter", "cave", "stone", "transition"],
+  "license": "draft"
+ },
+ "duration": "(steps - 1) * speed + 0.2",
+ "params": [
+  { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 150, "max": 500, "default": 260, "scale": "log", "hint": "The first step" },
+  { "id": "steps", "label": "Steps", "min": 3, "max": 8, "default": 5, "step": 1 },
+  { "id": "speed", "label": "Time between steps", "unit": "s", "min": 0.08, "max": 0.18, "default": 0.12 },
+  { "id": "drop", "label": "Direction", "unit": "semitones", "min": -6, "max": 6, "default": 4, "step": 1, "hint": "Above the middle the steps fall, going down; below it they rise, going up" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.4 }
+ ],
+ "nodes": [
+  { "id": "tick", "type": "clock", "rate": "1 / speed", "count": "steps" },
+  { "id": "idx", "type": "expr", "expr": "min(steps - 1, floor(t / speed + 0.01))" },
+  { "id": "level", "type": "expr", "expr": "pow(0.88, idx)" },
+  { "id": "grain", "type": "noise", "seed": 7 },
+  { "id": "tapAmp", "type": "ad", "attack": 0.0005, "decay": 0.006, "curve": 2, "trig": "tick" },
+  { "id": "hitAmp", "type": "ad", "attack": 0.0004, "decay": 0.002, "curve": 2, "trig": "tick" },
+  { "id": "tap", "type": "filter", "mode": "lp", "in": "hitAmp * level", "freq": "900 + bright * 4500", "q": 0.6 },
+  { "id": "knock", "type": "modal", "in": "tap", "freq": "pitch * semi(-drop * idx / (steps - 1))", "ratios": [1, 2.3, 4.1], "gains": [0.3, 1, 0.85], "decay": 0.09, "tilt": "0.6 - bright * 0.35" },
+  { "id": "scuff", "type": "filter", "mode": "bp", "in": "grain * tapAmp * level", "freq": "1100 + bright * 1800", "q": 0.8 },
+  { "id": "dry", "type": "expr", "expr": "knock * 0.06 + scuff * (0.8 + bright * 1.2)" },
+  { "id": "room", "type": "reverb", "in": "dry", "size": 0.35, "damp": "0.7 - bright * 0.3", "mix": 0.12 },
+  { "id": "fade", "type": "env", "points": [[0, 1], ["(steps - 1) * speed + 0.08", 1], ["(steps - 1) * speed + 0.195", 0, 1.5]] },
+  { "id": "tone", "type": "filter", "mode": "lp", "in": "room * fade", "freq": "2200 + bright * 9000", "q": 0.6 },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 60 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Going down": {},
+  "Going up": { "drop": -4 },
+  "Long stair": { "steps": 8, "speed": 0.1, "drop": 6 }
+ }
+}

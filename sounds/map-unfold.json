@@ -1,0 +1,45 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "map-unfold",
+  "name": "Map unfold",
+  "category": "ui",
+  "description": "A sheet of stiff paper opened with a crackle and a soft flap, for a map or a letter. Change the sheet's size, the length, the brightness, the crinkle and the number of folds.",
+  "meta": {
+    "type": "sfx",
+    "role": "interface/click",
+    "themes": ["fantasy", "neutral"],
+    "gameTypes": ["top-down-rpg", "turn-based-rpg"],
+    "words": ["map", "paper", "unfold", "open", "close", "scroll", "parchment", "letter", "page", "rustle", "crinkle", "menu", "read"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "size", "label": "Size", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.15, "max": 0.25, "default": 0.2, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "crinkle", "label": "Crinkle", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "folds", "label": "Folds", "min": 1, "max": 3, "default": 2, "step": 1 }
+  ],
+  "nodes": [
+    { "id": "sheet", "type": "noise", "seed": 31 },
+    { "id": "foldTick", "type": "clock", "rate": "folds / (length - 0.04)", "count": "folds" },
+    { "id": "burst", "type": "ad", "attack": 0.003, "decay": "(length - 0.04) / folds * (0.62 + size * 0.36)", "curve": 1.6, "trig": "foldTick" },
+    { "id": "glide", "type": "env", "trig": "foldTick", "points": [[0, "2500 * 2^((0.5 - size) * 1.4 + (bright - 0.5) * 0.9)"], ["(length - 0.04) / folds", "5000 * 2^((0.5 - size) * 1.4 + (bright - 0.5) * 0.9)", "exp"]] },
+    { "id": "band", "type": "filter", "mode": "bp", "in": "sheet", "freq": "glide", "q": 1.3 },
+    { "id": "airy", "type": "filter", "mode": "hp", "in": "sheet", "freq": 7000 },
+    { "id": "fineTick", "type": "clock", "rate": "70 + crinkle * 420" },
+    { "id": "creases", "type": "pattern", "trig": "fineTick", "steps": "X.xX..o.Xx...X.oX..x.X.x" },
+    { "id": "crackle", "type": "ad", "attack": 0.0004, "decay": 0.0035, "curve": 2, "trig": "creases" },
+    { "id": "paper", "type": "expr", "expr": "(band + airy * bright * 0.5) * burst * (0.3 + crackle * (0.9 + crinkle * 0.5)) * (1 - 0.55 * t / dur)" },
+    { "id": "puff", "type": "noise", "seed": 47 },
+    { "id": "flapTick", "type": "clock", "rate": 1, "count": 1, "delay": "length - 0.04" },
+    { "id": "flapAmp", "type": "ad", "attack": 0.005, "decay": 0.03, "curve": 1.5, "trig": "flapTick" },
+    { "id": "flap", "type": "filter", "mode": "lp", "in": "puff", "freq": "500 * 2^((0.5 - size) * 0.8)", "q": 0.7 }
+  ],
+  "out": "paper + flap * flapAmp * 1.1",
+  "presets": {
+    "Open map": {},
+    "Close map": { "folds": 1, "length": 0.15, "crinkle": 0.3 },
+    "Big chart": { "size": 0.9, "folds": 3, "length": 0.25 }
+  }
+}

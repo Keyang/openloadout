@@ -1,0 +1,4245 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "cut-bush",
+ "name": "Bush",
+ "blurb": "A bush that blocks the way until it is cut down to a stump, and grows back. Make it round, wide or tall, add berries or blossom, and change its size and colours.",
+ "meta": {
+  "type": "prop",
+  "role": "world/prop",
+  "themes": [
+   "fantasy",
+   "forest",
+   "farm"
+  ],
+  "gameTypes": [
+   "top-down-rpg",
+   "turn-based-rpg",
+   "farming-sim"
+  ],
+  "view": "top-down",
+  "words": [
+   "bush",
+   "shrub",
+   "hedge",
+   "leaves",
+   "cut",
+   "slash",
+   "stump",
+   "grow",
+   "hide",
+   "berries",
+   "grass",
+   "garden"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  30
+ ],
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "versions": [
+  {
+   "name": "Green bush",
+   "params": {}
+  },
+  {
+   "name": "Berry bush",
+   "params": {
+    "fruit": "berries",
+    "fruitColour": "#f2c230"
+   }
+  },
+  {
+   "name": "Blossom hedge",
+   "params": {
+    "shape": "wide",
+    "fruit": "blossom"
+   }
+  },
+  {
+   "name": "Autumn shrub",
+   "params": {
+    "leaf": "#c8553a",
+    "shape": "tall",
+    "size": 1
+   }
+  },
+  {
+   "name": "Dry thicket",
+   "params": {
+    "leaf": "#e6c96a",
+    "wood": "#9a6a3e",
+    "size": 0
+   }
+  }
+ ],
+ "palette": [
+  {
+   "id": "leaf",
+   "label": "Leaves",
+   "default": "#4f9d57",
+   "material": "plant",
+   "swatches": [
+    "#4f9d57",
+    "#357a4c",
+    "#e6c96a",
+    "#c8553a",
+    "#2f8f9d"
+   ]
+  },
+  {
+   "id": "wood",
+   "label": "Stump",
+   "default": "#8e3a4a",
+   "material": "wood",
+   "swatches": [
+    "#8e3a4a",
+    "#9a6a3e",
+    "#c9a06a",
+    "#a8a4a0"
+   ]
+  },
+  {
+   "id": "fruitColour",
+   "label": "Fruit",
+   "default": "#f0ead8",
+   "material": "paint",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#c9423a",
+    "#7a4fc4",
+    "#4fd8ee"
+   ]
+  },
+  {
+   "id": "petal-eye",
+   "material": "paint",
+   "derive": {
+    "rule": "apart",
+    "of": "shine",
+    "from": [
+     [
+      "fruitColour",
+      0.25
+     ]
+    ],
+    "least": 0.25
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "shape",
+   "kind": "choice",
+   "label": "Shape",
+   "options": [
+    "round",
+    "wide",
+    "tall"
+   ],
+   "default": "round"
+  },
+  {
+   "key": "leaf",
+   "kind": "colour",
+   "label": "Leaves"
+  },
+  {
+   "key": "wood",
+   "kind": "colour",
+   "label": "Stump"
+  },
+  {
+   "key": "fruit",
+   "kind": "choice",
+   "label": "Fruit",
+   "options": [
+    "none",
+    "berries",
+    "blossom"
+   ],
+   "default": "none"
+  },
+  {
+   "key": "fruitColour",
+   "kind": "colour",
+   "label": "Fruit",
+   "when": {
+    "fruit": [
+     "berries",
+     "blossom"
+    ]
+   }
+  },
+  {
+   "key": "sway",
+   "kind": "range",
+   "label": "Sway",
+   "lo": "Still",
+   "hi": "Swaying",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "fruit": {
+   "label": "Fruit",
+   "params": [
+    "fruit"
+   ],
+   "none": "none",
+   "shapes": [
+    "berries-round-l",
+    "blossom-round-l",
+    "berries-round-r",
+    "blossom-round-r",
+    "berries-round-t",
+    "blossom-round-t",
+    "berries-wide-1",
+    "blossom-wide-1",
+    "berries-wide-4",
+    "blossom-wide-4",
+    "berries-wide-2",
+    "blossom-wide-2",
+    "berries-wide-3",
+    "blossom-wide-3",
+    "berries-tall-b",
+    "blossom-tall-b",
+    "berries-tall-m",
+    "blossom-tall-m",
+    "berries-tall-t",
+    "blossom-tall-t"
+   ]
+  }
+ },
+ "body": {
+  "pictures": {
+   "nodes": [
+    {
+     "id": "bush",
+     "parent": null,
+     "at": [
+      16,
+      30
+     ]
+    },
+    {
+     "id": "trunk",
+     "parent": "bush",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "crown",
+     "parent": "bush",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "round-l",
+     "parent": "crown",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "round-r",
+     "parent": "crown",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "round-t",
+     "parent": "crown",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "wide-1",
+     "parent": "crown",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "wide-4",
+     "parent": "crown",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "wide-2",
+     "parent": "crown",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "wide-3",
+     "parent": "crown",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "tall-b",
+     "parent": "crown",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "tall-m",
+     "parent": "crown",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "tall-t",
+     "parent": "crown",
+     "at": [
+      0,
+      0
+     ]
+    }
+   ],
+   "draw": [
+    {
+     "id": "foot",
+     "kind": "rect",
+     "on": "trunk",
+     "at": [
+      -2,
+      -3
+     ],
+     "size": [
+      4,
+      3
+     ],
+     "paint": "wood"
+    },
+    {
+     "id": "foot-shade",
+     "kind": "rect",
+     "on": "trunk",
+     "at": [
+      -2,
+      -3
+     ],
+     "size": [
+      1,
+      3
+     ],
+     "paint": "wood.dark"
+    },
+    {
+     "id": "leaf-round-l",
+     "kind": "ellipse",
+     "on": "round-l",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -4.5
+        ],
+        [
+         0.5,
+         -5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "half"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -6
+        ],
+        [
+         0.5,
+         -6.5
+        ],
+        [
+         1,
+         -7
+        ]
+       ],
+       "round": "half"
+      }
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5.5
+        ],
+        [
+         0.5,
+         6
+        ],
+        [
+         1,
+         7
+        ]
+       ],
+       "round": "none"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.5,
+         5.5
+        ],
+        [
+         1,
+         6
+        ]
+       ],
+       "round": "none"
+      }
+     ],
+     "paint": "leaf",
+     "shade": 2,
+     "group": "leaves",
+     "when": {
+      "shape": [
+       "round"
+      ]
+     }
+    },
+    {
+     "id": "leaf-round-r",
+     "kind": "ellipse",
+     "on": "round-r",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         4.5
+        ],
+        [
+         0.5,
+         5.5
+        ],
+        [
+         1,
+         6
+        ]
+       ],
+       "round": "half"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -6
+        ],
+        [
+         0.5,
+         -6.5
+        ],
+        [
+         1,
+         -7
+        ]
+       ],
+       "round": "half"
+      }
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5.8
+        ],
+        [
+         0.5,
+         6.3
+        ],
+        [
+         1,
+         7.3
+        ]
+       ],
+       "round": "none"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.5,
+         5.5
+        ],
+        [
+         1,
+         6
+        ]
+       ],
+       "round": "none"
+      }
+     ],
+     "paint": "leaf",
+     "shade": 2,
+     "group": "leaves",
+     "when": {
+      "shape": [
+       "round"
+      ]
+     }
+    },
+    {
+     "id": "leaf-round-t",
+     "kind": "ellipse",
+     "on": "round-t",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         0
+        ],
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1,
+         0
+        ]
+       ],
+       "round": "half"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         0.5,
+         -10
+        ],
+        [
+         1,
+         -11
+        ]
+       ],
+       "round": "half"
+      }
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         6.5
+        ],
+        [
+         0.5,
+         7.5
+        ],
+        [
+         1,
+         8.5
+        ]
+       ],
+       "round": "none"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.5,
+         6
+        ],
+        [
+         1,
+         7
+        ]
+       ],
+       "round": "none"
+      }
+     ],
+     "paint": "leaf",
+     "shade": 2,
+     "group": "leaves",
+     "when": {
+      "shape": [
+       "round"
+      ]
+     }
+    },
+    {
+     "id": "leaf-wide-1",
+     "kind": "ellipse",
+     "on": "wide-1",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -6
+        ],
+        [
+         0.5,
+         -6.5
+        ],
+        [
+         1,
+         -7
+        ]
+       ],
+       "round": "half"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -6
+        ],
+        [
+         0.5,
+         -6.5
+        ],
+        [
+         1,
+         -7
+        ]
+       ],
+       "round": "half"
+      }
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.5,
+         5.5
+        ],
+        [
+         1,
+         6
+        ]
+       ],
+       "round": "none"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.5,
+         5.5
+        ],
+        [
+         1,
+         6
+        ]
+       ],
+       "round": "none"
+      }
+     ],
+     "paint": "leaf",
+     "shade": 2,
+     "group": "leaves",
+     "when": {
+      "shape": [
+       "wide"
+      ]
+     }
+    },
+    {
+     "id": "leaf-wide-4",
+     "kind": "ellipse",
+     "on": "wide-4",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         6
+        ],
+        [
+         0.5,
+         6.5
+        ],
+        [
+         1,
+         7
+        ]
+       ],
+       "round": "half"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -6
+        ],
+        [
+         0.5,
+         -6.5
+        ],
+        [
+         1,
+         -7
+        ]
+       ],
+       "round": "half"
+      }
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.5,
+         5.5
+        ],
+        [
+         1,
+         6
+        ]
+       ],
+       "round": "none"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.5,
+         5.5
+        ],
+        [
+         1,
+         6
+        ]
+       ],
+       "round": "none"
+      }
+     ],
+     "paint": "leaf",
+     "shade": 2,
+     "group": "leaves",
+     "when": {
+      "shape": [
+       "wide"
+      ]
+     }
+    },
+    {
+     "id": "leaf-wide-2",
+     "kind": "ellipse",
+     "on": "wide-2",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -3
+        ],
+        [
+         0.5,
+         -3
+        ],
+        [
+         1,
+         -3.5
+        ]
+       ],
+       "round": "half"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -8
+        ],
+        [
+         0.5,
+         -8.5
+        ],
+        [
+         1,
+         -9
+        ]
+       ],
+       "round": "half"
+      }
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5.5
+        ],
+        [
+         0.5,
+         6
+        ],
+        [
+         1,
+         6.5
+        ]
+       ],
+       "round": "none"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         6
+        ],
+        [
+         0.5,
+         6.5
+        ],
+        [
+         1,
+         7
+        ]
+       ],
+       "round": "none"
+      }
+     ],
+     "paint": "leaf",
+     "shade": 2,
+     "group": "leaves",
+     "when": {
+      "shape": [
+       "wide"
+      ]
+     }
+    },
+    {
+     "id": "leaf-wide-3",
+     "kind": "ellipse",
+     "on": "wide-3",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         3
+        ],
+        [
+         0.5,
+         3
+        ],
+        [
+         1,
+         3.5
+        ]
+       ],
+       "round": "half"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -7
+        ],
+        [
+         0.5,
+         -7.5
+        ],
+        [
+         1,
+         -8
+        ]
+       ],
+       "round": "half"
+      }
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5.5
+        ],
+        [
+         0.5,
+         6
+        ],
+        [
+         1,
+         6.5
+        ]
+       ],
+       "round": "none"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.5,
+         5.5
+        ],
+        [
+         1,
+         6
+        ]
+       ],
+       "round": "none"
+      }
+     ],
+     "paint": "leaf",
+     "shade": 2,
+     "group": "leaves",
+     "when": {
+      "shape": [
+       "wide"
+      ]
+     }
+    },
+    {
+     "id": "leaf-tall-b",
+     "kind": "ellipse",
+     "on": "tall-b",
+     "at": [
+      0,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         0.5,
+         -5
+        ],
+        [
+         1,
+         -5.5
+        ]
+       ],
+       "round": "half"
+      }
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         10
+        ],
+        [
+         0.5,
+         10
+        ],
+        [
+         1,
+         11
+        ]
+       ],
+       "round": "none"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         0.5,
+         4
+        ],
+        [
+         1,
+         4.5
+        ]
+       ],
+       "round": "none"
+      }
+     ],
+     "paint": "leaf",
+     "shade": 2,
+     "group": "leaves",
+     "when": {
+      "shape": [
+       "tall"
+      ]
+     }
+    },
+    {
+     "id": "leaf-tall-m",
+     "kind": "ellipse",
+     "on": "tall-m",
+     "at": [
+      -1,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -10
+        ],
+        [
+         0.5,
+         -11
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "half"
+      }
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         7.5
+        ],
+        [
+         0.5,
+         8
+        ],
+        [
+         1,
+         9
+        ]
+       ],
+       "round": "none"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         3
+        ],
+        [
+         0.5,
+         3
+        ],
+        [
+         1,
+         3.5
+        ]
+       ],
+       "round": "none"
+      }
+     ],
+     "paint": "leaf",
+     "shade": 2,
+     "group": "leaves",
+     "when": {
+      "shape": [
+       "tall"
+      ]
+     }
+    },
+    {
+     "id": "leaf-tall-t",
+     "kind": "ellipse",
+     "on": "tall-t",
+     "at": [
+      1.5,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13.5
+        ],
+        [
+         0.5,
+         -15
+        ],
+        [
+         1,
+         -16.5
+        ]
+       ],
+       "round": "half"
+      }
+     ],
+     "r": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         4.8
+        ],
+        [
+         0.5,
+         5.5
+        ],
+        [
+         1,
+         6.4
+        ]
+       ],
+       "round": "none"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         2.5
+        ],
+        [
+         0.5,
+         3
+        ],
+        [
+         1,
+         3.5
+        ]
+       ],
+       "round": "none"
+      }
+     ],
+     "paint": "leaf",
+     "shade": 2,
+     "group": "leaves",
+     "when": {
+      "shape": [
+       "tall"
+      ]
+     }
+    },
+    {
+     "id": "notch",
+     "kind": "cut",
+     "on": "trunk",
+     "shape": {
+      "kind": "rect",
+      "at": [
+       -2,
+       -3
+      ],
+      "size": [
+       4,
+       3
+      ]
+     },
+     "from": "leaves",
+     "when": {
+      "shape": [
+       "tall"
+      ]
+     }
+    },
+    {
+     "id": "tick-round-l",
+     "kind": "stamp",
+     "on": "round-l",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -3.5
+        ],
+        [
+         0.5,
+         -4
+        ],
+        [
+         1,
+         -5
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -7
+        ],
+        [
+         0.5,
+         -7.5
+        ],
+        [
+         1,
+         -8
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "..ll...",
+      ".....ll",
+      "ll.....",
+      "...ll.."
+     ],
+     "key": {
+      "l": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "round"
+      ]
+     }
+    },
+    {
+     "id": "tick-round-r",
+     "kind": "stamp",
+     "on": "round-r",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5.5
+        ],
+        [
+         0.5,
+         6.5
+        ],
+        [
+         1,
+         7
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -7
+        ],
+        [
+         0.5,
+         -7.5
+        ],
+        [
+         1,
+         -8
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "...ll..",
+      "ll.....",
+      ".....ll",
+      "..ll..."
+     ],
+     "key": {
+      "l": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "round"
+      ]
+     }
+    },
+    {
+     "id": "tick-round-t",
+     "kind": "stamp",
+     "on": "round-t",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         1
+        ],
+        [
+         0.5,
+         1.5
+        ],
+        [
+         1,
+         1
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -10
+        ],
+        [
+         0.5,
+         -11
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "..ll...",
+      ".....ll",
+      "ll.....",
+      "...ll.."
+     ],
+     "key": {
+      "l": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "round"
+      ]
+     }
+    },
+    {
+     "id": "tick-wide-1",
+     "kind": "stamp",
+     "on": "wide-1",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         0.5,
+         -5.5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -7
+        ],
+        [
+         0.5,
+         -7.5
+        ],
+        [
+         1,
+         -8
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "..ll...",
+      ".....ll",
+      "ll.....",
+      "...ll.."
+     ],
+     "key": {
+      "l": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ]
+     }
+    },
+    {
+     "id": "tick-wide-4",
+     "kind": "stamp",
+     "on": "wide-4",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         7
+        ],
+        [
+         0.5,
+         7.5
+        ],
+        [
+         1,
+         8
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -7
+        ],
+        [
+         0.5,
+         -7.5
+        ],
+        [
+         1,
+         -8
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "...ll..",
+      "ll.....",
+      ".....ll",
+      "..ll..."
+     ],
+     "key": {
+      "l": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ]
+     }
+    },
+    {
+     "id": "tick-wide-2",
+     "kind": "stamp",
+     "on": "wide-2",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -2
+        ],
+        [
+         0.5,
+         -2
+        ],
+        [
+         1,
+         -2.5
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         0.5,
+         -9.5
+        ],
+        [
+         1,
+         -10
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "...ll..",
+      "ll.....",
+      ".....ll",
+      "..ll..."
+     ],
+     "key": {
+      "l": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ]
+     }
+    },
+    {
+     "id": "tick-wide-3",
+     "kind": "stamp",
+     "on": "wide-3",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         0.5,
+         4
+        ],
+        [
+         1,
+         4.5
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -8
+        ],
+        [
+         0.5,
+         -8.5
+        ],
+        [
+         1,
+         -9
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "..ll...",
+      ".....ll",
+      "ll.....",
+      "...ll.."
+     ],
+     "key": {
+      "l": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ]
+     }
+    },
+    {
+     "id": "tick-tall-b",
+     "kind": "stamp",
+     "on": "tall-b",
+     "at": [
+      -3,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5.5
+        ],
+        [
+         0.5,
+         -5.5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "..ll...",
+      ".....ll",
+      "ll.....",
+      "...ll.."
+     ],
+     "key": {
+      "l": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "tall"
+      ]
+     }
+    },
+    {
+     "id": "tick-tall-m",
+     "kind": "stamp",
+     "on": "tall-m",
+     "at": [
+      1,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -10
+        ],
+        [
+         0.5,
+         -11
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "...ll..",
+      "ll.....",
+      ".....ll",
+      "..ll..."
+     ],
+     "key": {
+      "l": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "tall"
+      ]
+     }
+    },
+    {
+     "id": "tick-tall-t",
+     "kind": "stamp",
+     "on": "tall-t",
+     "at": [
+      1,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13.5
+        ],
+        [
+         0.5,
+         -15
+        ],
+        [
+         1,
+         -16.5
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".ll..",
+      "...ll",
+      "ll..."
+     ],
+     "key": {
+      "l": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "tall"
+      ]
+     }
+    },
+    {
+     "id": "berries-round-l",
+     "kind": "stamp",
+     "on": "round-l",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5.5
+        ],
+        [
+         0.5,
+         -6
+        ],
+        [
+         1,
+         -7
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         0.5,
+         -5.5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "bw....",
+      "db....",
+      "....bw",
+      "....db"
+     ],
+     "key": {
+      "b": "fruitColour",
+      "d": "fruitColour.dark",
+      "w": "shine"
+     },
+     "when": {
+      "shape": [
+       "round"
+      ],
+      "fruit": [
+       "berries"
+      ]
+     }
+    },
+    {
+     "id": "blossom-round-l",
+     "kind": "stamp",
+     "on": "round-l",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5.5
+        ],
+        [
+         0.5,
+         -6
+        ],
+        [
+         1,
+         -7
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         0.5,
+         -5.5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".f.....",
+      "fcf....",
+      ".f.....",
+      ".....f.",
+      "....fcf",
+      ".....f."
+     ],
+     "key": {
+      "f": "fruitColour",
+      "c": "petal-eye"
+     },
+     "when": {
+      "shape": [
+       "round"
+      ],
+      "fruit": [
+       "blossom"
+      ]
+     }
+    },
+    {
+     "id": "berries-round-r",
+     "kind": "stamp",
+     "on": "round-r",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5.5
+        ],
+        [
+         0.5,
+         6.5
+        ],
+        [
+         1,
+         7
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         0.5,
+         -5.5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "....bw",
+      "....db",
+      "bw....",
+      "db...."
+     ],
+     "key": {
+      "b": "fruitColour",
+      "d": "fruitColour.dark",
+      "w": "shine"
+     },
+     "when": {
+      "shape": [
+       "round"
+      ],
+      "fruit": [
+       "berries"
+      ]
+     }
+    },
+    {
+     "id": "blossom-round-r",
+     "kind": "stamp",
+     "on": "round-r",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5.5
+        ],
+        [
+         0.5,
+         6.5
+        ],
+        [
+         1,
+         7
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         0.5,
+         -5.5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".....f.",
+      "....fcf",
+      ".....f.",
+      ".f.....",
+      "fcf....",
+      ".f....."
+     ],
+     "key": {
+      "f": "fruitColour",
+      "c": "petal-eye"
+     },
+     "when": {
+      "shape": [
+       "round"
+      ],
+      "fruit": [
+       "blossom"
+      ]
+     }
+    },
+    {
+     "id": "berries-round-t",
+     "kind": "stamp",
+     "on": "round-t",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         0
+        ],
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1,
+         0
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -10
+        ],
+        [
+         0.5,
+         -11
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "bw....",
+      "db....",
+      "....bw",
+      "....db"
+     ],
+     "key": {
+      "b": "fruitColour",
+      "d": "fruitColour.dark",
+      "w": "shine"
+     },
+     "when": {
+      "shape": [
+       "round"
+      ],
+      "fruit": [
+       "berries"
+      ]
+     }
+    },
+    {
+     "id": "blossom-round-t",
+     "kind": "stamp",
+     "on": "round-t",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         0
+        ],
+        [
+         0.5,
+         0.5
+        ],
+        [
+         1,
+         0
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -10
+        ],
+        [
+         0.5,
+         -11
+        ],
+        [
+         1,
+         -12
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".f.",
+      "fcf",
+      ".f."
+     ],
+     "key": {
+      "f": "fruitColour",
+      "c": "petal-eye"
+     },
+     "when": {
+      "shape": [
+       "round"
+      ],
+      "fruit": [
+       "blossom"
+      ]
+     }
+    },
+    {
+     "id": "berries-wide-1",
+     "kind": "stamp",
+     "on": "wide-1",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -7
+        ],
+        [
+         0.5,
+         -7.5
+        ],
+        [
+         1,
+         -8
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         0.5,
+         -5.5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "bw....",
+      "db....",
+      "....bw",
+      "....db"
+     ],
+     "key": {
+      "b": "fruitColour",
+      "d": "fruitColour.dark",
+      "w": "shine"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ],
+      "fruit": [
+       "berries"
+      ]
+     }
+    },
+    {
+     "id": "blossom-wide-1",
+     "kind": "stamp",
+     "on": "wide-1",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -7
+        ],
+        [
+         0.5,
+         -7.5
+        ],
+        [
+         1,
+         -8
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         0.5,
+         -5.5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".f.",
+      "fcf",
+      ".f."
+     ],
+     "key": {
+      "f": "fruitColour",
+      "c": "petal-eye"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ],
+      "fruit": [
+       "blossom"
+      ]
+     }
+    },
+    {
+     "id": "berries-wide-4",
+     "kind": "stamp",
+     "on": "wide-4",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         7
+        ],
+        [
+         0.5,
+         7.5
+        ],
+        [
+         1,
+         8
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         0.5,
+         -5.5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "....bw",
+      "....db",
+      "bw....",
+      "db...."
+     ],
+     "key": {
+      "b": "fruitColour",
+      "d": "fruitColour.dark",
+      "w": "shine"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ],
+      "fruit": [
+       "berries"
+      ]
+     }
+    },
+    {
+     "id": "blossom-wide-4",
+     "kind": "stamp",
+     "on": "wide-4",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         7
+        ],
+        [
+         0.5,
+         7.5
+        ],
+        [
+         1,
+         8
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -5
+        ],
+        [
+         0.5,
+         -5.5
+        ],
+        [
+         1,
+         -6
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".f.",
+      "fcf",
+      ".f."
+     ],
+     "key": {
+      "f": "fruitColour",
+      "c": "petal-eye"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ],
+      "fruit": [
+       "blossom"
+      ]
+     }
+    },
+    {
+     "id": "berries-wide-2",
+     "kind": "stamp",
+     "on": "wide-2",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -4
+        ],
+        [
+         0.5,
+         -4
+        ],
+        [
+         1,
+         -4.5
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         0.5,
+         -9.5
+        ],
+        [
+         1,
+         -10
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "bw",
+      "db"
+     ],
+     "key": {
+      "b": "fruitColour",
+      "d": "fruitColour.dark",
+      "w": "shine"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ],
+      "fruit": [
+       "berries"
+      ]
+     }
+    },
+    {
+     "id": "blossom-wide-2",
+     "kind": "stamp",
+     "on": "wide-2",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -4
+        ],
+        [
+         0.5,
+         -4
+        ],
+        [
+         1,
+         -4.5
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         0.5,
+         -9.5
+        ],
+        [
+         1,
+         -10
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".f.....",
+      "fcf....",
+      ".f.....",
+      ".....f.",
+      "....fcf",
+      ".....f."
+     ],
+     "key": {
+      "f": "fruitColour",
+      "c": "petal-eye"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ],
+      "fruit": [
+       "blossom"
+      ]
+     }
+    },
+    {
+     "id": "berries-wide-3",
+     "kind": "stamp",
+     "on": "wide-3",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         0.5,
+         4
+        ],
+        [
+         1,
+         4.5
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         0.5,
+         -9.5
+        ],
+        [
+         1,
+         -10
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "bw",
+      "db"
+     ],
+     "key": {
+      "b": "fruitColour",
+      "d": "fruitColour.dark",
+      "w": "shine"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ],
+      "fruit": [
+       "berries"
+      ]
+     }
+    },
+    {
+     "id": "blossom-wide-3",
+     "kind": "stamp",
+     "on": "wide-3",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         4
+        ],
+        [
+         0.5,
+         4
+        ],
+        [
+         1,
+         4.5
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -9
+        ],
+        [
+         0.5,
+         -9.5
+        ],
+        [
+         1,
+         -10
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".f.",
+      "fcf",
+      ".f."
+     ],
+     "key": {
+      "f": "fruitColour",
+      "c": "petal-eye"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ],
+      "fruit": [
+       "blossom"
+      ]
+     }
+    },
+    {
+     "id": "berries-tall-b",
+     "kind": "stamp",
+     "on": "tall-b",
+     "at": [
+      -5,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -4
+        ],
+        [
+         0.5,
+         -4
+        ],
+        [
+         1,
+         -4.5
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "bw....",
+      "db....",
+      "....bw",
+      "....db"
+     ],
+     "key": {
+      "b": "fruitColour",
+      "d": "fruitColour.dark",
+      "w": "shine"
+     },
+     "when": {
+      "shape": [
+       "tall"
+      ],
+      "fruit": [
+       "berries"
+      ]
+     }
+    },
+    {
+     "id": "blossom-tall-b",
+     "kind": "stamp",
+     "on": "tall-b",
+     "at": [
+      -5,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -4
+        ],
+        [
+         0.5,
+         -4
+        ],
+        [
+         1,
+         -4.5
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".f.....",
+      "fcf....",
+      ".f.....",
+      ".....f.",
+      "....fcf",
+      ".....f."
+     ],
+     "key": {
+      "f": "fruitColour",
+      "c": "petal-eye"
+     },
+     "when": {
+      "shape": [
+       "tall"
+      ],
+      "fruit": [
+       "blossom"
+      ]
+     }
+    },
+    {
+     "id": "berries-tall-m",
+     "kind": "stamp",
+     "on": "tall-m",
+     "at": [
+      1,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -9.5
+        ],
+        [
+         0.5,
+         -10.5
+        ],
+        [
+         1,
+         -11.5
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "....bw",
+      "....db",
+      "bw....",
+      "db...."
+     ],
+     "key": {
+      "b": "fruitColour",
+      "d": "fruitColour.dark",
+      "w": "shine"
+     },
+     "when": {
+      "shape": [
+       "tall"
+      ],
+      "fruit": [
+       "berries"
+      ]
+     }
+    },
+    {
+     "id": "blossom-tall-m",
+     "kind": "stamp",
+     "on": "tall-m",
+     "at": [
+      1,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -9.5
+        ],
+        [
+         0.5,
+         -10.5
+        ],
+        [
+         1,
+         -11.5
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".....f.",
+      "....fcf",
+      ".....f.",
+      ".f.....",
+      "fcf....",
+      ".f....."
+     ],
+     "key": {
+      "f": "fruitColour",
+      "c": "petal-eye"
+     },
+     "when": {
+      "shape": [
+       "tall"
+      ],
+      "fruit": [
+       "blossom"
+      ]
+     }
+    },
+    {
+     "id": "berries-tall-t",
+     "kind": "stamp",
+     "on": "tall-t",
+     "at": [
+      1,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13.5
+        ],
+        [
+         0.5,
+         -15
+        ],
+        [
+         1,
+         -16.5
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      "bw...",
+      "db...",
+      "...bw",
+      "...db"
+     ],
+     "key": {
+      "b": "fruitColour",
+      "d": "fruitColour.dark",
+      "w": "shine"
+     },
+     "when": {
+      "shape": [
+       "tall"
+      ],
+      "fruit": [
+       "berries"
+      ]
+     }
+    },
+    {
+     "id": "blossom-tall-t",
+     "kind": "stamp",
+     "on": "tall-t",
+     "at": [
+      1,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -13.5
+        ],
+        [
+         0.5,
+         -15
+        ],
+        [
+         1,
+         -16.5
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "c",
+     "rows": [
+      ".f.",
+      "fcf",
+      ".f."
+     ],
+     "key": {
+      "f": "fruitColour",
+      "c": "petal-eye"
+     },
+     "when": {
+      "shape": [
+       "tall"
+      ],
+      "fruit": [
+       "blossom"
+      ]
+     }
+    },
+    {
+     "id": "stump",
+     "kind": "stamp",
+     "on": "bush",
+     "at": [
+      0,
+      -1
+     ],
+     "anchor": "bc",
+     "hidden": true,
+     "rows": [
+      ".ffffffff.",
+      "fffrrrrfff",
+      "bffffffffb",
+      "bbbbbbbbbb",
+      "dbbdbbbdbb",
+      ".dddddddd."
+     ],
+     "key": {
+      "f": "wood.light",
+      "r": "wood.dark",
+      "b": "wood",
+      "d": "wood.dark"
+     }
+    },
+    {
+     "id": "crumb-1",
+     "kind": "stamp",
+     "on": "bush",
+     "at": [
+      -10,
+      -3
+     ],
+     "anchor": "tl",
+     "hidden": true,
+     "rows": [
+      "lg",
+      "gg"
+     ],
+     "key": {
+      "l": "leaf.light",
+      "g": "leaf"
+     }
+    },
+    {
+     "id": "crumb-2",
+     "kind": "stamp",
+     "on": "bush",
+     "at": [
+      7,
+      -3
+     ],
+     "anchor": "tl",
+     "hidden": true,
+     "rows": [
+      "gl",
+      "gg"
+     ],
+     "key": {
+      "l": "leaf.light",
+      "g": "leaf"
+     }
+    },
+    {
+     "id": "crumb-3",
+     "kind": "stamp",
+     "on": "bush",
+     "at": [
+      10,
+      -7
+     ],
+     "anchor": "tl",
+     "hidden": true,
+     "rows": [
+      "lg",
+      "gg"
+     ],
+     "key": {
+      "l": "leaf.light",
+      "g": "leaf"
+     }
+    },
+    {
+     "id": "sprout",
+     "kind": "stamp",
+     "on": "bush",
+     "at": [
+      0,
+      -7
+     ],
+     "anchor": "bc",
+     "hidden": true,
+     "rows": [
+      "l..g",
+      "gl.g",
+      ".gg.",
+      ".g.."
+     ],
+     "key": {
+      "l": "leaf.light",
+      "g": "leaf"
+     }
+    },
+    {
+     "kind": "outline",
+     "paint": "ink"
+    },
+    {
+     "id": "glimmer-round",
+     "kind": "stamp",
+     "on": "round-r",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         3.5
+        ],
+        [
+         0.5,
+         4.5
+        ],
+        [
+         1,
+         5
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -10
+        ],
+        [
+         0.5,
+         -10.5
+        ],
+        [
+         1,
+         -11
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "tl",
+     "hidden": true,
+     "rows": [
+      "ss"
+     ],
+     "key": {
+      "s": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "round"
+      ]
+     }
+    },
+    {
+     "id": "glimmer-wide",
+     "kind": "stamp",
+     "on": "wide-4",
+     "at": [
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         5
+        ],
+        [
+         0.5,
+         5.5
+        ],
+        [
+         1,
+         6
+        ]
+       ],
+       "round": "px"
+      },
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -10
+        ],
+        [
+         0.5,
+         -10.5
+        ],
+        [
+         1,
+         -11
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "tl",
+     "hidden": true,
+     "rows": [
+      "ss"
+     ],
+     "key": {
+      "s": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "wide"
+      ]
+     }
+    },
+    {
+     "id": "glimmer-tall",
+     "kind": "stamp",
+     "on": "tall-b",
+     "at": [
+      -1,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -8
+        ],
+        [
+         0.5,
+         -8
+        ],
+        [
+         1,
+         -9
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "anchor": "tl",
+     "hidden": true,
+     "rows": [
+      "ss"
+     ],
+     "key": {
+      "s": "leaf.light"
+     },
+     "when": {
+      "shape": [
+       "tall"
+      ]
+     }
+    }
+   ],
+   "emitters": [
+    {
+     "id": "leaves",
+     "gen": "leaves",
+     "v": 1,
+     "on": "bush",
+     "at": [
+      0,
+      {
+       "from": "size",
+       "map": [
+        [
+         0,
+         -8
+        ],
+        [
+         0.5,
+         -9
+        ],
+        [
+         1,
+         -10
+        ]
+       ],
+       "round": "px"
+      }
+     ],
+     "count": 10,
+     "seed": 7,
+     "dist": {
+      "from": "size",
+      "map": [
+       [
+        0,
+        11
+       ],
+       [
+        0.5,
+        12
+       ],
+       [
+        1,
+        13
+       ]
+      ],
+      "round": "none"
+     },
+     "gravity": 9,
+     "size": 4,
+     "paints": [
+      "leaf.light",
+      "leaf",
+      "leaf",
+      "leaf.light",
+      "leaf.dark",
+      "leaf",
+      "leaf.light",
+      "leaf"
+     ],
+     "begin": 0.2,
+     "end": 0.75,
+     "area": {
+      "x0": 0,
+      "y0": 0,
+      "x1": 32,
+      "y1": 32
+     }
+    }
+   ]
+  }
+ },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "fps": 8,
+   "keys": [
+    {
+     "t": 0,
+     "ease": "hold",
+     "nodes": {
+      "round-l": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-2": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-m": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "round-t": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-3": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-t": {
+       "move": [
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.125,
+     "ease": "hold",
+     "nodes": {
+      "round-l": {
+       "move": [
+        1,
+        0
+       ]
+      },
+      "wide-2": {
+       "move": [
+        1,
+        0
+       ]
+      },
+      "tall-m": {
+       "move": [
+        1,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.375,
+     "ease": "hold",
+     "nodes": {
+      "round-l": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-2": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-m": {
+       "move": [
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.5,
+     "ease": "hold",
+     "nodes": {
+      "round-t": {
+       "move": [
+        1,
+        0
+       ]
+      },
+      "wide-3": {
+       "move": [
+        1,
+        0
+       ]
+      },
+      "tall-t": {
+       "move": [
+        1,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.75,
+     "ease": "hold",
+     "nodes": {
+      "round-t": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-3": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-t": {
+       "move": [
+        0,
+        0
+       ]
+      }
+     }
+    }
+   ],
+   "frameEdits": {
+    "6": {
+     "show": [
+      "glimmer-round",
+      "glimmer-wide",
+      "glimmer-tall"
+     ]
+    },
+    "7": {
+     "show": [
+      "glimmer-round",
+      "glimmer-wide",
+      "glimmer-tall"
+     ]
+    }
+   },
+   "travel": [
+    {
+     "tracks": [
+      "nodes.round-l.move",
+      "nodes.wide-2.move",
+      "nodes.tall-m.move",
+      "nodes.round-t.move",
+      "nodes.wide-3.move",
+      "nodes.tall-t.move"
+     ],
+     "about": "first",
+     "by": {
+      "from": "sway",
+      "map": [
+       [
+        0,
+        0
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        2
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "hurt": {
+   "frames": 4,
+   "fps": 9,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "ease": "hold",
+     "nodes": {
+      "round-t": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-2": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-3": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-t": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "round-l": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "round-r": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-1": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-4": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-b": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-m": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "trunk": {
+       "move": [
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.3333333333333333,
+     "ease": "hold",
+     "nodes": {
+      "round-t": {
+       "move": [
+        2,
+        0
+       ]
+      },
+      "wide-2": {
+       "move": [
+        2,
+        0
+       ]
+      },
+      "wide-3": {
+       "move": [
+        2,
+        0
+       ]
+      },
+      "tall-t": {
+       "move": [
+        2,
+        0
+       ]
+      },
+      "round-l": {
+       "move": [
+        1,
+        0
+       ]
+      },
+      "round-r": {
+       "move": [
+        1,
+        0
+       ]
+      },
+      "wide-1": {
+       "move": [
+        1,
+        0
+       ]
+      },
+      "wide-4": {
+       "move": [
+        1,
+        0
+       ]
+      },
+      "tall-b": {
+       "move": [
+        1,
+        0
+       ]
+      },
+      "tall-m": {
+       "move": [
+        1,
+        0
+       ]
+      },
+      "trunk": {
+       "move": [
+        1,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 0.6666666666666666,
+     "ease": "hold",
+     "nodes": {
+      "round-t": {
+       "move": [
+        -1,
+        0
+       ]
+      },
+      "wide-2": {
+       "move": [
+        -1,
+        0
+       ]
+      },
+      "wide-3": {
+       "move": [
+        -1,
+        0
+       ]
+      },
+      "tall-t": {
+       "move": [
+        -1,
+        0
+       ]
+      },
+      "round-l": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "round-r": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-1": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-4": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-b": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-m": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "trunk": {
+       "move": [
+        0,
+        0
+       ]
+      }
+     }
+    },
+    {
+     "t": 1,
+     "nodes": {
+      "round-t": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-2": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-3": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-t": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "round-l": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "round-r": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-1": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-4": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-b": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-m": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "trunk": {
+       "move": [
+        0,
+        0
+       ]
+      }
+     }
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "flash": true
+    }
+   },
+   "sounds": [
+    {
+     "sound": "bush-rustle",
+     "preset": "Small bush",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  },
+  "break": {
+   "frames": 8,
+   "fps": 12,
+   "loop": false,
+   "label": "Cut down",
+   "keys": [
+    {
+     "t": 0,
+     "ease": "hold",
+     "nodes": {
+      "round-l": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "round-r": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "round-t": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-1": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-4": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-2": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-3": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-b": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-m": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-t": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "crown": {
+       "scale": 1
+      }
+     },
+     "emit": {
+      "leaves": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.14285714285714285,
+     "ease": "hold",
+     "nodes": {
+      "round-l": {
+       "move": [
+        -2,
+        0
+       ]
+      },
+      "round-r": {
+       "move": [
+        2,
+        0
+       ]
+      },
+      "round-t": {
+       "move": [
+        0,
+        -2
+       ]
+      },
+      "wide-1": {
+       "move": [
+        -2,
+        0
+       ]
+      },
+      "wide-2": {
+       "move": [
+        -2,
+        -1
+       ]
+      },
+      "wide-3": {
+       "move": [
+        2,
+        -1
+       ]
+      },
+      "wide-4": {
+       "move": [
+        2,
+        0
+       ]
+      },
+      "tall-b": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-m": {
+       "move": [
+        2,
+        -2
+       ]
+      },
+      "tall-t": {
+       "move": [
+        -2,
+        -5
+       ]
+      },
+      "crown": {
+       "scale": 0.9
+      }
+     }
+    },
+    {
+     "t": 0.2857142857142857,
+     "ease": "hold",
+     "nodes": {
+      "round-l": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "round-r": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "round-t": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-1": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-4": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-2": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "wide-3": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-b": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-m": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "tall-t": {
+       "move": [
+        0,
+        0
+       ]
+      },
+      "crown": {
+       "scale": 0.85
+      }
+     },
+     "emit": {
+      "leaves": {
+       "amount": 1
+      }
+     }
+    },
+    {
+     "t": 0.42857142857142855,
+     "ease": "hold",
+     "nodes": {
+      "crown": {
+       "scale": 0.65
+      }
+     },
+     "hide": [
+      "tick-round-l",
+      "tick-round-r",
+      "tick-round-t",
+      "tick-wide-1",
+      "tick-wide-4",
+      "tick-wide-2",
+      "tick-wide-3",
+      "tick-tall-b",
+      "tick-tall-m",
+      "tick-tall-t",
+      "berries-round-l",
+      "blossom-round-l",
+      "berries-round-r",
+      "blossom-round-r",
+      "berries-round-t",
+      "blossom-round-t",
+      "berries-wide-1",
+      "blossom-wide-1",
+      "berries-wide-4",
+      "blossom-wide-4",
+      "berries-wide-2",
+      "blossom-wide-2",
+      "berries-wide-3",
+      "blossom-wide-3",
+      "berries-tall-b",
+      "blossom-tall-b",
+      "berries-tall-m",
+      "blossom-tall-m",
+      "berries-tall-t",
+      "blossom-tall-t"
+     ]
+    },
+    {
+     "t": 0.5714285714285714,
+     "ease": "hold",
+     "nodes": {
+      "crown": {
+       "scale": 0.45
+      }
+     }
+    },
+    {
+     "t": 0.7142857142857143,
+     "ease": "hold",
+     "nodes": {
+      "crown": {
+       "scale": 0.3
+      }
+     }
+    },
+    {
+     "t": 0.8571428571428571,
+     "ease": "hold",
+     "nodes": {
+      "crown": {
+       "scale": 1
+      }
+     },
+     "hide": [
+      "leaf-round-l",
+      "leaf-round-r",
+      "leaf-round-t",
+      "leaf-wide-1",
+      "leaf-wide-4",
+      "leaf-wide-2",
+      "leaf-wide-3",
+      "leaf-tall-b",
+      "leaf-tall-m",
+      "leaf-tall-t",
+      "foot",
+      "foot-shade"
+     ],
+     "show": [
+      "stump",
+      "crumb-1",
+      "crumb-2",
+      "crumb-3"
+     ],
+     "emit": {
+      "leaves": {
+       "amount": 0
+      }
+     }
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "flash": true
+    }
+   },
+   "sounds": [
+    {
+     "sound": "bush-rustle",
+     "preset": "Big hedge",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  },
+  "respawn": {
+   "frames": 6,
+   "fps": 12,
+   "loop": false,
+   "label": "Grow back",
+   "keys": [
+    {
+     "t": 0,
+     "ease": "hold",
+     "nodes": {
+      "crown": {
+       "scale": 1
+      }
+     },
+     "hide": [
+      "leaf-round-l",
+      "leaf-round-r",
+      "leaf-round-t",
+      "leaf-wide-1",
+      "leaf-wide-4",
+      "leaf-wide-2",
+      "leaf-wide-3",
+      "leaf-tall-b",
+      "leaf-tall-m",
+      "leaf-tall-t",
+      "tick-round-l",
+      "tick-round-r",
+      "tick-round-t",
+      "tick-wide-1",
+      "tick-wide-4",
+      "tick-wide-2",
+      "tick-wide-3",
+      "tick-tall-b",
+      "tick-tall-m",
+      "tick-tall-t",
+      "berries-round-l",
+      "blossom-round-l",
+      "berries-round-r",
+      "blossom-round-r",
+      "berries-round-t",
+      "blossom-round-t",
+      "berries-wide-1",
+      "blossom-wide-1",
+      "berries-wide-4",
+      "blossom-wide-4",
+      "berries-wide-2",
+      "blossom-wide-2",
+      "berries-wide-3",
+      "blossom-wide-3",
+      "berries-tall-b",
+      "blossom-tall-b",
+      "berries-tall-m",
+      "blossom-tall-m",
+      "berries-tall-t",
+      "blossom-tall-t",
+      "foot",
+      "foot-shade"
+     ],
+     "show": [
+      "stump",
+      "crumb-1",
+      "crumb-2",
+      "crumb-3"
+     ]
+    },
+    {
+     "t": 0.2,
+     "ease": "hold",
+     "show": [
+      "sprout"
+     ]
+    },
+    {
+     "t": 0.4,
+     "ease": "hold",
+     "nodes": {
+      "crown": {
+       "scale": 0.5
+      }
+     },
+     "show": [
+      "leaf-round-l",
+      "leaf-round-r",
+      "leaf-round-t",
+      "leaf-wide-1",
+      "leaf-wide-4",
+      "leaf-wide-2",
+      "leaf-wide-3",
+      "leaf-tall-b",
+      "leaf-tall-m",
+      "leaf-tall-t",
+      "foot",
+      "foot-shade"
+     ],
+     "hide": [
+      "sprout",
+      "stump",
+      "crumb-1",
+      "crumb-2",
+      "crumb-3"
+     ]
+    },
+    {
+     "t": 0.6,
+     "ease": "hold",
+     "nodes": {
+      "crown": {
+       "scale": 0.75
+      }
+     }
+    },
+    {
+     "t": 0.8,
+     "ease": "hold",
+     "nodes": {
+      "crown": {
+       "scale": 1
+      }
+     },
+     "show": [
+      "tick-round-l",
+      "tick-round-r",
+      "tick-round-t",
+      "tick-wide-1",
+      "tick-wide-4",
+      "tick-wide-2",
+      "tick-wide-3",
+      "tick-tall-b",
+      "tick-tall-m",
+      "tick-tall-t"
+     ]
+    },
+    {
+     "t": 1,
+     "show": [
+      "berries-round-l",
+      "blossom-round-l",
+      "berries-round-r",
+      "blossom-round-r",
+      "berries-round-t",
+      "blossom-round-t",
+      "berries-wide-1",
+      "blossom-wide-1",
+      "berries-wide-4",
+      "blossom-wide-4",
+      "berries-wide-2",
+      "blossom-wide-2",
+      "berries-wide-3",
+      "blossom-wide-3",
+      "berries-tall-b",
+      "blossom-tall-b",
+      "berries-tall-m",
+      "blossom-tall-m",
+      "berries-tall-t",
+      "blossom-tall-t"
+     ]
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "bush-rustle",
+     "preset": "Small bush",
+     "frame": 2,
+     "volume": 0.5
+    }
+   ]
+  }
+ }
+}

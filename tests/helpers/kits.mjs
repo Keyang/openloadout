@@ -10,9 +10,10 @@
 //   - there are at least three full kits (40 to 50 sprites, 20 sounds and 2 music tracks: KIT_SIZE in
 //     tools/lib/assets.mjs), for at least three different game types;
 //   - every kit, full or small, holds 12 to 50 sprites, 8 to 30 sounds and 1 to 4 music tracks (SMALL_KIT_SIZE:
-//     a kit may be smaller than a full one; Keyang, 2026-11-19);
+//     a kit may be smaller than a full one; Keyang, 2026-11-19), unless its plan declares its own "size", and then
+//     it holds what its plan says (kitSize in tools/lib/assets.mjs; such a kit is still full only at KIT_SIZE);
 //   - every kit is in the catalogue, as its plan describes it, and every asset it lists is in the catalogue.
-import { KIT_SIZE, SMALL_KIT_SIZE } from '../../tools/lib/assets.mjs';
+import { KIT_SIZE, kitSize } from '../../tools/lib/assets.mjs';
 
 export const MIN_KITS = 3;
 const idsOf = (list) => (list ?? []).map((x) => (typeof x === 'string' ? x : x.id));
@@ -31,12 +32,18 @@ export function isFullKit(bundle) {
   return inside(bundle, KIT_SIZE);
 }
 
-/** What is wrong with one kit's size: a list of sentences, empty when it is inside the size any kit may have (SMALL_KIT_SIZE). */
-export function sizeProblems(bundle) {
+/**
+ * What is wrong with one kit's size: a list of sentences, empty when it is inside the size it is held to (kitSize:
+ * its plan's own size when the plan declares one, else the size any kit may have, SMALL_KIT_SIZE).
+ * plan: the kit's plan; left out, the kit is held to the size any kit may have.
+ */
+export function sizeProblems(bundle, plan) {
   const out = [];
-  for (const [field, [lo, hi]] of Object.entries(SMALL_KIT_SIZE)) {
+  const size = kitSize(plan ?? undefined);                       // throws on a plan whose own size is not valid
+  const rule = plan?.size === undefined ? 'a kit holds' : 'its plan says a kit of';
+  for (const [field, [lo, hi]] of Object.entries(size)) {
     const n = bundle[field].length;
-    if (n < lo || n > hi) out.push(`${bundle.id} holds ${n} ${words[field]}; a kit holds ${lo === hi ? lo : `${lo} to ${hi}`}`);
+    if (n < lo || n > hi) out.push(`${bundle.id} holds ${n} ${words[field]}; ${rule} ${lo === hi ? lo : `${lo} to ${hi}`}`);
   }
   return out;
 }
@@ -48,7 +55,7 @@ export function kitProblems({ id, plan, bundle }, catalog) {
     return [`the kit "${id}" has a plan (bundles/specs/${id}.plan.json) but the catalogue does not list it (it lists: ${there}). `
       + 'Run "node tools/bundles-from-plans.mjs" to write its bundle file once its assets exist, then "npm run build".'];
   }
-  const out = [...sizeProblems(bundle)];
+  const out = [...sizeProblems(bundle, plan)];
   if (bundle.level !== 'kit') out.push(`${id} has the level "${bundle.level}"; a kit has the level "kit"`);
   if (bundle.gameType === 'any') out.push(`${id} is for "any" game; a kit is for one kind of game`);
   if (plan.gameType && bundle.gameType !== plan.gameType) out.push(`${id} is for "${bundle.gameType}" in the catalogue but its plan says "${plan.gameType}"`);

@@ -1,0 +1,48 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "stone-scrape",
+ "name": "Stone scrape",
+ "category": "impact",
+ "description": "A heavy stone block dragged across a stone floor: a rough, wandering grind with gritty clicks and a dull stop at the end. Change its weight, length, grit and how firmly it stops.",
+ "meta": {
+  "type": "sfx",
+  "role": "world/machine",
+  "themes": ["fantasy", "dungeon"],
+  "gameTypes": ["top-down-rpg", "turn-based-rpg"],
+  "words": ["stone", "scrape", "block", "push", "drag", "grind", "slide", "heavy", "puzzle", "floor", "socket", "rock", "gritty", "shove"],
+  "license": "draft"
+ },
+ "duration": "max(0.25, length*(0.85 + 0.15*weight))",
+ "params": [
+  { "id": "weight", "label": "Weight", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "length", "label": "Length", "min": 0.25, "max": 0.9, "default": 0.5, "unit": "s", "scale": "log" },
+  { "id": "grit", "label": "Grit", "min": 0, "max": 1, "default": 0.5 },
+  { "id": "thud", "label": "Thud", "min": 0, "max": 1, "default": 0.4 }
+ ],
+ "nodes": [
+  { "id": "swell", "type": "env", "points": [[0, 0.25], [0.02, 1], ["max(0.25, length*(0.85 + 0.15*weight)) - 0.13 - 0.05*weight", 0.9], ["max(0.25, length*(0.85 + 0.15*weight)) - 0.005", 0, 0.6]] },
+  { "id": "brown", "type": "noise", "color": "brown" },
+  { "id": "white", "type": "noise" },
+  { "id": "wanderTick", "type": "clock", "rate": 16, "jitter": 0.6 },
+  { "id": "wanderStep", "type": "rand", "lo": 0, "hi": 1, "trig": "wanderTick" },
+  { "id": "wander", "type": "lag", "in": "wanderStep", "time": 0.05 },
+  { "id": "judder", "type": "lag", "in": "white", "time": 0.004 },
+  { "id": "grind", "type": "filter", "mode": "bp", "in": "(brown*3 + white*0.25)*swell*(0.75 + judder*5)", "freq": "250*pow(3.6, wander)*pow(2, 0.45 - weight*0.9)", "q": 1.3 },
+  { "id": "chips", "type": "dust", "density": "260 + grit*240", "spread": 1 },
+  { "id": "clicks", "type": "filter", "mode": "bp", "in": "chips*swell", "freq": "(2000 + rnd(-150, 150))*pow(2, 0.2 - weight*0.4)", "q": 1.4 },
+  { "id": "stopAt", "type": "clock", "rate": 1, "count": 1, "delay": "max(0.25, length*(0.85 + 0.15*weight)) - 0.13 - 0.05*weight" },
+  { "id": "stopFall", "type": "env", "points": [[0, "110*pow(2, 0.3 - weight*0.6)"], [0.08, "60*pow(2, 0.3 - weight*0.6)", "exp"]], "trig": "stopAt" },
+  { "id": "stopLow", "type": "osc", "freq": "stopFall" },
+  { "id": "stopAmp", "type": "ad", "attack": 0.002, "decay": "0.1 + 0.05*weight", "curve": 2.2, "trig": "stopAt" },
+  { "id": "knockAmp", "type": "ad", "attack": 0.0005, "decay": 0.006, "curve": 2, "trig": "stopAt" },
+  { "id": "knock", "type": "modal", "in": "white*knockAmp", "freq": "335*rnd(0.94, 1.06)*pow(2, 0.1 - weight*0.2)", "ratios": [1, 1.83, 2.91, 4.37], "gains": [1, 0.7, 0.45, 0.25], "decay": "0.07 + 0.05*weight", "tilt": 0.9 },
+  { "id": "dry", "type": "expr", "expr": "grind*1.0 + clicks*grit*grit*12 + (stopLow*stopAmp*0.6 + knock*0.4)*thud*1.2" },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "dry", "freq": 30 }
+ ],
+ "out": "clean*(1 - smooth(dur - 0.008, dur - 0.001, t))",
+ "presets": {
+  "Push": {},
+  "Settle": { "length": 0.3, "thud": 1, "weight": 0.7 },
+  "Heavy slab": { "weight": 0.9, "length": 0.85, "grit": 0.7 }
+ }
+}

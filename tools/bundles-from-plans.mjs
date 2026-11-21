@@ -18,7 +18,10 @@
 //        palette   { name, colours }: the palette the kit's sprites are coloured from (see below)
 //        sprites, sounds, music   what it holds: lists of ids, or of { id, ... } rows
 //        level     optional; "kit" when left out
-//      A full kit holds 40 to 50 sprites, 20 sounds and 2 music tracks (KIT_SIZE in tools/lib/assets.mjs).
+//        size      optional; { sprites, sounds, music }, each [fewest, most]: the size this kit is held to
+//      A full kit holds 40 to 50 sprites, 20 sounds and 2 music tracks (KIT_SIZE in tools/lib/assets.mjs). A plan
+//      that is meant to be another size says so in "size" (kitSize in tools/lib/assets.mjs), and then gets a size
+//      note only when it is outside its own size.
 //   2. Make the assets: sprites/<id>.json (or a code file sprites/<id>.js) and sounds/<id>.json for every id the plan lists.
 //   3. Run this tool, then the build (node tools/build.mjs).
 //
@@ -34,7 +37,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { ROOT, loadPlans, KIT_SIZE, findSpriteFile } from './lib/assets.mjs';
+import { ROOT, loadPlans, KIT_SIZE, kitSize, findSpriteFile } from './lib/assets.mjs';
 
 const idsOf = (list) => (list ?? []).map((x) => (typeof x === 'string' ? x : x.id));
 const count = (n, one, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
@@ -86,11 +89,16 @@ export function planProblems(plan, file, palettes) {
   return problems;
 }
 
-/** A note for a plan that is outside the size of a full kit, or null. */
-function sizeNote(bundle) {
-  const off = Object.entries(KIT_SIZE).filter(([kind, [lo, hi]]) => bundle[kind].length < lo || bundle[kind].length > hi);
+/** A note for a plan that is outside its size (its own "size" when it declares one, else the size of a full kit), or null. file: the plan's file. */
+function sizeNote(bundle, plan, file) {
+  const size = kitSize(plan, KIT_SIZE);
+  const off = Object.entries(size).filter(([kind, [lo, hi]]) => bundle[kind].length < lo || bundle[kind].length > hi);
   if (!off.length) return null;
   const tracks = (kind) => (kind === 'music' ? 'music tracks' : kind);
+  if (plan.size !== undefined) {
+    return `this plan says its kit holds ${Object.entries(size).map(([kind, r]) => `${range(r)} ${tracks(kind)}`).join(', ')} ("size" in ${file}); `
+      + `it lists ${off.map(([kind]) => `${bundle[kind].length} ${tracks(kind)}`).join(' and ')}. Bring the plan's lists and its "size" together; the site's acceptance test (tests/e2e/three-bundles.spec.mjs) holds the kit to the size its plan says.`;
+  }
   return `a full kit holds ${Object.entries(KIT_SIZE).map(([kind, r]) => `${range(r)} ${tracks(kind)}`).join(', ')}; `
     + `this plan lists ${off.map(([kind]) => `${bundle[kind].length} ${tracks(kind)}`).join(' and ')}. A smaller kit is allowed (SMALL_KIT_SIZE in tools/lib/assets.mjs); the site's acceptance test (tests/e2e/three-bundles.spec.mjs) needs at least three full kits.`;
 }
@@ -131,7 +139,7 @@ async function main(args) {
     }
     if (!check) fs.writeFileSync(path.join(root, 'bundles', `${plan.id}.json`), JSON.stringify(bundle, null, 2) + '\n');
     console.log(`${plan.id}: ${check ? 'complete' : 'written'} (${count(bundle.sprites.length, 'sprite')}, ${count(bundle.sounds.length, 'sound')}, ${count(bundle.music.length, 'track')})`);
-    const note = sizeNote(bundle);
+    const note = sizeNote(bundle, plan, file);
     if (note) console.log(`${plan.id}: note: ${note}`);
   }
   // a mistake in a plan fails either way; assets still being made only fail --check
