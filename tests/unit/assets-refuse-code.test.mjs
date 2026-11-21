@@ -190,32 +190,6 @@ test('R4a: an id that exists only as a code file gets the refusal, not "Unknown 
   assert.ok(!fs.existsSync(MARK), 'a code sprite is never imported');
 });
 
-test('R4a: the skill\'s redraw sheet reads the old sprite by path (--old, else the frozen copy) and refuses a code file inside sprites/', () => {
-  const root = make({ 'coin.json': coin });
-  fs.symlinkSync(path.join(REAL, 'tools'), path.join(root, 'tools'));
-  const sheets = path.join(REAL, '..', '..', 'skills', 'sprite-forge', 'sheets.mjs');
-  if (!fs.existsSync(sheets)) return;   // the skill lives outside this folder; a copy of the project alone has no skill to test
-  const run = (...a) => spawnSync(process.execPath, [sheets, 'redraw', 'coin', '--root', root, '--scale', '1', ...a], { cwd: root, encoding: 'utf8', timeout: 120000 });
-  fs.writeFileSync(path.join(root, 'sprites', '_was-coin.js'), program('coin'));
-  const inside = run('--old', path.join(root, 'sprites', '_was-coin.js'));
-  assert.equal(inside.status, 1, inside.stdout + inside.stderr);
-  assert.match(inside.stderr, /is in sprites\/, where the build refuses any code file/);
-  assert.match(inside.stderr, /--old <file>/);
-  assert.ok(!fs.existsSync(MARK), 'a code file in sprites/ is never imported');
-  fs.rmSync(path.join(root, 'sprites', '_was-coin.js'));
-  const missing = run('--old', path.join(root, 'nothing.js'));
-  assert.equal(missing.status, 1);
-  assert.match(missing.stderr, /missing nothing\.js \(the old sprite: pass --old <file>/);
-  const fixture = path.join(REAL, 'tests', 'fixtures', 'code-sprites', 'coin.js');
-  const ok = run('--old', fixture);
-  assert.equal(ok.status, 0, ok.stdout + ok.stderr);
-  assert.match(ok.stdout, /coin-redraw\.png/);
-  assert.ok(fs.existsSync(path.join(root, 'out', 'coin-redraw.png')));
-  fs.mkdirSync(path.join(root, 'tests', 'fixtures'), { recursive: true });
-  fs.symlinkSync(path.join(REAL, 'tests', 'fixtures', 'code-sprites'), path.join(root, 'tests', 'fixtures', 'code-sprites'));
-  assert.equal(run().status, 0, 'the frozen copy tests/fixtures/code-sprites/<id>.js is the default old sprite');
-});
-
 test('R4a: dist ships the sprite data files of sprites/ only (the ones the build validates): a README, a picture, a page, a folder, _helper.json or index.json left in it stays out', () => {
   const root = make({ 'coin.json': coin, 'README.md': '# not a sprite', 'x.png': 'png', 'x.txt': 'notes', 'x.html': '<script>1</script>', '_helper.json': '{}', 'index.json': '{}' });
   fs.mkdirSync(path.join(root, 'sprites', 'sub'));
@@ -237,23 +211,6 @@ test('R4a: every kind of code file is refused, in any letter case: .jsx, .tsx, .
   assert.equal(r.status, 1, r.stdout + r.stderr);
   assert.match(r.stdout + r.stderr, /sprites\/x\.jsx, sprites\/y\.TSX, sprites\/z\.mts: code sprites/);
   assert.ok(!fs.existsSync(MARK), 'a code sprite is never imported');
-});
-
-test('R4a: the refusal says "take this file out of sprites/" only for a file that is in sprites/', () => {
-  const inside = codeSpriteRefusal('sprites/x.js');
-  assert.match(inside, /then take this file out of sprites\/\.$/);
-  assert.match(codeSpriteRefusal('sprites/x.js, sprites/y.js'), /then take these files out of sprites\/\.$/);
-  assert.match(codeSpriteRefusal(path.join(make({}), 'sprites', 'x.js')), /then take this file out of sprites\/\.$/, 'an absolute path into sprites/ counts');
-  const frozen = codeSpriteRefusal(path.join('tests', 'fixtures', 'code-sprites', 'coin.js'));
-  assert.doesNotMatch(frozen, /take this file out of sprites/);
-  assert.match(frozen, /^tests\/fixtures\/code-sprites\/coin\.js: a code sprite\./);
-  assert.match(frozen, /not a sprite of the library, so it stays outside sprites\/\.$/);
-  assert.doesNotMatch(codeSpriteRefusal('elsewhere/my-sprites.js'), /take this file out of sprites/, 'a folder only named like sprites is not sprites/');
-  // and as the tool prints it, for a frozen copy given by path
-  const r = spawnSync(process.execPath, [path.join(REAL, 'tools', 'render.mjs'), path.join(REAL, 'tests', 'fixtures', 'code-sprites', 'coin.js'), '--out', os.tmpdir()], { cwd: REAL, encoding: 'utf8', timeout: 60000 });
-  assert.equal(r.status, 1, r.stdout + r.stderr);
-  assert.match(r.stderr, /a code sprite/);
-  assert.doesNotMatch(r.stderr, /take this file out of sprites/);
 });
 
 test('R4a: the versions step refuses a code file in sprites/ instead of skipping it', async () => {

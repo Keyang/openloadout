@@ -7,38 +7,7 @@ import { hueTone, hued, lightness, HUE_TONES } from '../../engine/hue-tones.js';
 import { paintColour, COLOUR_RULES } from '../../engine/data-rules.js';
 import { PALETTE } from '../../engine/palettes.js';
 
-import { oldReplay } from '../helpers/old-replay.mjs';
-const OLD = oldReplay('hue-tones');   // what engine/icons-swatch.js (deleted by R3) drew and answered, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 const COLOURS = [...new Set(Object.values(PALETTE).flatMap((p) => Object.values(p)).filter((c) => typeof c === 'string' && /^#[0-9a-f]{6}$/i.test(c)))];
-
-test('hueTone gives every tone of hueRamp, and hued what iconHued gives, for every palette colour', () => {
-  assert.ok(COLOURS.length > 40, `${COLOURS.length} colours`);
-  for (const c of COLOURS) {
-    const r = OLD.value();
-    for (const t of HUE_TONES) assert.equal(hueTone(c, t), r[t], `${c} ${t}`);
-    assert.equal(lightness(c), OLD.value());
-  }
-  for (let i = 0; i < COLOURS.length; i++) {
-    const c = COLOURS[i], a = COLOURS[(i * 7 + 3) % COLOURS.length], b = COLOURS[(i * 13 + 5) % COLOURS.length];
-    for (const gap of [12, 20, 22]) {
-      assert.equal(hued(c, [a], gap), OLD.value(), `${c} against ${a} by ${gap}`);
-      assert.equal(hued(c, [a, b], gap), OLD.value(), `${c} against ${a}, ${b} by ${gap}`);
-    }
-  }
-});
-
-test('the colour rules hueTone and hued work out as the code did, nested as the tools sprite nests them', () => {
-  assert.ok(COLOUR_RULES.hueTone && COLOUR_RULES.hued);
-  for (let i = 0; i < COLOURS.length; i += 3) {
-    const metal = COLOURS[i], wood = COLOURS[(i + 11) % COLOURS.length], grip = COLOURS[(i + 17) % COLOURS.length];
-    const v = { metal, wood, accent: grip };
-    const metalOf = OLD.value(), gripOf = OLD.value();
-    const M = { rule: 'hued', of: 'metal', against: ['wood'], gap: 12 };
-    assert.equal(paintColour(M, v), metalOf.toLowerCase());
-    assert.equal(paintColour({ rule: 'hued', of: 'accent', against: [M], gap: 20 }, v), gripOf.toLowerCase());
-    for (const t of HUE_TONES) assert.equal(paintColour({ rule: 'hueTone', of: M, tone: t }, v), OLD.value().toLowerCase(), `${t} of ${metalOf}`);
-  }
-});
 
 test('a sprite may name them: the validator takes hueTone and hued in a palette rule and in a paint', async () => {
   const { validateSprite } = await import('../../catalog/sprite-schema.js');

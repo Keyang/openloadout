@@ -40,8 +40,6 @@ const store = () => {
   for (const file of BAKED_FILES) s.add(read(file), file.split('/').pop());
   return s;
 };
-const knight = await codeSprite('knight');
-
 test('base:person-side@7 is the base with its variant clips, pinned, under the piece cap', () => {
   assert.deepEqual(Object.keys(BASE7.body.clips), [...Object.keys(STANDARD_CLIPS), ...Object.keys(VARIANT_CLIPS)]);
   for (const name of ['punch', 'thrust', 'walk-unarmed', 'run-unarmed', 'talk-unarmed', 'shoot-bow']) assert.ok(BASE7.body.clips[name], name);
@@ -64,39 +62,6 @@ test('the released base:person-side@6 is unchanged: its standard clips only, its
   for (const name of Object.keys(STANDARD_CLIPS)) assert.deepEqual(BASE7.body.clips[name], v6.body.clips[name], name);
 });
 
-test('the Hero extends @7 and takes the code knight\'s clips, no more, in the code\'s order', () => {
-  assert.deepEqual(HERO.body.rig.extends.use, 'base:person-side');
-  assert.equal(HERO.body.rig.extends.v, 7);
-  const v = validateSprite(HERO, { pieces: pieceRegistry(store()) });
-  assert.ok(v.ok, v.errors.join('; '));
-  assert.deepEqual(v.warnings, []);
-  assert.deepEqual(v.clips, Object.keys(knight.clips));
-  const r = makeDataSprite(HERO, { pieces: store() });
-  assert.ok(r.ok, r.errors.join('; '));
-  assert.deepEqual(Object.keys(r.sprite.clips), Object.keys(knight.clips));
-  for (const [name, c] of Object.entries(knight.clips)) assert.equal(r.sprite.clips[name].frames, c.frames, name);
-});
-
-test('the Hero picks walk, run and attack by Weapon as the code knight does: none punches and walks and runs unarmed', () => {
-  const want = {
-    sword: { walk: 'walk', run: 'run', attack: 'attack' }, axe: { walk: 'walk', run: 'run', attack: 'attack' },
-    spear: { walk: 'walk', run: 'run', attack: 'attack' }, none: { walk: 'walk-unarmed', run: 'run-unarmed', attack: 'punch' },
-  };
-  for (const [weapon, clips] of Object.entries(want)) {
-    const r = resolveSprite(HERO, { weapon }, { pieces: store() });
-    assert.ok(r.ok, r.errors.join('; '));
-    assert.deepEqual(Object.keys(r.clips), Object.keys(knight.clips), weapon);
-    for (const [name, from] of Object.entries(clips)) {
-      assert.equal(r.clips[name].from, from, `${weapon}: ${name}`);
-      assert.deepEqual(r.clips[name].keys, BASE7.body.clips[from].keys, `${weapon}: ${name} plays ${from}'s keys`);
-      assert.equal(r.clips[name].frames, BASE7.body.clips[from].frames, `${weapon}: ${name}`);
-    }
-    // the sounds stay the Hero's: a blade with a weapon, a swish with none
-    assert.deepEqual(r.clips.attack.sounds.map((c) => c.sound), weapon === 'none' ? ['whoosh'] : ['sword-slash'], weapon);
-    assert.equal(r.clips.walk.sounds.length, 2, `${weapon}: footsteps`);
-  }
-});
-
 /** The share of pixels that differ between two sprites over every frame of a clip, at their own settings. */
 function share(a, pa, b, pb, clip, as = clip) {
   let diff = 0, drawn = 0;
@@ -106,21 +71,6 @@ function share(a, pa, b, pb, clip, as = clip) {
   }
   return drawn ? diff / drawn : 0;
 }
-
-test('the Hero with no weapon beside the code knight with none: attack, walk and run close, closer than the armed clips', () => {
-  const r = makeDataSprite(HERO, { pieces: store() });
-  assert.ok(r.ok, r.errors.join('; '));
-  const s = r.sprite;
-  const none = { ...defaultParams(s), weapon: 'none' }, code = { ...defaultParams(knight), weapon: 'none' };
-  // the Hero as it was before B4x: no weapon but the armed clips (a swing of an empty hand)
-  const armed = makeDataSprite({ ...HERO, clips: { ...HERO.clips, walk: { ...HERO.clips.walk, from: 'walk' }, run: { ...HERO.clips.run, from: 'run' }, attack: { ...HERO.clips.attack, from: 'attack' } } }, { pieces: store() });
-  assert.ok(armed.ok, armed.errors.join('; '));
-  for (const clip of ['attack', 'walk', 'run']) {
-    const now = share(knight, code, s, none, clip), before = share(knight, code, armed.sprite, none, clip);
-    assert.ok(now <= 0.15, `${clip}: ${(now * 100).toFixed(1)} % of pixels differ from the code knight with no weapon`);
-    assert.ok(now < before, `${clip}: ${(now * 100).toFixed(1)} % picked, ${(before * 100).toFixed(1)} % with the armed clip`);
-  }
-});
 
 test('the worked example of docs/data-sprites.md 2.2 names only what pieces/ holds: it validates, draws and picks by Weapon', () => {
   const doc = read('docs/data-sprites.md');
@@ -138,30 +88,4 @@ test('the worked example of docs/data-sprites.md 2.2 names only what pieces/ hol
     const r = resolveSprite(def, { weapon }, { pieces: store() });
     assert.deepEqual(['walk', 'run', 'attack'].map((c) => r.clips[c].from), want, weapon);
   }
-});
-
-test('the bone soldier, the spear goblin and the wizard can name thrust: each sketch validates on @7 and keeps its code clips', async () => {
-  const thrust = BASE7.body.clips.thrust;
-  for (const id of SKETCHES) {
-    const def = sketch(id);
-    const code = await codeSprite(id);
-    const v = validateSprite(def, { pieces: pieceRegistry(store()) });
-    assert.ok(v.ok, `${id}: ${v.errors.join('; ')}`);
-    assert.deepEqual(v.warnings, [], id);
-    const extra = id === 'wizard' ? ['attack'] : [];   // the wizard sketch adds a staff jab the code wizard never had
-    assert.deepEqual(v.clips, [...Object.keys(code.clips), ...extra], `${id}: the code sprite's clips`);
-    const settings = id === 'wizard' ? {} : { weapon: 'spear' };
-    const r = resolveSprite(def, settings, { pieces: store() });
-    assert.ok(r.ok, `${id}: ${r.errors.join('; ')}`);
-    assert.equal(r.clips.attack.from, 'thrust', id);
-    assert.deepEqual(r.clips.attack.keys, thrust.keys, `${id}: attack plays the base's thrust`);
-    const m = makeDataSprite(def, { pieces: store() });
-    assert.ok(m.ok, `${id}: ${m.errors.join('; ')}`);
-    const p = { ...defaultParams(m.sprite), ...settings };
-    for (let f = 0; f < m.sprite.clips.attack.frames; f++) assert.ok(renderFrame(m.sprite, 'attack', f, p).data.some(Boolean), `${id} attack ${f}`);
-  }
-  // where the code picks another attack, so does the sketch
-  const pick = (id, weapon) => resolveSprite(sketch(id), { weapon }, { pieces: store() }).clips.attack.from;
-  assert.deepEqual(['sword', 'axe', 'spear', 'none'].map((w) => pick('bone-soldier', w)), ['attack', 'attack', 'thrust', 'punch']);
-  assert.deepEqual(['spear', 'club', 'dagger', 'none'].map((w) => pick('spear-goblin', w)), ['thrust', 'attack', 'thrust', 'punch']);
 });

@@ -28,54 +28,12 @@
 //
 // Styles: these paint flat pixels, which suits the pixel style; a smooth style would want its own shoreline.
 
-import { INK, tone, mix, ramp, col } from './color.js';
-import { TAU, hash, fract, clamp } from './motion.js';
-import { textureLight, textureTone, pickPiece, pieceOf } from './tiles.js';
+import { INK, mix, ramp } from './color.js';
+import { TAU, hash, clamp } from './motion.js';
+import { pickPiece, pieceOf } from './tiles.js';
 
 const TILE = 32, M = TILE - 1;
 const wrap = (v) => ((Math.round(v) % TILE) + TILE) % TILE;
-
-/**
- * The tones of a body of water from one colour: { body, shallow, light, dark, foam, froth }, the body a step darker than the colour so that it stands apart from the ground round it by value under every look.
- * Arguments: colour (the water's colour, '#rrggbb': it becomes the shallows); options { foam (the foam's colour, default cream), depth (how much darker the body is, in steps of tone(); default 0.7) }. light and dark are the tones for marks in the body that no whole-bundle look merges with it; froth is foam thinned with water.
- */
-export function waterTones(colour, { foam = '#f0ead8', depth = 0.7 } = {}) {
-  const body = tone(colour, -Math.max(0, depth));
-  return { body, shallow: colour, light: textureLight(body), dark: textureTone(body), foam, froth: mix(foam, colour, 0.5) };
-}
-
-/**
- * A moving water surface as a tile fill: level streaks of light that swell, slide and fade on their own timers over one colour, wrapping round the tile's edges and closing over one loop; returns fill(x, y).
- * Arguments: base (the water's colour); t (clip phase 0..1); options { light (the streaks' colour), dark (a colour for every third streak, a trough; left out: all light), count (streaks in a tile, default 5), length (px of the longest, default 6), stir (px a streak slides in its life, default 2), seed, tips (a colour for the leading pixel of every full-grown streak, where it catches the sun; left out: none), glints ([[x, y, when, size]]: twinkles that flash at phase `when`, size 1 a plus, 2 a big plus), glint (their colour, default white) }.
- */
-export function rippleFill(base, t, { light = '#ffffff', dark = null, count = 5, length = 6, stir = 2, seed = 0, tips = null, glints = [], glint = '#ffffff' } = {}) {
-  const px = new Uint32Array(TILE * TILE).fill(col(base));
-  const put = (x, y, c) => { px[wrap(y) * TILE + wrap(x)] = col(c); };
-  const n = Math.max(0, Math.round(count));
-  const start = hash(seed, 9);
-  for (let i = 0; i < n; i++) {
-    // each streak lives three quarters of the loop: it swells from nothing to its length and back, sliding as it goes
-    const life = fract(t + hash(i, seed * 7 + 3));
-    const full = Math.max(2, length * (0.6 + 0.4 * hash(i, seed + 11)));
-    const len = life < 0.75 ? Math.round(full * Math.sin((Math.PI * life) / 0.75)) : 0;
-    if (len < 2) continue;
-    // rows evenly down the tile, columns a golden step apart: no two streaks line up, and the field has no blotch
-    const y = Math.round(((i + 0.5) * TILE) / n + (hash(i, seed + 5) - 0.5) * (TILE / n) * 0.4);
-    const x = Math.round(fract(i * 0.618034 + start) * TILE + stir * life - len / 2);
-    const c = dark && i % 3 === 2 ? dark : light;
-    for (let k = 0; k < len; k++) put(x + k, y, c);
-    if (tips && c === light && len >= 4) put(x + len - 1, y, tips);
-    if (i % 3 === 0 && len >= 5) for (let k = 0; k < len - 3; k++) put(x + 2 + k, y + 2, c);     // a second, shorter line under it
-  }
-  for (const [gx, gy, when = 0, big = 1] of glints) {
-    const life = fract(t - when);
-    const size = life < 0.125 ? big : life < 0.25 ? 1 : life < 0.375 || life >= 0.875 ? 0 : -1;
-    if (size < 0) continue;
-    for (let k = 1; k <= size; k++) { put(gx - k, gy, glint); put(gx + k, gy, glint); put(gx, gy - k, glint); put(gx, gy + k, glint); }
-    put(gx, gy, size ? '#ffffff' : glint);
-  }
-  return (x, y) => px[wrap(y) * TILE + wrap(x)];
-}
 
 /**
  * The colour of one pixel of water lapping at a shore: a line on the waterline, then shallow water with a foam line that moves out and back and breaks into pieces, or null further in, where the deep water shows.

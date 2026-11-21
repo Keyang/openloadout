@@ -10,11 +10,9 @@ import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
 import { Surface } from '../../engine/surface.js';
 import { brightness, INK } from '../../engine/color.js';
 import { PALETTE } from '../../engine/palettes.js';
-import { oldReplay } from '../helpers/old-replay.mjs';
 import { paintColour } from '../../engine/data-rules.js';
 import { drawList } from '../../engine/draw-list.js';
 
-const OLD = oldReplay('gen-faces-portrait');   // what engine/faces.js (deleted by R3) drew, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 // what engine/faces.js offered: every mood, hair style, headgear, collar and beard word, and the mouth's step by clip frame
 const FACE_MOODS = ['neutral', 'happy', 'worried', 'hurt', 'angry', 'surprised'];
 const FACE_HAIR = ['short', 'long', 'spiky', 'ponytail', 'bald', 'bowl', 'pigtails', 'balding'];
@@ -69,7 +67,6 @@ const PEOPLE = {
 // skins: the default, a dark one, one close to the wood hair and one close to the cream hair and beard
 const SKINS = { skin: P.skin, dark: '#5a3a22', near: '#a87850', pale: '#efe6d2' };
 
-function codeDraw(person, o) { return OLD.surface(48, 48); }
 function genDraw(args, o, palette, ctx = { size: [48, 48] }) {
   const r = registry.runGenerator({ gen: 'portrait', v: 1, at: [24, 24], ...args, ...o }, ctx);
   assert.ok(r.ok, r.errors.join('; '));
@@ -92,22 +89,6 @@ function same(d, o, label, skin = 'skin') {
   const got = genDraw(args, { ...(o.mood ? { mood: o.mood } : {}), ...(o.mouth ? { mouth: o.mouth } : {}), ...(o.zoom !== undefined ? { zoom: o.zoom } : {}), ...(o.frame ? { frame: o.frame } : {}) }, palette);
   assert.deepEqual(differ(want, got).slice(0, 6), [], `${label} (skin ${skin}): pixels differ`);
 }
-
-test('portrait@1 draws each person of the two library sets as engine/faces.js draws them, every mood, zoom, border and skin', () => {
-  for (const [who, d] of Object.entries(PEOPLE)) for (const mood of FACE_MOODS) for (const skin of Object.keys(SKINS)) {
-    same(d, { mood, zoom: 0.5 }, `${who} ${mood}`, skin);
-  }
-  for (const [who, d] of Object.entries(PEOPLE)) for (const zoom of [0, 0.25, 1]) for (const frame of ['none', 'round', 'square']) same(d, { zoom, frame }, `${who} zoom ${zoom} ${frame}`);
-});
-
-test('portrait@1 draws every hair style, headgear, beard and collar, and the mouth half and wide open, as engine/faces.js', () => {
-  for (const hair of FACE_HAIR) for (const skin of Object.keys(SKINS)) same({ hair, hairPaint: 'wood' }, {}, `hair ${hair}`, skin);
-  for (const headgear of FACE_HEADGEAR.filter((g) => g !== 'none')) same({ hair: 'short', headgear, plume: 'crimson', band: 'gold', jewel: 'gold', gear: 'roof' }, {}, `headgear ${headgear}`);
-  for (const beard of FACE_BEARDS.filter((b) => b !== 'none')) for (const skin of Object.keys(SKINS)) same({ hair: 'short', beard, beardPaint: 'cream', beardLength: 1.3 }, {}, `beard ${beard}`, skin);
-  for (const collar of FACE_COLLARS) same({ hair: 'short', outfit: 'hero', collar, trim: 'crimson', clasp: 'gold', panel: 'roof' }, { zoom: 0 }, `collar ${collar}`);
-  for (const carried of ['halberd', 'spear']) same({ hair: 'short', carried }, {}, `carried ${carried}`);
-  for (const mouth of [1, 2]) same(PEOPLE.mage, { mouth }, `mouth ${mouth}`);
-});
 
 test('a talk call opens and closes the mouth with the clip\'s frames: closed, half, open, half', () => {
   const { args } = both(PEOPLE.hero), palette = HEX;

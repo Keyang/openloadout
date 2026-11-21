@@ -40,11 +40,6 @@ test('the fixtures pass: no errors, no warnings, the cost measured', () => {
   }
 });
 
-test('a code sprite, or a version 1 studio sprite, is not looked at (nothing, no metrics)', async () => {
-  const crate = (await import('../fixtures/code-sprites/crate.js')).default;   // the code file as it was before P1
-  assert.deepEqual(dataChecks(crate), { errors: [], warnings: [], metrics: {} });
-});
-
 test('stamp out of frame: a stamp wholly outside the frame is an error naming where', () => {
   const r = dataChecks(make(coinWith((d) => d.body.pictures.draw.splice(1, 0, STAMP([40, 40])))));
   assert.equal(r.errors.length, 1, r.errors.join('\n'));

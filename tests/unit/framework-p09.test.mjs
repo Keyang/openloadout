@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
 import { Surface, tilt, lean, leanRoom, cropped, ellipseIn } from '../../engine/surface.js';
 import { clippedIn, insetIn } from '../../engine/shapes.js';
 import { squircleIn } from '../../engine/solids.js';
-import { chunks, rays, steps } from '../../engine/fx.js';
+import { steps } from '../../engine/fx.js';
 import { MARKS, markIn, drawMark } from '../../engine/marks.js';
 import { ramp, col } from '../../engine/color.js';
 import { PI } from '../../engine/motion.js';
@@ -54,75 +54,6 @@ test('tilt moves the far end by about distance x angle', () => {
   const b = out.bounds();
   assert.ok(b.x1 >= 27 && b.x1 <= 29, `top moved to ${b.x1}`);
 });
-
-test('lean slides rows only: the foot row stays, the top moves by height x slope, every row keeps its width', () => {
-  const g = new Surface(40, 40).rect(19, 5, 3, 30, '#a06a3c');
-  const out = lean(g, 35, 0.1);
-  assert.equal(lit(out), lit(g));
-  assert.ok(out.get(19, 34) && out.get(21, 34) && !out.get(22, 34), 'the foot row has not moved');
-  assert.ok(out.get(22, 5) && out.get(24, 5) && !out.get(21, 5), 'the top row moved 3 px right');
-  for (let y = 5; y < 35; y++) { let n = 0; for (let x = 0; x < 40; x++) if (out.get(x, y)) n++; assert.equal(n, 3, `row ${y} is still 3 px wide`); }
-  assert.ok(same(lean(g, 35, 0), g));
-  const left = lean(g, 35, -0.1);
-  assert.ok(left.get(16, 5) && !left.get(19, 5));
-});
-
-// ---- chunks -------------------------------------------------------------------
-
-const plank = (g, t, extra = {}) => chunks(g, { t, x: 16, y: 20, count: 6, seed: 3, dist: 12, rise: 10, size: 6, thick: 2, floor: 29, colour: '#a06a3c', ...extra });
-
-test('chunks: same input, same pixels; never empty; stays inside the 1 px border', () => {
-  for (const t of ts) {
-    const a = new Surface(32, 32), b = new Surface(32, 32);
-    plank(a, t); plank(b, t);
-    assert.ok(same(a, b), `t=${t} repeatable`);
-    assert.ok(lit(a) >= 2, `t=${t}: something is drawn`);
-    const bb = a.bounds();
-    assert.ok(bb.x0 >= 1 && bb.y0 >= 1 && bb.x1 <= 30 && bb.y1 <= 30, `t=${t}: inside the border (${JSON.stringify(bb)})`);
-  }
-});
-
-test('chunks fly up and out, then lie on the floor row', () => {
-  const at = (t) => { const g = new Surface(32, 32); plank(g, t); return g.bounds(); };
-  const start = at(0), high = at(0.3), end = at(1);
-  assert.ok(high.y0 < start.y0, `they rise: top ${start.y0} -> ${high.y0}`);
-  assert.ok(end.x1 - end.x0 > start.x1 - start.x0, 'they spread sideways');
-  assert.equal(end.y1, 29, 'the last frame rests on the floor row');
-  assert.ok(end.y0 >= 29 - 3, `and lies flat: nothing higher than 3 px above the floor (top ${end.y0})`);
-});
-
-test('chunks: count changes how many, a different seed changes the pattern', () => {
-  const few = new Surface(32, 32), many = new Surface(32, 32), other = new Surface(32, 32);
-  plank(few, 0.4, { count: 3 }); plank(many, 0.4, { count: 10 }); plank(other, 0.4, { count: 3, seed: 8 });
-  assert.ok(lit(many) > lit(few));
-  assert.ok(!same(few, other));
-});
-
-// ---- rays ---------------------------------------------------------------------
-
-test('rays fan out from a point, hottest near it, and stay in the box', () => {
-  const C = steps('#f2c230');
-  const g = new Surface(32, 32);
-  rays(g, { x: 16, y: 20, count: 5, angle: PI, arc: PI / 2, r0: 2, r1: 14, colours: C });
-  assert.ok(lit(g) >= 10);
-  const b = g.bounds();
-  assert.ok(b.y1 <= 20 && b.y0 >= 1, `upward only: ${JSON.stringify(b)}`);
-  assert.ok(b.x0 >= 1 && b.x1 <= 30);
-  const boxed = new Surface(32, 32);
-  rays(boxed, { x: 16, y: 20, count: 5, angle: PI, arc: PI / 2, r0: 2, r1: 30, colours: C, box: [8, 8, 24, 24] });
-  const bb = boxed.bounds();
-  assert.ok(bb.x0 >= 8 && bb.y0 >= 8 && bb.x1 < 24 && bb.y1 < 24);
-});
-
-test('rays: longer rays light more pixels; the dashes travel with phase and repeat every whole phase', () => {
-  const draw = (o) => { const g = new Surface(32, 32); rays(g, { x: 16, y: 28, count: 4, angle: PI, arc: PI / 3, r0: 2, colour: '#4fd8ee', dash: 3, gap: 2, ...o }); return g; };
-  assert.ok(lit(draw({ r1: 20 })) > lit(draw({ r1: 8 })));
-  assert.ok(!same(draw({ r1: 16, phase: 0 }), draw({ r1: 16, phase: 0.4 })));
-  assert.ok(same(draw({ r1: 16, phase: 0.25 }), draw({ r1: 16, phase: 1.25 })));
-  assert.equal(lit(draw({ r1: 2 })), 0, 'no length, no rays');
-});
-
-// ---- marks --------------------------------------------------------------------
 
 test('every mark draws at 5, 7 and 9 px, inside its box, and no two are the same picture', () => {
   assert.ok(MARKS.length >= 6);

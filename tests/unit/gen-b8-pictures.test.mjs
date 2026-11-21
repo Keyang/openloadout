@@ -16,8 +16,6 @@ import { generator, runGenerator } from '../../engine/gen/index.js';
 import { drawList } from '../../engine/draw-list.js';
 import { Surface } from '../../engine/surface.js';
 
-import { oldReplay } from '../helpers/old-replay.mjs';
-const OLD = oldReplay('gen-b8-pictures');   // what engine/icons.js (deleted by R3) drew and answered, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 const META = (type, role, view, words) => ({ type, role, view, themes: ['fantasy'], gameTypes: ['platformer'], words, license: 'draft' });
 const same = (a, b) => a.w === b.w && a.h === b.h && a.data.every((v, i) => v === b.data[i]);
 const solid = (g) => g.data.filter((v) => v >>> 24).length;
@@ -106,27 +104,6 @@ const ICONS = {
       small: { label: 'Small', draw: [{ gen: 'icon.fit', v: 1, size: 0, fill: 0.6, tilt: false, draw: [{ gen: 'icon.paint', v: 1, shapes: [{ kind: 'ellipse', at: [0, 0], r: [8, 11], paint: 'shell' }], paint: 'shell' }] }] },
     } } },
 };
-
-test('the body\'s fit fits each picture to the Size slider; a picture with its own icon.fit keeps it', () => {
-  const s = dataSprite(ICONS);
-  const p = defaultParams(s);
-  const side = (g) => { const b = g.bounds(); return Math.max(b.x1 - b.x0 + 1, b.y1 - b.y0 + 1); };
-  assert.equal(side(renderFrame(s, 'round', 0, { ...p, size: 0 })), 20, 'Small: the longer side 20 px, outline included (engine/icons.js iconFit)');
-  assert.equal(side(renderFrame(s, 'round', 0, { ...p, size: 1 })), 26, 'Big: 26 px');
-  // the middle as engine/icons.js iconFit finds it for the same shape (its search stops at 22 here, not 23)
-  const old = OLD.surface(32, 32);
-  assert.equal(side(renderFrame(s, 'round', 0, p)), side(old));
-  assert.deepEqual(renderFrame(s, 'round', 0, p).bounds(), old.bounds(), 'placed where iconFit places it');
-  const b = renderFrame(s, 'round', 0, p).bounds();
-  assert.ok(Math.abs((b.x0 + b.x1) / 2 - 15.5) <= 0.5 && Math.abs((b.y0 + b.y1) / 2 - 15.5) <= 0.5, 'centred in the frame');
-  assert.ok(!same(renderFrame(s, 'round', 0, { ...p, tilt: false }), renderFrame(s, 'round', 0, p)), 'Tilt turns it by the picture\'s angle');
-  assert.equal(side(renderFrame(s, 'small', 0, { ...p, size: 1 })), 12, 'its own fit (fill 0.6 of 20) is not fitted again');
-  // the glint lands only on painted pixels: no white pixel has an empty pixel on all four sides
-  const g = renderFrame(s, 'round', 0, p);
-  assert.ok(g.data.some((v) => (v & 0xffffff) === 0xffffff), 'the glint is drawn');
-});
-
-// ---- after the B8 review ------------------------------------------------------------------------------------------
 
 test('an emitter on a node runs in frame pixels: the same burst as one written at the node\'s frame point', () => {
   // the node sits in the top-right corner, where the burst keeps its sparkles inside the frame; run at the node's own

@@ -12,10 +12,6 @@ import { STAMP_BOUNDS, SIZE_KEYS, FRAME_GENERATORS } from '../../engine/gen/inde
 import { stampPixels } from '../../engine/gen/args.js';
 import { Surface } from '../../engine/surface.js';
 import { ellipseIn } from '../../engine/surface.js';
-import { oldReplay } from '../helpers/old-replay.mjs';
-
-const OLD = oldReplay('gen-fx-e1');   // what the modules that are gone (engine/spells.js, blast.js, fx-floor.js) drew, recorded in the order of the calls (tests/helpers/old-replay.mjs)
-
 const HEX = { p0: '#ffffff', p1: '#f0ead8', p2: '#f1c584', p3: '#f2a030', p4: '#8a5410' };
 const P5 = ['p0', 'p1', 'p2', 'p3', 'p4'];
 const P4 = ['p1', 'p2', 'p3', 'p4'];
@@ -141,29 +137,6 @@ function drawn(call, size) {
 }
 const offBy = (a, b) => a.data.reduce((n, v, i) => n + (v !== b.data[i] ? 1 : 0), 0);
 
-test('crescent@1 draws what engine/spells.js crescent draws: its ends through at along angle, start and end its from and to, width x thin, cooled paints, each claw another crescent', () => {
-  const size = [64, 64];
-  const cases = [
-    { at: [32, 32], length: 50, angle: -40, bulge: 12, width: 8, paints: P4 },
-    { at: [30, 22], length: 46, angle: 66, bulge: 9, flip: true, width: 10, start: 0.22, thin: 0.72, jag: 2.4, teeth: 9, seed: 3, paints: P5 },
-    { at: [32, 32], length: 52, angle: 0, bulge: 20, width: 5, head: 0.5, end: 0.6, paints: ['p3', 'p4'] },
-    { at: [32, 32], length: 60, angle: 220, bulge: 0.2, width: 11.5, start: 0.5, end: 1, thin: 0.45, cool: 2, paints: P5 },
-    { at: [32, 32], length: 54, angle: 140, bulge: 14, width: 6, claws: 3, gap: 7, paints: P4 },
-    // every claw count it takes (review E1, issue 8: only 1 and 3 were held)
-    { at: [32, 32], length: 50, angle: 140, bulge: 12, width: 5, claws: 2, gap: 6, paints: P4 },
-    { at: [32, 32], length: 44, angle: 150, bulge: 10, width: 4, claws: 4, gap: 5, paints: P4 },
-    { at: [32, 32], length: 40, angle: 130, bulge: 9, width: 4, claws: 5, gap: 4, seed: 2, jag: 1, paints: P5 },
-  ];
-  let lit = 0;
-  for (const o of cases) {
-    const mine = drawn({ gen: 'crescent', v: 1, ...o }, size);
-    const theirs = OLD.surface(64, 64);
-    assert.equal(offBy(mine, theirs), 0, JSON.stringify(o));
-    if (theirs.data.some((v) => v >>> 24)) lit++;
-  }
-  assert.equal(lit, cases.length);
-});
-
 test('crescent@1 stays within its stamp bound at any length, width, bow, jag and claws, and its keys do not change its price', () => {
   const size = [640, 360];
   for (const [bulge, flip] of [[60, true], [0.3, true], [0.6, false], [8, false], [40, true], [160, false]]) for (const width of [0, 6, 32]) for (const jag of [0, 8]) for (const length of [3, 40, 300]) for (const claws of [1, 4]) {
@@ -178,22 +151,6 @@ test('crescent@1 stays within its stamp bound at any length, width, bow, jag and
   }
 });
 
-test('spike.fan@1 draws what engine/blast.js spikesIn and a disc draw as one blob, outlined in the paint rim steps cooler', () => {
-  const size = [32, 32];
-  const cases = [
-    { at: [8.5, 15.5], count: 3, angle: 90, arc: 180, length: 16, short: 0.68, width: 5.5, disc: 3.2, paints: ['p1', 'p3'] },
-    { at: [8.5, 15.5], count: 5, angle: 90, arc: 92, length: 18, grow: 1.1, from: 0.28, short: 1, width: 6, thin: 0.55, belly: 0.74, disc: 1.8, cool: 1, paints: P5 },
-    { at: [8.5, 15.5], count: 3, angle: 90, arc: 40, length: 20, width: 4, hair: false, rim: 7, paints: ['p0'] },
-    { at: [16, 16], count: 1, angle: 45, arc: 0, length: 12, width: 0.4, paints: ['p3', 'p4'] },
-  ];
-  for (const o of cases) {
-    const mine = drawn({ gen: 'spike.fan', v: 1, ...o }, size);
-    const theirs = OLD.surface(32, 32);
-    assert.equal(offBy(mine, theirs), 0, JSON.stringify(o));
-    assert.ok(theirs.data.some((v) => v >>> 24));
-  }
-});
-
 test('bolt.grow@1 draws what bolt@1 draws at width x thin with its hottest paints cooled away', () => {
   const a = { at: [38, 2], length: 87, angle: -4, kinks: 6, zigzag: 3, sway: 7, forks: 3, forkAngle: 52, seed: 3 };
   const size = { size: [64, 96] };
@@ -201,35 +158,4 @@ test('bolt.grow@1 draws what bolt@1 draws at width x thin with its hottest paint
   assert.deepEqual(run({ gen: 'bolt.grow', v: 1, ...a, width: 5, thin: 0.36, forkLength: 0.1, cool: 2, lead: 0.8, paints: P5 }, size),
     run({ gen: 'bolt', v: 1, ...a, width: 1.8, forkLength: 0.1, lead: 0.8, paints: P5.slice(2) }, size));
   assert.deepEqual(run({ gen: 'bolt.grow', v: 1, ...a, width: 5, thin: 0, paints: P5 }, size), run({ gen: 'bolt', v: 1, ...a, width: 1, paints: P5 }, size));
-});
-
-test('floor.ring@1 draws what engine/fx-floor.js floorRing draws (r x scale; degrees for its turn and phase)', () => {
-  const size = [48, 48];
-  const cases = [
-    { at: [24, 24], r: 14, squash: 0.66, paints: P4 },
-    { at: [24, 24], r: 14, scale: 1.2, squash: 0.66, thick: 3, sides: 6, turn: 30, gaps: 5, open: 0.4, phase: 70, heat: 0.5, paints: P4 },
-    { at: [24, 24], r: 1, squash: 0.66, rim: false, paints: ['p2', 'p3'] },
-    { at: [24, 24], r: 20, squash: 0.5, thick: 1, gaps: 8, open: 0.68, heat: 0.2, paints: ['p3', 'p3'] },
-  ];
-  for (const o of cases) {
-    const mine = drawn({ gen: 'floor.ring', v: 1, ...o }, size);
-    const theirs = OLD.surface(48, 48);
-    assert.equal(offBy(mine, theirs), 0, JSON.stringify(o));
-    assert.ok(theirs.data.some((v) => v >>> 24));
-  }
-});
-
-test('rift@1 draws what engine/fx-floor.js riftIn painted with lightShape draws (its heart the first of three paints)', () => {
-  const size = [48, 48];
-  const cases = [
-    { at: [24, 20], length: 21, across: 9, seed: 2, paints: ['p1', 'p3', 'p4'] },
-    { at: [24, 20], length: 21, across: 9, scale: 0.6, open: 0.5, angle: 60, teeth: 4, jag: 0.7, seed: 3, paints: ['p3', 'p4'] },
-    { at: [24, 20], length: 18, across: 6, rim: false, paints: ['p3', 'p4'] },
-  ];
-  for (const o of cases) {
-    const mine = drawn({ gen: 'rift', v: 1, ...o }, size);
-    const theirs = OLD.surface(48, 48);
-    assert.equal(offBy(mine, theirs), 0, JSON.stringify(o));
-    assert.ok(theirs.data.some((v) => v >>> 24));
-  }
 });

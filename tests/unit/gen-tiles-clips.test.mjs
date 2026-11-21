@@ -16,8 +16,6 @@ import { validateSprite } from '../../catalog/sprite-schema.js';
 import { pieceRegistry } from '../../engine/pieces.js';
 import { testPieces } from '../fixtures/resolve/helpers.mjs';
 import { codeSprite } from '../helpers/library.mjs';
-const forestCode = await codeSprite('tiles-forest');   // the frozen copy: the library's is data since migration batch M5
-
 const FIX = new URL('../fixtures/v2/', import.meta.url);
 const load = (p) => JSON.parse(fs.readFileSync(new URL(p, FIX), 'utf8'));
 // a clip table as the code helpers write it, with fps a number (what a data definition holds)
@@ -65,15 +63,6 @@ test('every group kind: floor, liquid, platform, slope, stack; decals with their
   assert.deepEqual(k.stacks.map((x) => x.prefix), ['ladder']);
   assert.deepEqual(k.extras, ['stairs-down']);
   assert.deepEqual(TILE_GROUP_PIECES.block, ['block', 'narrow', 'lanes', 'thin', 'slope', 'inner']);
-});
-
-test('the forest fixture names every clip the code forest names for the same pieces, in the same order and words', () => {
-  const body = load('tiles-forest.json').body.tiles;
-  const names = tileClipNames(body);
-  const code = Object.keys(forestCode.clips).filter((n) => !/-deco-[bc]$/.test(n));
-  assert.deepEqual(names.filter((n) => !/-thin-/.test(n)), code.filter((n) => !/-thin-/.test(n)));
-  for (const n of names) if (!/-thin-/.test(n)) assert.equal(tileClips(body)[n].label, forestCode.clips[n].label, n);
-  assert.equal(tileClips(body)['grass-deco-a'].place, 'above');
 });
 
 test('tile.clips is a framework function, not a registry entry (the registry holds generators that draw)', () => {

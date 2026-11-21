@@ -13,8 +13,6 @@ import * as FX from '../../engine/fx.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { steps } from '../../engine/fx.js';
 import { codeSprite } from '../helpers/library.mjs';
-const boltCode = await codeSprite('blaster-bolt');   // batch E3: sprites/blaster-bolt.js is data now; its frozen code copy
-
 const RAD = Math.PI / 180;
 const P5 = ['p0', 'p1', 'p2', 'p3', 'p4'];
 const HEX = { p0: '#ffffff', p1: '#f0ead8', p2: '#f1c584', p3: '#f2a030', p4: '#8a5410', s0: '#c2c9d6', s1: '#9aa6c0', s2: '#6b7896' };
@@ -112,44 +110,6 @@ test('particles@1 draws what engine/fx.js particles draws, one-shot and looping'
   }
 });
 
-test('starburst@1 draws what engine/fx.js starburst draws (push, cut and short move the radii)', () => {
-  const size = [32, 32];
-  for (const o of [
-    { at: [15.5, 15.5], points: 6, r: [0, 9.5], width: 5.3, paints: ['p1', 'p3'] },
-    { at: [15.5, 15.5], points: 5, r: [4, 11], width: 0.4, turn: 216, paints: ['p2'] },
-    { at: [16, 16], points: 4, r: [3, 9], paints: ['p0'] },
-  ]) {
-    const g = new Surface(...size);
-    FX.starburst(g, { x: o.at[0], y: o.at[1], count: o.points, r0: o.r[0], r1: o.r[1], width: o.width ?? 3, turn: (o.turn ?? 180) * RAD, colour: HEX[o.paints[0]], rim: o.paints[1] ? HEX[o.paints[1]] : null });
-    same(drawn({ gen: 'starburst', v: 1, ...o }, {}, size), g, `starburst ${JSON.stringify(o)}`);
-  }
-  const g = new Surface(...size);
-  FX.starburst(g, { x: 15.5, y: 15.5, count: 6, r0: 2 + 5 + 1, r1: 6 + 5 - 2, width: 1.5, turn: 180 * RAD, colour: HEX.p2 });
-  same(drawn({ gen: 'starburst', v: 1, at: [15.5, 15.5], points: 6, r: [2, 6], push: 5, cut: 1, short: 2, width: 1.5, paints: ['p2'] }, {}, size), g, 'starburst pushed');
-});
-
-test('starburst@1: twist turns it by a share of half the spacing between spikes, and cool and rim walk a list of paints (B12b)', () => {
-  const size = [32, 32];
-  // sprites/hit-spark.js: turn = PI + twist * (PI / n), whatever n
-  for (const n of [4, 5, 6, 7, 8]) for (const twist of [0.3, 1]) {
-    const g = new Surface(...size);
-    FX.starburst(g, { x: 15.5, y: 15.5, count: n, r0: 0, r1: 10, width: 3, turn: Math.PI + twist * (Math.PI / n), colour: HEX.p1, rim: HEX.p3 });
-    same(drawn({ gen: 'starburst', v: 1, at: [15.5, 15.5], points: n, r: [0, 10], width: 3, twist, paints: ['p1', 'p3'] }, {}, size), g, `twist ${twist}, ${n} spikes`);
-  }
-  // paints hottest first; the spikes take paints[cool], their rim paints[cool + rim] or none past the end
-  const list = ['p0', 'p1', 'p2', 'p3', 'p4'];
-  for (const [cool, rim] of [[0, 1], [0, 2], [1, 2], [2, 2], [3, 2], [4, 1], [6, 1], [1.4, 3]]) {
-    const c = Math.min(4, Math.round(cool));
-    const g = new Surface(...size);
-    FX.starburst(g, { x: 15.5, y: 15.5, count: 6, r0: 1, r1: 11, width: 2.5, turn: Math.PI, colour: HEX[list[c]], rim: list[c + rim] ? HEX[list[c + rim]] : null });
-    same(drawn({ gen: 'starburst', v: 1, at: [15.5, 15.5], points: 6, r: [1, 11], width: 2.5, paints: list, cool, rim }, {}, size), g, `cool ${cool}, rim ${rim}`);
-  }
-  // the defaults keep the old meaning of paints: [spikes, rim]
-  const g = new Surface(...size);
-  FX.starburst(g, { x: 15.5, y: 15.5, count: 6, r0: 0, r1: 9, width: 4, turn: Math.PI, colour: HEX.p1, rim: HEX.p2 });
-  same(drawn({ gen: 'starburst', v: 1, at: [15.5, 15.5], points: 6, r: [0, 9], width: 4, paints: ['p1', 'p2'] }, {}, size), g, 'paints [spikes, rim]');
-});
-
 test('glow@1 draws what engine/fx.js glow draws', () => {
   for (const [x, y, r, list] of [[23.5, 23.5, 10.3, ['p0', 'p0', 'p1', 'p3']], [16, 16, 4, ['p2', 'p4']], [5, 6, 9, P5], [16, 16, 0.5, ['p3']]]) {
     const g = new Surface(32, 32);
@@ -180,14 +140,6 @@ test('ring@1 draws what engine/fx.js ring draws; begin and end start it later in
   assert.deepEqual(off.primitives, []);
 });
 
-test('streaks@1 draws what engine/fx.js streaks draws', () => {
-  for (const t of [0, 0.25, 0.5, 0.75]) {
-    const g = new Surface(32, 16);
-    FX.streaks(g, { t, x: 9, y: 8, count: 2, seed: 3, angle: -90 * RAD, length: 7, reach: 3, spread: 1.5, colours: hexes(['p3', 'p3', 'p4']) });
-    same(drawn({ gen: 'streaks', v: 1, at: [9, 8], count: 2, seed: 3, angle: -90, length: 7, reach: 3, spread: 1.5, paints: ['p3', 'p3', 'p4'] }, { t, loop: true }, [32, 16]), g, `streaks t ${t}`);
-  }
-});
-
 test('puffs@1 draws what engine/fx.js puffs draws (round, chunky, wispy; one-shot and looping; a floor)', () => {
   for (const t of [0, 0.3, 0.6, 0.9]) {
     for (const o of [
@@ -203,30 +155,6 @@ test('puffs@1 draws what engine/fx.js puffs draws (round, chunky, wispy; one-sho
   }
 });
 
-test('shot.bar@1 draws the blaster bolt\'s bar of light as sprites/blaster-bolt.js does (trail off), every style and beat', () => {
-  for (const style of ['bolt', 'pulse', 'needle']) {
-    for (const [length, thickness, flicker] of [[0.5, 0.5, 0.5], [0, 1, 0], [1, 0, 1]]) {
-      const p = { ...defaultParams(boltCode), style, length, thickness, flicker, trail: false };
-      const [, core, , glow, rim] = steps(p.glow, { core: p.core });
-      for (let f = 0; f < 4; f++) {
-        const code = renderFrame(boltCode, 'fly', f, p);
-        const rows = Math.round(3 + (5.4 - 3) * thickness);
-        const call = {
-          gen: 'shot.bar', v: 1, at: [16, 8], length: 12 + 9 * length, thick: rows, style, beat: [0, 1, 0, -1][f], flicker: Math.round(1 + 2 * flicker), lead: 0, paints: ['c', 'g', 'r'],
-        };
-        const r = registry.runGenerator(call, { size: [32, 16] });
-        assert.ok(r.ok, r.errors.join('; '));
-        const g = paintSimple(new Surface(32, 16), r.primitives, { c: core, g: glow, r: rim });
-        let off = 0;
-        for (let i = 0; i < g.data.length; i++) if (g.data[i] !== code.data[i]) off++;
-        assert.equal(off, 0, `${style} length ${length} thickness ${thickness} frame ${f}: ${off} pixels differ`);
-      }
-    }
-  }
-});
-
-// ---- after the review: keys that cool a ball and a bar with its own trail ------------------------------------------
-
 test('glow@1 scale and cool: keys shrink a ball and drop its hottest paints, as plasma-burst\'s cooling ball does', () => {
   const list = ['p0', 'p1', 'p2', 'p3', 'p4'];
   for (const [r, scale, cool] of [[9.25, 1, 0], [9.25, 0.9, 1], [9.25, 0.66, 2], [11, 0.4, 3], [7.5, 0.66, 2]]) {
@@ -239,40 +167,4 @@ test('glow@1 scale and cool: keys shrink a ball and drop its hottest paints, as 
   FX.glow(g, 23.5, 23.5, 6, hexes(['p4']));
   same(drawn({ gen: 'glow', v: 1, at: [23.5, 23.5], r: 6, cool: 7, paints: list }, {}, [48, 48]), g, 'glow cooled to its rim');
   assert.deepEqual([...registry.generator('glow', 1).keyable].sort(), ['cool', 'r', 'scale']);
-});
-
-test('shot.bar@1 trail: the bar draws the blaster bolt\'s speed lines behind its own tail, exactly as sprites/blaster-bolt.js (trail on)', () => {
-  for (const style of ['bolt', 'pulse', 'needle']) {
-    for (const [length, thickness, flicker] of [[0.5, 0.5, 0.5], [0, 1, 0], [1, 0, 1], [1, 1, 1]]) {
-      const p = { ...defaultParams(boltCode), style, length, thickness, flicker, trail: true };
-      const [, core, , glow, rim] = steps(p.glow, { core: p.core });
-      for (let f = 0; f < 4; f++) {
-        const code = renderFrame(boltCode, 'fly', f, p);
-        const call = {
-          gen: 'shot.bar', v: 1, at: [16, 8], length: 12 + 9 * length, thick: Math.round(3 + (5.4 - 3) * thickness), style, beat: [0, 1, 0, -1][f], flicker: Math.round(1 + 2 * flicker), lead: 2, trail: true, paints: ['c', 'g', 'r'],
-        };
-        const r = registry.runGenerator(call, { size: [32, 16], t: f / 4, loop: true, frame: f, frames: 4 });
-        assert.ok(r.ok, r.errors.join('; '));
-        const g = paintSimple(new Surface(32, 16), r.primitives, { c: core, g: glow, r: rim });
-        let off = 0;
-        for (let i = 0; i < g.data.length; i++) if (g.data[i] !== code.data[i]) off++;
-        assert.equal(off, 0, `${style} length ${length} thickness ${thickness} flicker ${flicker} frame ${f}: ${off} pixels differ`);
-      }
-    }
-  }
-});
-
-test('shot.bar@1 flat: the bolt flattened against what it hit, as the first frame of sprites/blaster-bolt.js\'s hit', () => {
-  for (const [length, thickness] of [[0.5, 0.5], [0, 1], [1, 0], [1, 1], [0, 0]]) {
-    const p = { ...defaultParams(boltCode), length, thickness };
-    const [white, core, , glow, rim] = steps(p.glow, { core: p.core });
-    const code = renderFrame(boltCode, 'hit', 0, p);
-    const call = { gen: 'shot.bar', v: 1, at: [17.5, 8], length: 6, thick: Math.round(3 + (5.4 - 3) * thickness), style: 'flat', lead: 0, paints: ['w', 'c', 'g', 'r'] };
-    const r = registry.runGenerator(call, { size: [32, 16], t: 0, loop: false, frame: 0, frames: 5 });
-    assert.ok(r.ok, r.errors.join('; '));
-    const g = paintSimple(new Surface(32, 16), r.primitives, { w: white, c: core, g: glow, r: rim });
-    let off = 0;
-    for (let i = 0; i < g.data.length; i++) if (g.data[i] !== code.data[i]) off++;
-    assert.equal(off, 0, `length ${length} thickness ${thickness}: ${off} pixels differ`);
-  }
 });

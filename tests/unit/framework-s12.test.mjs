@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { col, INK } from '../../engine/color.js';
 import { TILE, BLOCK_PIECES, NARROW_PIECES, blockJoins, drawSoftBlock } from '../../engine/tiles.js';
-import { drawSoftWall, SOFT_WALL_SLIVER, puddleIn, bubbleSpots, surfaceBubbles, drawVein } from '../../engine/ooze.js';
+import { puddleIn, drawVein } from '../../engine/ooze.js';
 
 const CAP = '#b04a8a', RIM = '#dd80a5', FACE = '#901f7e', SHADE = '#333564', LIQUID = '#9fe040';
 const at = (g, x, y) => g.data[y * g.w + x];
@@ -19,93 +19,6 @@ const DIPS = digits('00001122333221100000112233210000');
 const LIFT = digits('00011222110000012233322110000000');
 const rim = { depth: 3, inset: (u) => DIPS[u], paint: (d) => (d === 1 ? RIM : null) };
 const wall = (extra = {}) => ({ fill: () => CAP, round: 6, top: rim, left: rim, right: rim, face: { paint: () => FACE, foot: (u) => LIFT[u], round: 5, shadow: SHADE, ...extra } });
-const draw = (piece, m = wall()) => drawSoftWall(new Surface(TILE, TILE), piece, m, 0);
-const FRONT = ['bottom', 'bottom-l', 'bottom-r', 'col-b', 'strip-l', 'strip-m', 'strip-r', 'single'];
-
-// ---- drawSoftWall ----------------------------------------------------------------------------------
-
-test('drawSoftWall: the cap pieces are exactly drawSoftBlock\'s', () => {
-  for (const piece of ['fill', 'top', 'left', 'right', 'side-l', 'side-r', 'inner-tl', 'inner-tr', 'col-t', 'col-m']) {
-    const mine = draw(piece), m = wall(), theirs = drawSoftBlock(new Surface(TILE, TILE), piece, { ...m, face: undefined }, 0);
-    assert.deepEqual([...mine.data], [...theirs.data], piece);
-  }
-  const plain = { fill: () => CAP, round: 6, top: rim };
-  assert.deepEqual([...drawSoftWall(new Surface(TILE, TILE), 'bottom', plain).data], [...drawSoftBlock(new Surface(TILE, TILE), 'bottom', plain).data], 'no face: drawSoftBlock');
-});
-
-test('drawSoftWall: the face runs from the first row down to a foot line that follows `foot`, with two rows of shadow under it', () => {
-  const g = draw('bottom');
-  for (let x = 0; x < TILE; x++) {
-    const foot = 29 - LIFT[x];
-    assert.equal(at(g, x, 0), col(FACE), `the face starts on row 0 (column ${x})`);
-    assert.equal(at(g, x, foot), col(INK), `the foot line at column ${x}`);
-    assert.equal(at(g, x, foot + 1), col(SHADE)); assert.equal(at(g, x, foot + 2), col(SHADE));
-    if (foot + 3 < TILE) assert.equal(at(g, x, foot + 3), 0, 'see-through under the shadow');
-  }
-  assert.equal(count(draw('bottom', wall({ shadow: undefined })), SHADE), 0, 'no shadow colour, no shadow');
-});
-
-test('drawSoftWall: a step in the foot line is closed by the outline, so the face has no gap in its edge', () => {
-  const g = draw('bottom');
-  for (let x = 0; x < TILE - 1; x++) {
-    const a = 29 - LIFT[x], b = 29 - LIFT[x + 1];
-    for (let y = Math.min(a, b) + 1; y <= Math.max(a, b); y++) assert.equal(at(g, a > b ? x : x + 1, y), col(INK), `between columns ${x} and ${x + 1}, row ${y}`);      // the lower column's side
-  }
-});
-
-test('drawSoftWall: paint is told how far above the foot line a pixel is', () => {
-  const seen = [];
-  draw('bottom', wall({ paint: (x, y, t, up) => { if (x === 4) seen.push([y, up]); return FACE; } }));
-  const foot = 29 - LIFT[4];
-  assert.deepEqual(seen[0], [0, foot]);
-  assert.deepEqual(seen.at(-1), [foot - 1, 1], 'the last painted row rests on the line');
-});
-
-test('drawSoftWall: the ends of a face are closed by an outline and the foot corners are round', () => {
-  const l = draw('bottom-l'), r = draw('bottom-r'), b = draw('col-b');
-  assert.equal(at(l, 0, 0), col(INK)); assert.equal(at(r, 31, 0), col(INK));
-  assert.equal(at(l, 0, 29), 0, 'the corner is cut'); assert.equal(at(r, 31, 29), 0); assert.equal(at(b, 0, 29), 0); assert.equal(at(b, 31, 29), 0);
-  assert.notEqual(at(l, 31, 0), col(INK), 'the open end has no line');
-  // square corners when the radius is 0
-  assert.equal(at(draw('bottom-l', wall({ round: 0, foot: null })), 0, 29), col(INK));
-});
-
-test('drawSoftWall: every pair of pieces that can touch has outlines that meet (the checker\'s exact test)', () => {
-  const pics = Object.fromEntries([...BLOCK_PIECES, ...NARROW_PIECES].map((p) => [p, draw(p)]));
-  for (const [a, axis, b] of blockJoins({ narrow: true })) {
-    if (FRONT.includes(a) !== FRONT.includes(b) && axis === 'x') continue;      // a face beside a cap: the face simply ends
-    if (a.startsWith('inner-b') || b.startsWith('inner-b')) continue;           // drawn as side pieces with the face behind
-    const A = pics[a], B = pics[b];
-    for (let i = 0; i < TILE; i++) {
-      const pa = axis === 'x' ? at(A, 31, i) : at(A, i, 31), pb = axis === 'x' ? at(B, 0, i) : at(B, i, 0);
-      assert.equal(pa !== 0, pb !== 0, `${a} ${axis} ${b} at ${i}`);
-    }
-  }
-});
-
-test('drawSoftWall: a wall one tile deep is the face under a sliver of cap', () => {
-  const strip = draw('strip-m'), top = drawSoftBlock(new Surface(TILE, TILE), 'top', { ...wall(), face: undefined });
-  for (let y = 0; y < SOFT_WALL_SLIVER; y++) for (let x = 0; x < TILE; x++) assert.equal(at(strip, x, y), at(top, x, y), `cap at ${x},${y}`);
-  assert.equal(at(strip, 16, SOFT_WALL_SLIVER), col(FACE));
-  const single = draw('single');
-  assert.equal(at(single, 0, 0), 0, 'round cap corner'); assert.equal(at(single, 0, 29), 0, 'round foot corner');
-  assert.ok(count(single, FACE) > 200);
-});
-
-test('drawSoftWall: a lower inner corner is the cap\'s side with the neighbouring face behind its outline', () => {
-  const g = draw('inner-bl');
-  const side = drawSoftBlock(new Surface(TILE, TILE), 'side-l', { ...wall(), face: undefined });
-  let behind = 0;
-  for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) {
-    if (at(side, x, y)) assert.equal(at(g, x, y), at(side, x, y));
-    else if (at(g, x, y)) behind++;
-  }
-  assert.ok(behind > 10, 'the face shows in the bays of the cap\'s edge');
-  assert.equal(at(g, 0, 14), col(FACE));
-});
-
-// ---- puddleIn --------------------------------------------------------------------------------------
-
 test('puddleIn: no waves gives a plain ellipse, and waves push the edge out and in', () => {
   const plain = puddleIn(24, 16, 12, 8);
   assert.ok(plain(24, 16) && plain(35.5, 16) && !plain(36.5, 16) && plain(24, 23.5) && !plain(24, 24.5));
@@ -123,42 +36,6 @@ test('puddleIn: a phase of one whole turn is the same shape, and the middle is a
 });
 
 // ---- bubbles -----------------------------------------------------------------------------------------
-
-test('bubbleSpots: places lie inside the shape, apart from each other, and a longer list starts with the shorter one', () => {
-  const pool = puddleIn(24, 16, 16, 9), box = [4, 4, 44, 28];
-  const five = bubbleSpots(5, pool, box, { seed: 3 }), eight = bubbleSpots(8, pool, box, { seed: 3 });
-  assert.equal(five.length, 5); assert.equal(eight.length, 8);
-  assert.deepEqual(eight.slice(0, 5), five);
-  for (const [x, y] of eight) assert.ok(pool(x + 0.5, y + 0.5) && Number.isInteger(x) && Number.isInteger(y));
-  for (let i = 0; i < 5; i++) for (let j = 0; j < i; j++) assert.ok(Math.hypot(five[i][0] - five[j][0], five[i][1] - five[j][1]) >= 4, 'not on top of each other');
-  assert.deepEqual(bubbleSpots(4, () => false, box), [], 'no room, no bubbles');
-});
-
-test('surfaceBubbles: a loop closes, every bubble has its own timing, and nothing is drawn outside `keep`', () => {
-  const pool = puddleIn(24, 16, 16, 9);
-  const frame = (t, extra = {}) => { const g = new Surface(48, 32); surfaceBubbles(g, { t, count: 6, inside: pool, box: [4, 4, 44, 28], size: 3, seed: 2, ...extra }); return g; };
-  assert.deepEqual([...frame(0).data], [...frame(1).data]);
-  const drawn = Array.from({ length: 8 }, (_, i) => frame(i / 8).data.reduce((n, v) => n + (v ? 1 : 0), 0));
-  assert.ok(drawn.every((n) => n > 0), `bubbles on every frame: ${drawn}`);
-  assert.ok(new Set(Array.from({ length: 8 }, (_, i) => frame(i / 8).data.join(''))).size === 8, 'eight different frames');
-  const small = puddleIn(24, 16, 5, 3);
-  for (let i = 0; i < 8; i++) { const g = frame(i / 8, { keep: small }); for (let y = 0; y < 32; y++) for (let x = 0; x < 48; x++) if (at(g, x, y)) assert.ok(Math.hypot(x - 24, y - 16) < 12, `${x},${y}`); }
-});
-
-test('surfaceBubbles: a full dome is a rim round a lighter body with a glint', () => {
-  const g = new Surface(24, 24);
-  // one bubble at a known place, found at the time of its life when it is full
-  let best = null;
-  for (let i = 0; i < 64; i++) {
-    const s = new Surface(24, 24);
-    surfaceBubbles(s, { t: i / 64, spots: [[12, 12, 1]], size: 3, rim: '#4fbd0d', body: '#e6ff76', glint: '#ffffff' });
-    if (!best || count(s, '#e6ff76') > count(best, '#e6ff76')) best = s;
-  }
-  assert.ok(count(best, '#4fbd0d') >= 12, 'a ring'); assert.ok(count(best, '#e6ff76') >= 6, 'a body'); assert.equal(count(best, '#ffffff'), 1, 'one glint');
-  assert.deepEqual(surfaceBubbles(g, { t: 0, spots: [[12, 12, 1]] }), [[12, 12, 1]], 'returns the places');
-});
-
-// ---- drawVein ------------------------------------------------------------------------------------------
 
 test('drawVein: a main line and one path per fork, each joined pixel to pixel, all inside the box', () => {
   const g = new Surface(TILE, TILE), box = [3, 3, 29, 29];

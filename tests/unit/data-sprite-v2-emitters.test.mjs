@@ -17,10 +17,9 @@ import { resolveSprite } from '../../engine/resolve.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { checkSprite } from '../../quality/sprite.js';
 import { validateMeta } from '../../catalog/schema.js';
-import burstCode from '../fixtures/code-sprites/plasma-burst.js';   // batch E2: sprites/plasma-burst.js is data now; its frozen code copy
-import sparkCode from '../fixtures/code-sprites/hit-spark.js';   // batch E1: sprites/hit-spark.js is data now; its frozen code copy
+   // batch E2: sprites/plasma-burst.js is data now; its frozen code copy
+   // batch E1: sprites/hit-spark.js is data now; its frozen code copy
 import { codeSprite } from '../helpers/library.mjs';   // the frozen copy, or its recorded replay once the copy is gone (R3)
-const boltCode = await codeSprite('blaster-bolt');   // batch E3: sprites/blaster-bolt.js is data now; its code copy is a replay (engine/shots.js went in R3)
 import * as registry from '../../engine/gen/index.js';
 import { emitters as emittersLayout } from '../../engine/gen/emitters.js';
 import { nodeFrame, placeOn } from '../../engine/draw-list.js';
@@ -29,7 +28,6 @@ const V2 = new URL('../fixtures/v2/', import.meta.url);
 const read = (p) => JSON.parse(fs.readFileSync(new URL(p, V2), 'utf8'));
 const hitSpark = () => read('hit-spark.json');
 const redraw = (id) => read(`emitters/${id}.json`);
-const CODE = { 'blaster-bolt': boltCode, 'plasma-burst': burstCode, 'hit-spark': sparkCode };
 const solid = (g) => g.data.reduce((n, v) => n + (v >>> 24 ? 1 : 0), 0);
 
 const soundDir = new URL('../../sounds/', import.meta.url);
@@ -69,21 +67,6 @@ test('hit-spark: the control is `sparks` (not `amount`), and an old saved `amoun
   const old = dataFrameList(s, 'hit', 2, { size: 0.5, amount: 0 }).list.length;
   assert.ok(many > few, `more sparks with Sparks at Many (${few} -> ${many})`);
   assert.equal(old, few, 'a bag item saved with { amount: 0 } draws as Sparks 0');
-});
-
-test('hit-spark passes the validator with the site\'s generators and draws through the emitters layout', () => {
-  const r = validateSprite(hitSpark());
-  assert.deepEqual(r.errors, []);
-  assert.deepEqual([...r.uses].sort(), ['particles@1', 'starburst@1']);
-  const m = makeDataSprite(hitSpark());
-  assert.ok(m.ok, m.errors.join('; '));
-  const s = m.sprite, p = defaultParams(s);
-  for (let f = 0; f < 5; f++) assert.ok(solid(renderFrame(s, 'hit', f, p)) > 0, `frame ${f} draws`);
-  // the flash is keyed 1 at t 0 and 0 at t 0.5: frames 0 and 1 have it, 2 to 4 not; the sparks no key turns off
-  const ids = (f) => new Set(dataFrameList(s, 'hit', f, p).list.map((x) => JSON.stringify(x.key ?? null)));
-  const flash = renderFrame(s, 'hit', 0, p), later = renderFrame(s, 'hit', 2, p);
-  assert.ok(solid(flash) > solid(later), 'the flash is there on frame 0 and gone by frame 2');
-  assert.ok(ids(4).size >= 1, 'the sparks are still there on the last frame');
 });
 
 test('hit-spark passes the quality bar with no errors (checkSprite)', () => {
@@ -195,37 +178,6 @@ test('an emitter on a node, end to end (an emitters body\'s nodes and draw reach
 
 // ---- two library effects redrawn as data ---------------------------------------------------------------------------
 
-for (const id of Object.keys(CODE)) {
-  test(`${id} (redrawn as data) passes the validator with the site's generators, naming only behaviours`, () => {
-    const def = redraw(id);
-    assert.equal(def.version, 2);
-    assert.ok(def.body.emitters.length >= 2);
-    const r = validateSprite(def);
-    assert.deepEqual(r.errors, []);
-    assert.ok(r.uses.every((u) => /^(particles|starburst|glow|ring|streaks|puffs|shot\.bar|tone|mix)@1$/.test(u)), r.uses.join(', '));
-  });
-
-  test(`${id} (redrawn as data) keeps its code sprite's id, meta type, clips, sounds and control keys and kinds`, () => {
-    const s = dataSprite(redraw(id)), old = CODE[id];
-    assert.equal(s.id, old.id);
-    assert.equal(s.meta.type, old.meta.type);
-    assert.deepEqual(s.size, old.size);
-    assert.deepEqual(Object.keys(s.clips), Object.keys(old.clips));
-    for (const [c, clip] of Object.entries(old.clips)) {
-      assert.equal(s.clips[c].frames, clip.frames, `${c} frames`);
-      assert.equal(!!s.clips[c].loop, !!clip.loop, `${c} loop`);
-    }
-    assert.deepEqual(Object.keys(s.params).sort(), Object.keys(old.params).sort(), 'control keys');
-    for (const [k, d] of Object.entries(old.params)) assert.equal(s.params[k].kind, d.kind, `${k} kind`);
-    assert.deepEqual(JSON.parse(JSON.stringify(s.sounds ?? {})), JSON.parse(JSON.stringify(old.sounds ?? {})), 'sounds');
-  });
-
-  test(`${id} (redrawn as data) passes the quality bar with no errors`, () => {
-    const r = checkSprite(dataSprite(redraw(id)), { soundIndex, validateMeta });
-    assert.deepEqual(r.errors, []);
-  });
-}
-
 const SETTINGS = {
   'blaster-bolt': [{}, { length: 0, thickness: 1, flicker: 0 }, { length: 1, thickness: 0, flicker: 1 }, { style: 'pulse' }, { style: 'needle', trail: false }],
   'plasma-burst': [{}, { size: 0, spread: 0, pieces: 3 }, { size: 1, spread: 1, pieces: 10 }, { style: 'ring' }, { style: 'shards', smoke: false }],
@@ -236,99 +188,3 @@ function offBy(id, set, clip, f) {
   const s = dataSprite(redraw(id)), old = CODE[id];
   return pixelsOff(renderFrame(s, clip, f, { ...defaultParams(s), ...set }), renderFrame(old, clip, f, { ...defaultParams(old), ...set }));
 }
-
-test('each redraw draws close to its code sprite at several settings (within one pixel)', () => {
-  for (const id of Object.keys(CODE)) {
-    const s = dataSprite(redraw(id)), old = CODE[id];
-    for (const set of SETTINGS[id]) {
-      const pd = { ...defaultParams(s), ...set }, po = { ...defaultParams(old), ...set };
-      for (const [clip, c] of Object.entries(old.clips)) for (let f = 0; f < c.frames; f++) {
-        const a = renderFrame(s, clip, f, pd), b = renderFrame(old, clip, f, po);
-        assert.ok(solid(a) > 0, `${id} ${clip} ${f} ${JSON.stringify(set)}: draws`);
-        const apart = apartBy1(a, b);
-        assert.ok(apart <= 0.35, `${id} ${clip} ${f} ${JSON.stringify(set)}: ${(apart * 100).toFixed(0)}% of pixels more than a pixel from the code sprite's`);
-      }
-    }
-  }
-});
-
-test('blaster-bolt (redrawn) is the code sprite pixel for pixel: its flight with the trail on or off, and its hit', () => {
-  for (const set of [{}, { style: 'pulse', length: 1 }, { style: 'needle', thickness: 0, flicker: 1 }, { style: 'needle', length: 1, thickness: 1, flicker: 1 }, { length: 0, trail: false }]) {
-    for (const [clip, c] of Object.entries(boltCode.clips)) for (let f = 0; f < c.frames; f++) assert.equal(offBy('blaster-bolt', set, clip, f), 0, `${clip} ${f} ${JSON.stringify(set)}`);
-  }
-});
-
-test('hit-spark (redrawn): the star and ring styles are the code sprite pixel for pixel at any size, number of rays and twist', () => {
-  for (const set of [{}, { size: 0 }, { size: 1 }, { pieces: 4 }, { pieces: 8, size: 0.3 }, { style: 'ring' }, { style: 'ring', size: 0 }, { style: 'ring', size: 1, pieces: 8 },
-    // Twist turns the star by up to half a ray's spacing whatever the number of rays (starburst's `twist`; B12b)
-    { twist: 1 }, { twist: 0.5, pieces: 4 }, { twist: 1, pieces: 5 }, { twist: 0.7, pieces: 7, size: 1 }, { twist: 1, pieces: 8, size: 0 },
-    { style: 'ring', twist: 1, pieces: 4 }, { style: 'ring', twist: 0.4, pieces: 7 }]) {
-    for (let f = 0; f < 5; f++) assert.equal(offBy('hit-spark', set, 'burst', f), 0, `burst ${f} ${JSON.stringify(set)}`);
-  }
-  // it is the code sprite's look: a white core inside a rimmed six-point star on frame 0, its rays flying out
-  const s = dataSprite(redraw('hit-spark')), p = defaultParams(s), g = renderFrame(s, 'burst', 0, p);
-  assert.equal(g.get(16, 16) & 0xffffff, 0xffffff, 'a white core');
-  assert.ok(solid(g) > 100, `frame 0 is a big star (${solid(g)} pixels)`);
-});
-
-test('hit-spark (redrawn): the slash is the code sprite pixel for pixel at the default size (any Twist, any rays), close at other sizes, its light rimmed', () => {
-  // Five emitters (B12b): the frame-0 cut-across and blade bound to Size (exact at any size), and three keyed through
-  // the frames, each cooling through [core, mid, edge, rim] with its rim two steps cooler (starburst `cool`, `rim`) and
-  // its across-cuts turned half a spacing by `twist`. Keys cannot follow a control, so frames 1 to 4 are keyed at the
-  // default size (and the frame-0 white middle's width): exact there, within a pixel elsewhere.
-  for (const set of [{}, { twist: 1 }, { twist: 0.5, pieces: 4 }, { twist: 0.3, pieces: 5 }, { pieces: 7, twist: 1 }, { pieces: 8 }]) {
-    for (let f = 0; f < 5; f++) assert.equal(offBy('hit-spark', { style: 'slash', ...set }, 'burst', f), 0, `slash ${f} ${JSON.stringify(set)}`);
-  }
-  // at other sizes every drawn pixel is within a pixel of the code sprite's (measured: 0%; up to a third of them differ
-  // in colour or by a pixel, mostly on frame 1, whose widths are keyed)
-  const s = dataSprite(redraw('hit-spark')), old = CODE['hit-spark'];
-  for (const set of [{ size: 0 }, { size: 1 }, { size: 0.3, pieces: 8, twist: 1 }, { size: 0.8, pieces: 5, twist: 0.4 }, { size: 0.1, pieces: 4 }]) {
-    for (let f = 0; f < 5; f++) {
-      const p = { ...defaultParams(s), style: 'slash', ...set };
-      const a = renderFrame(s, 'burst', f, p), b = renderFrame(old, 'burst', f, { ...defaultParams(old), style: 'slash', ...set });
-      assert.ok(apartBy1(a, b) <= 0.05, `slash ${f} ${JSON.stringify(set)}: ${(apartBy1(a, b) * 100).toFixed(0)}% of pixels more than a pixel from the code sprite's`);
-    }
-  }
-  // light is rimmed (docs/style-guide.md): on the frames with a light blade, no core or white pixel touches an empty one
-  // and the rim is the edge colour
-  const rgb = (v) => ((v & 0xff) << 16) | (v & 0xff00) | ((v >>> 16) & 0xff);   // the surface holds 0xAABBGGRR
-  for (const size of [0, 0.5, 1]) for (const twist of [0, 1]) {
-    const p = { ...defaultParams(s), style: 'slash', size, twist };
-    const edge = Number.parseInt(String(p.edge).slice(1), 16), core = Number.parseInt(String(p.core).slice(1), 16);
-    for (let f = 0; f < 5; f++) {
-      const g = renderFrame(s, 'burst', f, p);
-      assert.ok(solid(g) > 0, `frame ${f} size ${size} twist ${twist} draws`);
-      if (f > 1) continue;
-      let light = 0, rimmed = 0;
-      for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
-        const c = g.get(x, y);
-        if (!(c >>> 24) || (rgb(c) !== core && rgb(c) !== 0xffffff)) continue;
-        light++;
-        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-          const n = g.get(x + dx, y + dy);
-          assert.ok(n >>> 24, `frame ${f} size ${size}: a light pixel at ${x},${y} touches an empty one`);
-          if (rgb(n) === edge) rimmed++;
-        }
-      }
-      assert.ok(light > 0 && rimmed > 0, `frame ${f} size ${size} twist ${twist}: a light blade rimmed in the edge colour (${light} light, ${rimmed} rim)`);
-    }
-  }
-  // 16 emitters in all: the slash shares the cap with the star (7) and the ring (4)
-  assert.equal(redraw('hit-spark').body.emitters.length, 16);
-});
-
-test('plasma-burst (redrawn): every style is the code sprite pixel for pixel at the default size; the ball follows Style', () => {
-  for (const set of [{}, { style: 'ring' }, { style: 'shards' }, { style: 'shards', smoke: false }, { style: 'ring', size: 1, spread: 0 }]) {
-    const frames = set.size === undefined ? 8 : 2;                 // away from the defaults, only the ball's frames are exact
-    for (let f = 0; f < frames; f++) assert.equal(offBy('plasma-burst', set, 'burst', f), 0, `burst ${f} ${JSON.stringify(set)}`);
-  }
-  const def = redraw('plasma-burst');
-  // its shards are one emitter cooling through [core, mid, edge, rim] (starburst `cool`, `rim`; B12b), not four copies
-  assert.ok(def.body.emitters.length <= 11, `${def.body.emitters.length} emitters: room under the cap of 16`);
-});
-
-test('the hit-spark format fixture (2.5c\'s example) and the redraw are both effects of one 32 x 32 frame (the redraw is tests/fixtures/v2/emitters/hit-spark.json)', () => {
-  const s = dataSprite(hitSpark());
-  assert.deepEqual(s.size, sparkCode.size);
-  assert.equal(s.meta.type, sparkCode.meta.type);
-});

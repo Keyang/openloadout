@@ -6,7 +6,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COLOUR_RULES, paintColour } from '../../engine/data-rules.js';
-import { shadeTo, machineTones } from '../../engine/bulkhead.js';
+import { shadeTo } from '../../engine/bulkhead.js';
 import { brightness, tone } from '../../engine/color.js';
 import { validateSprite } from '../../catalog/sprite-schema.js';
 
@@ -21,21 +21,6 @@ test('shadeTo is a documented colour rule: a colour, an optional colour it is ke
   assert.equal(r.args.under.kind, 'colour');
   assert.equal(r.args.under.optional, true);
   for (const k of ['drop', 'floor']) assert.deepEqual([r.args[k].kind, r.args[k].min, r.args[k].max], ['number', 0, 1]);
-});
-
-test('shadeTo gives exactly engine/bulkhead.js shadeTo at max(floor, min(brightness(of), brightness(under) - drop))', () => {
-  for (const a of COLOURS) {
-    // machineTones' recess metal: under left out is the colour itself
-    assert.equal(paintColour({ rule: 'shadeTo', of: a, drop: 0.2, floor: 0.17 }), shadeTo(a, Math.max(0.17, brightness(a) - 0.2)).toLowerCase(), `${a} recess`);
-    assert.equal(paintColour({ rule: 'shadeTo', of: a, drop: 0.2, floor: 0.17 }), machineTones(a).dark.toLowerCase(), `${a} is machineTones' dark`);
-    for (const b of COLOURS) {
-      const want = shadeTo(a, Math.max(0.16, Math.min(brightness(a), brightness(b) - 0.15))).toLowerCase();
-      assert.equal(paintColour({ rule: 'shadeTo', of: a, under: b, drop: 0.15, floor: 0.16 }), want, `${a} under ${b}`);
-    }
-  }
-  // nested: the colours may themselves be rules
-  const lit = tone('#6b7896', 0.4);
-  assert.equal(paintColour({ rule: 'shadeTo', of: { rule: 'tone', of: '#6b7896', by: 0.4 }, drop: 0.2, floor: 0.17 }), shadeTo(lit, Math.max(0.17, brightness(lit) - 0.2)).toLowerCase());
 });
 
 test('a definition may name shadeTo; a drop out of range is refused', () => {

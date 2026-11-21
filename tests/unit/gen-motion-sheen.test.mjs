@@ -64,26 +64,3 @@ test('in a pictures body it moves the glint@2 on its node across the frames, and
   const still = [0, 2, 5].map((f) => white(renderFrame(s, 'still', f, p)).length);
   assert.ok(still[0] > 0 && still.every((n) => n === still[0]), `still: ${still}`);
 });
-
-// pickup.beat@1 (same module): a heart's beat, two quick swells a loop (engine/pickups.js heartbeat), scaling its node
-// by 1 + amount * heartbeat(t); amount is a bound argument, so a slider sets how hard it beats.
-test('pickup.beat@1 swells its node twice a loop by 1 + amount * heartbeat(t), and rests the second half', async () => {
-  const { heartbeat } = await import('../../engine/pickups.js');
-  const e = registry.generator('pickup.beat', 1);
-  assert.ok(e, 'pickup.beat@1 is registered');
-  assert.equal(e.family, 'motion');
-  assert.equal(e.cost({}), 0);
-  assert.ok(registry.checkCall({ gen: 'pickup.beat', v: 1, amount: 0.2 }).ok);
-  assert.equal(registry.checkCall({ gen: 'pickup.beat', v: 1, amount: 2 }).ok, false);
-  for (const amount of [0, 0.1, 0.3]) {
-    for (let f = 0; f < 8; f++) {
-      const out = e.run(Object.freeze({ amount }), ctx(f / 8));
-      assert.equal(out.length, 1);
-      assert.deepEqual(out[0].move, [0, 0]);
-      assert.ok(Math.abs(out[0].scale - (1 + amount * heartbeat(f / 8))) < 1e-9, `amount ${amount} frame ${f}`);
-    }
-  }
-  assert.deepEqual(e.run({ amount: 0.3 }, ctx(1)), e.run({ amount: 0.3 }, ctx(0)), 'the loop closes');
-  const big = (f) => e.run({ amount: 0.3 }, ctx(f / 8))[0].scale;
-  assert.ok(big(1) > big(2) && big(3) > big(2) && big(6) === 1, 'beats on frames 1 and 3, still by frame 6');
-});

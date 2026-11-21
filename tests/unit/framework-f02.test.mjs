@@ -6,7 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { TILE, fillVariant } from '../../engine/tiles.js';
 import { col } from '../../engine/color.js';
-import { rippleVersion, rippleEvenness } from '../../engine/ripples.js';
+import { rippleVersion } from '../../engine/ripples.js';
 
 const DEEP = '#2c79c0', LIGHT = '#4fa8d8', TIP = '#f0ead8';
 const FRAMES = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875];
@@ -73,24 +73,4 @@ test('rippleVersion: tips mark the leading pixel of a full-grown streak, dark co
   const seen = new Set();
   for (const t of FRAMES) for (const [x, y] of marksOf(rippleVersion(DEEP, t, { light: LIGHT, dark: DARK, count: 6, seed: 4 }))) seen.add(rippleVersion(DEEP, t, { light: LIGHT, dark: DARK, count: 6, seed: 4 })(x, y));
   assert.deepEqual([...seen].sort(), [col(LIGHT), col(DARK)].sort());
-});
-
-test('rippleEvenness: counts the marked pixels of every frame of a loop; versions laid by the helper\'s rule differ from cell to cell', () => {
-  const make = (seed) => (t) => rippleVersion(DEEP, t, { light: LIGHT, count: 6, seed });
-  const one = rippleEvenness(make(1), { base: DEEP });
-  assert.equal(one.lit.length, 8, 'eight frames by default');
-  assert.ok(one.min > 0 && one.max >= one.min && one.mean > 0);
-  assert.ok(one.spread >= 0 && one.spread === (one.max - one.min) / one.mean);
-  // the numbers are the picture's: count by hand on one frame
-  assert.equal(one.lit[2], marksOf(make(1)(0.25)).length);
-  assert.equal(rippleEvenness(() => () => col(DEEP), { base: DEEP }).mean, 0, 'plain water: nothing lit');
-  assert.equal(rippleEvenness(() => () => col(DEEP), { base: DEEP }).spread, 0);
-  // frames: another count of frames
-  assert.equal(rippleEvenness(make(1), { base: DEEP, frames: 4 }).lit.length, 4);
-  // three versions laid out by the helper's own rule over a lake: never the same picture in every cell
-  const versions = [1, 2, 3].map((s) => rippleVersion(DEEP, 0.25, { light: LIGHT, count: 6, seed: s }));
-  const cells = new Set();
-  for (let cy = 0; cy < 6; cy++) for (let cx = 0; cx < 10; cx++) cells.add(fillVariant(cx, cy, 3));
-  assert.equal(cells.size, 3, 'a lake of 10 by 6 uses all three');
-  assert.notDeepEqual(marksOf(versions[0]), marksOf(versions[1]));
 });

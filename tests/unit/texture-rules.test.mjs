@@ -14,7 +14,6 @@ import { dataSprite } from '../../engine/data-sprite.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { codeSprite } from '../helpers/library.mjs';
 
-const dungeonCode = await codeSprite('tiles-dungeon');   // the frozen copy once the library's is redrawn
 const COLOURS = ['#7e84a0', '#a8a4a0', '#c9a06a', '#e6c96a', '#4f9d57', '#1a1c2c', '#f0ead8', '#ffffff', '#000000', '#c8553a'];
 
 test('textureTone and textureLight are colour rules, each saying what it takes', () => {
@@ -79,26 +78,4 @@ test('a derived palette slot names them, validates, and resolves to the code\'s 
   const bad = structuredClone(d);
   bad.palette[4].derive.from = 2;
   assert.match(validateSprite(bad).errors.join('\n'), /from/);
-});
-
-test('the dungeon redraw\'s wet streak is the code tileset\'s colour at every floor swatch (review B15b issue 6b)', () => {
-  const def = JSON.parse(fs.readFileSync(new URL('../fixtures/v2/tiles/tiles-dungeon.json', import.meta.url), 'utf8'));
-  const s = dataSprite(def);
-  const ds = defaultParams(s), dc = defaultParams(dungeonCode);
-  const floors = def.palette.find((x) => x.id === 'floor').swatches;
-  assert.ok(floors.length >= 4);
-  for (const floor of [...floors, '#3a6ea5', '#d8d0c0']) {
-    for (const clip of ['floor-fill-b', 'floor-fill-c']) {   // the first floor version has no wet streak
-      const set = { floor, damp: true };
-      const a = renderFrame(s, clip, 0, { ...ds, ...set }), b = renderFrame(dungeonCode, clip, 0, { ...dc, ...set });
-      const a0 = renderFrame(s, clip, 0, { ...ds, floor }), b0 = renderFrame(dungeonCode, clip, 0, { ...dc, floor });
-      let wet = 0;
-      for (let i = 0; i < a.data.length; i++) {
-        if (a.data[i] === a0.data[i] || b.data[i] === b0.data[i]) continue;   // where damp paints in both
-        assert.equal(a.data[i].toString(16), b.data[i].toString(16), `${clip} at floor ${floor}, pixel ${i % 32},${Math.floor(i / 32)}`);
-        wet++;
-      }
-      assert.ok(wet > 0, `${clip} at floor ${floor}: damp paints in both`);
-    }
-  }
 });

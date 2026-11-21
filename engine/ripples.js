@@ -64,19 +64,3 @@ export function rippleVersion(base, t, { seed = 0, light = '#ffffff', dark = nul
   }
   return (x, y) => px[wrap(y) * TILE + wrap(x)];
 }
-
-/**
- * Measures how even a moving tile fill is over one loop: the count of marked pixels on every frame and how far the fullest and the barest frame are apart, so that the arrangements of a water's versions can be picked by measuring; returns { lit, min, max, mean, spread }.
- * Arguments: make (a function of the clip phase t that returns the fill(x, y) of that frame, such as (t) => rippleVersion(base, t, { seed })); options { base (the plain colour: every other pixel counts as a mark), frames (how many frames of the loop are counted, default 8) }. lit is the count per frame; spread is (max - min) / mean, 0 for a fill with no marks: the smaller, the steadier the water.
- */
-export function rippleEvenness(make, { base, frames = 8 } = {}) {
-  const plain = col(base), n = Math.max(1, Math.round(frames)), lit = [];
-  for (let f = 0; f < n; f++) {
-    const fill = make(f / n);
-    let marks = 0;
-    for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) if (fill(x, y) !== plain) marks++;
-    lit.push(marks);
-  }
-  const min = Math.min(...lit), max = Math.max(...lit), mean = lit.reduce((a, b) => a + b, 0) / n;
-  return { lit, min, max, mean, spread: mean ? (max - min) / mean : 0 };
-}

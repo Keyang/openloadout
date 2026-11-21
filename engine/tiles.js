@@ -94,7 +94,7 @@
 import { Surface } from './surface.js';
 import { INK, ramp, mix, col } from './color.js';
 import { THEME_PRESETS, applyColour } from './theme.js';
-import { hash, rng, TAU } from './motion.js';
+import { hash, rng } from './motion.js';
 
 export const TILE = 32;
 const M = TILE - 1;
@@ -248,22 +248,6 @@ export function blockJoins(opts = {}) {
   }
   return out;
 }
-
-/**
- * The piece for a cell of a block, from what is around it: around = { N, E, S, W, NE, SE, SW, NW },
- * each true where there is more of the block. Null when no piece fits (a strip one tile wide, or a
- * cell that would need two cut corners): a block is at least two tiles wide and two high.
- */
-export function pieceFor(around) {
-  for (const p of BLOCK_PIECES) {
-    const s = SIGNATURE[p];
-    if (Object.keys(s).every((k) => !!around[k] === (s[k] === 1))) return p;
-  }
-  return null;
-}
-
-// ---- what a tileset has, and which piece goes in which cell ---------------------------------------
-// One classifier and one picker, shared by tools/tilemap.mjs and the playground, so they cannot disagree.
 
 const WALL_WORDS = /wall|cliff|hedge|fence/;
 const HOLE_WORDS = /^(pit|hole|water|void|lava|acid|pool|pond|chasm)/;
@@ -680,11 +664,6 @@ export function boundedCache(limit) {
   };
 }
 
-/** How many colours the texture tone caches hold now: { tone, light } (each at most TEXTURE_CACHE_LIMIT). For tests. */
-export function textureCacheSizes() {
-  return { tone: toneCache.size, light: lightCache.size };
-}
-
 const toneCache = boundedCache(TEXTURE_CACHE_LIMIT);
 /**
  * The tone for marks inside a fill (clods, cracks, seams, pebbles): the dark of the colour's ramp, or the next tone
@@ -705,20 +684,6 @@ export function textureTone(colour, against = colour) {
 /** A stable value 0..1 for a pixel that repeats every 32 px both ways. x, y: the pixel. seed: different seeds give unrelated values. */
 export function tileNoise(x, y = 0, seed = 0) {
   return hash(wrap(x) + (seed | 0) * 131, wrap(y) + (seed | 0) * 7919);
-}
-
-/**
- * A smooth profile 0..1 along an edge that repeats every 32 px: use it for the bumps of an outline
- * (`inset: (u) => Math.round(edgeWave(u, seed) * px)`). cycles: how many waves fit in one tile.
- */
-export function edgeWave(u, seed = 0, cycles = [1, 2, 3]) {
-  let v = 0, w = 0;
-  cycles.forEach((c, i) => {
-    const amp = 1 / (i + 1);
-    v += amp * Math.sin(TAU * ((c * u) / TILE + hash(seed, i + 1)));
-    w += amp;
-  });
-  return Math.min(1, Math.max(0, 0.5 + (0.5 * v) / w * 1.25));
 }
 
 /**
@@ -758,11 +723,6 @@ const edgeOf = (m, which) => m[which] ?? ((which === 'left' || which === 'right'
 // corners meet any neighbour exactly, and gives whatever stands on a tile a fixed point to stand on.
 const insetAt = (e, u, t) => { u = wrap(u); return e.inset ? Math.min(clampInt(e.inset(u, t), 0, 3), u, M - u) : 0; };
 const depthAt = (e, u, t) => Math.max(0, Math.round(e.depth ?? 0) - (e.ragged ? Math.max(0, Math.round(e.ragged(wrap(u), t))) : 0));
-
-/** The row of the top outline at column x of a top tile (0..3): where something standing on the block touches it. */
-export function surfaceAt(material, x, t = 0) {
-  return insetAt(edgeOf(material, 'top'), x, t);
-}
 
 // which sides of each piece face the outside
 const SHAPES = {
@@ -1017,16 +977,6 @@ export function liquidClips(prefix, opts = {}) {
   const out = { [`${prefix}-top`]: entry(o, `${word}: surface`, extra), [`${prefix}-fill`]: entry(o, `${word}: body`, extra) };
   for (let i = 1; i < Math.min(26, opts.fills ?? 1); i++) out[`${prefix}-fill-${String.fromCharCode(97 + i)}`] = entry(o, `${word}: body, version ${String.fromCharCode(65 + i)}`, extra);
   return out;
-}
-
-/**
- * Which piece of a liquid goes in a cell: 'top' (its surface: nothing of the liquid in the cell above) or 'fill' (its body); null for a cell with no liquid in it.
- * Arguments: liquid(x, y): true where the liquid is. x, y: the cell. A liquid needs no other piece: whatever holds
- * it closes its sides and its bed.
- */
-export function pickLiquid(liquid, x, y) {
-  if (!liquid(x, y)) return null;
-  return liquid(x, y - 1) ? 'fill' : 'top';
 }
 
 // Columns are read in pairs that straddle the tile boundary (31 and 0, 1 and 2, ... 29 and 30), so the surface
@@ -1312,20 +1262,6 @@ export function drawSoftBlock(g, piece, material, t = 0) {
     g.dot(x, y, colour ?? material.fill(x, y, t, variant));
   }
   return g;
-}
-
-/**
- * Give the marks of one colour in a tile pattern a lit lip: every `base` pixel just beside a `mark` pixel, on the side away from the light, turns `lit`, wrapping round the tile's edges (creases in rock, joints, cracks).
- * Arguments: s: the Surface a pattern is drawn on (as patternFill hands it to `draw`). mark: the colour of the lines.
- * base: the colour a lip may replace. lit: the lip's colour. opts.dx, opts.dy: where the lip lies from its mark
- * (default -1, 1: down and to the left, for light from the top right). A mark that runs on into the next tile keeps
- * its lip across the join, as long as it leaves every version of the fill at the same place. Returns s.
- */
-export function lipMarks(s, mark, base, lit, { dx = -1, dy = 1 } = {}) {
-  const m = col(mark), b = col(base), at = (x, y) => s.data[(((y % s.h) + s.h) % s.h) * s.w + (((x % s.w) + s.w) % s.w)], hits = [];
-  for (let y = 0; y < s.h; y++) for (let x = 0; x < s.w; x++) if (at(x, y) === b && at(x - dx, y - dy) === m) hits.push(y * s.w + x);
-  for (const i of hits) s.data[i] = col(lit);
-  return s;
 }
 
 /**

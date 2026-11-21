@@ -278,7 +278,7 @@ In a crowded picture this remains best effort: the quality bar names any pair le
 | `opening` | `{ x, y, w, h }` | A bar: the trough of the housing, which is exactly where its fill strips lie. It moves with the bar's settings |
 | `tile` | `{ x, w }` | Instead of `border`, for a middle that repeats a pattern (a segmented bar): columns `x` to `x + w - 1` are one repeat. Insert whole copies of them to lengthen the piece; never stretch it |
 
-A cursor's hot spot is a socket named `tip` on each frame (`sockets`, Contract 3); the pivot is not moved to it. `engine/ui.js` has the helpers (`slice9`, `barOpening`) and its header repeats this table.
+A cursor's hot spot is a socket named `tip` on each frame (`sockets`, Contract 3); the pivot is not moved to it. The panel generators in `engine/gen/` build the `slice9`-style stretch rules; `engine/ui.js` keeps only what a generator or the font draws with.
 
 ## Contract 9: the playground
 
@@ -523,7 +523,7 @@ What is built, as of 2026-11-20 05:00, commit `6773968` ("committed" = in git):
 | Library sprites that are data | **All 259** (2026-11-21; 0 code files in `sprites/`; the build refuses one, R4a) | `sprites/*.json` |
 | `make.sprite` takes data; sandbox deleted; the `made` token | Committed (B11, B11b; Contract 11) | `app/api-core.js`, `app/bag.js` |
 | The `/sprite-forge` skill and maker agent write data sprites | Done (B10, B10b), outside this folder | `skills/sprite-forge/` |
-| Tests ready for redraws (library tests load either file kind; frozen code copies) | Committed (T1, `87a4e2c`): 46 frozen copies pinned by `SHA256SUMS` | `tests/helpers/library.mjs`, `tests/fixtures/code-sprites/` |
+| Tests ready for redraws (library tests load either file kind; frozen code copies) | Committed (T1, `87a4e2c`): 46 frozen copies pinned by `SHA256SUMS`; none are left after R3b | `tests/helpers/library.mjs`, `tests/fixtures/code-sprites/` |
 | Advanced mode on a sprite page (B18) | Built 2026-11-20, review round 1 fixed, not committed: a library data sprite's page opens the version 2 editor inline on a copy (a version 2 studio draft, `made.from: "library:<id>"`); address `#/sprite/<id>?…&edit=advanced&copy=<draft>&pane=<tab>&aclip=<clip>` (docs/data-sprites.md section 6) | `app/sprite-advanced.js`, `app/sprite-advanced-model.js` |
 | Not built | 11 more bases (B16), the studio for every body (B17), the other editors (B19), migration M1 to M40, removals R3b (what is left of the drawing helpers: see `docs/data-sprites.md` section 5; R4d, 2026-11-21, took out `activeParams`, the backdrop helper's `example()`, the dead quality-worker guard and the duplicate `tools/lib/data-file.mjs`, and rewrote the stale comments: docs/data-sprites.md section 9 row R4d; R4c, 2026-11-21, took the dynamic code imports out of `app/api-core.js` and `app/api-worker.js`, the thumbnail key's `_*.js` hashing and fixed the redraw tools' `--from`, but for the `app/catalog.js` fallback, which is item Z1's; the sandbox, the library bodies, R2's and R2b's code rigs, R3's drawing helpers, R4a's build refusal of code sprites and R4b part 1, the quality bar's read-back tracing of drawing code, are done), a bag item recording its definition's `rev` | |
 

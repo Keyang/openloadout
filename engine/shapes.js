@@ -69,9 +69,6 @@ export function ringIn(cx, cy, r, thick = 1) {
   return (px, py) => { const d = (px - cx) ** 2 + (py - cy) ** 2; return d <= o && d > i; };
 }
 
-/** The heart styles heartIn accepts: classic (two round lobes and a point), round (plump), pixel (stepped blocks), crystal (a cut gem). No arguments: a frozen list. */
-export const HEART_STYLES = Object.freeze(['classic', 'round', 'pixel', 'crystal']);
-
 // unit hearts: u across (0 at the middle, 1 at the widest point), v down (-1 top of the lobes, 1 the tip)
 const HEART_UNIT = {
   // two tall round lobes with a deep notch; the sides run straight from where they leave the lobes to the tip
@@ -212,37 +209,6 @@ export function gemFacets(cx, cy, rx, ry, cut = 'diamond') {
   return C.facets.map((f) => ({ tone: f.tone, pts: f.pts.map(([x, y]) => [cx + x * rx, cy + y * ry]) }));
 }
 
-/**
- * Shape test for a small feathered wing: a fan of tapering feathers from a root, the longest on top.
- * Arguments: x, y (the root, where it joins the body); len (length of the longest feather in pixels); options { side (1 opens to the right, -1 to the left), lift (radians the top feather points above level, default 0.5; change it for a flap), spread (radians from the top feather to the lowest, default 0.75), feathers (how many, default 3) }.
- */
-export function wingIn(x, y, len, { side = 1, lift = 0.5, spread = 0.75, feathers = 3 } = {}) {
-  const tests = [];
-  for (let i = 0; i < feathers; i++) {
-    const k = feathers > 1 ? i / (feathers - 1) : 0;
-    const a = -lift + k * spread;                                // from up-and-out to level or below
-    const L = len * (1 - 0.3 * k);
-    tests.push(capsuleIn(x, y, x + side * Math.cos(a) * L, y + Math.sin(a) * L, Math.max(1.2, len * 0.2), 0.6));
-  }
-  return any(tests);
-}
-
-/**
- * How far a wingIn wing reaches from its root: returns { out, up, down } in pixels (sideways, above and below the root), feather tips included.
- * Arguments: len (length of the longest feather); options { lift, spread, feathers }: the same as wingIn's.
- */
-export function wingReach(len, { lift = 0.5, spread = 0.75, feathers = 3 } = {}) {
-  let out = 0, up = 0, down = 0;
-  const r0 = Math.max(1.2, len * 0.2);
-  for (let i = 0; i < feathers; i++) {
-    const k = feathers > 1 ? i / (feathers - 1) : 0, a = -lift + k * spread, L = len * (1 - 0.3 * k);
-    out = Math.max(out, Math.cos(a) * L + 0.6, r0);
-    up = Math.max(up, -Math.sin(a) * L + 0.6, r0);
-    down = Math.max(down, Math.sin(a) * L + 0.6, r0);
-  }
-  return { out, up, down };
-}
-
 /** The bottle shapes bottleIn accepts: round (a ball with a neck), tall (straight sides, round shoulders), flask (a cone with a wide foot), vial (a thin tube). No arguments: a frozen list. */
 export const BOTTLE_SHAPES = Object.freeze(['round', 'tall', 'flask', 'vial']);
 
@@ -291,19 +257,6 @@ export function bottleIn(h, shape = 'round') {
 
 // ---- sign shapes (batch S16) ----------------------------------------------------------------
 // The flat shapes that signs, status marks and badges are made of.
-
-/**
- * Shape test for a burst: a star whose points are long and short in turn, the first long one pointing up: an impact, a blast mark, a flash.
- * Arguments: cx, cy (centre); r (radius to the long tips); points (how many in all, an even number, default 8); options { short (radius of the short tips as a share of r, default 0.72), inner (radius of the inside corners as a share of r, default 0.42), angle (turn, radians clockwise) }.
- */
-export function burstIn(cx, cy, r, points = 8, { short = 0.72, inner = 0.42, angle = 0 } = {}) {
-  const pts = [];
-  for (let i = 0; i < points * 2; i++) {
-    const a = angle - Math.PI / 2 + (i * Math.PI) / points, d = r * (i % 2 ? inner : (i / 2) % 2 ? short : 1);
-    pts.push([cx + Math.cos(a) * d, cy + Math.sin(a) * d]);
-  }
-  return polyIn(pts);
-}
 
 /**
  * Shape test for a straight arrow from a tail point to a tip: a shaft of even width and a triangular head.
@@ -401,32 +354,6 @@ export function boundsOf(tests, w, h = w) {
     if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
   }
   return x1 < 0 ? null : { x0, y0, x1, y1 };
-}
-
-/**
- * A skull seen from the front, w wide and h tall, centred on (cx, cy): returns { bone, sockets, nose, gaps, eyes }, a round cranium on a narrower jaw with what is dark in it.
- * Arguments: cx, cy (centre of its box: a whole number for an even size, ending in .5 for an odd one); w, h (width of the cranium and height from crown to teeth, 9 px or more each; about as tall as wide looks right); options { teeth (how many, default 3), gap (width of the gap between two teeth in pixels, default 1) }. bone is the shape test of the whole skull; sockets (the two eye holes, 3x3 px each from 10 px wide) and nose are painted dark on it; gaps are cut out of the jaw from below (pass them as `minus` to g.blob), 2 px deep or more; eyes is the middle of each socket, [[x, y], [x, y]], for a glint or a glow.
- */
-export function skullIn(cx, cy, w, h, { teeth = 3, gap = 1 } = {}) {
-  const a = w / 2, top = cy - h / 2, bottom = cy + h / 2;
-  const jawH = Math.max(2, Math.round(0.3 * h)), ry = (h - jawH) / 2;       // the rows of jaw under the cranium; half the cranium's height
-  const jw = a - Math.max(2, Math.round(0.17 * w));                        // half the width of the jaw
-  const odd = Math.round(w) % 2 === 1, o = odd ? 0 : 0.5;                   // where pixel centres lie, counted from cx
-  const rs = Math.max(1.2, Math.min(0.16 * w, 0.44 * ry));                  // socket radius: 1.42 and up is a full 3x3 block
-  const ex = odd ? Math.round(0.22 * w) : Math.round(0.22 * w - 0.5) + 0.5, ey = Math.floor(top + ry) + 0.5;
-  const ny = ey + Math.floor(rs) + (h >= 11 ? 1.5 : 0.5), nw = odd ? 0.5 : 1, nh = h < 13 ? 1 : 2;
-  const depth = Math.max(2, Math.round(0.2 * h));
-  const mids = [];                                                          // the middle of each gap, snapped to the pixel grid, the same on both sides
-  for (let i = 1; i < teeth; i++) { const c = (i - teeth / 2) * ((2 * jw) / teeth); mids.push(Math.sign(c) * (Math.round(Math.abs(c) - o) + o)); }
-  const cranium = ellipseIn(cx, top + ry, a, ry), jaw = rectIn(cx - jw, top + ry, 2 * jw, h - ry);
-  const left = ellipseIn(cx - ex, ey, rs, rs), right = ellipseIn(cx + ex, ey, rs, rs);
-  return {
-    bone: (px, py) => cranium(px, py) || jaw(px, py),
-    sockets: (px, py) => left(px, py) || right(px, py),
-    nose: rectIn(cx - nw, ny, 2 * nw, nh),
-    gaps: (px, py) => { if (py < bottom - depth || py >= bottom + 1) return false; for (const m of mids) if (Math.abs(px - cx - m) <= gap / 2) return true; return false; },
-    eyes: [[cx - ex, ey], [cx + ex, ey]],
-  };
 }
 
 /**

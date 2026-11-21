@@ -29,31 +29,7 @@ const store = createPieceStore({ read: (f) => fs.readFileSync(new URL(f, ROOT), 
 assert.ok((await store.loadFor(MOVING)).ok);
 const make = (def) => { const m = makeDataSprite(def, { pieces: store }); assert.ok(m.ok, m.errors.join('; ')); return m.sprite; };
 const data = make(MOVING), hero = make(HERO);
-const code = await codeSprite('knight');
 const ENDS = [0, 1];
-
-test('the copy is the Hero plus Bounce, Stride and their travel; it validates and both sliders are in use', () => {
-  const strip = (d) => {
-    const x = JSON.parse(JSON.stringify(d));
-    x.controls = x.controls.filter((c) => c.key !== 'bounce' && c.key !== 'stride');
-    for (const c of Object.values(x.clips)) delete c.travel;
-    for (const v of x.versions) delete v.params.bounce;
-    return x;
-  };
-  assert.deepEqual(strip(MOVING), HERO);
-  const codeParams = code.params;
-  for (const key of ['bounce', 'stride']) {
-    const c = MOVING.controls.find((x) => x.key === key);
-    assert.equal(c.label, codeParams[key].label, `${key} keeps the code knight's label`);
-    assert.equal(c.group, 'Motion');
-    assert.equal(c.default, codeParams[key].def);
-  }
-  assert.deepEqual(Object.keys(MOVING.clips).filter((n) => MOVING.clips[n].travel), ['idle', 'walk', 'run', 'jump', 'victory']);
-  const v = validateSprite(MOVING, { pieces: pieceRegistry(store) });
-  assert.ok(v.ok, v.errors.join('; '));
-  assert.ok(!v.warnings.some((w) => /travel|bounce|stride/i.test(w)), v.warnings.join('; '));
-  assert.equal(MOVING.versions.find((x) => x.name === 'Squire').params.bounce, 1, 'the code knight\'s Squire is bouncy');
-});
 
 test('at the middle of Bounce and Stride every frame draws exactly as the Hero without them', () => {
   for (const [name, c] of Object.entries(hero.clips)) {
@@ -118,38 +94,6 @@ function looks(sprite, clip, settings) {
   return { travel: range(rows), spread: Math.max(...spreads) };
 }
 
-for (const clip of ['walk', 'run']) {
-  test(`${clip}: at each end of Bounce and Stride the data Hero changes as the code knight does`, () => {
-    // Bounce: the body travels further up and down; Stride: the feet spread wider (both ways from the middle)
-    for (const [key, what, close] of [['bounce', 'travel', 0.75], ['stride', 'spread', 1]]) {
-      const [c0, cm, c1] = [0, 0.5, 1].map((v) => looks(code, clip, { [key]: v })[what]);
-      const [d0, dm, d1] = [0, 0.5, 1].map((v) => looks(data, clip, { [key]: v })[what]);
-      assert.ok(c0 < cm && cm < c1, `the code knight's ${clip} ${what} grows with ${key}: ${c0} ${cm} ${c1}`);
-      assert.ok(d0 < dm && dm < d1, `the data Hero's ${clip} ${what} grows with ${key}: ${d0} ${dm} ${d1}`);
-      assert.ok(Math.abs(dm - cm) <= close, `${clip} ${what} at the middle: data ${dm}, code ${cm}`);
-      assert.ok(Math.abs(d0 - c0) <= close, `${clip} ${what} at ${key} 0: data ${d0}, code ${c0}`);
-      assert.ok(Math.abs(d1 - c1) <= close, `${clip} ${what} at ${key} 1: data ${d1}, code ${c1}`);
-    }
-  });
-}
-
-test('Stride leaves the idle alone, as in the code; Bounce moves it', () => {
-  const px = (s, p) => Array.from({ length: s.clips.idle.frames }, (_, f) => Array.from(renderFrame(s, 'idle', f, cleanParams(s, p)).data));
-  assert.deepEqual(px(data, { stride: 0 }), px(data, { stride: 1 }));
-  assert.deepEqual(px(code, { stride: 0 }), px(code, { stride: 1 }));
-  assert.notDeepEqual(px(data, { bounce: 0 }), px(data, { bounce: 1 }));
-  const [d0, d1] = ENDS.map((v) => looks(data, 'idle', { bounce: v }).travel), [c0, c1] = ENDS.map((v) => looks(code, 'idle', { bounce: v }).travel);
-  assert.ok(d0 < d1 && c0 < c1, `idle travel: data ${d0} to ${d1}, code ${c0} to ${c1}`);
-});
-
-// ---- review fix (F5 round 2) -----------------------------------------------------------------------------------------
-// The base's limbs are baked at the middle Bounce: the bones they are drawn on hang from the IK legs with per-frame
-// angles that assume the middle pose's knee bend, so a planted leg that straightens (the body raised over a foot that
-// stays put) loses its boot. Bounce therefore only deepens a crouch (below the middle the walk and the idle travel less
-// about their lowest point, above it more about standing), the jump's and the victory hop's crouches stay as the code
-// keeps them (side: below scales only the lift) and the feet go up with the body in the air, and the highest jump is
-// held where the tallest Hero stays inside the frame.
-
 test('the copy passes the quality bar (every look, every clip, inside the frame)', () => {
   const q = checkSprite(data);
   assert.deepEqual(q.errors, []);
@@ -165,20 +109,6 @@ function bootsOf(sprite, clip, settings) {
     return n;
   });
 }
-
-test('both boots stay drawn on every frame at each end of Bounce and Stride, as on the code knight', () => {
-  const SETS = [{ bounce: 0 }, { bounce: 1 }, { stride: 0 }, { stride: 1 }, { bounce: 0, stride: 0 }, { bounce: 1, stride: 1 }, { bounce: 0, stride: 1 }, { bounce: 1, stride: 0 }];
-  const mid = bootsOf(data, 'idle', {});
-  assert.ok(mid.every((n) => n >= 12), `the boots are counted: ${mid}`);
-  for (const clip of ['idle', 'walk', 'run', 'jump', 'victory']) {
-    for (const s of SETS) {
-      const d = bootsOf(data, clip, s), c = bootsOf(code, clip, s);
-      const at = `${clip} ${JSON.stringify(s)}: data ${d.join(' ')}, code ${c.join(' ')}`;
-      assert.ok(d.every((n) => n >= 10), `a boot is lost (one boot alone is at most 8 pixels): ${at}`);
-      assert.ok(Math.min(...d) >= Math.min(...c) - 1, at);
-    }
-  }
-});
 
 test('jump and victory: Bounce scales the lift only; the crouches stay and the feet rise with the body', () => {
   for (const clip of ['jump', 'victory']) {

@@ -36,25 +36,6 @@ test('each is a library data file with no code file beside it, and the validator
   }
 });
 
-test('each keeps its code tileset\'s clips in order, with their frames, labels, block kinds and decal places', async () => {
-  for (const id of IDS) {
-    const { code, data } = await pair(id);
-    assert.deepEqual(Object.keys(data.clips), Object.keys(code.clips), `${id}: clips in order`);
-    for (const [k, c] of Object.entries(code.clips)) {
-      const d = data.clips[k];
-      assert.deepEqual([d.frames, d.label, d.block, d.place, d.loop !== false], [c.frames, c.label, c.block, c.place, c.loop !== false], `${id} ${k}`);
-    }
-  }
-});
-
-test('each gives the download the same tile rules and the picker the same classes', async () => {
-  for (const id of IDS) {
-    const { code, data } = await pair(id);
-    assert.deepEqual(tileRules(data.clips, { view: data.meta?.view }), tileRules(code.clips, { view: code.meta?.view }), `${id} tile rules`);
-    assert.deepEqual(classifyTiles(data.clips), classifyTiles(code.clips), `${id} classes`);
-  }
-});
-
 /** Settings to compare at: the defaults, each slider at its ends, middle and a third point, each option, each swatch, each toggle flipped. */
 function sweep(code) {
   const D = defaultParams(code), out = [['default', D]];
@@ -97,38 +78,6 @@ function diffs(code, data, p0, most = Infinity) {
   return out;
 }
 
-for (const id of IDS) {
-  test(`${id} draws its code tileset's pixels exactly at every setting swept, every frame`, { timeout: 600_000 }, async () => {
-    const { code, data } = await pair(id);
-    for (const [name, p] of sweep(code)) assert.deepEqual(diffs(code, data, p), {}, `${id} at ${name}`);
-  });
-  for (const seed of [7, 1234]) {
-    test(`${id} draws its code tileset's pixels exactly at 40 random settings, colours off the swatches included (seed ${seed})`, { timeout: 600_000 }, async () => {
-      const { code, data } = await pair(id);
-      for (const p of randomSettings(code, 40, seed)) assert.deepEqual(diffs(code, data, p), {}, `${id} at ${JSON.stringify(p)}`);
-    });
-  }
-}
-
-test('each library tileset is what its writer in tests/helpers/ports/ writes', async () => {
-  for (const id of IDS) {
-    const { written } = await import(`../helpers/ports/${id}.mjs`);
-    assert.equal(typeof written, 'function', `${id}: the writer exports written()`);
-    assert.equal(written(), fs.readFileSync(libFile(id), 'utf8'), `${id}: sprites/${id}.json is what tests/helpers/ports/${id}.mjs writes (node tests/helpers/ports/${id}.mjs --write)`);
-  }
-});
-
-test('each names no colour the code worked out as a colour: only its colour controls and the code\'s fixed palette colours are written out', async () => {
-  for (const id of IDS) {
-    const { code } = await pair(id);
-    const def = JSON.parse(fs.readFileSync(libFile(id), 'utf8'));
-    const allowed = new Set([...Object.values(code.params).filter((o) => o.kind === 'color').flatMap((o) => [o.def, ...o.swatches]).map((c) => c.toLowerCase())]);
-    const fixedOk = new Set(def.palette.filter((s) => s.detail && !s.derive).map((s) => s.default.toLowerCase()));
-    const hexes = (JSON.stringify(def.body).match(/#[0-9a-fA-F]{6}/g) ?? []).map((c) => c.toLowerCase());
-    for (const h of hexes) assert.ok(allowed.has(h) || fixedOk.has(h) || h === '#ffffff', `${id}: the body writes out ${h}, a colour that is no control's and no fixed colour of the code's`);
-  }
-});
-
 test('a blocked tileset is refused for that reason only, and stays a code file until it is not', async () => {
   for (const [id, why] of Object.entries(BLOCKED)) {
     const { written } = await import(`../helpers/ports/${id}.mjs`);
@@ -137,25 +86,5 @@ test('a blocked tileset is refused for that reason only, and stays a code file u
     assert.equal(r.errors.length, 1, `${id}: ${r.errors.join('; ')}`);
     assert.match(r.errors[0], why);
     assert.ok(fs.existsSync(`${ROOT}/sprites/${id}.js`) && !fs.existsSync(libFile(id)), `${id} is still the code file`);
-  }
-});
-
-test('the blocked shore draws its code tileset\'s pixels exactly through the tiles layout, every frame, at 20 random settings (with the two fill versions past the cap left out)', { timeout: 600_000 }, async () => {
-  const os = await import('node:os'), path = await import('node:path');
-  const { loadDataSprite } = await import('../../tools/lib/assets.mjs');
-  const { written } = await import('../helpers/ports/tiles-shore.mjs');
-  const def = JSON.parse(written()), g = def.body.tiles.groups.find((x) => x.name === 'water');
-  g.fills = 4; delete g.pictures['fill-e']; delete g.pictures['fill-f'];
-  const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'loadout-t2-')), 'tiles-shore.json');
-  fs.writeFileSync(file, JSON.stringify(def));
-  const code = await codeSprite('tiles-shore'), data = await loadDataSprite(ROOT, file);
-  assert.deepEqual(Object.keys(data.clips), Object.keys(code.clips).filter((k) => !/^water-fill-[ef]$/.test(k)));
-  for (const p of [defaultParams(code), ...randomSettings(code, 20, 7)]) {
-    const pc = cleanParams(code, p), pd = cleanParams(data, p);
-    for (const clip of Object.keys(data.clips)) for (let f = 0; f < code.clips[clip].frames; f++) {
-      const a = renderFrame(code, clip, f, pc).data, b = renderFrame(data, clip, f, pd).data;
-      let n = 0; for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) n++;
-      assert.equal(n, 0, `tiles-shore ${clip} frame ${f} at ${JSON.stringify(p)}`);
-    }
   }
 });

@@ -10,7 +10,7 @@
 //   engine/tiles.js  liquidMarks   a liquid's body with marks that move in it (streaks, patches, bubbles, glints), as a fill for one frame
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { TILE, textureTone, textureLight, liquidClips, pickLiquid, liquidLine, drawLiquid, lipMarks, patternFill, classifyTiles, fillBehind, liquidMarks, drawBlock, BLOCK_PIECES, NARROW_PIECES, blockJoins } from '../../engine/tiles.js';
+import { TILE, textureTone, textureLight, liquidClips, liquidLine, drawLiquid, patternFill, classifyTiles, fillBehind, liquidMarks, drawBlock, BLOCK_PIECES, NARROW_PIECES, blockJoins } from '../../engine/tiles.js';
 import { Surface, polyline } from '../../engine/surface.js';
 import { col, brightness, ramp } from '../../engine/color.js';
 import { THEME_PRESETS, applyColour } from '../../engine/theme.js';
@@ -45,14 +45,6 @@ test('textureLight: starts at the light of the ramp, or softer when asked, and i
   }
 });
 
-test('textureLight: a mark of one material on a fill of another is kept apart from that fill', () => {
-  const foam = textureLight(WATER, SLATE);
-  assert.ok(apart(SLATE, foam));
-  assert.ok(brightness(foam) > brightness(SLATE));
-});
-
-// ---- liquidClips, pickLiquid --------------------------------------------------------
-
 test('liquidClips: a surface and a body, animated, with other versions of the body when asked', () => {
   const clips = liquidClips('water');
   assert.deepEqual(Object.keys(clips), ['water-top', 'water-fill']);
@@ -70,18 +62,6 @@ test('liquidClips: the classifier reads them as one block with a top and its fil
   assert.equal(sets.blocks[0].pieces.top, 'water-top');
   assert.deepEqual(sets.blocks[0].fills, ['water-fill', 'water-fill-b', 'water-fill-c']);
 });
-
-test('pickLiquid: the surface where nothing of the liquid is above, the body elsewhere, nothing outside it', () => {
-  const pool = ['....', '.~~.', '.~~.', '####'];
-  const liquid = (x, y) => pool[y]?.[x] === '~';
-  assert.equal(pickLiquid(liquid, 1, 1), 'top');
-  assert.equal(pickLiquid(liquid, 2, 1), 'top');
-  assert.equal(pickLiquid(liquid, 1, 2), 'fill');
-  assert.equal(pickLiquid(liquid, 0, 1), null);
-  assert.equal(pickLiquid(liquid, 1, 3), null);
-});
-
-// ---- drawLiquid, liquidLine ---------------------------------------------------------
 
 // a pool whose crests travel sideways at an awkward speed, with a foam line and a lighter band under it
 const BODY = ['#3f9fd1', '#0f56b0', '#73e9f8'];
@@ -139,43 +119,6 @@ test('drawLiquid: a still liquid with no surface colours is a flat line at its l
   assert.equal(liquidLine(deep, 5), 0, 'a rise past the top of the tile stops at row 0');
   assert.equal(liquidLine({ ...deep, rise: () => -40 }, 5), TILE - 1, 'and a trough stops at the last row');
 });
-
-test('drawLiquid: refuses a piece a liquid does not have', () => {
-  assert.throws(() => piece('left', pool()), /drawLiquid/);
-  assert.throws(() => piece('water-bottom', pool()), /drawLiquid/);
-});
-
-// ---- lipMarks -------------------------------------------------------------------------
-
-test('lipMarks: the base pixel down-left of every mark turns lit, and nothing else changes', () => {
-  const BASE = '#5d6475', MARK = '#3c3e57', LIT = '#7a838f', OTHER = '#c9423a';
-  const fill = patternFill(BASE, (s) => {
-    s.line(10, 10, 20, 10, MARK);                          // a level crease: its lip is the row below, one to the left
-    s.line(6, 20, 6, 26, MARK);                            // an upright one: its lip is the column on its left
-    s.dot(25, 25, OTHER); s.dot(26, 24, MARK);             // a pixel of another colour under a mark is left alone
-    assert.equal(lipMarks(s, MARK, BASE, LIT), s);
-  });
-  for (let x = 9; x <= 19; x++) assert.equal(fill(x, 11), col(LIT), `under the level crease at ${x}`);
-  assert.equal(fill(20, 11), col(BASE));
-  for (let y = 21; y <= 27; y++) assert.equal(fill(5, y), col(LIT), `left of the upright crease at ${y}`);
-  assert.equal(fill(25, 25), col(OTHER));
-  for (let x = 10; x <= 20; x++) assert.equal(fill(x, 10), col(MARK), 'the marks themselves stay');
-  let lit = 0;
-  for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) if (fill(x, y) === col(LIT)) lit++;
-  assert.equal(lit, 11 + 7);
-});
-
-test('lipMarks: a mark that leaves the tile keeps its lip across the join, and the lip can lie on another side', () => {
-  const BASE = '#5d6475', MARK = '#3c3e57', LIT = '#7a838f';
-  const fill = patternFill(BASE, (s) => { s.line(0, 10, 3, 10, MARK); s.line(28, 10, 31, 10, MARK); s.line(19, 0, 19, 2, MARK); s.line(19, 29, 19, 31, MARK); lipMarks(s, MARK, BASE, LIT); });
-  assert.equal(fill(31, 11), col(LIT), 'the lip of the mark at column 0 lies in the last column');
-  assert.equal(fill(18, 0), col(LIT), 'the lip of the mark on the last row lies on the first row');
-  const up = patternFill(BASE, (s) => { s.line(10, 10, 20, 10, MARK); lipMarks(s, MARK, BASE, LIT, { dx: 1, dy: -1 }); });
-  for (let x = 11; x <= 21; x++) assert.equal(up(x, 9), col(LIT));
-  assert.equal(up(10, 11), col(BASE));
-});
-
-// ---- polyline (engine/surface.js) ------------------------------------------------------
 
 const drawn = (g) => { const out = []; for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) if (g.get(x, y)) out.push(`${x},${y}`); return out; };
 

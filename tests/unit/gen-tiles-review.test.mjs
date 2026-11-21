@@ -198,15 +198,3 @@ test('a thin platform draws nothing beyond its outline: outside is for blocks (a
   }
   assert.ok(renderFrame(s, 'rock-top', 0, {}).data.slice(0, 32).some((v) => v >>> 24), 'a block piece paints beyond its outline');
 });
-
-test('the cave redraw\'s drips: damp water hangs from the ceiling\'s hollow exactly as the code tileset\'s does, never under a ledge', async () => {
-  const { codeSprite } = await import('../helpers/library.mjs');
-  const code = await codeSprite('tiles-cave');
-  const data = dataSprite(load('tiles/tiles-cave.json'));
-  for (const set of [{ damp: true, jagged: 1 }, { damp: true, jagged: 0.5 }, { damp: false, jagged: 1 }]) {
-    for (const clip of ['rock-bottom', 'rock-bottom-l', 'rock-bottom-r', 'rock-strip-m', 'rock-thin-m']) {
-      const a = renderFrame(code, clip, 0, { ...defaultParams(code), ...set }), b = renderFrame(data, clip, 0, set);
-      for (let y = 27; y < 32; y++) assert.equal(b.data[y * 32 + 25], a.data[y * 32 + 25], `${clip} ${JSON.stringify(set)} column 25 row ${y}`);
-    }
-  }
-});

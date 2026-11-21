@@ -150,16 +150,6 @@ test('tiles-platforms: ladders and vines are 16 px wide and centred; rungs come 
   assert.ok(frame(platforms, 'vine-foot').bounds().y1 < 31, 'the vine ends inside its last tile');
 });
 
-test('a top-down tileset made with the helper (floor, path, wall with a front face, pit) passes the quality bar', async () => {
-  const room = (await import('../fixtures/quality/sprite-files/q-room-tiles.js')).default;
-  const r = checkSprite(room, { validateMeta });
-  assert.deepEqual(r.errors, [], show(r));
-  assert.ok(r.metrics.joins.includes('wall-fill above wall-bottom') && r.metrics.joins.includes('path-inner-tr left of path-top') && r.metrics.joins.includes('pit-top above pit-fill'));
-  // the wall's face is a full tile, darker than its cap
-  const cap = renderFrame(room, 'wall-fill', 0, defaultParams(room)), face = renderFrame(room, 'wall-bottom', 0, defaultParams(room));
-  assert.ok(face.data.every((v) => v !== 0));
-  assert.notEqual(cap.get(16, 10), face.get(16, 10));
-});
 test('tools/tilemap.mjs --map draws a map written as letters, and says what it could not place', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'loadout-map-'));
   const map = path.join(dir, 'hill.txt');

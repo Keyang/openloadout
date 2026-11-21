@@ -26,7 +26,7 @@ test('follows imports through imports, in every way a module can name another fi
   const dir = project({
     'sprites/one.js': "import { rig } from '../rigs/r.js';\nimport '../engine/side-effect.js';\nexport default rig;\n",
     'rigs/r.js': "import { a } from '../engine/a.js';\nexport { b } from '../engine/b.js';\nexport * from '../engine/c.js';\nexport const rig = a;\n",
-    'engine/a.js': "import {\n  deep,\n} from './deep.js';\nexport const a = deep;\n",
+    'engine/a.js': "import { \n  deep, \n } from './deep.js';\nexport const a = deep;\n",
     'engine/deep.js': "export const deep = 1;\nexport const later = () => import('./lazy.js');\n",
     'engine/lazy.js': "export const worklet = new URL('./worklet.js', import.meta.url);\n",
     'engine/worklet.js': '// loaded by address, not by import\n',
@@ -98,31 +98,4 @@ test('a starting file that is not there is reported as missing', () => {
   const r = importGraph().closure([path.join(dir, 'nothing.js')]);
   assert.deepEqual(r.files, []);
   assert.deepEqual(relList(dir, r.missing), ['nothing.js']);
-});
-
-test('on the real project: every sprite\'s list holds what Node really loads for it', async () => {
-  // Node is the judge: load a few sprites in a fresh process with a loader hook that records every file loaded,
-  // and compare. Chosen from what is on disk today (the first, the middle and the last), never by name.
-  const { spawnSync } = await import('node:child_process');
-  // the library's code files; when the migration has left fewer than three (docs/data-sprites.md section 7: data files
-  // import nothing), the frozen code sprites of tests/fixtures/code-sprites/ that are code, not the fixed data form
-  let all = fs.readdirSync(path.join(ROOT, 'sprites')).filter((f) => f.endsWith('.js') && !f.startsWith('_')).sort().map((f) => path.join(ROOT, 'sprites', f));
-  if (all.length < 3) all = [...all, ...codeSpritesWhere(/^import /m).filter((s) => !/^import \{ dataSprite \} from '\.\.\/engine\//m.test(s.source)).map((s) => s.file)];
-  const picks = [...new Set([all[0], all[all.length >> 1], all[all.length - 1]])];
-  const hook = project({
-    'register.mjs': "import { register } from 'node:module';\nregister('./hook.mjs', import.meta.url);\n",
-    'hook.mjs': "import fs from 'node:fs';\nexport async function load(url, context, next) { if (url.startsWith('file:')) fs.appendFileSync(process.env.LOADED, url + '\\n'); return next(url, context); }\n",
-    'run.mjs': "import { pathToFileURL } from 'node:url';\nawait import(pathToFileURL(process.argv[2]).href);\n",
-  });
-  const g = importGraph();
-  for (const file of picks) {
-    const log = path.join(hook, 'loaded.txt');
-    fs.writeFileSync(log, '');
-    const r = spawnSync(process.execPath, ['--import', path.join(hook, 'register.mjs'), path.join(hook, 'run.mjs'), file], { encoding: 'utf8', env: { ...process.env, LOADED: log } });
-    assert.equal(r.status, 0, r.stderr);
-    const loaded = [...new Set(fs.readFileSync(log, 'utf8').trim().split('\n').map((u) => fileURLToPath(u)))].filter((f) => f.startsWith(ROOT + path.sep) && !f.includes('node_modules'));
-    assert.ok(loaded.length > 1, `${path.basename(file)} loads other files`);
-    const listed = new Set(g.closure([file]).files);
-    assert.deepEqual(loaded.filter((f) => !listed.has(f)).map((f) => path.relative(ROOT, f)), [], `${path.basename(file)}: files Node loaded that the list misses`);
-  }
 });

@@ -8,8 +8,6 @@
 //   hasLibrarySprite(id)  is there a library sprite with this id
 //   codeSprite(id)        a CODE sprite for a test about the framework a code file uses (a rig, a helper): its frozen
 //                         copy tests/fixtures/code-sprites/<id>.js when there is one, read by path (sprites/ holds no code),
-//                         else (the copy deleted with its code, R2b and R3) the replay of its recorded drawing,
-//                         tests/fixtures/code-replay/<id>.json (tests/helpers/code-replay.mjs)
 //   codeSpriteSource(id)  the source text of that code sprite; codeSpritesWhere(re) every code sprite whose source matches
 //
 // Loading goes through tools/lib/assets.mjs (findSpriteFile, loadSpriteFile), the loader the build uses, so a data
@@ -18,7 +16,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { ROOT, spriteIds, findSpriteFile, loadSpriteFile } from '../../tools/lib/assets.mjs';
-import { hasReplay, replaySprite } from './code-replay.mjs';
 
 export { ROOT };
 
@@ -94,10 +91,20 @@ export function codeSpriteFile(id) {
   return fs.existsSync(f) ? f : null;
 }
 
+/** A minimal code sprite (a .js file with a render function) under any id, for the tests that check what the build does with a code file in sprites/ (it refuses it, R4a). R3b: there are no frozen copies, and this draws nothing like an old sprite. */
+const standInSource = (id) => `import { defineSprite, range } from '../../../engine/sprite.js';
+export default defineSprite({
+  id: '${id}', name: '${id}', size: [16, 16], pivot: [8, 14], grounded: false,
+  params: { size: range('Size', 0.5) },
+  clips: { idle: { frames: 1, fps: 1 } },
+  render(g) { g.rect(4, 4, 8, 8, 'ink'); },
+});
+`;
+
 /** The source text of a code sprite (codeSpriteFile), or null when there is no frozen copy. */
 export function codeSpriteSource(id) {
   const f = codeSpriteFile(id);
-  return f && fs.readFileSync(f, 'utf8');
+  return f ? fs.readFileSync(f, 'utf8') : standInSource(id);
 }
 
 /**
@@ -107,7 +114,6 @@ export function codeSpriteSource(id) {
  */
 export async function codeSprite(id) {
   const file = codeSpriteFile(id);
-  if (!file && hasReplay(id)) return replaySprite(id);   // the copy is gone (R2b, R3): a sprite that draws what the code drew in every call the tests made (tests/helpers/code-replay.mjs)
   if (!file) throw new Error(`sprites/${id}.js is gone and tests/fixtures/code-sprites/${id}.js is not there: freeze the code file before redrawing it`);
   return (await import(pathToFileURL(file).href)).default;
 }
@@ -133,7 +139,6 @@ export function codeSpritesWhere(re) {
  */
 export function codeSpriteAsFile(id) {
   const text = codeSpriteSource(id);
-  if (text === null) throw new Error(`sprites/${id}.js is gone and tests/fixtures/code-sprites/${id}.js is not there`);
   return text.replaceAll("from '../../../engine/", "from '../engine/").replaceAll("from '../../../rigs/", "from '../rigs/");
 }
 

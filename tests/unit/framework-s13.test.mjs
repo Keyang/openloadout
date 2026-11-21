@@ -14,7 +14,7 @@ import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { col, brightness } from '../../engine/color.js';
 import { PALETTES, applyColour } from '../../engine/theme.js';
-import { DEPTH_KINDS, dashedRim, shaftWall, depthFill, trussIn, cableRun } from '../../engine/shafts.js';
+import { DEPTH_KINDS, dashedRim, shaftWall, trussIn, cableRun } from '../../engine/shafts.js';
 const VOID = '#141a33', LINE = '#333564', LIP = '#7c8ca5', AMBER = '#f2a030';
 const lit = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);
 const same = (a, b) => a.data.every((v, i) => v === b.data[i]);
@@ -53,45 +53,6 @@ test('shaftWall: the tones step down, seams take the next tone, and it ends afte
   assert.equal(shaded(1, 3), '#444444', 'the row under the rim is in its shadow');
   assert.equal(shaded(2, 3), '#aaaaaa');
   assert.throws(() => shaftWall({ rows: 6, tones: [] }), /tone/);
-});
-
-for (const kind of DEPTH_KINDS) {
-  test(`depthFill (${kind}): repeats every 32 px, closes its loop, and leaves no single pixels`, () => {
-    const tones = { faint: '#363e54', bright: '#c2c9d6', heart: '#ffffff' };
-    const frames = Array.from({ length: 8 }, (_, f) => depthFill(VOID, f / 8, { kind, count: 6, seed: 3, tones }));
-    const base = col(VOID);
-    const grid = (fill) => Array.from({ length: 32 * 32 }, (_, i) => col(fill(i % 32, Math.floor(i / 32))));
-    const grids = frames.map(grid);
-    assert.deepEqual(grid(depthFill(VOID, 1, { kind, count: 6, seed: 3, tones })), grids[0], 't = 1 is t = 0');
-    assert.deepEqual(grid(depthFill(VOID, 0, { kind, count: 6, seed: 3, tones })), grids[0], 'the same every time');
-    assert.equal(col(frames[2](5, 9)), col(frames[2](37, -23)), 'the same pixel one tile on');
-    assert.ok(new Set(grids.map((g) => g.join())).size >= 6, 'the frames differ');
-    grids.forEach((g, f) => {
-      const on = (x, y) => g[((y + 32) % 32) * 32 + ((x + 32) % 32)] !== base;
-      let marks = 0;
-      for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
-        if (!on(x, y)) continue;
-        marks++;
-        assert.ok(on(x - 1, y) || on(x + 1, y) || on(x, y - 1) || on(x, y + 1), `frame ${f}: a single pixel at ${x},${y}`);
-      }
-      assert.ok(marks >= 4 && marks < 200, `frame ${f}: ${marks} px of specks`);
-    });
-  });
-}
-
-test('depthFill: more specks are added to the ones already there', () => {
-  const tones = { faint: '#363e54', bright: '#c2c9d6' }, base = col(VOID);
-  for (const kind of DEPTH_KINDS) for (let f = 0; f < 8; f++) {
-    const few = depthFill(VOID, f / 8, { kind, count: 3, seed: 1, tones }), many = depthFill(VOID, f / 8, { kind, count: 7, seed: 1, tones });
-    let a = 0, b = 0;
-    for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) {
-      if (col(few(x, y)) !== base) { a++; assert.notEqual(col(many(x, y)), base, `${kind} frame ${f}: the speck at ${x},${y} is gone`); }
-      if (col(many(x, y)) !== base) b++;
-    }
-    assert.ok(b >= a);
-  }
-  assert.equal(col(depthFill(VOID, 0.3, { count: 0, tones })(4, 4)), base, 'no specks: the plain depth');
-  assert.throws(() => depthFill(VOID, 0, { kind: 'fish', tones }), /stars, wisps, sparks/);
 });
 
 test('trussIn: two chords with lacing between them, inside its width', () => {

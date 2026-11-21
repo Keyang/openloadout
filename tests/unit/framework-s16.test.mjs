@@ -12,7 +12,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface, rectIn } from '../../engine/surface.js';
 import { col, INK } from '../../engine/color.js';
-import { burstIn, arrowIn, crossIn, hexIn, hoopIn } from '../../engine/shapes.js';
+import { arrowIn, crossIn, hexIn, hoopIn } from '../../engine/shapes.js';
 const lit = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);
 const diff = (a, b) => a.data.reduce((n, v, i) => n + (v !== b.data[i] ? 1 : 0), 0);
 const colours = (g) => { const s = new Set(g.data); s.delete(0); return s; };
@@ -21,19 +21,6 @@ const filled = (test, w = 40, h = 40) => new Surface(w, h).fill(0, 0, w, h, test
 const BODY = '#5fe0f0', ACCENT = '#f2a030', METAL = '#9aa6c0', GLOW = '#5fe0f0', MARK = '#f2a030';
 
 // ---- shape tests ---------------------------------------------------------------------------
-
-test('burstIn: long and short points alternate, the first long one pointing up', () => {
-  const b = burstIn(20, 20, 12, 8);
-  assert.ok(b(20, 8.6) && b(31.4, 20) && b(20, 31.4) && b(8.6, 20), 'the four long points reach the full radius');
-  const d = 12 * Math.SQRT1_2;
-  assert.ok(!b(20 + d - 0.6, 20 - d + 0.6), 'a short point stops short of the full radius');
-  assert.ok(b(20 + d * 0.6, 20 - d * 0.6), 'but is there further in');
-  assert.ok(b(20.5, 20.5), 'the middle is solid');
-  const g = filled(b).bounds();
-  assert.equal(g.x1 - g.x0, g.y1 - g.y0, 'as wide as it is tall');
-  assert.ok(g.x1 - g.x0 >= 18 && g.x0 === 39 - g.x1 && g.y0 === 39 - g.y1, 'and centred');
-  assert.ok(count(burstIn(20, 20, 12, 8, { inner: 0.6 })) > count(b), 'a bigger inner radius makes fatter points');
-});
 
 test('arrowIn: a shaft and a wider head ending at the tip', () => {
   const a = arrowIn(4, 20, 34, 20, { shaft: 4, head: 12, long: 8 });

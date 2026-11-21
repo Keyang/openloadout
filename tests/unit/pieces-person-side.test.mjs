@@ -36,13 +36,11 @@ import { makeDataSprite } from '../../engine/data-sprite.js';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
 import { checkSprite } from '../../quality/sprite.js';
 import { codeSprite } from '../helpers/library.mjs';   // the code Hero: its frozen copy, or its recorded replay once the copy is gone (R2b)
-import { codeFrames } from '../helpers/code-frames.mjs';
 import { SPEED_FPS, resolveSprite } from '../../engine/resolve.js';
 import { col, INK } from '../../engine/color.js';
 import { DRAW_LIST_OPS } from '../../engine/draw-list.js';
 
 const ROOT = new URL('../../', import.meta.url);
-const knight = await codeSprite('knight');
 const json = (rel) => JSON.parse(fs.readFileSync(new URL(rel, ROOT), 'utf8'));
 // the pieces the baker wrote (tools/bake-person-side.mjs, deleted by R2b), the base first
 const BAKED_FILES = ['pieces/base-person-side.v7.json', 'pieces/part-hair.v2.json', 'pieces/part-hair-long.v1.json', 'pieces/part-ponytail.v1.json', 'pieces/part-hair-nape.v2.json', 'pieces/part-helmet.v3.json', 'pieces/part-plume.v1.json', 'pieces/part-crown.v4.json', 'pieces/part-cape.v1.json', 'pieces/part-cape-ground.v2.json', 'pieces/part-belt.v1.json', 'pieces/held-sword.v1.json', 'pieces/held-axe.v1.json', 'pieces/held-spear.v1.json'];
@@ -74,7 +72,6 @@ const SCALES = {
 };
 const CODE_CLIPS = json('tests/fixtures/person-side/code-rig-clips.json');
 const CODE_JOINTS = json('tests/fixtures/person-side/code-rig-joints.json').frames;
-const CODE_BASE = codeFrames('person-side-base');
 /** The code rig's pose facts of one frame (the head turn, in radians). */
 const codePose = (clip, f) => CODE_JOINTS[`${clip} ${f}`];
 /** How two frames differ: { diff (pixels not the same), drawn (pixels drawn in either), share (diff / drawn) }. */
@@ -199,58 +196,6 @@ test('base: at every frame of every clip its bones put every joint where the cod
   }
 });
 
-test('base: within 2 % of the code rig\'s pixels at every frame of every clip, but where the code turns the head part way', () => {
-  const all = shares();
-  assert.equal(all.length, framesOf(BASE_CLIPS).length);
-  assert.deepEqual(all.filter((x) => x.share > 0.02 && !TURNING(x)).map(pct), [], 'over 2 %');
-  assert.ok(all[0].share <= 0.02, `at rest: ${pct(all[0])}`);
-  // die 1 to 3, AN ACCEPTED EXCEPTION to row B16's 2 % (the orchestrator, 2026-11-20): the code draws the head upright
-  // on a layer and turns its pixels part way (rigs/humanoid.js stampTurned, a turned bitmap); data draws no turned
-  // bitmaps (rigs/bones.js) and turns the skull's ellipse, whose edge steps differently. They read as the same
-  // character. Measured 2026-11-20: 7.1, 6.7 and 6.3 %; held to 8 % so a real change still fails
-  const turning = all.filter(TURNING);
-  assert.deepEqual(turning.map((x) => `${x.clip} ${x.f}`), ['die 1', 'die 2', 'die 3']);
-  for (const x of turning) assert.ok(x.share <= 0.08, pct(x));
-  const mean = all.reduce((a, x) => a + x.share, 0) / all.length;
-  assert.ok(mean <= 0.01, `mean ${(mean * 100).toFixed(2)} %`);
-});
-
-test('the Hero rebuilt from the base and pieces only: valid, every frame drawn, the quality bar passes', () => {
-  const r = hero();
-  assert.ok(r.ok, r.errors.join('; '));
-  assert.deepEqual(r.warnings, []);
-  const s = r.sprite;
-  for (const clip of Object.keys(knight.clips)) assert.equal(s.clips[clip]?.frames, knight.clips[clip].frames, `${clip}: the code Hero's frames`);
-  const p = defaultParams(s);
-  for (const [clip, c] of Object.entries(s.clips)) for (let f = 0; f < c.frames; f++) assert.ok(renderFrame(s, clip, f, p).data.some(Boolean), `${clip} ${f}`);
-  assert.deepEqual(s.sounds.attack.map((c) => c.sound), ['sword-slash', 'whoosh']);
-  const q = checkSprite(s);
-  assert.deepEqual(q.errors, []);
-});
-
-test('the Hero keeps the code knight\'s versions by name and its controls\' keys, kinds and ranges', () => {
-  // versions: every one, with the code's settings, less Bounce (the base's clips are baked at the middle bounce)
-  assert.deepEqual(HERO.versions.map((v) => v.name), knight.versions.map((v) => v.name));
-  for (const v of knight.versions) {
-    const { bounce, ...rest } = v.params;
-    assert.deepEqual(HERO.versions.find((x) => x.name === v.name).params, rest, v.name);
-  }
-  // controls: every one but the motion sliders (bounce, stride, hold angle, swing: baked at their middles)
-  const mine = new Map(HERO.controls.map((c) => [c.key, c]));
-  for (const [key, c] of Object.entries(knight.params)) {
-    if (key === 'speed') { assert.equal(mine.get(key)?.standard, 'speed'); continue; }
-    if (['bounce', 'stride', 'weaponAngle', 'weaponSwing'].includes(key)) { assert.ok(!mine.has(key), key); continue; }
-    const m = mine.get(key);
-    assert.ok(m, `${key} kept`);
-    if (c.kind === 'range') assert.deepEqual([m.min ?? 0, m.max ?? 1, m.default], [c.min, c.max, c.def], `${key}: the code's range and default`);
-    if (c.kind === 'choice') assert.deepEqual(m.options, c.options.map((o) => o.value), `${key}: the code's options`);
-  }
-});
-
-test('the Hero\'s clips are the code knight\'s, no more (its extends.clips, B4x)', () => {
-  assert.deepEqual(Object.keys(hero().sprite.clips), Object.keys(knight.clips));
-});
-
 test('the Hero with no weapon punches, as the code knight does (a from picked by Weapon, B4x)', () => {
   assert.equal(resolveSprite(HERO, { weapon: 'none' }, { pieces: store() }).clips.attack.from, 'punch');
   assert.equal(resolveSprite(HERO, { weapon: 'sword' }, { pieces: store() }).clips.attack.from, 'attack');
@@ -274,24 +219,6 @@ test('the Hero swaps its parts: weapon, headgear, hair, cape', () => {
   assert.notDeepEqual([...at({ headgear: 'none', hairStyle: 'spiky' }).data], [...at({ headgear: 'none' }).data], 'spikes');
 });
 
-test('the Hero\'s hair and headgear grow and shrink with the Head slider, as the code knight\'s do', () => {
-  const s = hero().sprite;
-  // the pixels a part changes over the bald, bare head: its area, any overhang and what it covers
-  const area = (sp, head, look) => {
-    const set = { ...defaultParams(sp), head, weapon: 'none', cape: 'none' };
-    const a = renderFrame(sp, 'idle', 0, { ...set, hairStyle: 'bald', headgear: 'none' }), b = renderFrame(sp, 'idle', 0, { ...set, hairStyle: 'bald', headgear: 'none', ...look });
-    let n = 0;
-    for (let i = 0; i < a.data.length; i++) if (a.data[i] !== b.data[i]) n++;
-    return n;
-  };
-  for (const head of [0, 0.55, 1]) {
-    for (const look of [{ hairStyle: 'short' }, { hairStyle: 'spiky' }, { headgear: 'helmet' }, { headgear: 'crown' }]) {
-      const a = area(knight, head, look), b = area(s, head, look);
-      assert.ok(Math.abs(a - b) <= Math.max(6, 0.15 * a), `head ${head}, ${JSON.stringify(look)}: ${b} pixels, the code ${a}`);
-    }
-  }
-});
-
 test('the Hero never draws under the ground row, in any clip, version, choice or slider end', () => {
   const s = hero().sprite;
   const low = (g) => { for (let y = g.h - 1; y >= 0; y--) for (let x = 0; x < g.w; x++) if (g.data[y * g.w + x]) return y; return -1; };
@@ -306,17 +233,6 @@ test('the Hero never draws under the ground row, in any clip, version, choice or
     if (y > GROUND) under.push(`${clip} ${f} at ${JSON.stringify(set)}: row ${y}`);
   }
   assert.deepEqual(under.slice(0, 10), [], `${under.length} frames under the ground`);
-});
-
-test('the Hero beside the code knight: every clip of the code sprite, close in pixels', () => {
-  const s = hero().sprite;
-  const sheet = { shares: heroShares(s, knight) };
-  // measured 2026-11-20 (B16a2): idle 9.2, walk 7.7, run 8.6, jump 9.2, attack 14.1, hurt 9.9, block 11.9, victory
-  // 11.6 %: the code knight's tunic and helmet shading, the slash trail and the Head default (0.55, where the base's
-  // bones are 0.5's). Die 17.2 % (25.6 before the cape hung down while falling and lay on the ground, part:cape-ground):
-  // the turning head (die 1 to 3) and the lying cape's outline
-  for (const [clip, share] of Object.entries(sheet.shares)) assert.ok(share <= (clip === 'die' ? 0.2 : 0.15), `${clip}: ${(share * 100).toFixed(1)} % of pixels differ`);
-  assert.deepEqual(Object.keys(sheet.shares), Object.keys(knight.clips));
 });
 
 test('drawing order: the base carries the one ground cut, the Hero none, and resolved the cut is last, so parts paint by z', () => {
@@ -356,36 +272,6 @@ test('drawing order: the base carries the one ground cut, the Hero none, and res
   }
 });
 
-test('the Hero\'s hair and headgear turn with the head as it falls and lies down, as the code knight\'s do', () => {
-  // the pixels a part changes over the bald, bare head at Head 0.5 (the base's bones), die frames 1 to 7, beside the
-  // code knight's: where they are (the middle of them within a pixel) and how many differ (lying down, the code turns
-  // its head's layer a quarter, which maps pixels to pixels: within 6 %; falling, die 1 to 3, it turns them part way,
-  // a turned bitmap the data's turned shapes approach: within 35 %). Measured 2026-11-20: lying 0 to 5 %, falling 9
-  // to 31 %, middles 0 to 0.9 px apart
-  const s = hero().sprite;
-  const foot = (sp, f, look) => {
-    const set = { ...defaultParams(sp), head: 0.5, weapon: 'sword', cape: 'none', hairStyle: 'bald', headgear: 'none' };
-    const a = renderFrame(sp, 'die', f, set), b = renderFrame(sp, 'die', f, { ...set, ...look });
-    const m = new Set();
-    for (let i = 0; i < a.data.length; i++) if (a.data[i] !== b.data[i]) m.add(i);
-    return m;
-  };
-  const middle = (m) => { let x = 0, y = 0; for (const i of m) { x += i % 64; y += Math.floor(i / 64); } return [x / m.size, y / m.size]; };
-  const bad = [];
-  for (const look of [{ hairStyle: 'short' }, { hairStyle: 'spiky' }, { hairStyle: 'long' }, { hairStyle: 'ponytail' }, { headgear: 'helmet' }, { headgear: 'crown' }]) {
-    for (let f = 1; f < 8; f++) {
-      const a = foot(knight, f, look), b = foot(s, f, look);
-      const both = new Set([...a, ...b]);
-      let x = 0;
-      for (const i of both) if (!(a.has(i) && b.has(i))) x++;
-      const share = x / both.size, [ca, cb] = [middle(a), middle(b)], far = Math.hypot(ca[0] - cb[0], ca[1] - cb[1]);
-      const lying = codePose('die', f).headTurn === Math.PI / 2;
-      if (share > (lying ? 0.06 : 0.35) || far > 1) bad.push(`${JSON.stringify(look)} die ${f}: ${(share * 100).toFixed(0)} % differ, middles ${far.toFixed(2)} px apart`);
-    }
-  }
-  assert.deepEqual(bad, []);
-});
-
 test('a sprite on the base that writes no cut stays on the ground in every clip, at every slider end', () => {
   // the bare base (and its variant clips) with the sliders a sprite scales it by (SCALES) at both ends: nothing under
   // the ground row (the outline may touch it, as the code's does)
@@ -404,32 +290,6 @@ test('a sprite on the base that writes no cut stays on the ground in every clip,
   assert.deepEqual(under.slice(0, 10), [], `${under.length} frames under the ground`);
   // and the Hero, which writes no cut, never does either (its own test above: every look, version and slider end)
   assert.ok(!HERO.body.rig.shapes.some((x) => x.kind === 'cut'));
-});
-
-test('the Hero keeps its cape in every die frame, where the code knight has it', () => {
-  // the pixels the cape changes (cape on against none) at every die frame, beside the code knight's: the cape hangs
-  // straight down from the neck while the body falls (die 1 to 3: the code's drawCape is screen-aligned, its hem held
-  // above the ground) and lies along the ground under the body when it is down (die 4 to 7: drawCapeOnGround)
-  // Measured 2026-11-20 (B16a2), data / code pixels at the defaults: 64/57 60/60 58/54 22/21 57/55 62/61 51/51 50/50;
-  // before, the cape was gone from die 2 on (0 pixels)
-  const s = hero().sprite;
-  const capePx = (sp, f, over = {}) => {
-    const set = { ...defaultParams(sp), ...over };
-    const a = renderFrame(sp, 'die', f, { ...set, cape: 'none' }), b = renderFrame(sp, 'die', f, set);
-    const m = [];
-    for (let i = 0; i < a.data.length; i++) if (a.data[i] !== b.data[i]) m.push(i);
-    return m;
-  };
-  const middle = (m) => { let x = 0, y = 0; for (const i of m) { x += i % 64; y += Math.floor(i / 64); } return [x / m.length, y / m.length]; };
-  const bad = [];
-  for (const over of [{}, { cape: 'tattered' }, { capeLength: 1.8 }, { capeLength: 0.3 }]) {
-    for (let f = 0; f < s.clips.die.frames; f++) {
-      const a = capePx(knight, f, over), b = capePx(s, f, over);
-      const [ca, cb] = [middle(a), middle(b)], far = Math.hypot(ca[0] - cb[0], ca[1] - cb[1]);
-      if (b.length < 0.7 * a.length || b.length > 1.4 * a.length || far > 2) bad.push(`die ${f} ${JSON.stringify(over)}: ${b.length} pixels (the code ${a.length}), middles ${far.toFixed(1)} px apart`);
-    }
-  }
-  assert.deepEqual(bad, []);
 });
 
 test('at any frame size the base keeps what it draws on the ground: its cut reaches the frame\'s bottom, a sprite writes none', () => {

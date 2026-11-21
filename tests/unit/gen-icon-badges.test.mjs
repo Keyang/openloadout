@@ -11,10 +11,6 @@ import { Surface } from '../../engine/surface.js';
 import { INK } from '../../engine/color.js';
 import { paintColour } from '../../engine/data-rules.js';
 import { drawList } from '../../engine/draw-list.js';
-import { oldReplay } from '../helpers/old-replay.mjs';
-
-const OLD = oldReplay('gen-icon-badges');   // what the modules that are gone (engine/icons.js, icons-badge.js, icons-badge-stem.js, glyphs.js) drew, recorded in the order of the calls (tests/helpers/old-replay.mjs)
-
 const HEX = { ink: INK, body: '#c9423a', accent: '#7a4f33', face: '#f0ead8', pale: '#a8a4a0' };
 const box = (x0, y0, x1, y1, paint) => ({ kind: 'poly', points: [[x0, y0], [x1, y0], [x1, y1], [x0, y1]], paint });
 
@@ -51,9 +47,6 @@ const TOWN_DATA = TOWN.map((l) => {
 
 const BADGE_STEM_TIP = 11.5;   // what engine/icons-badge-stem.js said: how far down the pin's tip reaches at full size (deleted by R3)
 const tipOf = (size) => BADGE_STEM_TIP - (BADGE_STEM_TIP - 7.8) * Math.max(0, 1 - 2 * size);
-function codeBadge({ size, bold, shine }, { picture, glyph }) {
-  return OLD.surface(32, 32);
-}
 function genBadge({ size, bold, shine }, args) {
   const r = registry.runGenerator({ gen: 'icon.badge', v: 1, size, tip: tipOf(size), paint: 'body', face: 'face', shiny: shine, pinGrow: bold ? 0.15 : 0, grow: bold ? 0.5 : 0, ...args }, { size: [32, 32] });
   assert.ok(r.ok, r.errors.join('; '));
@@ -69,29 +62,6 @@ function differ(a, b) {
 }
 const LOOKS = [];
 for (let size = 0; size <= 1.0001; size += 0.05) for (const bold of [false, true]) for (const shine of [true, false]) LOOKS.push({ size: Math.round(size * 100) / 100, bold, shine });
-
-test('icon.badge@1 draws the map marks\' badge pins with a picture on the plate as the code did, at every size, bold and shine', () => {
-  for (const [name, p] of Object.entries(PICTURES)) for (const look of LOOKS) {
-    const want = codeBadge(look, { picture: p }), got = genBadge(look, { draw: p.data, ...(p.snap ? { snap: true } : {}) });
-    assert.deepEqual(differ(want, got).slice(0, 6), [], `${name} ${JSON.stringify(look)}: pixels differ`);
-  }
-});
-
-test('icon.badge@1 draws a badge pin with hand-set layers on the plate as the code did', () => {
-  for (const look of LOOKS) {
-    const want = codeBadge(look, { glyph: TOWN }), got = genBadge(look, { draw: TOWN_DATA });
-    assert.deepEqual(differ(want, got).slice(0, 6), [], `town ${JSON.stringify(look)}: pixels differ`);
-  }
-});
-
-test('icon.badge@1 with no pin draws the picture alone as iconFit drew it, tidied and inked, bold or not', () => {
-  for (const [name, p] of Object.entries(PICTURES).filter(([n]) => n !== 'here')) for (const look of LOOKS) {   // (here moves itself on a pin only)
-    const want = OLD.surface(32, 32);
-    const got = genBadge(look, { draw: p.data, pin: false });
-    assert.deepEqual(differ(want, got).slice(0, 6), [], `${name} alone ${JSON.stringify(look)}: pixels differ`);
-  }
-  assert.deepEqual(registry.runGenerator({ gen: 'icon.badge', v: 1, paint: 'body', face: 'face', draw: [] }).primitives, [], 'an empty picture draws nothing');
-});
 
 test('icon.badge@1 passes the goldens harness', () => {
   checkGeneratorContract(registry, registry.generator('icon.badge', 1), { cases: [

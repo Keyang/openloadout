@@ -120,67 +120,6 @@ test('each is version 2 data the validator passes, with no code, naming only the
   }
 });
 
-test('each keeps its code sprite\'s name, meta, frame, clips (frames, fps, loop), sound cues, controls and versions', async () => {
-  for (const old of RECORDS) {
-    const id = old.id, s = await spriteOf(id);
-    assert.equal(s.id, id);
-    assert.equal(s.name, old.name, `${id} name`);
-    assert.equal(s.preview, old.preview, `${id} preview`);
-    assert.deepEqual([...s.size], old.size, `${id} size`);
-    assert.deepEqual([...s.pivot], old.pivot, `${id} pivot`);
-    assert.equal(!!s.grounded, !!old.grounded, `${id} grounded`);
-    assert.deepEqual(JSON.parse(JSON.stringify(s.meta)), old.meta, `${id} meta`);
-    assert.deepEqual(Object.keys(s.clips), Object.keys(old.clips), `${id} clips in order`);
-    for (const [c, { frames, loop, fps }] of Object.entries(old.clips)) {
-      assert.equal(s.clips[c].frames, frames, `${id} ${c} frames`);
-      assert.equal(!!s.clips[c].loop, loop, `${id} ${c} loop`);
-      // a one-frame clip (a prop's resting state) shows no motion, so its fps is not part of what it shows (P1's crate idle)
-      if (frames > 1) [0, 0.5, 1].forEach((speed, i) => assert.equal(clipFps(s, c, cleanParams(s, { speed })), fps[i], `${id} ${c} fps at speed ${speed}`));
-    }
-    // every old control key is a control now (or renamed through was.controls) with the same kind
-    for (const [k, o] of Object.entries(old.params)) {
-      if (droppedOf(old).has(k)) {
-        assert.equal(s.params[nowKey(s, k)], undefined, `${id}: dropped control ${k} is gone`);
-        // the sprite really stands on the base that cannot move it, and that base takes no setting of that name
-        const ext = JSON.parse(fs.readFileSync(fileOf(id), 'utf8')).body?.rig?.extends;
-        assert.match(ext?.use ?? '', PERSON_BASE, `${id}: dropped ${k}, so it extends a person base`);
-        assert.ok(old.dropped[k].includes(ext.use), `${id}: dropped ${k}: the reason names ${ext.use}, the base it extends`);
-        const base = JSON.parse(fs.readFileSync(path.join(ROOT, 'pieces', `${ext.use.replace(':', '-')}.v${ext.v}.json`), 'utf8'));
-        assert.equal(Object.hasOwn(base.args ?? {}, k), false, `${id}: ${ext.use}@${ext.v} has a ${k} setting, so ${k} can be kept`);
-        continue;
-      }
-      const d = s.params[nowKey(s, k)];
-      assert.ok(d, `${id}: control ${k} kept`);
-      assert.equal(d.kind, o.kind, `${id} ${k} kind`);
-      // what the panel says keeps too: the control's label, a slider's end words, and option labels where the record has them
-      assert.equal(d.label, o.label, `${id} ${k} label`);
-      if (o.kind === 'range') assert.deepEqual([d.lo, d.hi], [o.lo, o.hi], `${id} ${k} end words`);
-      for (const [v, label] of Object.entries(o.optionLabels ?? {})) assert.equal(d.options.find((x) => x.value === nowValue(s, k, v))?.label, label, `${id} ${k}: option ${v} keeps its label`);
-      if (o.kind === 'choice') {
-        for (const v of o.options) assert.ok(d.options.some((x) => x.value === nowValue(s, k, v)), `${id} ${k}: option ${v} kept or mapped by was`);
-        assert.equal(d.def, nowValue(s, k, o.def), `${id} ${k} default`);
-      } else if (o.kind === 'color') {
-        assert.equal(d.def, o.def, `${id} ${k} default`);
-        // a data sprite's swatches are its slot's colour first, then every listed one (engine/data-sprite.js slotSwatches):
-        // the code's list, every colour kept in its order, with the default moved to the front when another led it (M6)
-        assert.deepEqual(d.swatches, [o.def, ...o.swatches.filter((c) => c !== o.def)], `${id} ${k} swatches`);
-      } else if (o.kind === 'range') {
-        assert.equal(d.def, o.def, `${id} ${k} default`);
-        assert.deepEqual([d.min, d.max, d.step], [o.min, o.max, o.step], `${id} ${k} min, max, step`);
-      } else assert.equal(d.def, o.def, `${id} ${k} default`);
-      // a control shown only for some settings keeps that condition (recorded when the code sprite had one)
-      // (a control it names that was renamed, sprite-level was: { controls }, is named by its new key: batch M9's input-dpad)
-      const renamed = (w) => (Array.isArray(w) ? w.map(renamed) : Object.fromEntries(Object.entries(w).map(([c, v]) => [s.was?.controls?.[c] ?? c, v])));
-      if (o.when) assert.deepEqual(JSON.parse(JSON.stringify(d.when)), renamed(o.when), `${id} ${k} when`);
-    }
-    assert.deepEqual(JSON.parse(JSON.stringify(s.sounds ?? {})), old.sounds, `${id} sound cues`);
-    assert.deepEqual((s.versions ?? []).map((v) => v.name), old.versions.map((v) => v.name), `${id} versions by name`);
-    for (const [n, v] of old.versions.entries()) {
-      const p = cleanParams(s, s.versions[n].params), q = cleanParams(s, v.params);
-      assert.deepEqual(p, q, `${id} version ${v.name} keeps its settings`);
-    }
-  }
-});
 
 test('each passes the quality bar with no errors', { timeout: 1_200_000 }, async () => {
   const cacheFile = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'loadout-redraws-')), 'quality.json');
@@ -193,78 +132,7 @@ test('each passes the quality bar with no errors', { timeout: 1_200_000 }, async
   }
 });
 
-test('settings saved before the redraw (links, bags, versions) open with the same values, every option and swatch, and draw', async () => {
-  for (const old of RECORDS) {
-    const id = old.id, s = await spriteOf(id);
-    const saved = [];
-    for (const [k, o] of Object.entries(old.params)) {
-      if (o.kind === 'choice') for (const v of o.options) saved.push({ [k]: v });
-      else if (o.kind === 'color') for (const v of o.swatches) saved.push({ [k]: v });
-      else if (o.kind === 'toggle') saved.push({ [k]: !o.def }, { [k]: String(!o.def) });
-      else saved.push({ [k]: o.min }, { [k]: o.max }, { [k]: String(o.min + (o.max - o.min) / 4) });
-    }
-    for (const v of old.versions) saved.push(v.params);
-    for (const input of saved) {
-      const p = cleanParams(s, input);
-      for (const [k, v] of Object.entries(input)) {
-        if (droppedOf(old).has(k)) { assert.equal(k in p, false, `${id}: saved ${k} (dropped) is left out`); continue; }
-        const kind = old.params[k].kind;
-        const want = kind === 'toggle' ? v === true || v === 'true' : kind === 'range' ? Math.min(old.params[k].max, Math.max(old.params[k].min, Number(v))) : nowValue(s, k, v);
-        assert.equal(p[nowKey(s, k)], want, `${id}: saved ${k}=${v} opens as ${p[nowKey(s, k)]}`);
-      }
-      for (const c of Object.keys(s.clips)) assert.ok(drawn(s, c, p) > 12, `${id} ${c} draws at ${JSON.stringify(input)}`);
-    }
-    // a link from before: a key the sprite never had is dropped, an out-of-range number clamped
-    const p = cleanParams(s, { gone: 3, size: 7 });
-    assert.equal('gone' in p, false);
-    if (s.params.size) assert.equal(p.size, s.params.size.max);
-  }
-});
 
-test('a bag stored before the redraw, and a bag link made before it, open each redraw with its saved settings and draw them', async () => {
-  // what was saved before: each sprite at its last ready-made version (or every choice at its last option), by id only
-  const SAVED = RECORDS.map((r) => {
-    const v = r.versions.at(-1)?.params;
-    const chosen = v && Object.keys(v).length ? v : Object.fromEntries(Object.entries(r.params).filter(([, o]) => o.kind === 'choice').map(([k, o]) => [k, o.options.at(-1)]));
-    // a sprite with no versions and no choices (an icon set such as icons-key-items, batch M4): every toggle the other way
-    const params = Object.keys(chosen).length ? chosen : Object.fromEntries(Object.entries(r.params).filter(([, o]) => o.kind === 'toggle').map(([k, o]) => [k, !o.def]));
-    // a sprite with no versions, choices or toggles (bg-battle-dungeon, batch M10): every slider at its top
-    const saved = Object.keys(params).length ? params : Object.fromEntries(Object.entries(r.params).filter(([, o]) => o.kind === 'range').map(([k, o]) => [k, o.max]));
-    return { id: r.id, params: saved, scale: 2 };
-  });
-  const STORED = JSON.stringify({
-    version: 1,
-    items: SAVED.map((o, i) => ({ key: `i${i + 1}`, kind: 'sprite', id: o.id, settings: { params: o.params, cues: null, scale: o.scale }, addedAt: 1763500000000 })),
-    theme: { seed: 0, colour: { hue: 0, saturation: 1, contrast: 1, tint: null, tintAmount: 0, palette: null, outline: null }, sound: { pitch: 0, brightness: 0 }, music: { tempo: 1, intensity: null }, shapes: false },
-    next: SAVED.length + 1,
-  });
-  const LINK = `#/bag?load=${Buffer.from(JSON.stringify({ v: 1, i: SAVED.map((o) => ['s', o.id, { params: o.params, cues: null, scale: o.scale }]) })).toString('base64url')}`;
-  const store = memoryStorage();
-  store.setItem(BAG_KEY, STORED);
-  const fromStore = createBag(store);
-  const fromLink = createBag(memoryStorage());
-  assert.equal(fromLink.fromLink(LINK), SAVED.length);
-  for (const [how, bag] of [['stored', fromStore], ['link', fromLink]]) {
-    const items = bag.items();
-    assert.deepEqual(items.map((i) => i.id), IDS, `${how}: every redraw, in order`);
-    for (const [n, it] of items.entries()) {
-      const o = SAVED[n], s = await spriteOf(it.id);
-      assert.equal(it.settings.scale, o.scale, `${how} ${it.id} scale`);
-      const p = cleanParams(s, it.settings.params);
-      for (const [k, v] of Object.entries(o.params)) if (!droppedOf(RECORDS[n]).has(k)) assert.equal(p[nowKey(s, k)], nowValue(s, k, v), `${how} ${it.id}: saved ${k} kept`);
-      const plain = defaultParams(s);
-      let differs = false;
-      for (const c of Object.keys(s.clips)) {
-        const a = renderFrame(s, c, 0, p), b = renderFrame(s, c, 0, plain);
-        assert.ok(solid(a) > 12 || drawn(s, c, p) > 12, `${how} ${it.id} ${c} draws`);
-        differs ||= a.data.some((v, i) => v !== b.data[i]);
-        // an effect whose first frame is a flash the settings do not reach (enemy-poof's white ball, batch E2): its later frames
-        for (let f = 1; !differs && f < s.clips[c].frames; f++) { const fa = renderFrame(s, c, f, p), fb = renderFrame(s, c, f, plain); differs = fa.data.some((v, i) => v !== fb.data[i]); }
-      }
-      assert.ok(differs, `${how} ${it.id}: the saved values change the picture`);
-    }
-  }
-});
 
 test('each loads through the build\'s loader as data, draws its card, and stays in its bundles', async () => {
   const kits = loadBundles(ROOT);

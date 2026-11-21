@@ -19,7 +19,7 @@
 // (light tone); where it falls to the right it is turned away (dark tone). Light comes from the top
 // right, as everywhere. Draw solids before g.outline(INK).
 
-import { ramp, tone, brightness, col } from './color.js';
+import { ramp, tone, brightness } from './color.js';
 
 const TAU = Math.PI * 2;
 
@@ -106,63 +106,6 @@ export function faceRamps(colour, topColour) {
 }
 
 /**
- * Draws an upright solid in three-quarter view from the shape of its top face: the top, lit, and the wall that drops `h` px below it, shaded by the way each part of the wall faces (a box, a drum, a prism). Returns the solid() geometry with the two ramps used ({ ..., ramps }), for adding detail.
- * Arguments: g (the Surface); top (shape test of the top face: rectIn a box, ellipseIn a drum, squircleIn a round-cornered box, polyIn(ngonPoints(...)) a prism); h (px the wall drops); colour (the wall's colour; the top is a step lighter); options { topColour (another colour for the top face), lip (px: a raised light rim round the top face, default 0: only its lit edges are light), shade (px of dark band along the wall's left side and foot, default 1; 2 on things wider than 14 px; 0 none), turn (how steeply the top's front edge must climb or fall, rise over run, before the wall counts as turned to or from the light; default 0.22), box ([x0, y0, x1, y1] the top lies in; default the whole Surface) }.
- */
-export function extrude(g, top, h, colour, { topColour, lip = 0, shade = 1, turn = 0.22, box } = {}) {
-  const S = solid(top, h, box ?? [0, 0, g.w, g.h]);
-  const R = faceRamps(colour, topColour);
-  S.ramps = R;
-  if (!S.box) return S;
-  const [x0, y0, x1, y1] = S.box;
-  const packed = { light: col(R.wall.light), base: col(R.wall.base), dark: col(R.wall.dark) };
-  const opt = { shade, turn, shadow: g.shadow };
-  for (let y = Math.max(0, y0); y < Math.min(g.h, y1); y++) for (let x = Math.max(0, x0); x < Math.min(g.w, x1); x++) {
-    const px = x + 0.5, py = y + 0.5;
-    if (top(px, py) || !S.wall(px, py)) continue;
-    g.data[y * g.w + x] = packed[S.shadeOf(px, py, opt)];
-  }
-  g.fill(x0, y0, x1, y1, top, { base: R.top.base, light: R.top.light, dark: R.top.base }, { shade: 0, light: lip > 0 ? 0 : 1 });
-  if (lip > 0) {
-    const ring = (px, py) => top(px, py) && !(top(px - lip, py) && top(px + lip, py) && top(px, py - lip) && top(px, py + lip));
-    g.fill(x0, y0, x1, y1, ring, R.top.light);
-  }
-  return S;
-}
-
-// ---- marking a solid -------------------------------------------------------------
-
-/**
- * Shape test for a band round the wall of a solid, a set number of rows below the top's front edge, so it follows the curve of a drum or the corners of a prism: a hoop, a rib, a strap, a painted stripe.
- * Arguments: S (a solid from solid() or extrude()); from (rows below the top's front edge where the band starts, 0 = the first wall row); thick (rows, default 1); options { x0, x1 (keep only columns x0 <= x < x1: a label instead of a full band) }.
- */
-export function bandIn(S, from, thick = 1, { x0 = -Infinity, x1 = Infinity } = {}) {
-  return (px, py) => {
-    if (px < x0 || px >= x1 || !S.wall(px, py)) return false;
-    const d = S.drop(px, py);
-    return d >= from && d < from + thick;
-  };
-}
-
-/**
- * Paints part of the wall of a solid in another colour, shaded like the wall itself (dark where it turns from the light and along its left side and foot, light where it turns to the light): a hoop, a label, a painted panel.
- * Arguments: g (the Surface); S (a solid from extrude() or solid()); inside (shape test of what to paint; only wall pixels are touched); colour ('#rrggbb', or a ramp { light, base, dark }); options { shade, turn (as extrude; defaults 1 and 0.22), flat (true: one tone, the colour itself, with no shading) }.
- */
-export function wallFill(g, S, inside, colour, { shade = 1, turn = 0.22, flat = false } = {}) {
-  if (!S.box) return g;
-  const R = typeof colour === 'object' ? colour : ramp(colour);
-  const packed = { light: col(R.light), base: col(R.base), dark: col(R.dark) };
-  const opt = { shade, turn, shadow: g.shadow };
-  const [x0, y0, x1, y1] = S.box;
-  for (let y = Math.max(0, y0); y < Math.min(g.h, y1); y++) for (let x = Math.max(0, x0); x < Math.min(g.w, x1); x++) {
-    const px = x + 0.5, py = y + 0.5;
-    if (!S.wall(px, py) || !inside(px, py)) continue;
-    g.data[y * g.w + x] = flat ? packed.base : packed[S.shadeOf(px, py, opt)];
-  }
-  return g;
-}
-
-/**
  * Shape test for slanted stripes inside another shape: hazard tape, a striped label, warning paint. Stripes are counted in whole pixels, so their edges stay crisp.
  * Arguments: inside (the shape test to stripe); options { pitch (px from one stripe to the next, default 4), slant (px a stripe moves sideways per row down, default 1; 0 upright bars; negative leans the other way), duty (share of the pitch that is stripe, default 0.5), phase (px to slide the stripes sideways, default 0) }.
  */
@@ -181,47 +124,5 @@ export function stripesIn(inside, { pitch = 4, slant = 1, duty = 0.5, phase = 0 
 //   const cube = turningCubeIn(6, t);                                               // a data cube turning in place, round (0, 0)
 //   hologram(g, placedIn(cube.body, 16, 14), p.glow, { lit: placedIn(cube.lit, 16, 14) });
 
-import { hash } from './motion.js';
-import { polyIn } from './surface.js';
 
-// where wallWear puts its marks when seed is 0: across (-1..1) and down (0..1) the wall; d a dent, s a scratch
-const WEAR_SPOTS = [[-0.5, 0.16, 'd'], [0.5, 0.74, 'd'], [0.15, 0.45, 's'], [-0.3, 0.86, 's'], [0.62, 0.3, 'd'], [-0.66, 0.58, 's']];
 
-/**
- * Wears the wall of a solid: small dents and short diagonal scratches, then dirt along its foot once the wear passes half. Each mark keeps its place, so more wear adds marks and never moves the ones there.
- * Arguments: g (the Surface); S (a solid from extrude() or solid()); amount (0 new, which draws nothing, to 1 worn out); tones (the wall's ramp { light, base, dark }, as S.ramps.wall, or its colour); options { spots (how many dents and scratches at full wear, default 6), grime (rows of dirt just above the foot, default 2; 0 none), seed (0, the default, is a layout placed by hand; any other whole number scatters the marks another way), mid, half (the column of the wall's middle and how many columns it reaches to each side; default: read from the solid) }.
- */
-export function wallWear(g, S, amount, tones, { spots = 6, grime = 2, seed = 0, mid, half } = {}) {
-  if (!S.box || !(amount > 0)) return g;
-  const R = typeof tones === 'object' ? tones : ramp(tones);
-  const cx = mid ?? (S.box[0] + S.box[2] - 1) / 2, reach = (half ?? (S.box[2] - 1 - S.box[0]) / 2) - 1;
-  const mark = (x, y, c) => { if (S.wall(x + 0.5, y + 0.5)) g.dot(x, y, c); };
-  const worn = Math.round(Math.min(1, amount) * spots);
-  for (let i = 0; i < worn; i++) {
-    const [u, v, kind] = seed === 0 && i < WEAR_SPOTS.length ? WEAR_SPOTS[i]
-      : [hash(i, seed * 64 + 1) * 1.4 - 0.7, 0.1 + hash(i, seed * 64 + 2) * 0.78, hash(i, seed * 64 + 3) < 0.5 ? 'd' : 's'];
-    const x = Math.round(cx + u * reach), top = S.front(x);
-    if (top === null) continue;
-    const y = top + 2 + Math.round(v * Math.max(0, S.h - 4));
-    if (kind === 'd') { mark(x, y, R.dark); mark(x + 1, y, R.dark); mark(x, y + 1, R.dark); mark(x + 1, y + 1, R.light); }   // a dent: a shadow with a lit lower lip
-    else { mark(x, y, R.light); mark(x + 1, y - 1, R.light); mark(x + 2, y - 2, R.light); }                                    // a scratch: bare metal showing
-  }
-  if (grime > 0 && amount > 0.5) {
-    const foot = bandIn(S, S.h - 1 - grime, grime);
-    wallFill(g, S, (px, py) => foot(px, py) && hash(Math.floor(px) + seed * 64, Math.floor(py) + 31) < amount * 0.7, R.dark, { flat: true });
-  }
-  return g;
-}
-
-/**
- * Shape tests for a cube turning about its upright axis in three-quarter view, round (0, 0): { body, lit, top, wall }, where lit is its top face and the upright edge of the corner nearest the camera. Draws nothing.
- * Arguments: R (half its width from corner to corner, in px); t (the turn: a quarter turn, after which a cube looks the same, per whole number, so t and t + 1 are one picture; 0 has a corner to the camera and shows three faces, 0.5 is face-on and shows two); options { squash (how flat the camera sees the top face: half its depth on screen as a share of R, default 0.5), height (the wall as a share of R, default 0.95), lift (how far the middle of the top face sits above (0, 0), as a share of R; the default 0.45 puts the middle of the default cube on (0, 0)) }.
- */
-export function turningCubeIn(R, t, { squash = 0.5, height = 0.95, lift = 0.45 } = {}) {
-  const corners = ngonPoints(0, -R * lift, R, R * squash, 4, (Math.PI / 2) * (t - Math.floor(t) + 0.5));
-  const box = [-R - 1, Math.min(-R - 2, -R * (lift + squash) - 1), R + 1, Math.max(R + 2, R * (squash - lift) + 1)];
-  const S = solid(polyIn(corners), Math.round(R * height), box);
-  const [nx, ny] = corners.reduce((a, b) => (b[1] > a[1] ? b : a));                    // the corner nearest the camera
-  const edge = (px, py) => Math.floor(px) === Math.floor(nx) && py > ny && S.wall(px, py);
-  return { body: S.body, top: S.top, wall: S.wall, lit: (px, py) => S.top(px, py) || edge(px, py) };
-}

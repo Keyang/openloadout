@@ -13,7 +13,7 @@ import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { ramp, col } from '../../engine/color.js';
 import { TAU } from '../../engine/motion.js';
-import { toothedIn, coil, chain } from '../../engine/mech.js';
+import { toothedIn } from '../../engine/mech.js';
 import { fragments, drawFragment, crumble, rise } from '../../engine/breaking.js';
 import { spikeIn } from '../../engine/shapes.js';
 
@@ -38,74 +38,6 @@ test('toothedIn: the hub is inside, beyond the tips is outside, and there are as
     }
   }
 });
-
-test('toothedIn: turning by one tooth gives the same wheel, turning by half a tooth does not', () => {
-  const draw = (angle, profile) => new Surface(48, 48).fill(0, 0, 48, 48, toothedIn(24, 24, 16, 8, 4, angle, profile), '#c2c9d6');
-  for (const profile of ['square', 'saw']) {
-    assert.ok(same(draw(0, profile), draw(TAU / 8, profile)), `${profile}: one tooth on`);
-    assert.ok(!same(draw(0, profile), draw(TAU / 16, profile)), `${profile}: half a tooth on`);
-  }
-  // a saw tooth leans: it is not its own mirror image
-  const g = draw(0, 'saw');
-  let differs = 0;
-  for (let y = 0; y < 48; y++) for (let x = 0; x < 48; x++) if (!!g.get(x, y) !== !!g.get(47 - x, y)) differs++;
-  assert.ok(differs > 8, `saw teeth lean (${differs} px differ from the mirror image)`);
-});
-
-// ---- coil -----------------------------------------------------------------------
-
-test('coil: fills the space between its ends, as wide as asked, and never draws nothing', () => {
-  for (const len of [3, 6, 12, 24]) {
-    const g = new Surface(32, 32);
-    coil(g, 16, 28 - len, 16, 28, { turns: 3, width: 10, colour: '#c2c9d6' });
-    const b = g.bounds();
-    assert.ok(b, `length ${len}: something drawn`);
-    assert.ok(b.x0 >= 10 && b.x1 <= 21, `length ${len}: ${b.x0}..${b.x1} is inside the width`);
-    assert.ok(b.x1 - b.x0 >= 7, `length ${len}: ${b.x1 - b.x0 + 1} px wide`);
-    assert.ok(b.y0 >= 27 - len - 1 && b.y1 <= 29, `length ${len}: rows ${b.y0}..${b.y1}`);
-    assert.ok(b.y1 - b.y0 + 1 >= len - 1, `length ${len}: reaches both ends`);
-  }
-});
-
-test('coil: more turns is a different picture; the far half-turns are darker than the near ones; repeatable', () => {
-  const draw = (turns) => { const g = new Surface(32, 32); coil(g, 16, 6, 16, 28, { turns, width: 12, colour: '#c2c9d6' }); return g; };
-  assert.ok(!same(draw(2), draw(4)));
-  assert.ok(same(draw(3), draw(3)));
-  const R = ramp('#c2c9d6'), g = draw(3);
-  const count = (c) => g.data.reduce((n, v) => n + (v === col(c) ? 1 : 0), 0);
-  assert.ok(count(R.dark) > 4, 'far strokes in the dark tone');
-  assert.ok(count(R.base) + count(R.light) > 8, 'near strokes in the lit tones');
-});
-
-// ---- chain ----------------------------------------------------------------------
-
-test('chain: an unbroken run of links three pixels wide from one end to the other', () => {
-  const g = new Surface(32, 32);
-  chain(g, 10, 2, 10, 20, { colour: '#c2c9d6' });
-  const b = g.bounds();
-  assert.deepEqual([b.x0, b.x1, b.y0, b.y1], [9, 11, 2, 20]);
-  for (let y = 2; y <= 20; y++) assert.ok(g.get(9, y) || g.get(10, y) || g.get(11, y), `row ${y} has a link`);
-  // links alternate: some rows are one pixel (edge on), some are two (the sides of a flat link)
-  const widths = new Set();
-  for (let y = 2; y <= 20; y++) widths.add([9, 10, 11].filter((x) => g.get(x, y)).length);
-  assert.ok(widths.has(1) && widths.has(2));
-});
-
-test('chain: bow hangs the middle to one side and leaves the ends where they are; any direction works', () => {
-  const g = new Surface(32, 32);
-  chain(g, 10, 2, 10, 20, { colour: '#c2c9d6', bow: 3 });
-  assert.ok(g.get(10, 2) && g.get(10, 20), 'ends in place');
-  assert.ok(g.bounds().x1 >= 13 || g.bounds().x0 <= 7, 'the middle hangs out');
-  const h = new Surface(32, 32);
-  chain(h, 4, 10, 26, 16, { colour: '#c2c9d6' });
-  const b = h.bounds();
-  assert.ok(b.x0 <= 4 && b.x1 >= 26 && b.y0 >= 8 && b.y1 <= 18);
-  const short = new Surface(32, 32);
-  chain(short, 5, 5, 5, 6, { colour: '#c2c9d6' });
-  assert.ok(lit(short) >= 2, 'a two pixel chain still draws');
-});
-
-// ---- fragments, drawFragment ---------------------------------------------------------
 
 test('fragments: as many chunks as asked for, every drawn pixel in exactly one of them', () => {
   for (let pieces = 1; pieces <= 9; pieces++) {

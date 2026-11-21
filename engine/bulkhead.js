@@ -29,7 +29,7 @@ import { hash, clamp, fract } from './motion.js';
 import { tone, brightness } from './color.js';
 import { rectIn } from './surface.js';
 import { stripesIn } from './solids.js';
-import { textureTone, textureLight } from './tiles.js';
+
 
 const T = 32;
 
@@ -258,16 +258,6 @@ export function laserBeam(g, o) {
 }
 
 // ---- added with batch S11, fix round 1: the casing of a machine, and warning paint -------------------------
-
-/**
- * The six tones a metal machine is drawn in, all from its one colour: the body, its brightest edge, a softer light for top faces and lit sides, the grooves, and a darker metal for recesses (a bezel, a nozzle, the band under warning paint) with that metal's own lit edge.
- * Arguments: colour ('#rrggbb': the body); options { drop (how much darker than the body the recess metal is, in brightness, default 0.2), floor (the darkest the recess metal may get, so it stays clear of the outline; default 0.17) }.
- * Returns { base, lit, soft, seam, dark, darkLit }. base, lit, soft and seam are what drawCasing takes; they are also the tones drawBulkhead and drawGrate ask for.
- */
-export function machineTones(colour, { drop = 0.2, floor = 0.17 } = {}) {
-  const dark = shadeTo(colour, Math.max(floor, brightness(colour) - drop));
-  return { base: colour, lit: textureLight(colour), soft: textureLight(colour, colour, 0.4), seam: textureTone(colour), dark, darkLit: textureLight(dark, dark, 0.4) };
-}
 
 /**
  * Draws a box of a machine seen from the south, in whole pixels: a lit top face over a front that is lit down its right edge and dark down its left. Stack several for a cabinet, a pillar, a post; draw the ones behind first.

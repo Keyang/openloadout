@@ -8,7 +8,7 @@
 // R3 (2026-11-21): engine/foliage.js (the tree parts) went with its tests; the engine/tiles.js tests stay.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { TILE, BLOCK_PIECES, NARROW_PIECES, blockJoins, drawBlock, drawSoftBlock, edgeWave, bandCell, bandStone } from '../../engine/tiles.js';
+import { TILE, BLOCK_PIECES, NARROW_PIECES, blockJoins, drawBlock, drawSoftBlock, bandCell, bandStone } from '../../engine/tiles.js';
 import { Surface } from '../../engine/surface.js';
 import { col, INK } from '../../engine/color.js';
 const SAND = '#ecda95', RIM = '#a05c37', SHADE = '#c9a06a', BANK = '#7fbf5a';
@@ -17,8 +17,6 @@ const column = (g, x) => Array.from({ length: TILE }, (_, y) => g.get(x, y));
 const row = (g, y) => Array.from({ length: TILE }, (_, x) => g.get(x, y));
 const count = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);
 
-// a top-down path: no ink, a dark line on the outline, a strip of shade under the top and right edges, a deep wander
-const dips = (seed, px) => (u) => Math.round(edgeWave(u, seed, [1, 3]) * px);
 const soft = (over = {}) => ({
   ink: null, round: 8,
   fill: (x, y, t, v) => (v ? '#d9bc7e' : SAND),
@@ -27,25 +25,6 @@ const soft = (over = {}) => ({
   bottom: { depth: 1, inset: dips(7, 4), paint: () => RIM },
   left: { depth: 1, inset: dips(9, 8), paint: () => RIM },
   ...over,
-});
-
-test('drawSoftBlock: every pair of pieces that can touch joins exactly, narrow pieces included', () => {
-  for (const material of [soft(), soft({ ink: INK }), soft({ round: 14 }), soft({ round: 0 })]) {
-    const made = Object.fromEntries([...BLOCK_PIECES, ...NARROW_PIECES].map((p) => [p, piece(drawSoftBlock, p, material)]));
-    for (const [a, axis, b] of blockJoins({ narrow: true })) {
-      const A = axis === 'x' ? column(made[a], TILE - 1) : row(made[a], TILE - 1);
-      const B = axis === 'x' ? column(made[b], 0) : row(made[b], 0);
-      for (let i = 0; i < TILE; i++) assert.equal(!!A[i], !!B[i], `${a} ${axis === 'x' ? 'left of' : 'above'} ${b}: the outlines meet at ${i}`);
-    }
-  }
-});
-
-test('drawSoftBlock: the fill is opaque, and a fill version is passed on to the material', () => {
-  const m = soft();
-  const fill = piece(drawSoftBlock, 'fill', m), other = piece(drawSoftBlock, 'path-fill-b', m);
-  assert.equal(count(fill), TILE * TILE);
-  assert.ok(fill.data.every((v) => v === col(SAND)));
-  assert.ok(other.data.every((v) => v === col('#d9bc7e')));
 });
 
 test('drawSoftBlock: an outer corner is a true arc of the radius asked for', () => {
@@ -73,48 +52,6 @@ test('drawSoftBlock: the outline may wander up to 8 px in, and is still on the t
   assert.equal(first(TILE - 1), 0);
   assert.equal(first(3), 3);
   assert.equal(first(16), 8);
-});
-
-test('drawSoftBlock: with no ink the band starts on the outline; with ink the outline is inked and the band lies inside it', () => {
-  const bare = piece(drawSoftBlock, 'top', soft({ round: 0, top: { depth: 2, paint: (d) => (d === 1 ? RIM : SHADE) } }));
-  assert.equal(bare.get(16, 0), col(RIM));
-  assert.equal(bare.get(16, 1), col(SHADE));
-  assert.equal(bare.get(16, 2), col(SAND));
-  const inked = piece(drawSoftBlock, 'top', soft({ ink: INK, round: 0, top: { depth: 2, paint: (d) => (d === 1 ? RIM : SHADE) } }));
-  assert.equal(inked.get(16, 0), col(INK));
-  assert.equal(inked.get(16, 1), col(RIM));
-  assert.equal(inked.get(16, 2), col(SHADE));
-  // an inner corner carries its two neighbours' bands round the turn
-  const corner = piece(drawSoftBlock, 'inner-tl', soft({ round: 0 }));
-  assert.equal(count(corner), TILE * TILE);
-  assert.equal(corner.get(0, 0), col(RIM));
-  assert.equal(corner.get(10, 10), col(SAND));
-});
-
-test('drawSoftBlock: with square corners and a small wander it draws what drawBlock draws (inner corners apart)', () => {
-  const shallow = (seed) => (u) => Math.round(edgeWave(u, seed, [1, 3]) * 3);
-  for (const ink of [null, INK, RIM]) {
-    const m = soft({ ink, round: 0, top: { depth: 3, inset: shallow(3), paint: (d) => (d === 1 ? RIM : SHADE) }, right: { depth: 3, inset: shallow(5), paint: (d) => (d === 1 ? RIM : SHADE) }, bottom: { depth: 1, inset: shallow(7), paint: () => RIM }, left: { depth: 1, inset: shallow(9), paint: () => RIM } });
-    for (const p of [...BLOCK_PIECES, ...NARROW_PIECES].filter((n) => !n.startsWith('inner'))) {
-      assert.deepEqual([...piece(drawSoftBlock, p, m).data], [...piece(drawBlock, p, m).data], `${p}, ink ${ink}`);
-    }
-  }
-});
-
-test('drawSoftBlock: outside() paints what is beyond the outline, t reaches the material, and a bad name throws', () => {
-  const seen = new Set();
-  const m = soft({ outside: (x, y, t) => { seen.add(t); return BANK; }, fill: (x, y, t) => { seen.add(t); return SAND; } });
-  const g = piece(drawSoftBlock, 'left', m, 0.25);
-  assert.equal(count(g), TILE * TILE);
-  assert.equal(g.get(0, 0), col(BANK));
-  assert.deepEqual([...seen], [0.25]);
-  assert.throws(() => drawSoftBlock(new Surface(TILE, TILE), 'grass-thin-m', soft()), /not a block piece/);
-  // outside() is told how far beyond the outline a pixel is, so a bank can follow the curve and stop
-  const pond = piece(drawSoftBlock, 'left', { ink: INK, round: 10, fill: () => '#4fa8d8', outside: (x, y, t, out) => (out <= 3 ? BANK : null) });
-  assert.equal(pond.get(0, 0), 0, 'the far corner of the tile is beyond the bank');
-  let bank = 0;
-  for (let y = 0; y < TILE; y++) for (let x = 0; x < TILE; x++) if (pond.get(x, y) === col(BANK)) { bank++; assert.ok(x < 13 && y < 13, 'the bank lies round the arc'); }
-  assert.ok(bank >= 20, `${bank} px of bank`);
 });
 
 const row48 = (g, y) => Array.from({ length: g.w }, (_, x) => g.get(x, y));

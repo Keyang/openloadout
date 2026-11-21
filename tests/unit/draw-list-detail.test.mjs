@@ -4,7 +4,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface, rectIn, ellipseIn } from '../../engine/surface.js';
 import { ramp, col, INK } from '../../engine/color.js';
-import { fontMetrics, drawText, textWidth } from '../../engine/pixel-font.js';
+import { fontMetrics } from '../../engine/pixel-font.js';
 import * as D from '../../engine/draw-list.js';
 
 const SKY = '#5b8fd6', MIST = '#dfe8f0', CLOTH = '#3a6ea5';
@@ -87,22 +87,6 @@ test('draw-list bands: the area may be any shape (a sky ellipse) and is covered 
 });
 
 // ---- text -------------------------------------------------------------------------------------------------------
-
-test('draw-list text: glyphs of the font at the pen point on the baseline, as pixel-font drawText draws them', () => {
-  const m = fontMetrics(0.5, 'chunky');
-  const want = new Surface(64, 24); drawText(want, 'HI 7', 3, 14, { metrics: m, colour: CLOTH, outline: 'none' });
-  assert.ok(same(draw([{ kind: 'text', font: 'font:chunky@1', size: 0.5, text: 'HI 7', at: [3, 14], paint: 'cloth' }], {}, 64, 24), want));
-  const inked = new Surface(64, 24); drawText(inked, 'Go!', 3, 14, { metrics: fontMetrics(1, 'slim'), colour: CLOTH, outline: 'ink' });
-  assert.ok(same(draw([{ kind: 'text', font: 'slim', cap: 9, text: 'Go!', at: [3, 14], paint: 'cloth', outline: 'ink' }], {}, 64, 24), inked));
-});
-
-test('draw-list text: align centre and right move the pen point by the line\'s width', () => {
-  const m = fontMetrics(0, 'serif'), w = textWidth('ABC', m);
-  for (const [align, x0] of [['left', 30], ['centre', Math.round(30 - w / 2)], ['center', Math.round(30 - w / 2)], ['right', 30 - w]]) {
-    const g = draw([{ kind: 'text', font: 'font:serif', cap: 5, text: 'ABC', at: [30, 20], align, paint: 'cloth' }], {}, 64, 24);
-    assert.equal(g.bounds().x0, x0, align);
-  }
-});
 
 test('draw-list text: a character the font lacks, an unknown font or more than 40 characters is refused and reported', () => {
   for (const bad of [{ text: 'a~b' }, { font: 'font:gothic' }, { text: 'A'.repeat(41) }]) {

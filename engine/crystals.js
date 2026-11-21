@@ -17,14 +17,11 @@
 //
 // Styles: the faces are polygons and carry over to any style; drawAura reads pixels back, so it is pixel only.
 
-import { ramp, mix, col } from './color.js';
+
 import { polyIn, ellipseIn } from './surface.js';
 import { starPoints } from './shapes.js';
 
 const TAU = Math.PI * 2;
-
-/** The cuts drawCrystal and crystalFaces accept: shard (a long four-sided point), prism (a six-sided column with pointed ends), orb (a polished ball) and star (a flat four-pointed star). No arguments: a frozen list. */
-export const CRYSTAL_CUTS = Object.freeze(['shard', 'prism', 'orb', 'star']);
 
 // A spindle: a ring of `sides` corners at the waist (or two rings, for a column), a point above and a point below.
 const SPINDLES = { shard: { sides: 4, top: 0.22, bottom: 0.22, width: 1 }, prism: { sides: 6, top: -0.5, bottom: 0.5, width: 1 } };
@@ -69,47 +66,4 @@ export function crystalFaces(cx, cy, rx, ry, cut = 'shard', turn = 0) {
     }
   }
   return { outline: (px, py) => all.some((f) => f(px, py)), faces };
-}
-
-/**
- * Draws a standing crystal that fills the box cx ± rx, cy ± ry, lit from the top right, turned about its upright axis; returns its silhouette as a shape test (for a glint or a glow). Call g.outline afterwards.
- * Arguments: g (the Surface); cx, cy (centre); rx, ry (half its width and height in pixels); colour; options { cut (one of CRYSTAL_CUTS, default 'shard'), turn (0..1: one step of its turn; run it from 0 to 1 over a loop) }.
- */
-export function drawCrystal(g, cx, cy, rx, ry, colour, { cut = 'shard', turn = 0 } = {}) {
-  const R = ramp(colour), { outline, faces } = crystalFaces(cx, cy, rx, ry, cut, turn);
-  const box = [cx - rx - 2, cy - ry - 2, cx + rx + 2, cy + ry + 2];
-  const tones = { 2: mix(R.light, '#ffffff', 0.55), 1: R.light, 0: R.base, [-1]: R.dark };
-  if (cut === 'orb') {
-    // a polished ball: a dark side, a window of light that drifts a little as it turns, a white spot in it
-    g.fill(...box, outline, R, { shade: Math.min(rx, ry) >= 6 ? 2 : 1 });
-    const a = TAU * turn, wx = cx + rx * (0.28 + 0.1 * Math.cos(a)), wy = cy - ry * (0.3 + 0.08 * Math.sin(a));
-    const keep = (px, py) => outline(px, py) && outline(px + 1, py) && outline(px, py - 1);
-    g.fill(...box, ellipseIn(wx, wy, rx * 0.42, ry * 0.42), R.light, { clip: keep });
-    g.fill(...box, ellipseIn(wx + rx * 0.12, wy - ry * 0.1, Math.max(1, rx * 0.18), Math.max(1, ry * 0.18)), tones[2], { clip: keep });
-    g.fill(...box, (px, py) => outline(px, py) && !outline(px + 1.5, py - 1.5) && px < cx && py > cy, R.dark);
-    return outline;
-  }
-  g.fill(...box, outline, R.base);
-  for (const f of faces) g.fill(...box, polyIn(f.pts), tones[f.tone] ?? R.base, { clip: outline });
-  return outline;
-}
-
-/**
- * Paints a glow that hugs whatever is drawn on another Surface: every empty pixel within `reach` px of it, in rings of colour from the nearest outwards. Draw it on the frame first and paste the other Surface over it, so the glow is light behind an inked thing.
- * Arguments: g (the Surface to paint on); src (the Surface whose drawing glows, the same size); options { reach (px, default 2), colours (a list, nearest ring first; the last is used for the rest; default white), dx, dy (where src will be pasted, default 0 and 0), box ([x0, y0, x1, y1] to keep the glow in; default the frame inside its 1 px border) }.
- */
-export function drawAura(g, src, { reach = 2, colours = ['#ffffff'], dx = 0, dy = 0, box } = {}) {
-  const r = Math.max(0, Math.round(reach));
-  if (!r) return g;
-  const [x0, y0, x1, y1] = box ?? [1, 1, g.w - 1, g.h - 1];
-  const b = src.bounds();
-  if (!b) return g;
-  for (let y = Math.max(y0, b.y0 + dy - r); y < Math.min(y1, b.y1 + dy + r + 1); y++) for (let x = Math.max(x0, b.x0 + dx - r); x < Math.min(x1, b.x1 + dx + r + 1); x++) {
-    if (src.get(x - dx, y - dy)) continue;
-    let near = Infinity;
-    for (let oy = -r; oy <= r; oy++) for (let ox = -r; ox <= r; ox++) if (src.get(x - dx + ox, y - dy + oy)) near = Math.min(near, Math.hypot(ox, oy));
-    const ring = Math.round(near);
-    if (ring >= 1 && ring <= r) g.data[y * g.w + x] = col(colours[Math.min(ring, colours.length) - 1]);
-  }
-  return g;
 }

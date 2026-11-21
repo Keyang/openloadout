@@ -21,15 +21,12 @@
 // ROOM. drawText draws nothing outside the surface; keep 2 px round the body for 'ink', 3 for
 // 'rimmed', and one more down and to the left for `shadow`.
 
-import { Surface } from './surface.js';
-import { ramp, INK } from './color.js';
-import { glyphGrid, digitBody, rimmed } from './ui.js';
+
+
+import { glyphGrid, digitBody } from './ui.js';
 
 /** The font's four styles: chunky (heavy 2 px uprights), slim (1 px everywhere), rounded (chunky with every turn rounded) and serif (feet on uprights). No arguments: a frozen list. */
 export const FONT_STYLES = Object.freeze(['chunky', 'slim', 'rounded', 'serif']);
-
-/** The font's three cap heights in pixels, small to large: 5, 7 and 9. No arguments: a frozen list. */
-export const FONT_HEIGHTS = Object.freeze([5, 7, 9]);
 
 /** The characters the font draws, in font-sheet order: { upper, lower, digits, marks } (18 marks). A space is no glyph, only an advance. No arguments: a frozen object. */
 export const FONT_CHARS = Object.freeze({
@@ -352,50 +349,6 @@ export const FONT_HAND = Object.freeze({
   'rounded/9/)': { rows: ['##.', '.##', '.##', '.##', '.##', '.##', '.##', '.##', '##.'], rise: 9 },
 });
 
-/** The letters allowed to come out the same in two styles, as '<char>:<style>:<style>', because they have no turn to round (rounded) and no foot to add (serif). M, m, W and w are here for serif by a spec deviation: they are drawn without feet (no room at maxW; see `nofeet` below). An entry with a fourth field, '<char>:<style>:<style>:<cap>', holds at that cap height only: there the letter cannot be told apart in the two styles (M of 5 rows has no room for 2 px uprights beside its V, so chunky's and rounded's are slim's with the V's point a row longer, 1 px apart; m of 3 rows has no room for 2 px legs and two counters, so chunky's is slim's: its solid second row made a blob; z of 3 rows has room for one diagonal row, so the serif z is chunky's and rounded's with a 1 px diagonal; v of 5 rows narrows from its third row in rounded as in serif, so the two are one glyph, with nothing to round and no foot; I of 5 rows in serif is a 1 px stem between slabs 2 px past it each side, to stand 3 px from the serif l with its head flag and centred foot, and that is the slim I of 5 rows already, and the chunky and rounded I of 7 and 9 rows; s of 4 rows in serif has its corners off, as slim's, and 4 rows of a 1 px stroke have no room for a terminal). No arguments: a frozen list. */
-export const FONT_SAME = Object.freeze([
-  'H:chunky:rounded',
-  'I:chunky:rounded',
-  'i:chunky:rounded',
-  'K:chunky:rounded',
-  'k:chunky:rounded',
-  'M:chunky:rounded',
-  'N:chunky:rounded',
-  'T:chunky:rounded',
-  'V:chunky:rounded',
-  'v:chunky:rounded',
-  'X:chunky:rounded',
-  'x:chunky:rounded',
-  'Y:chunky:rounded',
-  'Z:chunky:rounded',
-  'z:chunky:rounded',
-  'L:chunky:serif',
-  'M:chunky:serif',
-  'm:chunky:serif',
-  'W:chunky:serif',
-  'w:chunky:serif',
-  'M:rounded:serif',
-  'L:slim:serif',
-  'M:slim:serif',
-  'm:slim:serif',
-  'W:slim:serif',
-  'w:slim:serif',
-  'M:chunky:slim:5',
-  'M:slim:rounded:5',
-  'm:chunky:slim:5',
-  'z:chunky:serif:5',
-  'z:rounded:serif:5',
-  'v:rounded:serif:7',
-  'I:slim:serif:5',
-  'I:chunky:serif:7',
-  'I:chunky:serif:9',
-  'I:rounded:serif:7',
-  'I:rounded:serif:9',
-  's:slim:serif:5',
-]);
-
-// ---- measures ---------------------------------------------------------------------------------------------
-
 const SIZES = [
   { cap: 5, x: 3, descent: 2, maxW: 5, space: 2, digitW: { chunky: 5, rounded: 5, slim: 3, serif: 4 } },
   { cap: 7, x: 5, descent: 2, maxW: 7, space: 3, digitW: { chunky: 6, rounded: 6, slim: 4, serif: 5 } },
@@ -620,8 +573,6 @@ function trim(g) {
   return { body, top: y0 };
 }
 
-const count = (g) => { let n = 0; for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) n += g.at(x, y); return n; };
-
 function letterGlyph(ch, m) {
   const k = kitFor(m), base = (LETTERS[ch] ?? MARKS[ch])({ ...k, serif: m.serif });
   const isLetter = !!LETTERS[ch];
@@ -816,47 +767,4 @@ function lineBody(text, metrics, track, offsets) {
     for (let y = 0; y < b.h; y++) for (let x = 0; x < b.w; x++) if (b.at(x, y)) body.set(it.x + x, y0 + y);
   });
   return { body, w, h, rise: up, advances: items.map((it) => it.x), items, offsetOf: off };
-}
-
-/**
- * The width in pixels of a line of text, as textBody would make it, without drawing.
- * Arguments: text; metrics (from fontMetrics); options { track } (as textBody).
- */
-export function textWidth(text, metrics, opt = {}) {
-  return layout(text, metrics, opt.track ?? metrics.track).w;
-}
-
-/**
- * Draws a line of text with its first pen point at (x, base) and returns the box drawn, ink and shadow included: { x, y, w, h }.
- * Arguments: g (the Surface); text; x, base (pen point and baseline); options { metrics, colour, outline ('none', 'ink' or 'rimmed'), edge (the rim colour), shadow (1 px ink drop shadow down-left), shine (the rows above each glyph's middle in the colour's light tone), offsets (whole-pixel rises, one per character), ink, track }.
- */
-export function drawText(g, text, x, base, { metrics, colour, outline = 'ink', edge, shadow = false, shine = false, offsets, ink = INK, track } = {}) {
-  if (!metrics) throw new Error('drawText: needs metrics (from fontMetrics)');
-  if (!colour) throw new Error('drawText: needs a colour');
-  if (!['none', 'ink', 'rimmed'].includes(outline)) throw new Error(`drawText: outline "${outline}" is not one of none, ink, rimmed`);
-  const line = lineBody(text, metrics, track ?? metrics.track, offsets ?? null);
-  const x0 = Math.round(x), y0 = Math.round(base) - line.rise;
-  const s = new Surface(g.w, g.h);
-  if (outline === 'rimmed') rimmed(s, line.body, x0, y0, { colour, edge, shadow, ink });
-  else {
-    for (let j = 0; j < line.h; j++) for (let i = 0; i < line.w; i++) if (line.body.at(i, j)) s.dot(x0 + i, y0 + j, colour);
-    if (outline === 'ink') s.outline(ink);
-  }
-  if (shine) {
-    const light = ramp(colour).light;
-    line.items.forEach((it, i) => {
-      if (!it.gl) return;
-      const b = it.gl.body, gy = y0 + line.rise - it.gl.rise - line.offsetOf(i), mid = Math.floor((b.h - 1) / 2);
-      for (let j = 0; j < mid; j++) for (let i2 = 0; i2 < b.w; i2++) if (b.at(i2, j)) s.dot(x0 + it.x + i2, gy + j, light);
-    });
-  }
-  if (shadow && outline !== 'rimmed') {
-    const under = new Surface(g.w, g.h);
-    for (let py = 0; py < g.h; py++) for (let px = 0; px < g.w; px++) if (s.get(px, py)) under.dot(px - 1, py + 1, ink);
-    under.blit(s);
-    s.data.set(under.data);
-  }
-  const b = s.bounds();
-  g.blit(s);
-  return b ? { x: b.x0, y: b.y0, w: b.x1 - b.x0 + 1, h: b.y1 - b.y0 + 1 } : { x: x0, y: Math.round(base), w: 0, h: 0 };
 }

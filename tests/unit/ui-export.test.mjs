@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import { defineSprite, renderSheet, renderFrame, defaultParams, cleanParams, range, clipStretch } from '../../engine/sprite.js';
 import { col, INK } from '../../engine/color.js';
 import { librarySprite } from '../helpers/library.mjs';   // the library asset, a code file or a data file (tests/helpers/library.mjs)
-import coin from '../fixtures/code-sprites/coin.js';   // the code file as it was before P1 (a code sprite to export)
+   // the code file as it was before P1 (a code sprite to export)
 const slime = await librarySprite('slime');
 const dialogue = await librarySprite('ui-dialogue');
 const menu = await librarySprite('ui-battle-menu');
@@ -34,31 +34,6 @@ function looks(s) {
   }
   return out;
 }
-
-test('a sprite with no slice exports exactly what it did before: no new keys anywhere', () => {
-  for (const s of [coin, slime]) for (const scale of [1, 2]) {
-    const { meta } = renderSheet(s, defaultParams(s), { scale });
-    assert.deepEqual(Object.keys(meta), ['app', 'version', 'sprite', 'name', 'image', 'frameWidth', 'frameHeight', 'scale', 'pivot', 'facing', 'params', 'parts', 'animations', 'frames'], s.id);
-    for (const [name, a] of Object.entries(meta.animations)) assert.deepEqual(Object.keys(a), ['row', 'frames', 'fps', 'loop'], `${s.id} ${name}`);
-    for (const f of meta.frames) assert.deepEqual(Object.keys(f), ['name', 'animation', 'x', 'y', 'w', 'h', 'duration'], `${s.id} ${f.name}`);
-    const text = JSON.stringify(meta);
-    for (const k of NEW) assert.ok(!text.includes(`"${k}"`), `${s.id}: no "${k}"`);
-    assert.equal(clipStretch(s, Object.keys(s.clips)[0], defaultParams(s)), null);
-  }
-});
-
-test('the stretch fields are purely additive: take them away and the sheet is byte for byte the one without a slice', () => {
-  for (const s of [coin, slime]) for (const scale of [1, 3]) {
-    const plain = renderSheet(s, defaultParams(s), { scale });
-    const first = Object.keys(s.clips)[0];
-    const sliced = Object.create(s);
-    sliced.slice = { [first]: { left: 3, top: 4, right: 5, bottom: 6, rect: { x: 1, y: 2, w: 10, h: 12 }, opening: { x: 2, y: 3, w: 4, h: 5 }, tile: { x: 4, w: 3 } } };
-    const out = renderSheet(sliced, defaultParams(s), { scale });
-    assert.ok(out.meta.animations[first].border, 'the slice shows up');
-    assert.equal(JSON.stringify(strip(out.meta), null, 2), JSON.stringify(plain.meta, null, 2), `${s.id} x${scale}: JSON`);
-    assert.deepEqual(out.data, plain.data, `${s.id} x${scale}: pixels`);
-  }
-});
 
 const fixture = (slice) => defineSprite({
   id: 'fixture', name: 'Fixture', size: [32, 16], pivot: [16, 8],

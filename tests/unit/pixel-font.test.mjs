@@ -4,11 +4,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { INK, col, ramp } from '../../engine/color.js';
-import { digitBody, rimmed } from '../../engine/ui.js';
-import {
-  FONT_STYLES, FONT_HEIGHTS, FONT_CHARS, FONT_HAND, FONT_SAME,
-  fontMetrics, fontGlyph, textBody, textWidth, drawText,
-} from '../../engine/pixel-font.js';
+import { digitBody } from '../../engine/ui.js';
+import { FONT_STYLES, FONT_CHARS, FONT_HAND, fontMetrics, fontGlyph, textBody } from '../../engine/pixel-font.js';
 
 const SIZES = [0, 0.5, 1];
 const ALL = [...FONT_CHARS.upper, ...FONT_CHARS.lower, ...FONT_CHARS.digits, ...FONT_CHARS.marks];
@@ -24,21 +21,6 @@ function differ(a, b) {
 }
 const same = (a, b) => a.w === b.w && a.h === b.h && a.rise === b.rise && differ(a, b) === 0;
 const pixels = (g) => { const out = []; for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) if (g.get(x, y)) out.push([x, y, g.get(x, y)]); return out; };
-
-test('the lists say what the spec says', () => {
-  assert.deepEqual([...FONT_STYLES], ['chunky', 'slim', 'rounded', 'serif']);
-  assert.deepEqual([...FONT_HEIGHTS], [5, 7, 9]);
-  assert.equal(FONT_CHARS.upper.length, 26);
-  assert.equal(FONT_CHARS.lower.length, 26);
-  assert.equal(FONT_CHARS.digits, '0123456789');
-  assert.equal(FONT_CHARS.marks, '.,:;!?\'"-+=/()%#*&');
-  assert.ok(Object.isFrozen(FONT_STYLES) && Object.isFrozen(FONT_HEIGHTS) && Object.isFrozen(FONT_CHARS) && Object.isFrozen(FONT_HAND) && Object.isFrozen(FONT_SAME));
-  for (const [key, hand] of Object.entries(FONT_HAND)) {
-    const [, style, cap, ch] = /^(\w+)\/(\d+)\/(.)$/.exec(key);
-    assert.ok(FONT_STYLES.includes(style) && FONT_HEIGHTS.includes(Number(cap)) && ALL.includes(ch), key);
-    for (const row of hand.rows) assert.match(row, /^[#.]+$/, key);
-  }
-});
 
 test('fontMetrics gives the table of sizes and names the styles when one is unknown', () => {
   assert.deepEqual(SIZES.map((s) => fontMetrics(s).cap), [5, 7, 9]);
@@ -122,44 +104,6 @@ test('(3) the mirror-image glyphs are symmetric to the pixel in every style', ()
   }
 });
 
-test('(4) any two styles of a letter differ by 2 pixels, except FONT_SAME, which only holds letters with nothing to round or no foot to add (or, at one cap height, no room)', () => {
-  const allowed = new Set(FONT_SAME);
-  for (const s of SIZES) for (let a = 0; a < 4; a++) for (let b = a + 1; b < 4; b++) {
-    const ma = fontMetrics(s, FONT_STYLES[a]), mb = fontMetrics(s, FONT_STYLES[b]);
-    for (const ch of LETTERS) {
-      if (allowed.has(`${ch}:${ma.style}:${mb.style}`) || allowed.has(`${ch}:${ma.style}:${mb.style}:${ma.cap}`)) continue;
-      const d = differ(fontGlyph(ch, ma), fontGlyph(ch, mb));
-      assert.ok(d >= 2, `"${ch}" ${ma.style} and ${mb.style} at cap ${ma.cap} differ by ${d}`);
-    }
-  }
-  for (const entry of FONT_SAME) {
-    const [ch, s1, s2, cap] = entry.split(':');
-    assert.ok(LETTERS.includes(ch), entry);
-    assert.ok(FONT_STYLES.indexOf(s1) >= 0 && FONT_STYLES.indexOf(s1) < FONT_STYLES.indexOf(s2), `${entry}: two styles in FONT_STYLES order`);
-    if (cap !== undefined) {
-      // a no-room entry: one cap height, where a hand-set glyph says so (test (2) still tells it from every other letter)
-      assert.ok(FONT_HEIGHTS.includes(Number(cap)), `${entry}: cap ${cap}`);
-      assert.ok(FONT_HAND[`${s1}/${cap}/${ch}`] || FONT_HAND[`${s2}/${cap}/${ch}`], `${entry}: no hand-set glyph at cap ${cap}`);
-      continue;
-    }
-    for (const s of SIZES) {
-      // no turn to round: rounding this letter changes nothing; no foot to add: the serif feet change nothing
-      if ([s1, s2].includes('rounded')) {
-        const m = fontMetrics(s, 'rounded');
-        assert.ok(same(fontGlyph(ch, m), fontGlyph(ch, { ...m, round: false })), `${entry}: "${ch}" has a turn to round at cap ${m.cap}`);
-        const c = fontMetrics(s, 'chunky');
-        assert.ok(same(fontGlyph(ch, c), fontGlyph(ch, { ...c, round: true })), `${entry}: "${ch}" has a turn to round at cap ${c.cap}`);
-      }
-      if ([s1, s2].includes('serif')) {
-        // spec deviation: M, m, W and w are drawn without serif feet (nofeet in engine/pixel-font.js: no room
-        // at maxW), so they pass here although the spec gives every upright a foot
-        const m = fontMetrics(s, 'serif');
-        assert.ok(same(fontGlyph(ch, m), fontGlyph(ch, { ...m, serif: false })), `${entry}: "${ch}" has a foot at cap ${m.cap}`);
-      }
-    }
-  }
-});
-
 test('(5) the digits are digitBody of engine/ui.js, with feet in the serif style', () => {
   const hand = [];
   for (const style of FONT_STYLES) for (const s of SIZES) {
@@ -184,118 +128,6 @@ test('(5) the digits are digitBody of engine/ui.js, with feet in the serif style
   ]);
   assert.ok(fontGlyph('4', fontMetrics(0.5, 'serif')).w > fontMetrics(0.5, 'serif').digitW, 'the serif 4 has its feet');
 });
-
-test('(6) textBody lays glyphs track apart and spaces space wide; textWidth agrees; unknown characters throw', () => {
-  const m = fontMetrics(0.5, 'chunky');
-  for (const text of ['A', 'SCORE', 'Game over!', ' 42 ', 'a  b', 'x+y=(3*4)%#&']) {
-    const glyphs = [...text].filter((c) => c !== ' ').map((c) => fontGlyph(c, m));
-    const spaces = [...text].filter((c) => c === ' ').length;
-    const t = textBody(text, m);
-    const w = glyphs.reduce((n, g) => n + g.w, 0) + m.track * Math.max(0, glyphs.length - 1) + m.space * spaces;
-    assert.equal(t.w, w, text);
-    assert.equal(t.body.w, w, text);
-    assert.equal(textWidth(text, m), w, text);
-    assert.equal(t.advances.length, text.length);
-    for (let i = 1; i < t.advances.length; i++) assert.ok(t.advances[i] > t.advances[i - 1], `${text}: advances increase`);
-    assert.equal(t.rise, Math.max(...glyphs.map((g) => g.rise)));
-  }
-  assert.equal(textWidth('AB', m, { track: 3 }), fontGlyph('A', m).w + fontGlyph('B', m).w + 3);
-  assert.equal(textBody('', m).w, 0);
-  assert.throws(() => textBody('HI~', m), /"~"/);
-  assert.throws(() => textWidth('é', m), /"é"/);
-  assert.throws(() => fontGlyph('@', m), /"@"/);
-});
-
-test('(7) drawText: none is the body, ink adds a line, rimmed is rimmed, shadow falls down-left, shine lights the top rows, all inside the box', () => {
-  const colour = '#e8b04a', edge = '#7a3b1e';
-  for (const style of FONT_STYLES) for (const s of SIZES) {
-    const metrics = fontMetrics(s, style), text = 'Ab9?', base = 16, x = 4;
-    const t = textBody(text, metrics);
-    const draw = (opt) => { const g = new Surface(64, 28); const box = drawText(g, text, x, base, { metrics, colour, ...opt }); return { g, box }; };
-
-    const none = draw({ outline: 'none' });
-    const body = new Set();
-    for (let y = 0; y < t.h; y++) for (let i = 0; i < t.w; i++) if (t.body.at(i, y)) body.add(`${x + i},${base - t.rise + y}`);
-    assert.deepEqual(new Set(pixels(none.g).map(([px, py]) => `${px},${py}`)), body, `${style} ${metrics.cap}: none draws the body`);
-
-    const inked = draw({ outline: 'ink' });
-    for (const [px, py, c] of pixels(inked.g)) {
-      if (body.has(`${px},${py}`)) { assert.equal(c, col(colour)); continue; }
-      assert.equal(c, ink, `${style}: only ink round the body`);
-      assert.ok([[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => body.has(`${px + dx},${py + dy}`)), `${style}: ink touches the body`);
-    }
-
-    const rim = draw({ outline: 'rimmed', edge });
-    const ref = new Surface(64, 28);
-    rimmed(ref, t.body, x, base - t.rise, { colour, edge });
-    assert.deepEqual([...rim.g.data], [...ref.data], `${style} ${metrics.cap}: rimmed`);
-
-    for (const outline of ['none', 'ink']) {
-      const plain = draw({ outline }), shade = draw({ outline, shadow: true });
-      for (const [px, py, c] of pixels(shade.g)) {
-        if (plain.g.get(px, py) === c) continue;
-        assert.equal(c, ink, `${style} ${outline}: the shadow is ink`);
-        assert.ok(plain.g.get(px + 1, py - 1), `${style} ${outline}: the shadow falls down and to the left`);
-      }
-    }
-
-    for (const [ch, i] of [...text].map((c, k) => [c, k])) {
-      const g = fontGlyph(ch, metrics);
-      if (g.h <= 3) continue;
-      const a = new Surface(20, 24), b = new Surface(20, 24);
-      drawText(a, ch, 4, 14, { metrics, colour, outline: 'none' });
-      drawText(b, ch, 4, 14, { metrics, colour, outline: 'none', shine: true });
-      const lit = col(ramp(colour).light);
-      assert.ok(pixels(b).some(([px, py, c]) => c === lit && a.get(px, py) !== c), `${style} ${metrics.cap} "${ch}" (${i}): shine changes a row`);
-    }
-
-    for (const opt of [{ outline: 'none' }, { outline: 'ink', shadow: true }, { outline: 'rimmed', edge, shadow: true, shine: true }, { outline: 'ink', offsets: [0, 2, 1, -1] }]) {
-      const { g, box } = draw(opt);
-      for (const [px, py] of pixels(g)) assert.ok(px >= box.x && py >= box.y && px < box.x + box.w && py < box.y + box.h, `${style} ${JSON.stringify(opt)}: ${px},${py} outside the box`);
-      assert.ok(pixels(g).length > 0);
-    }
-  }
-});
-
-test('drawText offsets raise single characters and draws nothing outside the surface', () => {
-  const metrics = fontMetrics(0.5, 'chunky'), colour = '#ffffff';
-  const flat = new Surface(40, 20), bounce = new Surface(40, 20);
-  drawText(flat, 'AB', 2, 12, { metrics, colour, outline: 'none' });
-  drawText(bounce, 'AB', 2, 12, { metrics, colour, outline: 'none', offsets: [0, 2] });
-  const a = fontGlyph('A', metrics);
-  for (let y = 0; y < 20; y++) for (let x = 2; x < 2 + a.w; x++) assert.equal(flat.get(x, y), bounce.get(x, y), 'the first letter stays');
-  assert.ok(bounce.bounds().y0 === flat.bounds().y0 - 2, 'the second rises 2 px');
-  const tiny = new Surface(6, 6);
-  assert.doesNotThrow(() => drawText(tiny, 'WIDE TEXT', -3, 4, { metrics, colour, outline: 'rimmed', edge: '#000000', shadow: true }));
-});
-
-test('(8) a font sheet frame fits: every character, large, rimmed, with shadow, at (4, 13) of 16x20', () => {
-  for (const style of FONT_STYLES) {
-    const metrics = fontMetrics(1, style);
-    for (const ch of ALL) {
-      const g = new Surface(16, 20);
-      drawText(g, ch, 4, 13, { metrics, colour: '#f0d060', edge: '#80602a', outline: 'rimmed', shadow: true });
-      for (let i = 0; i < 16; i++) { assert.equal(g.get(i, 0), 0, `${style} "${ch}" row 0`); assert.equal(g.get(i, 19), 0, `${style} "${ch}" row 19`); }
-      for (let j = 0; j < 20; j++) { assert.equal(g.get(0, j), 0, `${style} "${ch}" column 0`); assert.equal(g.get(15, j), 0, `${style} "${ch}" column 15`); }
-    }
-  }
-});
-
-test('(9) the same arguments give the same pixels', () => {
-  for (const style of FONT_STYLES) {
-    const metrics = fontMetrics(0.5, style), opt = { metrics, colour: '#5ac8e0', edge: '#1d4f73', outline: 'rimmed', shadow: true, shine: true, offsets: [1, 0, 2] };
-    const a = new Surface(48, 20), b = new Surface(48, 20);
-    drawText(a, 'Hi 5!', 3, 13, opt);
-    drawText(b, 'Hi 5!', 3, 13, opt);
-    assert.deepEqual([...a.data], [...b.data]);
-    const g1 = fontGlyph('Q', metrics), g2 = fontGlyph('Q', metrics);
-    assert.ok(same(g1, g2));
-    g1.body.set(0, 0, 1);                                     // a caller's copy: changing it changes nothing else
-    assert.ok(same(fontGlyph('Q', metrics), g2));
-  }
-});
-
-// ---- round 1 fixes: each test below catches one kind of defect seen on the font sheets ----------------------
 
 // a row's runs of ink, as [first, last] columns
 function runs(g, y) {

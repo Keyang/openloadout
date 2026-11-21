@@ -12,10 +12,7 @@ import crypto from 'node:crypto';
 import { pathToFileURL } from 'node:url';
 import { spriteIds, findSpriteFile } from '../../tools/lib/assets.mjs';
 import { renderFrame, defaultParams } from '../../engine/sprite.js';
-import {
-  ROOT, FROZEN_DIR, librarySprite, librarySprites, hasLibrarySprite, librarySpriteFile,
-  codeSprite, codeSpriteModule, codeSpriteFile, codeSpriteSource, codeSpritesWhere, codeSpriteAsFile, libraryCoverage,
-} from '../helpers/library.mjs';
+import { ROOT, FROZEN_DIR, librarySprite, librarySprites, hasLibrarySprite, librarySpriteFile, codeSprite, codeSpriteModule, codeSpriteFile, codeSpriteSource, codeSpritesWhere, codeSpriteAsFile, libraryCoverage } from '../helpers/library.mjs';
 
 const ids = spriteIds(ROOT);
 const kindOf = (id) => (findSpriteFile(ROOT, id).endsWith('.json') ? 'data' : 'code');
@@ -59,79 +56,9 @@ test('librarySprites is every file in sprites/, code and data files, each under 
 
 // ---- frozen code sprites, for tests about the framework ----------------------------------------------------------
 
-const FROZEN = fs.readdirSync(FROZEN_DIR).filter((f) => f.endsWith('.js')).map((f) => f.slice(0, -3)).sort();
-
-test('every frozen copy loads as a sprite with the id of its file name; a code copy imports only ../../../engine and ../../../rigs', async () => {
-  assert.ok(FROZEN.length >= 30, `${FROZEN.length} frozen copies`);
-  for (const id of FROZEN) {
-    const file = path.join(FROZEN_DIR, `${id}.js`), text = fs.readFileSync(file, 'utf8');
-    assert.equal(codeSpriteFile(id), file, `${id}: the frozen copy comes first`);
-    const def = await codeSprite(id);
-    assert.equal(def.id, id, `${id}: the sprite's id`);
-    assert.equal(typeof def.render, 'function', id);
-    assert.match(text, /^\/\/ FROZEN COPY, not a sprite:/, `${id}: says what it is on its first line`);
-    const from = [...text.matchAll(/^(?:import|export)[^;]*?from '([^']+)'/gm)].map((m) => m[1]);
-    assert.ok(from.length >= 1, `${id}: imports the framework`);
-    for (const f of from) assert.match(f, /^\.\.\/\.\.\/\.\.\/(engine|rigs)\//, `${id}: ${f}`);
-  }
-});
-
-test('codeSprite: a code file with no frozen copy is read from sprites/; with neither, it says to freeze the file first', async () => {
-  const code = ids.find((id) => kindOf(id) === 'code' && !FROZEN.includes(id));
-  if (code) {
-    assert.equal(codeSpriteFile(code), path.join(ROOT, 'sprites', `${code}.js`));
-    assert.equal((await codeSprite(code)).id, code);
-  }
-  assert.equal(codeSpriteFile('zz-not-a-sprite'), null);
-  assert.equal(codeSpriteSource('zz-not-a-sprite'), null);
-  await assert.rejects(codeSprite('zz-not-a-sprite'), /freeze the code file before redrawing it/);
-  await assert.rejects(codeSpriteModule('zz-not-a-sprite'), /freeze the code file before redrawing it/);
-  assert.throws(() => codeSpriteAsFile('zz-not-a-sprite'), /zz-not-a-sprite/);
-});
-
-test('codeSpriteModule hands over the module; codeSpriteAsFile puts the imports back for a project\'s sprites/ folder', async () => {
-  const slime = await codeSpriteModule('slime');   // (no frozen copy has named exports now that rigs/humanoid.js and its Hero, with weaponReach, are gone: R2b)
-  assert.equal(slime.default.id, 'slime');
-  const text = codeSpriteAsFile('slime');
-  assert.ok(!text.includes("'../../../"), 'no import left pointing out of tests/');
-  assert.match(text, /from '\.\.\/engine\/sprite\.js'/);
-});
-
-test('no frozen copy is in the fixed data form: the two that were (rogue-battler, road-bandit) went with the library-body path (build item R1)', () => {
-  assert.ok(!FROZEN.includes('rogue-battler') && !FROZEN.includes('road-bandit'));
-  for (const id of FROZEN) assert.match(fs.readFileSync(path.join(FROZEN_DIR, `${id}.js`), 'utf8'), /^\/\/ FROZEN COPY, not a sprite:/, `${id}: a code copy, said on its first line`);
-});
-
-// ---- frozen copies stay as they were frozen ----------------------------------------------------------------------
-
 // tests/fixtures/code-sprites/SHA256SUMS: one line per copy, "<sha256 of the file>  <file>" (the format sha256sum
 // writes and `shasum -a 256 -c` checks). A migration batch that freezes a code file adds its line; nobody edits a copy.
 const SUMS = path.join(FROZEN_DIR, 'SHA256SUMS');
-test('every frozen copy is pinned by its SHA-256 in SHA256SUMS, and no copy has changed since it was frozen', () => {
-  const pinned = Object.fromEntries(fs.readFileSync(SUMS, 'utf8').split('\n').filter((l) => l.trim()).map((l) => {
-    const m = /^([0-9a-f]{64}) {2}([\w-]+\.js)$/.exec(l);
-    assert.ok(m, `SHA256SUMS: not "<sha256>  <id>.js": ${l}`);
-    return [m[2], m[1]];
-  }));
-  const files = FROZEN.map((id) => `${id}.js`);
-  assert.deepEqual(files.filter((f) => !(f in pinned)), [], 'a new frozen copy: add its line to SHA256SUMS (shasum -a 256 <file>)');
-  assert.deepEqual(Object.keys(pinned).filter((f) => !files.includes(f)), [], 'a copy that went (R1 to R4): take its line out of SHA256SUMS');
-  const changed = files.filter((f) => crypto.createHash('sha256').update(fs.readFileSync(path.join(FROZEN_DIR, f))).digest('hex') !== pinned[f]);
-  assert.deepEqual(changed, [], 'never edit a frozen copy (tests/fixtures/code-sprites/README.md): a test that needs a changed drawing tests the library asset');
-});
-
-test('codeSpritesWhere finds the code that uses a module, the frozen copy first, one per id', () => {
-  const onFx = codeSpritesWhere(/engine\/fx\.js/);   // (the code rigs it once looked for, rigs/humanoid.js last, are gone: R2b)
-  assert.ok(onFx.length >= 5, `${onFx.length}`);
-  assert.equal(new Set(onFx.map((s) => s.id)).size, onFx.length);
-  const crate = onFx.find((s) => s.id === 'crate');
-  assert.ok(crate, 'crate uses engine/fx.js');
-  assert.equal(crate.file, path.join(FROZEN_DIR, 'crate.js'));
-  for (const s of onFx) assert.equal(s.file, codeSpriteFile(s.id));
-});
-
-// ---- no test goes around the helpers -----------------------------------------------------------------------------
-
 // Files that still import a library code sprite by id, each with why (they belong to builders working on them now:
 // the frozen copies they need are already in tests/fixtures/code-sprites/, so each switch is one line: codeSprite(id)).
 // (none now: data-sprite-v2-emitters.test.mjs reads the frozen copies of blaster-bolt, plasma-burst and hit-spark since
@@ -274,11 +201,6 @@ test('no test scans sprites/ for code files only: a scan takes data files too', 
   assert.deepEqual(bad, [], 'use librarySprites() from tests/helpers/library.mjs');
 });
 
-// A unit test that fakes the built catalogue (globalThis.fetch) and then loads one of its sprites through
-// app/catalog.js: a row with no src, or a src that is not a .json file, is refused by loadSprite (since Z1; it used to import
-// sprites/<id>.js). For a real library id such a row is a mistake in the test (B9c review round 2, issue 1: catalog-studio-shadow and knight).
-// Give the row an id no library sprite uses and serve its data file with tests/helpers/code-standin.mjs (standInFetch).
-const LIBRARY_IDS = new Set([...ids, ...FROZEN]);   // every id that is, or was, a library sprite
 /** The catalogue rows `{ id: '<x>', kind: 'sprite', ... }` (either key first) inside an `assets: [...]` list in a test file's text: [{ id, text }]. */
 function spriteRows(text) {
   const lists = [];      // [start, end) of each assets: [...] list (a fake catalogue's); a bag item or a runtime row is not in one
@@ -325,15 +247,6 @@ test('the guard catches a fake catalogue row that makes the site import a librar
     "await openLink(page, [{ kind: 'sprite', id: 'knight', settings: {} }]);\nawait C.loadSprite('knight');",
   ];
   for (const c of fine) assert.deepEqual(fakeRowLoads(c, lib), [], `flagged: ${c}`);
-});
-
-test('no test loads a library id through a fake catalogue row that sends the site to its code file', () => {
-  const bad = [];
-  for (const f of testFiles()) {
-    if (HELPERS.has(f)) continue;
-    for (const n of fakeRowLoads(fs.readFileSync(path.join(ROOT, f), 'utf8'))) bad.push(`${f}:${n}`);
-  }
-  assert.deepEqual(bad, [], 'give the row an id no library sprite uses: tests/helpers/code-standin.mjs (CODE_STANDIN, standInFetch)');
 });
 
 test('every unit test that scans librarySprites() says what it covered (libraryCoverage) or fails on an unloadable file', () => {

@@ -134,40 +134,6 @@ function download(sprite, p) {
   return Object.fromEntries(Object.entries(info.animations).map(([name, a]) => [name, { border: a.border, rect: a.rect, opening: a.opening, tile: a.tile, textArea: a.textArea, state: a.state, kind: info.kind }]));
 }
 
-for (const [fixture, id] of [['panel/ui-buttons-wood.json', 'ui-buttons-wood'], ['panel/ui-dialogue.json', 'ui-dialogue'], ['panel/ui-bars-flat.json', 'ui-bars-flat']]) {
-  test(`${id} redrawn as data: same id, clips, controls and sounds; the download's stretching and text areas equal the code sprite's`, async () => {
-    const [s, o] = [await load(fixture), await old(id)];
-    assert.equal(s.id, o.id);
-    assert.deepEqual(Object.keys(s.clips), Object.keys(o.clips), 'clips kept, in order');
-    for (const c of Object.keys(o.clips)) assert.deepEqual([s.clips[c].frames, s.clips[c].loop, s.clips[c].label], [o.clips[c].frames, o.clips[c].loop, o.clips[c].label], c);
-    assert.deepEqual(Object.keys(s.params).sort(), Object.keys(o.params).sort(), 'control keys kept');
-    for (const [k, c] of Object.entries(o.params)) {
-      assert.equal(s.params[k].kind, c.kind, k);
-      if (c.kind === 'choice') assert.deepEqual(s.params[k].options.map((x) => x.value), c.options.map((x) => x.value), k);
-      if (c.kind === 'color') assert.equal(s.params[k].def, c.def, k);
-    }
-    assert.deepEqual(s.sounds ?? {}, o.sounds ?? {}, 'sound cues kept');
-    assert.deepEqual([s.size, s.pivot, s.grounded, s.preview], [o.size, o.pivot, o.grounded, o.preview]);
-    for (const p of grid(o)) {
-      const want = download(o, p), got = download(s, p);
-      assert.deepEqual(got, want, `${id} at ${JSON.stringify(p)}`);
-      for (const c of Object.keys(o.clips)) {
-        assert.deepEqual(clipStretch(s, c, p), clipStretch(o, c, p), `${id} ${c} slice`);
-        if (!o.textArea || o.clips[c].noText) continue;
-        const [a, b] = [s.textArea(c, p), o.textArea(c, p)];
-        const strip = (x) => (Array.isArray(x) ? x.map(strip) : { x: x.x, y: x.y, w: x.w, h: x.h, ...(x.edge ? { edge: x.edge } : {}) });
-        assert.deepEqual(strip(a), strip(b), `${id} ${c} text area at ${JSON.stringify(p)}`);
-      }
-    }
-  });
-
-  test(`${id} redrawn as data passes the quality bar`, async () => {
-    const s = await load(fixture);
-    const r = checkSprite(s);
-    assert.deepEqual(r.errors, [], r.errors.join('\n'));
-  });
-}
-
 test('the dialogue box\'s states that are not button states draw as normal; its "next" arrow bobs and carries no text', async () => {
   const s = await load('panel/ui-dialogue.json');
   const p = defaultParams(s);
@@ -179,22 +145,6 @@ test('the dialogue box\'s states that are not button states draw as normal; its 
 });
 
 // ---- review fixes (B13 round 2) ----------------------------------------------------------------------------------
-
-test('ui-buttons-wood redrawn: every pixel of plank and carved is the code sprite\'s, in every state; stone is a greyed slab', async () => {
-  const [s, o] = [await load('panel/ui-buttons-wood.json'), await old('ui-buttons-wood')];
-  for (const p of grid(o)) for (const c of Object.keys(o.clips)) {
-    const [a, b] = [renderFrame(o, c, 0, p), renderFrame(s, c, 0, p)];
-    if (p.style !== 'stone') {
-      let off = 0;
-      for (let i = 0; i < a.data.length; i++) if (a.data[i] !== b.data[i]) off++;
-      assert.equal(off, 0, `${c} at ${JSON.stringify(p)}: ${off} pixels differ`);
-      continue;
-    }
-    let worst = 0;
-    for (let i = 0; i < a.data.length; i++) for (let k = 0; k < 24; k += 8) worst = Math.max(worst, Math.abs(((a.data[i] >>> k) & 255) - ((b.data[i] >>> k) & 255)));
-    assert.ok(worst <= 10, `stone ${c} at ${JSON.stringify(p)}: a channel is ${worst} levels off`);
-  }
-});
 
 test('a skin\'s text paint that names one of its own slots is the sprite\'s slot it is mapped to', async () => {
   const base = nodePieceReader(undefined, { check: checkSkinPiece });

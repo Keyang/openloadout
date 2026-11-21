@@ -23,19 +23,6 @@ const PORTS = {
   'tile.station-walls': { id: 'tiles-station-walls', clips: WALL_CLIPS, paints: { hull: 'hull', plate: 'plate', accent: 'accent', lights: 'glow' }, heavy: ['panels', 'ribbed', 'plated'].map((style) => ({ style, edge: 6, texture: 1, wear: 1 })) },
 };
 
-test('the four tile ports are registered, family tile, with a picture for every clip of their code tileset', async () => {
-  for (const [id, P] of Object.entries(PORTS)) {
-    const e = generator(id, 1);
-    assert.ok(e, `${id}@1 is registered`);
-    assert.equal(e.family, 'tile');
-    assert.ok(e.about.length > 40 && /port/.test(e.about), `${id}: says it is a port`);
-    const code = await codeSprite(P.id);
-    assert.deepEqual(Object.keys(P.clips).sort(), Object.keys(code.clips).sort(), `${id}: one picture per clip of ${P.id}`);
-    for (const [c, s] of Object.entries(code.clips)) assert.equal(P.clips[c].frames, s.frames, `${id} ${c} frames`);
-    assert.deepEqual([...e.args.picture.values], Object.keys(P.clips), `${id}: picture names the clips`);
-  }
-});
-
 test('each port is pinned by its golden and draws the same on a node as in frame pixels', () => {
   for (const [id, P] of Object.entries(PORTS)) {
     const names = Object.keys(P.clips), last = names.at(-1), mid = names[Math.floor(names.length / 2)];

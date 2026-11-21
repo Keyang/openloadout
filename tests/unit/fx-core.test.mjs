@@ -5,27 +5,13 @@ import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
 import { brightness, tone, col } from '../../engine/color.js';
 import { PI } from '../../engine/motion.js';
-import { steps, stepAt, lifeOf, particles, sparkles, twinkle, ring, shards, smoke, glow } from '../../engine/fx.js';
+import { steps, stepAt, lifeOf, particles, twinkle, ring, glow } from '../../engine/fx.js';
 
 const S = 48, C = 24;
 const draw = (fn) => { const g = new Surface(S, S); fn(g); return g; };
 const lit = (g) => g.data.reduce((n, v) => n + (v ? 1 : 0), 0);
 const same = (a, b) => a.data.every((v, i) => v === b.data[i]);
 const ts = [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
-
-// Every helper, with an ordinary call, as a function of the clip phase t (and an optional box).
-const CASES = {
-  particles: { loop: true, run: (g, t, box) => particles(g, { t, x: C, y: 40, count: 10, seed: 3, dist: 26, size: 2, colour: '#e08a2c', box }) },
-  'particles one-shot': { loop: false, run: (g, t, box) => particles(g, { t, x: C, y: C, loop: false, count: 10, seed: 5, arc: 2 * PI, dist: 16, size: 2, colour: '#4fd8ee', box }) },
-  sparkles: { loop: true, run: (g, t, box) => sparkles(g, { t, count: 6, seed: 2, colour: '#f2c230', box }) },
-  smoke: { loop: true, run: (g, t, box) => smoke(g, { t, x: C, y: 40, count: 5, seed: 1, rise: 24, size: 5, colour: '#8f97a8', box }) },
-  'smoke one-shot': { loop: false, run: (g, t, box) => smoke(g, { t, x: C, y: 36, loop: false, count: 6, seed: 4, rise: 10, size: 5, colour: '#8f97a8', box }) },
-  ring: { loop: false, run: (g, t, box) => ring(g, { t, x: C, y: C, r0: 2, r1: 20, thick: 4, colour: '#5fe0f0', box }) },
-  'ring squashed': { loop: false, box: [8, 30, 41, 46], run: (g, t, box) => ring(g, { t, x: C, y: 40, r0: 3, r1: 22, thick: 3, squash: 0.35, colour: '#a06a3c', box }) },
-  shards: { loop: false, run: (g, t, box) => shards(g, { t, x: C, y: C, count: 7, seed: 9, dist: 18, gravity: 8, size: 3, colour: '#8f97a8', box }) },
-  twinkle: { loop: null, run: (g, t, box) => twinkle(g, C, C, Math.round(2 * t), '#f2c230', { box }) },
-  glow: { loop: null, run: (g, t, box) => glow(g, C, C, 3 + 8 * t, steps('#e8662c'), { box }) },
-};
 
 test('steps run from a white core to a dark rim of the effect\'s own colour', () => {
   const s = steps('#e08a2c');
@@ -61,65 +47,6 @@ test('lifeOf: looping lives wrap and close; one-shot lives wait, then age to 1 a
   assert.equal(lifeOf(0.5, 3, { loop: false, stagger: 0 }), 0.5);
 });
 
-for (const [name, c] of Object.entries(CASES)) {
-  test(`${name}: deterministic, draws something, every pixel solid`, () => {
-    const orig = Math.random;
-    Math.random = () => { throw new Error('Math.random used'); };
-    try {
-      for (const t of ts) {
-        const a = draw((g) => c.run(g, t)), b = draw((g) => c.run(g, t));
-        assert.ok(same(a, b), `t=${t} same pixels twice`);
-      }
-    } finally { Math.random = orig; }
-    const drawn = ts.map((t) => lit(draw((g) => c.run(g, t))));
-    assert.ok(drawn.filter((n) => n > 0).length >= ts.length - 1, `${name} draws in nearly every frame: ${drawn}`);
-    assert.ok(Math.max(...drawn) >= 6, `${name} draws more than a speck: ${drawn}`);
-    // every pixel is fully opaque (hard edges, no half-transparent pixels)
-    for (const t of ts) for (const v of draw((g) => c.run(g, t)).data) if (v) assert.equal(v >>> 24, 255);
-  });
-
-  test(`${name}: stays inside the frame and inside a box it is given`, () => {
-    for (const t of ts) {
-      const g = draw((s) => c.run(s, t));
-      for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
-        if (x === 0 || y === 0 || x === S - 1 || y === S - 1) assert.equal(g.get(x, y), 0, `t=${t}: pixel on the frame's outer border at ${x},${y}`);
-      }
-      const box = c.box ?? [16, 14, 33, 35];   // x0, y0, x1, y1: pixels with x0 <= x < x1, y0 <= y < y1
-      const h = draw((s) => c.run(s, t, box));
-      for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
-        const inside = x >= box[0] && x < box[2] && y >= box[1] && y < box[3];
-        if (!inside) assert.equal(h.get(x, y), 0, `t=${t}: pixel outside the box at ${x},${y}`);
-      }
-    }
-  });
-
-  if (c.loop === true) {
-    test(`${name}: the loop closes (t = 0 and t = 1 give the same pixels) and it moves`, () => {
-      const a = draw((g) => c.run(g, 0)), b = draw((g) => c.run(g, 1));
-      assert.ok(same(a, b));
-      const mid = draw((g) => c.run(g, 0.5));
-      assert.ok(!same(a, mid), 'frames differ during the loop');
-    });
-  }
-  if (c.loop === false) {
-    test(`${name}: a one-shot ends on a few pixels, never empty, and is biggest early`, () => {
-      assert.ok(lit(draw((g) => c.run(g, 0))) > 0, 'frame 0 of a one-shot is never empty: it is the brightest idea');
-      const end = lit(draw((g) => c.run(g, 1)));
-      assert.ok(end >= 2, `last frame keeps ${end} pixels`);
-      const peak = Math.max(...ts.slice(0, 5).map((t) => lit(draw((g) => c.run(g, t)))));
-      assert.ok(peak > end, `the end (${end}) is thinner than the peak (${peak})`);
-    });
-  }
-}
-
-test('particles and smoke loop exactly over whole cycles only', () => {
-  const p = (t) => draw((g) => particles(g, { t, x: C, y: 40, count: 12, cycles: 2, seed: 7, colour: '#9fe040' }));
-  assert.ok(same(p(0), p(1)));
-  assert.ok(same(p(0), p(0.5)), 'two cycles: half way is the start again');
-  const s = (t) => draw((g) => smoke(g, { t, x: C, y: 40, cycles: 2, colour: '#7fb0b8' }));
-  assert.ok(same(s(0), s(1)));
-});
-
 test('more particles draw more pixels; a seed changes the pattern', () => {
   const n = (count) => lit(draw((g) => particles(g, { t: 0.3, x: C, y: 40, count, seed: 1, arc: PI, dist: 24, colour: '#e08a2c' })));
   assert.ok(n(16) > n(3));
@@ -152,54 +79,3 @@ test('twinkle sizes: 0 is one pixel, 1 a plus, 2 a big plus with a white centre'
 });
 
 // ---- review round 1 ------------------------------------------------------------
-
-// Each helper called with one colour and with that colour's steps must draw the same pixels.
-const BOTH = {
-  particles: (g, cs) => particles(g, { t: 0.3, x: C, y: 40, count: 10, seed: 3, dist: 20, size: 3, ...cs }),
-  sparkles: (g, cs) => sparkles(g, { t: 0.3, count: 8, seed: 2, ...cs }),
-  smoke: (g, cs) => smoke(g, { t: 0.4, x: C, y: 40, size: 5, rise: 20, ...cs }),
-  ring: (g, cs) => ring(g, { t: 0.3, x: C, y: C, r1: 16, ...cs }),
-  shards: (g, cs) => shards(g, { t: 0.4, x: C, y: C, size: 6, ...cs }),
-  glow: (g, cs) => glow(g, C, C, 8, cs.colours ?? cs.colour),
-  twinkle: (g, cs) => twinkle(g, C, C, 2, cs.colours ?? cs.colour),
-};
-for (const [name, run] of Object.entries(BOTH)) {
-  test(`${name}: accepts colour or colours, and uses them`, () => {
-    const one = draw((g) => run(g, { colour: '#e2473f' }));
-    const list = draw((g) => run(g, { colours: steps('#e2473f') }));
-    assert.ok(lit(one) > 0);
-    assert.ok(same(one, list), 'colour: c and colours: steps(c) draw the same');
-    const other = draw((g) => run(g, { colours: steps('#5fd47a') }));
-    assert.ok(!same(list, other), 'a different colour list changes the pixels');
-  });
-}
-
-test('shards and smoke use their seed', () => {
-  const a = draw((g) => shards(g, { t: 0.4, x: C, y: C, seed: 1, colour: '#8f97a8' }));
-  const b = draw((g) => shards(g, { t: 0.4, x: C, y: C, seed: 2, colour: '#8f97a8' }));
-  assert.ok(!same(a, b));
-  const c = draw((g) => smoke(g, { t: 0.4, x: C, y: 40, seed: 1 }));
-  const d = draw((g) => smoke(g, { t: 0.4, x: C, y: 40, seed: 2 }));
-  assert.ok(!same(c, d));
-});
-
-test('one-shots never end on an empty frame, even when pieces fly past the box', () => {
-  const box = [10, 10, 30, 30];
-  const ends = {
-    particles: (g, t) => particles(g, { t, x: 20, y: 20, loop: false, count: 6, dist: 200, gravity: 90, colour: '#4fd8ee', box }),
-    shards: (g, t) => shards(g, { t, x: 20, y: 20, count: 5, dist: 300, gravity: 200, colour: '#8f97a8', box }),
-    ring: (g, t) => ring(g, { t, x: 20, y: 20, r0: 2, r1: 80, colour: '#5fe0f0', box }),
-    'ring off-centre': (g, t) => ring(g, { t, x: 12, y: 27, r1: 40, squash: 0.4, colour: '#5fe0f0', box }),
-  };
-  for (const [name, run] of Object.entries(ends)) {
-    for (const t of ts) {
-      const g = draw((s) => run(s, t));
-      assert.ok(lit(g) > 0, `${name} t=${t} is not empty`);
-      for (let y = 0; y < S; y++) for (let x = 0; x < S; x++) {
-        if (!(x >= box[0] && x < box[2] && y >= box[1] && y < box[3])) assert.equal(g.get(x, y), 0, `${name} t=${t} outside the box`);
-      }
-    }
-  }
-  // a ring whose centre is outside its box cannot be kept in it: say so
-  assert.throws(() => draw((g) => ring(g, { t: 0.5, x: 2, y: 2, colour: '#5fe0f0', box })), /centre .* outside/);
-});

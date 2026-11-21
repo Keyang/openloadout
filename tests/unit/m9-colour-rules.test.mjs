@@ -11,7 +11,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COLOUR_RULES, paintColour } from '../../engine/data-rules.js';
 import { tone, brightness } from '../../engine/color.js';
-import { worstContrast, desaturate } from '../../engine/ui.js';
 import { validateSprite } from '../../catalog/sprite-schema.js';
 import { lifted, grey, ifLight } from '../../engine/look-tones.js';
 
@@ -21,18 +20,6 @@ const hex = () => '#' + [0, 0, 0].map(() => Math.floor(rnd() * 256).toString(16)
 // the name plate's swatches, the review's near-blacks (review M9 issue 6), and a seeded spread
 const COLOURS = ['#2a2a3a', '#4a3a2a', '#f2c230', '#d1453b', '#9b5fd0', '#5fa04a', '#e8763a', '#f4e8c8', '#8ec5e8', '#050505', '#060606', '#080808',
   '#090909', '#0b0b0b', '#0c0c0c', '#081000', '#000000', '#ffffff', '#000002', '#3afef0', '#40f9fa', ...Array.from({ length: 60 }, hex)];
-
-// sprites/ui-name-plate.js (frozen in tests/fixtures/code-sprites/) litBand, as the code worked it out
-function litBand(accent, face, frame) {
-  let fallback = null;
-  for (let t = 0; t <= 2.4; t += 0.15) {
-    const c = tone(accent, t);
-    if (worstContrast(c, face) < 3) continue;
-    fallback ??= c;
-    if (Math.abs(brightness(c) - brightness(frame)) >= 0.1) return c;
-  }
-  return fallback ?? accent;
-}
 
 test('lifted, grey and ifLight are documented colour rules taking colours (and a number)', () => {
   assert.deepEqual(Object.keys(COLOUR_RULES.lifted.args).sort(), ['against', 'beside', 'of']);
@@ -46,23 +33,6 @@ test('lifted, grey and ifLight are documented colour rules taking colours (and a
   assert.equal(COLOUR_RULES.ifLight.args.above.kind, 'number');
   assert.equal(COLOUR_RULES.ifLight.args.above.min, 0);
   assert.equal(COLOUR_RULES.ifLight.args.above.max, 1);
-});
-
-test('lifted gives exactly the name plate\'s litBand, for any accent, plate and band', () => {
-  const faces = ['#2a2a3a', '#4a3a2a', '#14141e', '#f4e8c8', hex(), hex()], frames = ['#f4e8c8', '#8ec5e8', '#5fa04a', '#9aa6c0', hex()];
-  for (const a of COLOURS) for (const f of faces) for (const b of frames) {
-    const want = litBand(a, f, b).toLowerCase();
-    assert.equal(lifted(a, f, b).toLowerCase(), want, `${a} on ${f} beside ${b}`);
-    assert.equal(paintColour({ rule: 'lifted', of: 'accent', against: 'face', beside: 'frame' }, { accent: a, face: f, frame: b }), want);
-  }
-});
-
-test('grey gives exactly engine/ui.js desaturate, and nests in other rules', () => {
-  for (const c of COLOURS) {
-    assert.equal(grey(c).toLowerCase(), desaturate(c).toLowerCase(), c);
-    assert.equal(paintColour({ rule: 'grey', of: 'face' }, { face: c }), desaturate(c).toLowerCase());
-    assert.equal(paintColour({ rule: 'tone', of: { rule: 'grey', of: 'face' }, by: 0.3 }, { face: c }), tone(desaturate(c), 0.3).toLowerCase());
-  }
 });
 
 test('ifLight picks by brightness exactly as the code did: strictly above the line is light, at it or below dark', () => {

@@ -109,25 +109,6 @@ test('what the validator passes for a group the layout draws: fills 1 on a platf
 
 const DAMP_CLIPS = ['floor-deco-a', 'floor-deco-c', 'floor-fill-b', 'floor-fill-c', 'pit-top', 'pit-left', 'pit-strip-m', 'pit-single', 'wall-bottom', 'wall-bottom-l', 'wall-strip-m', 'wall-single'];
 
-test('the dungeon redraw\'s Damp changes the same pixels as the code tileset\'s, and colours the puddle and slime as it does', async () => {
-  const { codeSprite } = await import('../helpers/library.mjs');
-  const code = await codeSprite('tiles-dungeon');
-  const data = dataSprite(load('tiles/tiles-dungeon.json'));
-  const P = defaultParams(code);
-  for (const clip of DAMP_CLIPS) {
-    const c0 = renderFrame(code, clip, 0, { ...P, damp: false }), c1 = renderFrame(code, clip, 0, { ...P, damp: true });
-    const d0 = renderFrame(data, clip, 0, { damp: false }), d1 = renderFrame(data, clip, 0, { damp: true });
-    const want = changed(c0, c1), got = changed(d0, d1);
-    assert.deepEqual(got, want, `${clip}: damp changes ${got.length} px in the data tileset, ${want.length} in the code one`);
-    if (['floor-deco-a', 'floor-deco-c', 'pit-top', 'wall-bottom'].includes(clip)) {
-      const off = want.filter((i) => d1.data[i] !== c1.data[i]);
-      assert.equal(off.length, 0, `${clip}: ${off.length} damp pixels differ in colour`);
-    }
-  }
-});
-
-// ---- band rules: a `when`, and rows down to a profile ---------------------------------------------------------------
-
 test('a band rule may carry a when (the rules after it decide at other settings) and rows { profile } (rows 1 to its value at each column)', () => {
   const runs = [0, 0, 3, 0, 1, 0, 0, 0];
   const mat = plain({ edges: { top: { depth: 6, bands: [

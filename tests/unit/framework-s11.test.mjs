@@ -16,7 +16,7 @@ import { col, brightness } from '../../engine/color.js';
 import { TILE, patternFill, drawBlock, blockClips, decoClips, classifyTiles, pickDecal, layoutTiles, pieceOf, DECAL_CHANCE, FACE_PIECES, textureTone, textureLight } from '../../engine/tiles.js';
 import { stripesIn } from '../../engine/solids.js';
 import { rectIn } from '../../engine/surface.js';
-import { shadeTo, BULKHEAD_STYLES, drawBulkhead, DOOR_STYLES, doorLeaves, SCREEN_PICTURES, screenIn, laserBeam, machineTones, drawCasing, hazardBand } from '../../engine/bulkhead.js';
+import { shadeTo, BULKHEAD_STYLES, drawBulkhead, DOOR_STYLES, doorLeaves, SCREEN_PICTURES, screenIn, laserBeam, drawCasing, hazardBand } from '../../engine/bulkhead.js';
 
 import { codeSprite } from '../helpers/library.mjs';   // the code, frozen first (tests/helpers/library.mjs): a test about the framework it uses
 const TONES = { base: '#6b7896', lit: '#9db2c5', soft: '#7f8fa9', seam: '#424672', skirt: '#575f84', dark: '#2f3059' };
@@ -179,21 +179,6 @@ test('screenIn: text scrolls: from one eighth of the loop to the next the lines 
 
 // ---- the casing of a machine, and warning paint ----------------------------------------------------------
 
-test('machineTones: six tones from one colour; the recess metal is darker by the drop asked for, never under the floor', () => {
-  for (const c of ['#6b7896', '#434d6d', '#a87894', '#2f3059']) {
-    const T = machineTones(c);
-    assert.deepEqual(Object.keys(T), ['base', 'lit', 'soft', 'seam', 'dark', 'darkLit']);
-    assert.equal(T.base, c);
-    assert.equal(T.lit, textureLight(c)); assert.equal(T.soft, textureLight(c, c, 0.4)); assert.equal(T.seam, textureTone(c));
-    assert.ok(brightness(T.lit) >= brightness(T.soft) && brightness(T.soft) > brightness(c) && brightness(T.seam) < brightness(c), c);
-    assert.ok(Math.abs(brightness(T.dark) - Math.max(0.17, brightness(c) - 0.2)) < 0.02, `${c}: ${brightness(T.dark).toFixed(3)}`);
-    assert.ok(brightness(T.darkLit) > brightness(T.dark));
-    assert.deepEqual(machineTones(c), T, 'the same every time');
-  }
-  assert.ok(brightness(machineTones('#6b7896', { drop: 0.1 }).dark) > brightness(machineTones('#6b7896').dark));
-  assert.ok(Math.abs(brightness(machineTones('#2f3059', { floor: 0.1 }).dark) - 0.1) < 0.02);
-});
-
 test('drawCasing: a lit top face over a front that is lit down its right edge and dark down its left; nothing outside the box', () => {
   const T = { base: '#6b7896', lit: '#c0d0e0', soft: '#8fa0b9', seam: '#424672' };
   const g = new Surface(24, 24);
@@ -309,19 +294,6 @@ test("layoutTiles: a 'face' decal written in a map is drawn on a face cell and l
   const on = layoutTiles(['.....', '.WWW.', '.WcW.', '.WWW.', '.....'], WALLS, { view: 'top-down' });
   assert.ok(on.tiles.some((t) => t.clip === 'wall-deco-c' && t.col === 2 && t.row === 2)); assert.deepEqual(on.notes, []);
 });
-
-test("the station walls: every fixture is a 'face' decal, and a room built from letters puts them on face cells only", async () => {
-  const walls = (await codeSprite('tiles-station-walls')), floor = (await codeSprite('tiles-station-floor'));
-  for (const k of ['a', 'b', 'c', 'd']) assert.equal(walls.clips[`wall-deco-${k}`].place, 'face');
-  const T = classifyTiles([{ key: 'walls', clips: walls.clips }, { key: 'floor', clips: floor.clips }]);
-  const L = layoutTiles(ROOM, T, { view: 'top-down', decals: true });
-  const pieceAt = (c, r) => { const t = L.tiles.find((x) => x.col === c && x.row === r && /^wall-/.test(x.clip) && pieceOf(x.clip)?.kind === 'block'); return t ? pieceOf(t.clip).piece : null; };
-  const fixtures = L.tiles.filter((t) => /^wall-deco-/.test(t.clip));
-  assert.ok(fixtures.length >= 4, `${fixtures.length} fixtures`);
-  for (const t of fixtures) assert.ok(FACE_PIECES.includes(pieceAt(t.col, t.row)), `${t.clip} at ${t.col},${t.row} is on ${pieceAt(t.col, t.row)}`);
-});
-
-// ---- the beam -------------------------------------------------------------------------------------
 
 const C = ['#ffffff', '#ffb0a0', '#f07060', '#e2473f', '#901030'];
 const beam = (o) => { const g = new Surface(48, 16); const n = laserBeam(g, { x0: 4, x1: 43, y: 8, colours: C, ...o }); return { g, n }; };

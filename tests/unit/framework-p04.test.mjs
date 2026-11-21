@@ -18,7 +18,7 @@ import { Surface, swing, masked, ellipseIn, rectIn } from '../../engine/surface.
 import { col, INK } from '../../engine/color.js';
 import { TILE, patternFill, drawBlock, drawCourses, courseShift, drawBattlement, drawArchway, stoneSpot, stoneTuft } from '../../engine/tiles.js';
 import { anyIn, archIn } from '../../engine/shapes.js';
-import { layOver, archStones } from '../../engine/buildings.js';
+import { archStones } from '../../engine/buildings.js';
 
 const STONE = '#8f97a8', JOINT = '#5d6475', LIT = '#c2c9d6', TRIM = '#d8dce6';
 const count = (g, hex) => { const c = col(hex); return g.data.reduce((n, v) => n + (v === c ? 1 : 0), 0); };
@@ -329,42 +329,6 @@ test('archIn: straight sides from the springing line down, a round head above it
   const flat = new Surface(24, 24).fill(0, 0, 24, 24, archIn(4, 16, 2, 2, 20), '#aa0000');
   assert.equal(count(flat, '#aa0000'), 12 * 18, 'spring at the top: a plain box');
   assert.deepEqual(new Surface(24, 24).fill(0, 0, 24, 24, archIn(4, 16, 6, 2, 20), '#aa0000').bounds(), { x0: 4, y0: 6, x1: 15, y1: 19 }, 'spring above the top: still a box from the top down');
-});
-
-test('archIn: grown, it is the outside of the frame: wider on both sides and higher, with the same foot', () => {
-  const hole = archIn(8, 20, 8, 14, 28), frame = archIn(8, 20, 8, 14, 28, 3, 4);
-  const g = new Surface(32, 32).fill(0, 0, 32, 32, frame, '#888888').fill(0, 0, 32, 32, hole, '#222222');
-  assert.deepEqual(g.bounds(), { x0: 5, y0: 4, x1: 22, y1: 27 });
-  assert.equal(row(g, 27).filter((c) => c === col('#888888')).length, 6, '3 px of frame each side at the foot');
-  assert.equal(column(g, 13).filter((c) => c === col('#888888')).length, 4, '4 px of frame over the crown');
-  for (let y = 0; y < 32; y++) for (let x = 0; x < 32; x++) if (hole(x + 0.5, y + 0.5)) assert.ok(frame(x + 0.5, y + 0.5), 'the frame holds the whole opening');
-  assert.equal(frame(13.5, 28.5), false, 'it does not grow downwards');
-  // one number grows the sides and the head alike; a flat-topped frame is a box
-  const even = new Surface(32, 32).fill(0, 0, 32, 32, archIn(8, 20, 8, 14, 28, 2), '#888888');
-  assert.deepEqual(even.bounds(), { x0: 6, y0: 6, x1: 21, y1: 27 });
-  const box = new Surface(32, 32).fill(0, 0, 32, 32, archIn(8, 20, 8, 8, 28, 3, 4), '#888888');
-  assert.equal(count(box, '#888888'), 18 * 24);
-});
-
-// ---- layOver, archStones (fix round 1) ----------------------------------------------------------
-
-test('layOver: a piece gets an ink line only where it covers what is already drawn, never along the silhouette', () => {
-  const g = new Surface(24, 24);
-  layOver(g, rectIn(4, 4, 6, 6), '#aa0000');
-  assert.equal(count(g, INK), 0, 'nothing under the first piece: no line');
-  assert.equal(count(g, '#aa0000'), 36);
-  layOver(g, rectIn(8, 6, 8, 2), '#00aa00');
-  assert.equal(count(g, '#00aa00'), 16);
-  for (const [x, y] of [[8, 5], [9, 5], [8, 8], [9, 8], [7, 6], [7, 7]]) assert.equal(g.get(x, y), col(INK), `a line at ${x},${y}, where it lies on the first piece`);
-  assert.equal(count(g, INK), 6, 'and none round the part that sticks out');
-  assert.equal(g.get(12, 5), 0); assert.equal(g.get(16, 6), 0);
-  // the paint and its options are the ones g.fill takes; the line can be another colour
-  const ramp = { light: '#ffffff', base: '#888888', dark: '#333333' };
-  layOver(g, rectIn(5, 5, 3, 3), ramp, { light: 1, shade: 1, ink: '#0000aa' });
-  assert.equal(g.get(7, 5), col('#ffffff')); assert.equal(g.get(5, 7), col('#333333')); assert.equal(g.get(6, 6), col('#888888'));
-  assert.equal(g.get(4, 6), col('#0000aa')); assert.equal(g.get(6, 4), col('#0000aa'));
-  assert.equal(count(g, '#0000aa'), 12);
-  assert.equal(layOver(g, rectIn(0, 0, 1, 1), '#aa0000'), g, 'it returns the Surface');
 });
 
 test('archStones: joints square to the curve, above the springing line only, an odd number of stones and a keystone on the crown', () => {

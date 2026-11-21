@@ -9,16 +9,9 @@ import { checkGeneratorContract } from '../helpers/gen-harness.mjs';
 import { dataSprite } from '../../engine/data-sprite.js';
 import { defaultParams, renderFrame } from '../../engine/sprite.js';
 import { lerp, keys, fract } from '../../engine/motion.js';
-import { oldReplay } from '../helpers/old-replay.mjs';
-
-const OLD = oldReplay('gen-shape-chip');   // what engine/gadgets.js (deleted by R3) drew, recorded in the order of the calls (tests/helpers/old-replay.mjs)
 const chip = () => registry.generator('chip', 1);
 const PAL = { metal: '#f2c230', glow: '#3fd1e0' };
 
-/** What sprites/credit-chip.js painted for one look (no outline), on a 32 x 32 Surface centred on (16, 17). */
-function oldChip({ shape, width, thick, mark, spin, sheen, scale = 1, squash = 0, bare = false }) {
-  return OLD.surface(32, 32);
-}
 /** What chip@1 paints for the same look, drawn through a data sprite (so its paints resolve as a library sprite's do). */
 function newChip(o) {
   const call = { gen: 'chip', v: 1, at: [16, 17], shape: o.shape, width: o.width, thick: o.thick, mark: o.mark, spin: o.spin,
@@ -51,21 +44,6 @@ test('chip@1 passes the goldens harness', () => {
     { args: { at: [0, 0], shape: 'bar', width: 10, thick: 2, spin: 120, mark: 'plain', scale: 0.6, squash: 0.2, metal: 'gold', field: 'gold.dark', gleam: 'shine', lit: 'glow', pad: 'shine' } },
     { args: { at: [16, 17], shape: 'hex', width: 18, spin: 90, metal: 'gold', field: 'gold.dark', gleam: 'shine', lit: 'glow', pad: 'shine' } },
   ] });
-});
-
-test('chip@1 paints what sprites/credit-chip.js painted, pixel for pixel', () => {
-  const looks = [];
-  for (const shape of ['hex', 'round', 'bar']) for (const mark of ['circuit', 'star', 'plain']) for (const spin of [0, 22.5, 67.5, 112.5, 157.5]) {
-    looks.push({ shape, mark, spin, width: shape === 'bar' ? 10 : 15, thick: 3, sheen: lerp(-1.6, 1.6, fract(spin / 180 + 0.5)) });
-  }
-  looks.push({ shape: 'hex', mark: 'circuit', spin: 30, width: 18, thick: 5, sheen: null, scale: 1.1, squash: -0.1 });
-  looks.push({ shape: 'round', mark: 'star', spin: 90, width: 13, thick: 2, sheen: null, scale: 0.5, squash: 0.18, bare: true });
-  for (const o of looks) {
-    const a = oldChip(o), b = newChip(o);
-    let off = 0;
-    for (let i = 0; i < a.data.length; i++) if (a.data[i] !== b.data[i]) off++;
-    assert.equal(off, 0, `${JSON.stringify(o)}: ${off} pixels differ`);
-  }
 });
 
 test('chip.turn@1 turns a chip half a turn a loop with its glint, and flips, swells and shrinks it in a collect', () => {

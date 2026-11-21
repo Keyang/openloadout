@@ -14,8 +14,6 @@ import { mix, ramp } from '../../engine/color.js';
 import { textureLight } from '../../engine/tiles.js';
 import { codeSprite } from '../helpers/library.mjs';
 
-const dungeonCode = await codeSprite('tiles-dungeon');   // the frozen copy once the library's is redrawn
-
 const FLOOR = '#7e84a0';
 function pictures(palette, paint = 'glint') {
   return {
@@ -54,22 +52,4 @@ test('a slot called white is the slot, in a derive rule and elsewhere', () => {
   d.body.pictures.draw.push({ kind: 'rect', on: 'root', at: [2, 2], size: [1, 1], paint: 'white' });
   assert.deepEqual(validateSprite(d).errors, []);
   assert.equal(resolvePalette(d).glint.hex, '#ddeeff');
-});
-
-test('the dungeon redraw\'s wet streak is the code tileset\'s colour at the defaults (textureLight of the floor)', () => {
-  const def = JSON.parse(fs.readFileSync(new URL('../fixtures/v2/tiles/tiles-dungeon.json', import.meta.url), 'utf8'));
-  const s = dataSprite(def);
-  const ds = defaultParams(s), dc = defaultParams(dungeonCode);
-  for (const clip of ['floor-fill-b', 'floor-fill-c']) {   // the first floor version has no wet streak
-    const a = renderFrame(s, clip, 0, { ...ds, damp: true }), b = renderFrame(dungeonCode, clip, 0, { ...dc, damp: true });
-    const a0 = renderFrame(s, clip, 0, ds), b0 = renderFrame(dungeonCode, clip, 0, dc);
-    let wet = 0;
-    for (let i = 0; i < a.data.length; i++) {
-      const mine = a.data[i] !== a0.data[i], theirs = b.data[i] !== b0.data[i];
-      if (!mine || !theirs) continue;
-      if (a.data[i] === b.data[i]) wet++;
-      else assert.fail(`${clip} pixel ${i % 32},${Math.floor(i / 32)}: damp paints ${a.data[i].toString(16)} in the data tileset, ${b.data[i].toString(16)} in the code one`);
-    }
-    assert.ok(wet > 0, `${clip}: damp paints the same colours`);
-  }
 });

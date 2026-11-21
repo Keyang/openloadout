@@ -4,7 +4,7 @@
 //                     faceClips, parseFaceClip, talkStep                                           the clips of a set: <who>-<mood>, <who>-talk
 //                     faceBust, portraitFrame, portrait                                            a head and shoulders from a description; its border; the two together
 // And the two sprites made with it: each portrait is the same person as that person's map sprite.
-// R3 (2026-11-21): engine/faces.js went: the tests of its functions are deleted, the portrait sets' own tests (below) stay, and tests/unit/gen-faces-portrait.test.mjs holds portrait@1 to what it drew (tests/fixtures/old-code/gen-faces-portrait.json).
+// R3 (2026-11-21): engine/faces.js went: the tests of its functions are deleted, the portrait sets' own tests (below) stay.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';

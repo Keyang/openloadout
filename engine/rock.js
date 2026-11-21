@@ -17,26 +17,7 @@
 // crack() uses the rig convention for its direction: 0 = down, PI/2 = right, PI = up.
 
 import { hash } from './motion.js';
-import { col } from './color.js';
 
-/**
- * Darkens the already-drawn pixels that touch a shape from outside: the contact line between a thing and what it is stacked on or stuck to (stacked stones, armour plates, scales), so the two read as separate pieces.
- * Arguments: g (the Surface), inside (the shape test of the thing on top, drawn already or about to be), colour (the seam's colour, usually the material's deep tone), options { box ([x0, y0, x1, y1] to look in; default the whole Surface), clip (extra test limiting where the seam may land) }.
- */
-export function seam(g, inside, colour, { box, clip } = {}) {
-  const x0 = Math.max(0, Math.floor(box ? box[0] : 0)), y0 = Math.max(0, Math.floor(box ? box[1] : 0));
-  const x1 = Math.min(g.w - 1, Math.ceil(box ? box[2] : g.w - 1)), y1 = Math.min(g.h - 1, Math.ceil(box ? box[3] : g.h - 1));
-  const cc = col(colour);
-  const hits = [];
-  for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
-    if (!g.data[y * g.w + x]) continue;
-    const px = x + 0.5, py = y + 0.5;
-    if (inside(px, py) || (clip && !clip(px, py))) continue;
-    if (inside(px + 1, py) || inside(px - 1, py) || inside(px, py + 1) || inside(px, py - 1)) hits.push(y * g.w + x);
-  }
-  for (const i of hits) g.data[i] = cc;
-  return g;
-}
 
 /**
  * Shape test for the layer lying on top of a shape (moss, snow, icing, slime): the top `depth` px of `inside` in each column, with a ragged lower edge and lumps that rise above it.

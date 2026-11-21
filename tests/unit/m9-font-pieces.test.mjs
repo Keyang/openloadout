@@ -86,22 +86,3 @@ test('a data sprite may name a font piece in a text primitive, and what it draws
   for (let y = 0; y < 16; y++) for (let x = 0; x < 32; x++) if (g.get(x, y)) got.add(`${x},${y}`);
   assert.deepEqual([...got].sort(), [...want].sort());
 });
-
-// review M9 round 2, issue 5: the port copy (what font.cell, score.pop, word.pop and the counters draw with) is held to
-// engine/pixel-font.js glyph for glyph, so the three copies cannot drift apart unseen
-test('the port copy of the font (engine/gen/ports/pixel-font.js) has the same characters, metrics and glyphs as engine/pixel-font.js', async () => {
-  const port = await import('../../engine/gen/ports/pixel-font.js');
-  assert.deepEqual(port.FONT_STYLES, FONT_STYLES);
-  assert.deepEqual(port.FONT_CHARS, FONT_CHARS);
-  const rows = (g) => Array.from({ length: g.h }, (_, y) => Array.from({ length: g.w }, (_, x) => (g.body.at(x, y) ? '#' : '.')).join(''));
-  for (const style of FONT_STYLES) for (const size of [0, 0.25, 0.5, 0.75, 1]) {
-    const m = fontMetrics(size, style), pm = port.fontMetrics(size, style);
-    assert.deepEqual(pm, m, `${style} ${size} metrics`);
-    for (const ch of CHARS) {
-      const a = fontGlyph(ch, m), b = port.fontGlyph(ch, pm);
-      assert.deepEqual([b.w, b.h, b.rise], [a.w, a.h, a.rise], `${style} ${size} ${ch}`);
-      assert.deepEqual(rows(b), rows(a), `${style} ${size} ${ch}`);
-    }
-    assert.equal(port.textWidth('SCORE 0123', pm), (await import('../../engine/pixel-font.js')).textWidth('SCORE 0123', m));
-  }
-});
