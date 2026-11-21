@@ -1,5 +1,5 @@
 // Ready-made versions of an asset (docs/site-design.md, section 4): a handful of named, clearly different settings to
-// start from. A sprite may list its own (`versions` in defineSprite, Contract 1); the rest are made from the changes people
+// start from. A sprite may list its own (a top-level `versions` in its data, Contract 1); the rest are made from the changes people
 // notice first (a part put on or taken off, a new colour over a large area, a big change of shape), kept only when the
 // result looks different at card size from the defaults and from every version already chosen, and named in a few everyday
 // words ("Long hair, axe", "Blue outfit"). Sounds and music get one version per style, then seeded settings.

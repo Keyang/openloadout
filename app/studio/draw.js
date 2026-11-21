@@ -33,7 +33,7 @@ export function drawRest(def, facing = 'side', p = {}) {
 
 /**
  * The studio's file of a version 1 draft, <id>.js, in the one fixed data form (the library no longer takes it, build item R4a): a promise of { ok, errors, warnings, name, text }.
- * The writer (tools/lib/data-file.mjs) is loaded only when a file is made, so the page opens where tools/ is not served.
+ * The writer (catalog/data-file.js) is loaded only when a file is made.
  * Arguments: def, catalogIds (the library's ids; the file's id may not be one).
  */
 export async function libraryFile(def, catalogIds) {

@@ -4,12 +4,12 @@
 // They are shaped after the library's own bodies so that what people make looks at home next to them:
 //
 //   two-legs         a side-view person, after rigs/humanoid.js (64x64, about 35 px tall, feet planted by IK)
-//   four-legs        a side-view beast, after rigs/quadruped.js and sprites/wolf.js (64x48, trotting diagonal pairs)
+//   four-legs        a side-view beast, after rigs/quadruped.js and sprites/wolf.json (64x48, trotting diagonal pairs)
 //   crawler          a low beetle on three pairs of legs, after rigs/crawler.js (48x48, tripod gait)
-//   flyer            a bat-like body and two wings, after sprites/bat.js (48x48, anchored in the air)
-//   blob             one body and no legs, after sprites/slime.js (48x48, oozes and hops)
+//   flyer            a bat-like body and two wings, after tests/fixtures/code-sprites/bat.js (48x48, anchored in the air)
+//   blob             one body and no legs, after tests/fixtures/code-sprites/slime.js (48x48, oozes and hops)
 //   blank            one bone and one shape with an eye: the least there is to start from (48x48, side view)
-//   topdown-person   a top-down person in three directions, after rigs/topdown.js and sprites/hero-walker.js
+//   topdown-person   a top-down person in three directions, after rigs/topdown.js and sprites/hero-walker.json
 //   topdown-beast    a top-down four-legged beast in three directions, after rigs/creature-topdown.js
 //
 // The top-down bodies follow style guide 5 and Contract 2: clips idle_down, idle_up, idle_side, walk_*, attack_*,
@@ -211,7 +211,7 @@ function twoLegs() {
   });
 }
 
-// ---- four legs: a side-view beast (after rigs/quadruped.js and sprites/wolf.js) -------------------------------------
+// ---- four legs: a side-view beast (after rigs/quadruped.js and tests/fixtures/code-sprites/wolf.js) -------------------------------------
 
 function fourLegs() {
   const colours = [
@@ -406,7 +406,7 @@ function crawler() {
   });
 }
 
-// ---- flyer: a body and two wings (after sprites/bat.js) -----------------------------------------------------------
+// ---- flyer: a body and two wings (after tests/fixtures/code-sprites/bat.js) -----------------------------------------------------------
 
 function flyer() {
   const colours = [
@@ -490,7 +490,7 @@ function flyer() {
   });
 }
 
-// ---- blob: one body, no legs (after sprites/slime.js) --------------------------------------------------------------
+// ---- blob: one body, no legs (after tests/fixtures/code-sprites/slime.js) --------------------------------------------------------------
 
 function blob() {
   const colours = [
@@ -665,7 +665,7 @@ function frontWalk(pairA, pairB, legLength) {
   return out;
 }
 
-// ---- top-down person (after rigs/topdown.js and sprites/hero-walker.js) ---------------------------------------------
+// ---- top-down person (after rigs/topdown.js and sprites/hero-walker.json) ---------------------------------------------
 
 function topdownPerson() {
   const colours = [

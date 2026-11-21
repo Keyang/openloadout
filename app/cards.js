@@ -28,7 +28,7 @@ import { tileScale, rowCrop, rowFacts, lengthWords, dotColour, versionSettings, 
 const plural = (n, one, many = one + 's') => `${n} ${n === 1 ? one : many}`;
 const DOTS = 3;          // ready-made versions offered on a card
 
-/** A catalogue row for whatever was handed in: a row, an id, or an asset's own object (a sprite program or a patch). */
+/** A catalogue row for whatever was handed in: a row, an id, or an asset's own object (a sprite object or a patch). */
 const rowOf = (x) => (typeof x === 'string' ? assetById(x) : x && x.kind && x.src ? x : (x && assetById(x.id)) || x);
 
 // ---- icons: 1.5px strokes, like the rest of the site -------------------------------------------------

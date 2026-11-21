@@ -21,35 +21,11 @@
 //      it when a visitor recolours the bundle with a palette. litTone() gives a shape's sunlit
 //      tone, and tidy(g), called last in each layer, removes stray single pixels.
 //
-// Worked examples: sprites/bg-forest.js (a landscape) and sprites/bg-castle.js (buildings).
-// The whole of a small backdrop (this is example() at the bottom of the file, which the
-// tests run, so it cannot go stale):
-//
-//   import { layerClips, skyLook, recede, ridge, treeline, litEdge, scatter,
-//            fillBands, fillBelow, fillBetween, disc, cloud, canopy } from '../engine/backdrop.js';
-//   import { ramp, tone } from '../engine/color.js';
-//
-//   clips: layerClips(),                                         // far, mid, near: one still frame each
-//   render(g, { clip, p }) {
-//     const sky = skyLook(p.sky, p.time);                        // { bands, air, glow, cloud, cloudShade }
-//     if (clip === 'far') {
-//       fillBands(g, sky.bands, [46, 84, 114]);                  // four flat bands, lightest at the horizon
-//       disc(g, 236, 34, 11, sky.glow);                          // the sun
-//       for (const c of scatter(4, 7)) cloud(g, c.x, 30 + c.v * 40, 34 + c.u * 26, sky.cloud, sky.cloudShade, c.i);
-//       const peaks = ridge({ base: 132, height: 44, seed: 3, peaks: 5, shape: 'jagged' });
-//       fillBelow(g, peaks, recede(p.land, 0.9, sky.air));       // depth 0.9: almost the sky's colour
-//       fillBetween(g, peaks, litEdge(peaks), recede(tone(p.land, 0.6), 0.9, sky.air));   // sunlit faces
-//     } else if (clip === 'mid') {
-//       const hills = ridge({ base: 150, height: 34, seed: 5, peaks: 3 });
-//       fillBelow(g, treeline({ base: hills, height: 12, count: 16, seed: 2 }), recede(p.leaf, 0.5, sky.air));
-//       fillBelow(g, hills, recede(p.land, 0.5, sky.air));
-//     } else {
-//       const leaf = ramp(p.leaf);                               // near: depth 0.1, the darkest layer
-//       const tones = { light: recede(leaf.base, 0.1, sky.air), base: recede(leaf.dark, 0.1, sky.air), dark: recede(leaf.deep, 0.1, sky.air) };
-//       for (const t of scatter(4, 11)) canopy(g, t.x, 150, 30 + t.u * 12, tones, t.i);
-//       fillBelow(g, ridge({ base: 172, height: 10, seed: 8, peaks: 7 }), tones.dark);   // a strip across the whole bottom edge
-//     }
-//   }
+// A background is data (sprites/bg-forest.json, a landscape; sprites/bg-castle.json, buildings): the generators in
+// engine/gen/backdrop.js draws its layers with ports of this module's outlines, fills and colour rules, and engine/gen/scenery.js
+// imports it. No sprite file imports it.
+// tests/unit/backdrop-helper.test.mjs draws a small three-layer backdrop with it (its `example`), so the way the
+// pieces fit together is run, not described.
 //
 // Rules the helper cannot enforce (style guide, section 7): no outline anywhere; at most
 // eight landscape colours per layer (stars, sun, moon and lit windows do not count); nothing in
@@ -470,33 +446,4 @@ export function stars(g, count, seed, colour, { top = 0, bottom = 100 } = {}) {
     });
   }
   return g;
-}
-
-// ---- the example from the top of this file -------------------------------------------------
-
-/** Draws the example backdrop of the header comment: { far, mid, near } Surfaces. Run by the tests. */
-export function example(p = { sky: '#8fd0f0', land: '#7fb0b8', leaf: '#3f8a4f', time: 'day' }) {
-  const out = {};
-  for (const clip of ['far', 'mid', 'near']) {
-    const g = (out[clip] = new Surface(W, H));
-    const sky = skyLook(p.sky, p.time);
-    if (clip === 'far') {
-      fillBands(g, sky.bands, [46, 84, 114]);
-      disc(g, 236, 34, 11, sky.glow);
-      for (const c of scatter(4, 7)) cloud(g, c.x, 30 + c.v * 40, 34 + c.u * 26, sky.cloud, sky.cloudShade, c.i);
-      const peaks = ridge({ base: 132, height: 44, seed: 3, peaks: 5, shape: 'jagged' });
-      fillBelow(g, peaks, recede(p.land, 0.9, sky.air));
-      fillBetween(g, peaks, litEdge(peaks), recede(tone(p.land, 0.6), 0.9, sky.air));
-    } else if (clip === 'mid') {
-      const hills = ridge({ base: 150, height: 34, seed: 5, peaks: 3 });
-      fillBelow(g, treeline({ base: hills, height: 12, count: 16, seed: 2 }), recede(p.leaf, 0.5, sky.air));
-      fillBelow(g, hills, recede(p.land, 0.5, sky.air));
-    } else {
-      const leaf = ramp(p.leaf);
-      const tones = { light: recede(leaf.base, 0.1, sky.air), base: recede(leaf.dark, 0.1, sky.air), dark: recede(leaf.deep, 0.1, sky.air) };
-      for (const t of scatter(4, 11)) canopy(g, t.x, 150, 30 + t.u * 12, tones, t.i);
-      fillBelow(g, ridge({ base: 172, height: 10, seed: 8, peaks: 7 }), tones.dark);
-    }
-  }
-  return out;
 }

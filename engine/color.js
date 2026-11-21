@@ -1,4 +1,4 @@
-// Colour helpers. Colours are written as '#rrggbb' strings in sprite code and
+// Colour helpers. Colours are written as '#rrggbb' strings (in a sprite's data, and in the renderers) and
 // packed to 32-bit ABGR (the byte order ImageData uses) when they hit a Surface.
 
 const packed = new Map();

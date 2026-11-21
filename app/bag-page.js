@@ -249,7 +249,7 @@ function describe(item, theme = null) {
 
 export function bagPage(app, query = {}, isCurrent = () => true) {
   document.title = 'Your bag · Loadout';
-  // ==== W2-G: sprite programs are loaded when the bag first shows them (app/catalog.js) ====
+  // ==== W2-G: sprite objects are loaded when the bag first shows them (app/catalog.js) ====
   // asked: sprites sent for; lost: ones whose file did not load (shown as missing). here(): false once the page is left.
   const asked = new Set(), lost = new Set();
   let left = false;

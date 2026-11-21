@@ -2,7 +2,7 @@
 // upright and turn slowly about their upright axis, for save points, shrines, power cores and boss weak spots.
 // The small gems a player picks up are in pickups.js (drawGem); these are their big cousins, drawn as solids
 // whose faces slide across as they turn, and the glow that hugs them. Pure functions: Node and browser.
-// Worked example: sprites/save-crystal.js.
+// Worked example: sprites/save-crystal.json.
 //
 //   import { CRYSTAL_CUTS, crystalFaces, drawCrystal, drawAura } from '../engine/crystals.js';
 //   const body = new Surface(32, 48);

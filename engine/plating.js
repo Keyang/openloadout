@@ -1,5 +1,5 @@
 // Plated metal floors seen from above, and what is fitted into them: the hard-surface partner of the soft ground in
-// engine/tiles.js (docs/style-guide.md, sections 6 and 14). Added with batch S03 (sprites/tiles-station-floor.js, the
+// engine/tiles.js (docs/style-guide.md, sections 6 and 14). Added with batch S03 (tests/fixtures/code-sprites/tiles-station-floor.js, the
 // worked example); the other station tilesets (walls, pit) and metal props are meant to share it.
 //
 //   import { patternFill, drawBlock, textureTone, textureLight } from '../engine/tiles.js';

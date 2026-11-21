@@ -1,6 +1,6 @@
 // The studio's first page, #/studio (docs/studio.md section 5; item S9): "Make a new one" opens the starting bodies (the
-// templates, side view and top-down, and the Hero from the library); "Open a file" reads a studio file (<id>.js
-// in the data form, or the JSON; the library no longer takes it, build item R4a); the drafts kept on this computer are listed newest first, each opened or removed.
+// templates, side view and top-down); "Open a file" reads a studio file (<id>.js
+// in the data form, or the JSON; the library does not take the .js, build item R4a); the drafts kept on this computer are listed newest first, each opened or removed.
 // When the saved drafts cannot be read whole, the page says so, saves nothing over them, and offers to download what is
 // there and then to start afresh (app/studio/drafts.js problem, savedText, startAfresh).
 import { el, header, saveBlob } from '../ui.js';
@@ -123,14 +123,14 @@ export function homePage(app, { drafts, kept, query }) {
     const textIn = await f.text();
     let def = null;
     if (textIn.includes('Made in the Loadout studio')) {
-      // the reader (tools/lib/data-file.mjs) is loaded only now: tools/ may not be served where the site is published
+      // the reader (catalog/data-file.js) is loaded only now, so the page opens without it
       let F;
       try { F = await import('../../catalog/data-file.js'); } catch { say('Studio files cannot be opened on this copy of the site. Open the JSON instead.'); return; }
       const r = F.readDataFile(textIn);
       if (!r.ok) { say(`That file could not be opened: ${r.errors[0]}`); return; }
       def = r.value;
     } else {
-      try { def = JSON.parse(textIn); } catch { say('That is not a file the studio made. Open a sprites/<name>.js file downloaded from the studio.'); return; }
+      try { def = JSON.parse(textIn); } catch { say('That is not a file the studio made. Open the <name>.js or <name>.sprite.json file the studio gave you.'); return; }
     }
     create(def, 'file');
   } });

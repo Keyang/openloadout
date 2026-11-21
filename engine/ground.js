@@ -1,7 +1,7 @@
 // Ground colours (added with batch R10, fix round 1: the Hearthvale shore). Rules for turning the one colour a
 // person picks for a kind of ground (a path, a sandy bank, a beach, a floor) into the colour it is drawn in, so
 // that two tilesets that share a control draw the same ground. Pure functions: Node and browser.
-// Worked examples: sprites/tiles-shore.js (the bank), sprites/tiles-meadow.js (the path, which wrote the rule first).
+// Worked examples: sprites/tiles-shore.json (the bank), sprites/tiles-meadow.json (the path, which wrote the rule first).
 //
 //   import { raisedGround } from '../engine/ground.js';
 //   const sand = ramp(raisedGround(p.land));      // the bank: a step lighter than its colour, cream left as it is

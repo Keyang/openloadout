@@ -1,7 +1,7 @@
-// The library file form of a studio sprite, published with the site (docs/studio.md 2.4; docs/architecture.md, Contract 14
-// rule 8). This is the same code as tools/lib/data-file.mjs (the build's reader and checker), in a folder the published
-// site serves: tools/ is not published (tools/build.mjs DIST), so the download (app/bundle.js) and the studio page load
-// the writer from here. tests/unit/bag-data-publish.test.mjs fails when the two differ after their imports.
+// The file form of a studio sprite, published with the site (docs/studio.md 2.4; docs/architecture.md, Contract 14
+// rule 8). This is the one copy of the writer and the reader: it is in a folder the published site serves (tools/ is not
+// published, tools/build.mjs DIST), so the download (app/bundle.js) and the studio page load it from here; tools/lib/data-file.mjs
+// only re-exports it for the tools and tests that name it there.
 // A sprite made in the studio (version 1) downloads as <id>.js, the visitor's own copy; since build item R4a it is NOT a
 // library file (the library takes only data sprites, sprites/<id>.json of version 2, made with the /sprite-forge skill).
 // The file is data. It has exactly this form and nothing else:
@@ -19,8 +19,10 @@
 // (headerFor) and the reader refuses a line 1 that says otherwise than made.in.
 //
 // writeDataFile() makes that text from a definition (validated first, written from the cleaned copy, read back before
-// it is returned). readDataFile() reads such a text back to its JSON WITHOUT RUNNING IT (see tools/lib/data-file.mjs for
-// why that is safe). checkDataFile() is the build's check of one sprite file. Pure (no Node imports, no DOM).
+// it is returned). readDataFile() reads such a text back to its JSON WITHOUT RUNNING IT: the three lines must be exactly
+// these, what sits between `dataSprite(` and the final `);` must parse as JSON on its own (JSON has no calls, names, comments or
+// operators, so there is no room for code), and no key may be __proto__, constructor or prototype. checkDataFile() says whether a
+// text is exactly this form with a definition that passes strict validation (the build no longer calls it: R4a). Pure (no Node imports, no DOM).
 
 import { validateDataSprite } from '../engine/data-sprite.js';
 import { STUDIO_LIMITS } from './studio-schema.js';

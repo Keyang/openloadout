@@ -25,7 +25,7 @@ test('styles is declared on the sprite, not in its meta, and the message says wh
   const meta = { type: 'creature', role: 'characters/enemy', themes: ['neutral'], gameTypes: ['platformer'], view: 'side', words: ['a', 'b', 'c', 'd', 'e', 'f'], license: 'draft', styles: ['pixel'] };
   const r = validateMeta(meta, 'sprite');
   assert.ok(!r.ok);
-  assert.ok(r.errors.some((e) => /meta\.styles/.test(e) && /defineSprite/.test(e) && /styles: \[/.test(e)), r.errors.join('\n'));
+  assert.ok(r.errors.some((e) => /meta\.styles/.test(e) && /top-level "styles"/.test(e) && !/defineSprite/.test(e)), r.errors.join('\n'));
 });
 
 test('a sprite item in the bag keeps its style; one without a style is stored exactly as before', () => {

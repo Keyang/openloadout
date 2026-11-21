@@ -2,7 +2,7 @@
 // of a pit, bones to scatter on a floor, and a rune seal that turns over a door or a floor.
 // (docs/style-guide.md section 1: the camera looks from the south, tilted down, so of a hole it sees the north
 // inner wall, and of a flight of stairs it sees the treads, plus the risers when the flight climbs away from it.)
-// Pure functions: Node and browser, no Math.random. Worked example: sprites/tiles-dungeon.js, sprites/dungeon-door.js.
+// Pure functions: Node and browser, no Math.random. Worked example: sprites/tiles-dungeon.json, sprites/dungeon-door.json.
 //
 //   import { drawStairs, sunkWall, boneIn, runeSeal } from '../engine/dungeon.js';
 //   drawStairs(g, 'down', { tread: p.floor, wall: p.stone });                     // a whole tile: steps going down to the north

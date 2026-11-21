@@ -131,7 +131,7 @@ function spriteStage(sprite, read) {
 }
 
 /**
- * item: a bag item { key, kind, id }. asset: its sprite program, or its sound or track patch.
+ * item: a bag item { key, kind, id }. asset: its sprite object, or its sound or track patch.
  * onAct(what): after the visitor does something in the panel (see app/panel.js). versions: how many version tiles.
  * tabs: extra tabs for the panel. head: the panel's title row (the bag's: name, its page, Close).
  * A sound plays after each change, so the change is heard; a track is played with play() (the Play button on its picture).

@@ -1,7 +1,7 @@
 // Station bulkheads: the plated metal wall of a space station seen from the south, and the machines set in it
 // (docs/style-guide.md, sections 6 and 14). The hard-surface partner of the stone faces in engine/tiles.js
-// (coursedFace) and of the plated floors in engine/plating.js. Added with batch S11: sprites/tiles-station-walls.js
-// is the worked example for the wall, sprites/blast-door.js, wall-terminal.js and laser-gate.js for the machines.
+// (coursedFace) and of the plated floors in engine/plating.js. Added with batch S11: tests/fixtures/code-sprites/tiles-station-walls.js
+// is the worked example for the wall, sprites/blast-door.json, wall-terminal.json and laser-gate.json for the machines.
 //
 //   import { patternFill, drawBlock, textureTone, textureLight } from '../engine/tiles.js';
 //   import { shadeTo, drawBulkhead, doorLeaves, screenIn, laserBeam, machineTones, drawCasing, hazardBand } from '../engine/bulkhead.js';

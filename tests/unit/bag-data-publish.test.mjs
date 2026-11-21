@@ -1,8 +1,8 @@
 // Studio item S8, review round 3 (issue 1): what the bag, the catalogue and the download load must be on the published
 // site. `npm run build -- --dist` copies only the folders the browser loads (tools/build.mjs DIST); tools/ is not one of
 // them, so a module there that the export imports is a 404 on the published site and the whole download fails. The
-// library file writer the download uses for a studio sprite is catalog/data-file.js, a published copy of
-// tools/lib/data-file.mjs (the build's reader and checker); the two must stay the same code.
+// library file writer the download uses for a studio sprite is catalog/data-file.js (tools/lib/data-file.mjs
+// re-exports it: there is one copy of the code).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -39,7 +39,7 @@ test('publish: every module the bag, the catalogue and the download name (also l
   assert.deepEqual(out, [], 'not published');
 });
 
-test('publish: what the download reaches, through every module, is published', { todo: 'app/api-studio.js (S11) still imports ../tools/lib/data-file.mjs; it should import ../catalog/data-file.js' }, () => {
+test('publish: what the download reaches, through every module, is published', () => {
   const dist = published();
   const g = importGraph({ root: ROOT });
   const reach = g.closure(['app/bundle.js', 'app/bag.js', 'app/catalog.js'].map((f) => path.join(ROOT, f)));

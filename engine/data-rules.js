@@ -49,7 +49,7 @@ import { textureTone, textureLight } from './tiles.js';   // build item B15b: th
 import { faceRamps } from './solids.js';   // migration batch M3: faceTone, the faces of a solid lit from above (solids.js does not import this module)
 import { stoneShade } from './paving.js';   // migration batch M5: stoneShade, a paving's darker stones and joints (paving.js does not import this module)
 import { hueTone, hued, HUE_TONES } from './hue-tones.js';   // migration batch M4: hueTone and hued, the tool and material icons' tones in their own hue
-import { lifted, grey, ifLight } from './look-tones.js';   // migration batch M9: lifted, grey and ifLight, what the interface code sprites read from a colour's numbers (look-tones.js does not import this module at load)
+import { lifted, grey, ifLight } from './look-tones.js';   // migration batch M9: lifted, grey and ifLight, what the (old) interface code sprites read from a colour's numbers (look-tones.js does not import this module at load)
 import { shadeTo } from './bulkhead.js';   // migration batch P5: shadeTo, the station machines' recess metal and the blast door's frame (bulkhead.js does not import this module)
 import { brightness as shadeBrightness } from './color.js';   // migration batch P5: the brightness shadeTo's target is worked out from
 import { raisedGround } from './ground.js';   // build item T2: raisedGround, the meadow's path and the shore's bank (ground.js does not import this module)
@@ -106,11 +106,11 @@ export const COLOUR_RULES = Object.freeze({
   grey: Object.freeze({ about: 'The grey of the same brightness as a colour (a disabled button or card): engine/ui.js desaturate (engine/look-tones.js grey).', args: Object.freeze({ of: arg('colour') }) }),   // migration batch M9
   ifLight: Object.freeze({ about: 'One of two colours by how light a third is: then when its brightness is above `above` (0 to 1), else `else` (a pale face shaded darker, not lighter): engine/look-tones.js ifLight.', args: Object.freeze({ of: arg('colour'), above: arg('number', { min: 0, max: 1 }), then: arg('colour'), else: arg('colour') }) }),   // migration batch M9
   shadeTo: Object.freeze({ about: 'A colour taken darker or lighter along its own ramp until its brightness is max(floor, min(its own, that of under (default itself) less drop)): a machine\'s recess metal, a frame kept darker than its door: engine/bulkhead.js shadeTo.', args: Object.freeze({ of: arg('colour'), under: arg('colour', { optional: true }), drop: arg('number', { min: 0, max: 1 }), floor: arg('number', { min: 0, max: 1 }) }) }),   // migration batch P5
-  sunkTone: Object.freeze({ about: 'A colour sunk below another (a floor\'s inset plating, a wall\'s cap): mixed towards its own ramp\'s dark until its brightness is max(floor, min(its own, that of under less drop)), never past that dark: sprites/tiles-station-floor.js and tiles-hive.js tones.', args: Object.freeze({ of: arg('colour'), under: arg('colour'), drop: arg('number', { min: 0, max: 1 }), floor: arg('number', { min: 0, max: 1 }) }) }),   // build item T3
-  shadeApart: Object.freeze({ about: 'A colour taken along its own ramp until its brightness is max(floor, min(its own less self, that of under less drop)): a wall\'s cap kept darker than itself and than the face under it: engine/bulkhead.js shadeTo, as sprites/tiles-station-walls.js worked its target out.', args: Object.freeze({ of: arg('colour'), under: arg('colour'), drop: arg('number', { min: 0, max: 1 }), self: arg('number', { min: 0, max: 1 }), floor: arg('number', { min: 0, max: 1 }) }) }),   // build item T3
+  sunkTone: Object.freeze({ about: 'A colour sunk below another (a floor\'s inset plating, a wall\'s cap): mixed towards its own ramp\'s dark until its brightness is max(floor, min(its own, that of under less drop)), never past that dark: the tones of sprites/tiles-station-floor.json and tiles-hive.json.', args: Object.freeze({ of: arg('colour'), under: arg('colour'), drop: arg('number', { min: 0, max: 1 }), floor: arg('number', { min: 0, max: 1 }) }) }),   // build item T3
+  shadeApart: Object.freeze({ about: 'A colour taken along its own ramp until its brightness is max(floor, min(its own less self, that of under less drop)): a wall\'s cap kept darker than itself and than the face under it: engine/bulkhead.js shadeTo, as sprites/tiles-station-walls.json works its target out.', args: Object.freeze({ of: arg('colour'), under: arg('colour'), drop: arg('number', { min: 0, max: 1 }), self: arg('number', { min: 0, max: 1 }), floor: arg('number', { min: 0, max: 1 }) }) }),   // build item T3
   raisedGround: Object.freeze({ about: 'A ground colour (a path, a sandy bank) lifted towards its ramp\'s light so it stands apart by value from the ground round it: a full step for a mid colour, less for a light one, none for a very light one: engine/ground.js raisedGround.', args: Object.freeze({ of: arg('colour') }) }),   // build item T2
   pavingTone: Object.freeze({ about: 'The colour light paving is laid in: the colour itself when light enough, else lifted towards its ramp\'s light and past that towards white: engine/paving.js pavingTone.', args: Object.freeze({ of: arg('colour') }) }),   // build item T2
-  brighterBy: Object.freeze({ about: 'One colour when its brightness is at least `by` (0 to 1) above that of `than`, else `else`: the castle\'s highlight on a stone, none on a stone as pale as cream (sprites/tiles-castle.js).', args: Object.freeze({ of: arg('colour'), than: arg('colour'), by: arg('number', { min: 0, max: 1 }), else: arg('colour') }) }),   // build item T2
+  brighterBy: Object.freeze({ about: 'One colour when its brightness is at least `by` (0 to 1) above that of `than`, else `else`: the castle\'s highlight on a stone, none on a stone as pale as cream (sprites/tiles-castle.json).', args: Object.freeze({ of: arg('colour'), than: arg('colour'), by: arg('number', { min: 0, max: 1 }), else: arg('colour') }) }),   // build item T2
 });
 
 /**
@@ -210,18 +210,18 @@ function evaluate(e, v, depth) {
       const c = of(), under = e.under === undefined ? c : evaluate(e.under, v, depth + 1);
       return shadeTo(c, Math.max(n(e.floor, 0), Math.min(shadeBrightness(c), shadeBrightness(under) - n(e.drop, 0))));
     }
-    case 'sunkTone': {   // build item T3: the station floor's plating and the hive wall's cap, as sprites/tiles-station-floor.js and tiles-hive.js worked them out
+    case 'sunkTone': {   // build item T3: the station floor's plating and the hive wall's cap, as the code sprites tiles-station-floor and tiles-hive worked them out (frozen: tests/fixtures/code-sprites/tiles-station-floor.js)
       const c = of(), dark = ramp(c).dark, b = shadeBrightness(c);
       const want = Math.max(n(e.floor, 0), Math.min(b, shadeBrightness(evaluate(e.under, v, depth + 1)) - n(e.drop, 0)));
       return mix(c, dark, Math.min(1, Math.max(0, (b - want) / Math.max(0.01, b - shadeBrightness(dark)))));
     }
-    case 'shadeApart': {   // build item T3: the station wall's cap, as sprites/tiles-station-walls.js worked it out
+    case 'shadeApart': {   // build item T3: the station wall's cap, as the code sprite tiles-station-walls worked it out (frozen: tests/fixtures/code-sprites/tiles-station-walls.js)
       const c = of();
       return shadeTo(c, Math.max(n(e.floor, 0), Math.min(shadeBrightness(c) - n(e.self, 0), shadeBrightness(evaluate(e.under, v, depth + 1)) - n(e.drop, 0))));
     }
     case 'raisedGround': return raisedGround(of());   // build item T2
     case 'pavingTone': return pavingTone(of());   // build item T2
-    case 'brighterBy': {   // build item T2: sprites/tiles-castle.js, brightness(stone.light) - brightness(stone) >= 0.1 ? stone.light : (no highlight)
+    case 'brighterBy': {   // build item T2: the code sprite tiles-castle (frozen: tests/fixtures/code-sprites/tiles-castle.js), brightness(stone.light) - brightness(stone) >= 0.1 ? stone.light : (no highlight)
       const c = of();
       return shadeBrightness(c) - shadeBrightness(evaluate(e.than, v, depth + 1)) >= n(e.by, 0.1) ? c : evaluate(e.else, v, depth + 1);
     }

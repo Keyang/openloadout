@@ -41,7 +41,7 @@
 //   unused control      not here: the validator refuses a control nothing names, and checkSprite errors on a control
 //                       that changes no pixel ("never changes the picture", "does nothing when ..."); both run on every
 //                       data sprite (tests/unit/assets-data-checks.test.mjs proves both).
-// A code sprite or a version 1 studio sprite is not looked at.
+// A sprite that is not a version 2 data sprite (a version 1 studio sprite, or an object a test builds with defineSprite) is not looked at.
 // Plain ES module: runs unchanged in the browser and in Node.
 import { dataFrameList } from '../engine/data-sprite.js';
 import { listCost, workBudget, STAMP_ANCHORS } from '../engine/draw-list.js';

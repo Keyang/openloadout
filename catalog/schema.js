@@ -166,13 +166,13 @@ export function validateMeta(meta, kind) {
   if (!KINDS.includes(kind)) return { ok: false, errors: [`kind ${q(kind)} is not known; use one of: ${list(KINDS)}`] };
   const need = META_FIELDS.filter((f) => f !== 'view' || kind === 'sprite');
   if (meta === undefined || meta === null) {
-    return { ok: false, errors: [`meta is missing: add a meta object with ${list(need)}${kind === 'sprite' ? ' (in defineSprite)' : ' (a top-level "meta" in the JSON)'}`] };
+    return { ok: false, errors: [`meta is missing: add a meta object with ${list(need)} (a top-level "meta" in the JSON)`] };
   }
   if (!isObj(meta)) return { ok: false, errors: [`meta must be an object with ${list(need)}; got ${q(meta)}`] };
 
   for (const k of Object.keys(meta)) {
     // a sprite's styles (Contract 12) are declared on the sprite, next to its clips; the build copies them into its catalogue row
-    if (k === 'styles' && kind === 'sprite') errors.push("meta.styles: the styles a sprite can be drawn in go on the sprite itself, not in meta: defineSprite({ styles: ['pixel'], ... }); remove it from meta");
+    if (k === 'styles' && kind === 'sprite') errors.push('meta.styles: the styles a sprite can be drawn in go on the sprite itself, not in meta: a top-level "styles": ["pixel"] in its JSON; remove it from meta');
     else if (DERIVED_FIELDS.includes(k)) errors.push(`meta.${k}: is derived by the build from the asset itself; remove it`);
     else if (!META_FIELDS.includes(k)) errors.push(`meta.${k}: is not a known field; meta takes ${list(need)}`);
   }

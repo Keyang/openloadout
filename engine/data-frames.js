@@ -1,5 +1,5 @@
-// Any frame number of a data sprite, drawn inside its clip (build item B9, review rounds 1 and 2). A code sprite draws
-// whatever frame it is asked for; a data sprite's generators are handed the clip phase, which must lie in 0..1, and the
+// Any frame number of a data sprite, drawn inside its clip (build item B9, review rounds 1 and 2). A game, the
+// sprite page and the exporters may ask for any frame; a data sprite's generators are handed the clip phase, which must lie in 0..1, and the
 // sprite page's clock can ask for frame -1 (a requestAnimationFrame time before the start) or `frames` (a loop's end).
 // framesInClip wraps a sprite's render and sockets so that a looping clip wraps round (frame -1 is its last frame,
 // `frames` its first) and a clip that plays once holds its first and last frames; frames inside the clip are drawn
@@ -19,7 +19,7 @@ export const frameInClip = (c, frame) => (!Number.isFinite(frame) ? frame : c.lo
 const phaseOfFrame = (c, f) => (c.loop !== false ? f / c.frames : c.frames > 1 ? f / (c.frames - 1) : 0);
 
 /**
- * Makes a data sprite draw any frame number, as a code sprite does: render brings the frame into its clip first
+ * Makes a data sprite draw any frame number: render brings the frame into its clip first
  * (frameInClip, with the phase to match) and sockets asks at a phase inside 0..1 (a looping clip wraps, one that plays
  * once is held at its ends). Changes the sprite in place, once (a second call does nothing), and returns it; anything
  * that is not a sprite is returned as it is.

@@ -1,6 +1,6 @@
 // Tones that keep a colour's hue (migration batch M4): the colour work of engine/icons-swatch.js (hueRamp, iconHued)
 // as plain colour functions, so a data sprite can name them as colour rules (engine/data-rules.js COLOUR_RULES
-// hueTone and hued) and the code module can go when its last code sprite does. The arithmetic is the same, step for
+// hueTone and hued); the code module it came from is gone with its last code sprite. The arithmetic is the same, step for
 // step, so a redraw paints the colours the code sprite painted. Pure: Node and browser.
 //
 //   lightness(hex)                      CIE L* of a colour, 0 (black) to 100 (white): the lightness people see

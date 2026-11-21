@@ -1,10 +1,9 @@
 // Rail fences for top-down maps, seen from the south in three-quarter view (docs/style-guide.md, section 1): three
 // tiles that a level builder places by hand. They are not a block: a fence is a line, and it stands on whatever
-// ground is under it, so everything outside the wood is see-through. Worked example: sprites/tiles-village.js.
+// ground is under it, so everything outside the wood is see-through. Worked example: sprites/tiles-village.json.
 //
-//   import { FENCE_PIECES, drawFence } from '../engine/fences.js';
-//   clips: { 'fence-h': {...}, 'fence-v': {...}, 'fence-post': {...} }
-//   render(g, { clip, p }) { if (clip.startsWith('fence-')) return drawFence(g, clip.slice(6), { wood: p.wood }); }
+//   The village tileset's clips are 'fence-h', 'fence-v' and 'fence-post'; engine/gen/ports/tiles-village.js draws each with
+//   drawFence(g, clip.slice(6), { wood }). No sprite file imports this module.
 //
 // WHERE THE POST STANDS. Every piece has its post in the same place: the bottom right of its cell (FENCE.post).
 //   'h'     two rails right across the tile, and the post in front of them: it repeats sideways

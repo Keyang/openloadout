@@ -1,7 +1,7 @@
 // Advanced editing on a sprite's page, the parts that are plain data (build item B18; docs/data-sprites.md section 6,
 // "Advanced mode on a sprite page"; Contract 15 rule 7; DQ5: it edits a copy). app/sprite-advanced.js puts these on the
 // page. Pure: no DOM, no storage, so it runs in Node too (tests/unit/sprite-advanced.test.mjs).
-//   - which sprites get Advanced: a library sprite whose file is data (sprites/<id>.json); not one that is still code,
+//   - which sprites get Advanced: a library sprite whose file is data (sprites/<id>.json);
 //     not a studio sprite, not one made on this visit;
 //   - the visitor's sliders as the copy's defaults (a control's `default`, a colour slot's `default`);
 //   - which studio draft is the copy to go on with (a version 2 sprite draft whose made.from is "library:<id>");

@@ -48,7 +48,9 @@ export const METAL = ['#c2c9d6', '#8f97a8', '#e6c545', '#c98a4a', '#5d6475'];
 // ---- definition ------------------------------------------------------------
 
 /**
- * Define a sprite: checks the definition, fills in its defaults and returns it. Every sprite file's default export.
+ * Define a sprite: checks the definition, fills in its defaults and returns the sprite object every renderer, exporter and checker takes.
+ * Only framework code calls it: engine/data-sprite.js builds the object from a sprite's data file (sprites/<id>.json, Contract 15), and it is
+ * where the object's `render` and `sockets` come from. No sprite file calls it and none holds a `render`: a sprite is data.
  *
  * defineSprite({
  *   id, name, kind: 'Character' | 'Creature' | 'Item' | 'Effect', blurb,
@@ -71,8 +73,9 @@ export const METAL = ['#c2c9d6', '#8f97a8', '#e6c545', '#c98a4a', '#5d6475'];
  *   styles: ['pixel'],                      // optional: the art styles it can be drawn and exported in, best first (engine/styles.js,
  *                                           // Contract 12). Left out: ['pixel']. The chosen one is called `artStyle` wherever a
  *                                           // control's key can appear (links, the bag, exports), so a control may be called "style"
- *   render(g, { clip, t, frame, frames, p, style }) { ...draw on Surface g... },
- *                                           // style: the id of the style being drawn; branch on it for the detail layer only
+ *   render(g, { clip, t, frame, frames, loop, p, style }),
+ *                                           // draws one frame on the surface g of the style (renderFrame); engine/data-sprite.js
+ *                                           // supplies it, from the definition's body (framework renderers and generators)
  * })
  */
 export function defineSprite(def) {
@@ -330,11 +333,6 @@ function effective(sprite, key, p, trail) {
   const part = partOf(sprite, key);
   if (!part || key === part.selector) return true;
   return !partRemoved(sprite, part.name, p) && effective(sprite, part.selector, p, next);
-}
-
-/** Keys of the controls in effect for these values, in the order of sprite.params. */
-export function activeParams(sprite, p) {
-  return Object.keys(sprite.params).filter((k) => inEffect(sprite, k, p));
 }
 
 /** A sprite's controls at their defaults: { key: value }. */

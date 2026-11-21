@@ -4,8 +4,7 @@
 // the bone rig and the bone renderer (rigs/bones.js) draws it. Nothing in the definition ever runs. So renderSheet,
 // describeSheet, the looks (Contract 7), the export and the quality bar (quality/sprite.js) take it like any sprite.
 //
-//   import { dataSprite } from '../engine/data-sprite.js';
-//   export default dataSprite({ "format": "loadout-sprite", "version": 1, ... });   // a library file (studio.md 2.4)
+//   dataSprite({ "format": "loadout-sprite", "version": 2, ... })   // a sprites/<id>.json read as JSON (never imported), and a studio definition
 //
 // What the definition becomes (studio.md 2.3):
 //   colour slots  one color() control per slot that is not a detail (label and material from the slot; swatches:

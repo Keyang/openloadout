@@ -7,7 +7,7 @@
 //   pixel   the one style on the site today: the pixel grid of surface.js, no finish, a PNG sheet plus JSON.
 //           A sprite that lists no styles has this one, and draws exactly as it did before styles existed.
 //
-// A sprite opts in with `styles: ['pixel', 'flat']` in defineSprite (best first) and is told which one is
+// A sprite opts in with a top-level `styles: ["pixel", "flat"]` in its data (best first); the renderer is told which one is
 // being drawn as `ctx.style` in render(g, ctx). How to add a style is in docs/framework-api.md, "Styles".
 
 import { Surface } from './surface.js';

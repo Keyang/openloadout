@@ -236,7 +236,6 @@ test('J4.6 and J4.3: changes made in the panel are still there after a reload', 
   await expect.poll(async () => (await bagItems(page)).find((i) => i.id === 'knight').settings.params.hair).toBe('#c9423a');
   await page.reload();
   await expect(items(page)).toHaveCount(3);
-  // (the Hero's hair colour is a colour control of the data sprite, which a part cannot list, so the row says "red colour" where the code sprite said "red hair";
-  // that the saved change is the hair's is the stored parameter above)
-  await expect(row(page, 'Hero').locator('.hint')).toContainText(/red (hair|colour)/i);
+  // (the Hero's hair colour is a general colour control of the data sprite whose `when` names the hair style: app/changes.js reads it as the hair's)
+  await expect(row(page, 'Hero').locator('.hint')).toContainText(/red hair/i);
 });

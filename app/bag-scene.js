@@ -5,7 +5,7 @@
 //   the tray in the library     bagScene(): a short picture of the whole bag that opens the playground
 //   the sprite page's workbench bagBackdrop({ id }): the bag's scene drawn behind the sprite on the page, with up to six
 //                               other things from the bag standing around it, quieter
-// Both follow the bag as it changes (also from another tab). Sprite programs are loaded only for what is drawn.
+// Both follow the bag as it changes (also from another tab). Sprite objects are loaded only for what is drawn.
 import { el, reduceMotion, hover } from './ui.js';
 import { bag, lookOf, themeFor } from './bag.js';
 import { assetById, loadSprite } from './catalog.js';

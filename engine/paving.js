@@ -1,7 +1,7 @@
 // Paving: patterns and tones for ground that people laid by hand (cobbled squares, brick lanes, courtyards), for
 // the fills of a tileset. It goes with engine/tiles.js: drawCourses there lays stones in rows; here are the
 // patterns rows cannot make, a way to pick out single stones, and the tone that keeps light paving apart from grass.
-// Worked example: sprites/tiles-village.js.
+// Worked example: sprites/tiles-village.json.
 //
 //   import { patternFill, textureTone, drawCourses } from '../engine/tiles.js';
 //   import { drawHerringbone, paintStone, pavingTone, stoneShade } from '../engine/paving.js';

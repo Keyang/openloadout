@@ -4,19 +4,18 @@
 // leaves, the glints that make it catch the eye, and two things pickups are often made of: a cut gem
 // and a corked bottle with liquid in it. Shapes come from shapes.js, sparkles from fx.js.
 //
-//   import { pickupClips, pickupPose, collectBurst, glint, gleam, drawGem } from '../engine/pickups.js';
-//   clips: pickupClips(),                                              // idle 8 (loop), collect 8
-//   render(g, { clip, t, p }) {
-//     const at = pickupPose(clip, t, { bob: p.bob, pop: p.pop, cy: 17, up: ry + 1 });   // where it is this frame
+// A pickup is data (sprites/gem.json, sprites/coin.json); the pickup generators and ports in engine/gen/ draw with these
+// (engine/gen/props-p5.js calls glint; engine/gen/ports/pickups.js holds copies of the rest). No sprite file imports this module.
+// The order a pickup is drawn in, for the code that draws one (pickupClips() gives the clips: idle 8 (loop), collect 8):
+//     const at = pickupPose(clip, t, { bob, pop, cy: 17, up: ry + 1 });   // where it is this frame
 //     if (at.show) {
-//       const gem = drawGem(g, 16, at.y, rx * at.sx, ry * at.sy, p.body, { cut: p.shape });
+//       const gem = drawGem(g, 16, at.y, rx * at.sx, ry * at.sy, body, { cut });
 //       glint(g, gem, { x: 16, y: at.y, r: rx, phase: lerp(-1.6, 1.6, t) });             // before the outline: it is on the body
 //       if (at.flash) g.tint('#ffffff');
 //       g.outline(INK);
 //     }
 //     if (clip === 'idle') gleam(g, 16 + rx, at.y - ry, t, '#ffffff');                    // after the outline: it is light
-//     collectBurst(g, { burst: at.burst, x: 16, y: at.y, r: rx, colour: p.body, sparkle: p.sparkle });
-//   }
+//     collectBurst(g, { burst: at.burst, x: 16, y: at.y, r: rx, colour: body, sparkle });
 //
 // The collect clip, frame by frame (8 frames, t = frame / 7): 0 rest, 1 dip and squash (the sound starts
 // here), 2 to 3 stretch and rise, 4 at the top, a little bigger and all white, 5 half size among sparkles,

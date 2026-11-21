@@ -13,7 +13,7 @@
 //
 // What every house repeats is here too: houseColours(palette) (glass, doorway, floor, and plaster and beam swatches),
 // doorSwing(t) (how far open the door is through an `open` clip), doorStep (the slab under the door) and
-// litWindow (a paneWindow that glows and flickers at night). sprites/cottage.js and sprites/inn.js are the worked examples.
+// litWindow (a paneWindow that glows and flickers at night). sprites/cottage.json and sprites/inn.json are the worked examples.
 //
 // Rules every piece follows:
 //   - Light from the top right (the engine default): a piece is lit along its top and right, dark along its left and bottom.

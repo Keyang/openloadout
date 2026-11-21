@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { Surface } from '../../engine/surface.js';
-import { brightness, mix, hexToRgb, col } from '../../engine/color.js';
+import { brightness, mix, hexToRgb, col, ramp, tone } from '../../engine/color.js';
 import { PALETTES, THEME_PRESETS, applyColour } from '../../engine/theme.js';
 import { seamCheck } from '../../quality/sprite.js';
 import {
@@ -496,8 +496,35 @@ test('a canopy uses its three tones and is deterministic', () => {
   assert.ok(box.x1 - box.x0 >= 40 && box.x1 - box.x0 <= 2 * 30 + 12, `about as wide as asked (${box.x1 - box.x0})`);
 });
 
-test('the example at the top of the helper draws a seamless three-layer backdrop', async () => {
-  const { example } = await import('../../engine/backdrop.js');
+// A small three-layer backdrop drawn with the helpers (it was `example()` in engine/backdrop.js, with its header; a background is
+// data now, so the drawing code lives here and only runs). It shows how the helpers fit together: outlines, scattered things, receding colour.
+function example(p = { sky: '#8fd0f0', land: '#7fb0b8', leaf: '#3f8a4f', time: 'day' }) {
+  const out = {};
+  for (const clip of ['far', 'mid', 'near']) {
+    const g = (out[clip] = new Surface(W, H));
+    const sky = skyLook(p.sky, p.time);
+    if (clip === 'far') {
+      fillBands(g, sky.bands, [46, 84, 114]);
+      disc(g, 236, 34, 11, sky.glow);
+      for (const c of scatter(4, 7)) cloud(g, c.x, 30 + c.v * 40, 34 + c.u * 26, sky.cloud, sky.cloudShade, c.i);
+      const peaks = ridge({ base: 132, height: 44, seed: 3, peaks: 5, shape: 'jagged' });
+      fillBelow(g, peaks, recede(p.land, 0.9, sky.air));
+      fillBetween(g, peaks, litEdge(peaks), recede(tone(p.land, 0.6), 0.9, sky.air));
+    } else if (clip === 'mid') {
+      const hills = ridge({ base: 150, height: 34, seed: 5, peaks: 3 });
+      fillBelow(g, treeline({ base: hills, height: 12, count: 16, seed: 2 }), recede(p.leaf, 0.5, sky.air));
+      fillBelow(g, hills, recede(p.land, 0.5, sky.air));
+    } else {
+      const leaf = ramp(p.leaf);
+      const tones = { light: recede(leaf.base, 0.1, sky.air), base: recede(leaf.dark, 0.1, sky.air), dark: recede(leaf.deep, 0.1, sky.air) };
+      for (const t of scatter(4, 11)) canopy(g, t.x, 150, 30 + t.u * 12, tones, t.i);
+      fillBelow(g, ridge({ base: 172, height: 10, seed: 8, peaks: 7 }), tones.dark);
+    }
+  }
+  return out;
+}
+
+test('a small backdrop drawn with the helpers is a seamless three-layer backdrop', () => {
   const layers = example();
   assert.deepEqual(Object.keys(layers), ['far', 'mid', 'near']);
   for (const [name, g] of Object.entries(layers)) {

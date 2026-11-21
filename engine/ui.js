@@ -1,9 +1,10 @@
 // Interface helper: nine-slice panels, button states, bars, highlight rows, arrow heads and
 // digits (docs/style-guide.md sections 8 and 14). Pure drawing on a Surface: runs in Node
-// and in the browser. Every piece draws its own INK outline, so a sprite made only
-// of these does not call g.outline().
-//
-//   import { panel9, button, barHousing, barOpening, barFill, highlight, triangle, slice9 } from '../engine/ui.js';
+// and in the browser. Every piece draws its own INK outline, so a piece made only
+// of these does not call g.outline(). An interface piece is data (sprites/ui-dialogue.json, ui-buttons-wood.json); no sprite
+// file imports this module. The interface generators (engine/gen/ui*.js) draw with the port copy of it, engine/gen/ports/ui.js;
+// engine/gen/counter.js and engine/pixel-font.js import the few helpers they need from here. The calls, with the colours a
+// piece's controls give (face, frame, border, corner, shine, fill, accent):
 //
 //   // a 96x48 dialogue box: pass the frame minus its 1 px empty border
 //   const box = panel9(g, 1, 1, 94, 46, { face: p.face, frame: p.frame, border: p.border, corner: p.corner });
@@ -27,21 +28,21 @@
 // nine-slice border of the style guide (SLICE): cut 8 px off each side of the frame, keep the
 // corners, repeat the edges along their length and the middle both ways.
 //
-// TELLING THE GAME (docs/architecture.md, Contract 8). A sprite declares `slice`, one entry per
-// stretchable clip, and the exported sheet JSON then carries, on that clip and on each of its frames:
+// TELLING THE GAME (docs/architecture.md, Contract 8). A piece has a `slice`, one entry per
+// stretchable clip (the `panel` layout, engine/gen/ui.js, works it out from the piece's data), and the exported sheet JSON then carries, on that clip and on each of its frames:
 //   border   { left, bottom, right, top }   Unity's order, in sheet pixels: how far the corners reach in
 //            from each side of `rect` (or of the frame when there is no rect)
 //   rect     { x, y, w, h }                 where the piece sits in its frame, when it does not fill it
 //   opening  { x, y, w, h }                 the trough of a bar housing, and where its fill strips lie
 //   tile     { x, w }                       instead of a border, for a middle that repeats a pattern (a
 //            segmented bar): columns x .. x + w - 1 are one repeat; insert whole copies to lengthen
-// In defineSprite:
+// The sprite object's `slice` (engine/sprite.js clipStretch) has this shape:
 //   slice: {
 //     box: slice9(),                                         // a panel that fills its frame: 8 px each side
 //     'name-tag': slice9({ x: 20, y: 14, w: 56, h: 20 }),    // a piece drawn in its own rectangle: rect + 7 px
 //     frame: (p) => ({ left: 16, top: 8, right: 16, bottom: 8, opening: barOpening(1, 1, 62, 14, p) }),   // may follow the settings
 //   },
-// A cursor exports its hot spot as a `tip` socket: sockets: (clip, t, p) => ({ tip: { x, y, angle } }).
+// A cursor exports its hot spot as a `tip` socket (a `points` entry in its data: { "id": "tip", "on": "ui", "at": [0, 0], "angle": 0 }).
 //
 // CONTRAST (style guide, section 8). White text must keep 4.5 to 1 on a text face, and a frame 3 to 1
 // against its face, under every whole-bundle look. Do not pick face and frame swatches by eye:

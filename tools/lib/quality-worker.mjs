@@ -26,14 +26,13 @@ if (fs.existsSync(soundsDir)) for (const f of fs.readdirSync(soundsDir)) {
 const failed = (id, msg) => ({ id, ok: false, errors: [msg], warnings: [], notes: [], metrics: {} });
 
 async function checkOne({ kind, file }) {
-  const base = path.basename(file).replace(/\.(js|mjs|json)$/, '');
+  const base = path.basename(file).replace(/\.json$/, '');
   if (kind === 'sprite') {
     let def;
     // a sprite is a data file (sprites/<id>.json, build item B9): read as JSON and drawn by the project's engine/data-sprite.js, never imported;
     // a code file is refused (R4a: tools/lib/assets.mjs codeSpriteRefusal; runQuality refuses it before it gets here)
     const { loadSpriteFile } = await import('./assets.mjs');
-    try { def = await loadSpriteFile(root, file, { soundIds: [...soundIndex.keys()] }); } catch (e) { return failed(base, `cannot be loaded: ${String(e.message).replace(/^.*?\.(json|m?js|cjs|ts): /, '')}`); }
-    if (!def || typeof def.render !== 'function' || !def.clips) return failed(base, 'cannot be loaded: the default export is not a sprite made with defineSprite');
+    try { def = await loadSpriteFile(root, file, { soundIds: [...soundIndex.keys()] }); } catch (e) { return failed(base, `cannot be loaded: ${String(e.message).replace(/^.*?\.json: /, '')}`); }
     const r = checkSprite(def, { soundIndex, validateMeta });
     if (def.id !== base) r.errors.unshift(`id "${def.id}" must match the file name "${base}"`);
     const uses = [...new Set(Object.values(def.sounds ?? {}).flat().map((c) => c.sound))].sort();

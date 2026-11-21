@@ -3,13 +3,11 @@
 // same place every 32 px, however much it moves. The cure is the one a floor uses: several versions of the fill,
 // which whoever lays out a level mixes by position (fillVariant in engine/tiles.js). For that, versions must be
 // able to lie beside each other in any order, so no mark of any version may reach the tile's edge on any frame.
-// Worked example: sprites/tiles-shore.js.
+// Worked example: sprites/tiles-shore.json.
 //
-//   import { rippleVersion, rippleEvenness } from '../engine/ripples.js';
-//   const SEEDS = [5, 12, 31];                                              // one arrangement per version of the fill
-//   const body = rippleVersion(W.body, t, { light: W.light, count: 6, length: 7, stir: 2, seed: SEEDS[v] });   // fill(x, y)
-//   clips: { ...blockClips('water', { frames: 8, fills: 3 }) }               // water-fill, water-fill-b, water-fill-c
-//   rippleEvenness((t) => rippleVersion(W.body, t, { seed }), { base: W.body })   // how even a seed is over the loop
+//   rippleVersion(W.body, t, { light: W.light, count: 6, length: 7, stir: 2, seed: SEEDS[v] })   // the marks of one version of the fill: fill(x, y)
+//   rippleEvenness((t) => rippleVersion(W.body, t, { seed }), { base: W.body })                  // how even a seed is over the loop
+//   (SEEDS: one arrangement per version of the fill; a tileset asks for 3 fills and engine/gen/ports/tiles-shore.js draws them with these.)
 //
 // engine/water.js has rippleFill, the same streaks wrapping round the tile's edges: right for a tile that only ever
 // lies beside itself (a pool one tile big, a trough), wrong for a field. engine/tiles.js has liquidMarks, marks that

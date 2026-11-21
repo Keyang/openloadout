@@ -5,14 +5,15 @@
 // worked out from where it is in the world (texture repeats every 32 px) and how far it is
 // from the outline (edges continue from tile to tile).
 //
-// Worked examples: sprites/tiles-forest.js (side view: block, ledge, slopes, decals) and
-// tests/fixtures/quality/sprite-files/q-room-tiles.js (top-down: floor, path, wall with a face, pit).
-// Look at the result with `node tools/tilemap.mjs <id>`.
+// A tileset is data (sprites/tiles-forest.json, side view; sprites/tiles-station-floor.json, top-down): engine/gen/tiles.js builds
+// the material below from its definition and draws every piece with this module (engine/gen/tiles-clips.js names the pieces with
+// blockClips, thinClips, slopeClips, decoClips and liquidClips; drawBlock, drawSoftBlock, drawThin, drawSlope and drawLiquid draw
+// them; patternFill and scatter make a fill). No sprite file imports it. Look at the result with `node tools/tilemap.mjs <id>`.
 //
-//   import { blockClips, thinClips, slopeClips, decoClips, drawTile, patternFill, scatter } from '../engine/tiles.js';
+// What a material looks like (the grass ground of the forest, as a generator works it out from the sprite's controls):
 //
 //   const DIPS = [0, 0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 0, 0, 0];   // the top line, per column
-//   function ground(p) {                                  // one material, from the sprite's controls
+//   function ground(p) {
 //     const soil = ramp(p.soil), grass = ramp(p.grass);
 //     return {
 //       fill: patternFill(p.soil, (s) => scatter(7, 4).forEach((m) => s.rect(m.x, m.y, 2, 1, soil.dark))),   // the inside
@@ -26,8 +27,6 @@
 //       bottom: { depth: 2, paint: () => soil.dark },     // the underside, in shade; the sides are bare (ink only)
 //     };
 //   }
-//   clips: { ...blockClips('grass', { narrow: true, fills: 3 }), ...thinClips('grass'), ...slopeClips('grass'), ...decoClips('grass', ['above', 'on']) },
-//   render(g, { clip, t, p }) { if (!drawTile(g, clip, ground(p), t)) drawMyDecal(g, clip, p); }
 //
 // A material:
 //   fill(x, y, t, v)  required. The colour inside, for x, y in 0..31 (patternFill makes one from a drawing).
@@ -982,7 +981,7 @@ export function drawDecal(g, draw, { ink = INK } = {}) {
 // ---- light marks, and liquids (added with batch P05: cave rock, water and waterfalls) ----------------------
 // A liquid is two pieces under one prefix: '<prefix>-top', the surface, see-through above a line that may wave,
 // and '<prefix>-fill', the body (with other versions, like a block's fill). It has no sides and no underside: it
-// lies in a basin of some block, whose own outline closes it. Worked example: sprites/tiles-water.js.
+// lies in a basin of some block, whose own outline closes it. Worked example: sprites/tiles-water.json.
 
 const lightCache = boundedCache(TEXTURE_CACHE_LIMIT);   // capped like toneCache (build item F3)
 /**
@@ -1226,7 +1225,7 @@ export function drawArchway(g, material, t = 0, { x0 = 1, x1 = 2 * TILE - 2, spr
 // pond want a softer line than a block of rock: corners that are true arcs, and an outline that wanders further in.
 // drawSoftBlock draws the same pieces as drawBlock, under the same names, from the same kind of material, so the
 // picker, the classifier and the checker need nothing new: build the clips with blockClips as usual.
-// Worked example: sprites/tiles-meadow.js.
+// Worked example: sprites/tiles-meadow.json.
 
 const softInset = (e, u, t) => { u = wrap(u); return e.inset ? Math.min(clampInt(e.inset(u, t), 0, 8), u, M - u) : 0; };
 
@@ -1351,7 +1350,7 @@ export function courseShift(heights, from = 1) {
 // ---- marks in an edge band that have a top and a bottom (added with batch R04: stones along a path's border) ----
 // An edge's paint(d, u) counts d in from the outline and u along the edge, so the same mark comes out turned a
 // different way on each of the four edges. These two put a mark back upright, so it keeps the light on its top and
-// right whichever edge it lies along. They work in drawBlock and drawSoftBlock alike. Worked example: sprites/tiles-meadow.js.
+// right whichever edge it lies along. They work in drawBlock and drawSoftBlock alike. Worked example: sprites/tiles-meadow.json.
 
 /**
  * Turn a pixel of an edge band into a column and a row of a box lying in that band, counted from the box's top left on screen, so a mark drawn there stands upright on all four edges.
@@ -1443,7 +1442,7 @@ export function stoneTuft(s, stone, tones, { big = false, seed = 0 } = {}) {
 
 // ---- added with batch P05, fix round 2 (water and waterfalls): liquidMarks ----
 // What moves inside the body of a liquid, worked out in one place so that every liquid moves the same way and a
-// tileset keeps only the table of its marks. Worked example: sprites/tiles-water.js (water, lava and a swamp).
+// tileset keeps only the table of its marks. Worked example: sprites/tiles-water.json (water, lava and a swamp).
 //
 //   const MARKS = [['dash', 'light', 6, 13, 7, 0], ['dash', 'dark', 18, 11, 5, 0.7], ['bubble', 'light', 22, 27, 2, 0.1]];
 //   const made = [];                                     // one fill per version for this frame, not one per pixel
@@ -1495,7 +1494,7 @@ export function liquidMarks(base, marks, t = 0, { tones = {}, stir = 1, glints =
 
 // ---- added with batch R08, fix round 1 (village walls): coursedFace ----
 // The paint of a top-down wall's front face (material.face.paint), worked out in one place so that every wall face is
-// laid the same way and a tileset keeps only its table of joints. Worked example: sprites/tiles-village.js.
+// laid the same way and a tileset keeps only its table of joints. Worked example: sprites/tiles-village.json.
 //
 //   const face = (rows) => coursedFace({ rows, course: 7, joints: [[4, 15, 26], [9, 20, 30]], body, top, joint, foot: MOSS, footColour, chips: worn ? CHIPS : [] });
 //   const wall = (rows) => ({ fill: cap, top: capEdge, face: { paint: face(rows), shadow } });
@@ -1529,7 +1528,7 @@ export function coursedFace({ rows = 29, course = 7, joints = [], body, top = bo
 // scatters it (pickDecal(decals, 'face', ...), DECAL_CHANCE.face) over the cells of a top-down wall whose piece is one
 // of FACE_PIECES, never over the cap. Keep such a decal to the rows that are face on every piece (8 to 28 of the
 // tile, under the 8 px sliver of cap of the low pieces) and to columns 2 to 29, clear of the outline at a wall's ends.
-// Worked example: sprites/tiles-station-walls.js.
+// Worked example: sprites/tiles-station-walls.json.
 
 /** The pieces of a top-down wall block that show its front face, where a decal declared with place 'face' may go: a full face ('bottom', 'bottom-l', 'bottom-r', 'col-b') or a face under a sliver of cap ('strip-l', 'strip-m', 'strip-r', 'single'). No arguments: a frozen list. */
 export const FACE_PIECES = Object.freeze(['bottom', 'bottom-l', 'bottom-r', 'col-b', 'strip-l', 'strip-m', 'strip-r', 'single']);
@@ -1546,7 +1545,7 @@ export const FACE_PIECES = Object.freeze(['bottom', 'bottom-l', 'bottom-r', 'col
 // cells whose piece is one of RIM_PIECES, and leaves it out, with a note, when a map writes its letter on any other
 // cell. On a top-down wall the pieces that show the front face keep their 'face' decals: a 'rim' decal goes on the
 // rest. Draw such a decal from row 0 down, clear of columns 0 to 2 and 29 to 31, where a corner piece has its side.
-// Worked example: sprites/tiles-pit.js.
+// Worked example: sprites/tiles-pit.json.
 
 /** The pieces of a block that have the block's north edge (its top line; on a hole, the rim with the inner wall under it), where a decal declared with place 'rim' may go: 'top', the two top corners, the strip, 'col-t', 'single', and the lane pieces closed on top. No arguments: a frozen list. */
 export const RIM_PIECES = Object.freeze(Object.keys(SIGNATURE).filter((k) => SIGNATURE[k].N === 0));

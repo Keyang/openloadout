@@ -18,7 +18,7 @@
 //   rows above it that should not block (roots that spread, a shadow, grass at the foot).
 //   A sprite cannot yet say its footprint itself. One that needs to (an arch you walk through, an L-shaped house,
 //   a tree with wide roots) would need a field such as `footprint: { left, right, depth }` in pixels from the pivot
-//   in defineSprite, carried to the catalogue's `tech`: proposed, not in the engine.
+//   in the sprite's data, carried to the catalogue's `tech`: proposed, not in the engine.
 // Pure JavaScript: no DOM.
 import { cleanParams, defaultParams, clipFps, renderFrame, frameSockets, cueInEffect } from '../../engine/sprite.js';
 import { clipSpeed, restClip, actionOf, STATES } from './clips.js';
@@ -97,7 +97,7 @@ const HARMFUL = /\b(lava|acid|magma|poison)\b/i;
 /**
  * True for a liquid that hurts whoever stands in it. It is told by its words: lava, acid, magma or poison in the
  * block's prefix, in the tileset's name, or in what one of its controls is set to (the Liquid control of
- * sprites/tiles-water.js set to "lava"). Search words (meta.words) do not count.
+ * sprites/tiles-water.json set to "lava"). Search words (meta.words) do not count.
  * prefix: the liquid block's prefix. sprite: its tileset (may be null). params: the tileset's settings.
  */
 export function harmfulLiquid(prefix, sprite, params = {}) {

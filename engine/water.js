@@ -2,7 +2,7 @@
 // tones from one colour, a surface that moves, the line where it laps at a shore, and a pond, river or pool seen
 // from above and in front, piece by piece, for a top-down tileset. Plus two things that go with water: a lily pad
 // and a plank bridge. Pure functions: Node and browser, no Math.random; everything repeats every 32 px and closes
-// over one loop. Worked example: sprites/tiles-shore.js.
+// over one loop. Worked example: sprites/tiles-shore.json.
 //
 //   import { waterTones, rippleFill, lapPaint, drawShore, wakeRing, lilyPad, plankBridge } from '../engine/water.js';
 //   const W = waterTones(p.water, { foam: p.foam });                    // { body, shallow, light, dark, foam, froth }

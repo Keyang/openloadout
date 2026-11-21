@@ -8,7 +8,7 @@
 //   spriteChanges(sprite, params)          -> ['height: taller', 'no weapon', 'red cape', ...]   in the order of the sprite's controls
 //   soundChanges(patch, style, params)     -> ['higher blade pitch', 'flute', 'length: shorter']  compared with the chosen style
 //   inWords(list, most = 3)                -> 'Height: taller, no weapon, red cape and 2 more'
-import { defaultParams, cleanParams, inEffect, partOf } from '../engine/sprite.js';
+import { defaultParams, cleanParams, inEffect, partOf, partList } from '../engine/sprite.js';
 import { hexToRgb, rgbToHsl } from '../engine/color.js';
 
 const low = (s) => String(s).toLowerCase();
@@ -69,6 +69,18 @@ const GENERAL = new Set(['length', 'size', 'color', 'colour', 'width', 'height',
 const WHOLE = new Set(['height', 'size', 'build', 'speed', 'length', 'width', 'bulk', 'thickness', 'span']);
 const sameStart = (a, b) => a.slice(0, 4) === b.slice(0, 4);
 
+// The part a general control belongs to when no part lists it but its `when` names that part's controls ("Color" shown
+// only while the hair style is not bald is the hair's colour: a data sprite's colour control cannot sit in a part's params).
+// Null when the `when` names no part's control, or controls of two parts (then it is not clear which one it is about).
+function linkedPart(sprite, d) {
+  const owners = new Set();
+  for (const alt of [].concat(d.when ?? [])) {
+    if (alt === null || typeof alt !== 'object') continue;
+    for (const k of Object.keys(alt)) { const part = partOf(sprite, k); if (part) owners.add(part.name); }
+  }
+  return owners.size === 1 ? partList(sprite).find((part) => part.name === [...owners][0]) : null;
+}
+
 /** What differs from the sprite's standard settings, one short phrase per control that is in effect, in the order of its controls. */
 export function spriteChanges(sprite, params) {
   const def = defaultParams(sprite), p = cleanParams(sprite, params ?? {});
@@ -76,9 +88,12 @@ export function spriteChanges(sprite, params) {
   for (const [key, d] of Object.entries(sprite.params)) {
     if (p[key] === def[key] || !inEffect(sprite, key, p)) continue;
     const part = partOf(sprite, key), label = low(d.label);
-    // inside a part, a general label ("Length", "Color") is about that part
-    const inPart = part && key !== part.selector && GENERAL.has(label);
-    const thing = inPart ? low(part.label) : label;
+    // inside a part, a general label ("Length", "Color") is about that part; so is one outside every part
+    // whose `when` is about one part's controls (the Hero's hair colour: "red hair", not "red colour")
+    const general = GENERAL.has(label);
+    const about = part ? (key !== part.selector && general ? part : null) : (general && d.when ? linkedPart(sprite, d) : null);
+    const inPart = Boolean(about);
+    const thing = inPart ? low(about.label) : label;
     if (d.kind === 'range') {
       const name = inPart ? `${thing} ${label}` : label;               // "weapon length"
       const end = p[key] > def[key] ? d.hi : d.lo;
@@ -90,8 +105,8 @@ export function spriteChanges(sprite, params) {
     } else if (d.kind === 'choice') {
       const none = part && key === part.selector ? [].concat(part.none ?? []) : ['none'];
       const option = d.options.find((o) => o.value === p[key]);
-      const about = part && key === part.selector ? low(part.label) : thing;
-      out.push(none.includes(p[key]) || p[key] === 'none' ? `no ${about}` : `${low(option ? option.label : p[key])} ${about}`);
+      const named = part && key === part.selector ? low(part.label) : thing;
+      out.push(none.includes(p[key]) || p[key] === 'none' ? `no ${named}` : `${low(option ? option.label : p[key])} ${named}`);
     } else if (d.kind === 'color') {
       out.push(`${colourName(p[key])} ${GENERAL.has(thing) ? 'colour' : thing}`);
     } else if (d.kind === 'toggle') {

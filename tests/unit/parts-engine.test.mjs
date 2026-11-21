@@ -1,7 +1,10 @@
 // Parts (docs/architecture.md, Contract 3): what a sprite holds or wears, one level below the sprite.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { defineSprite, defaultParams, cleanParams, renderSheet, range, choice, color, toggle, partList, partOf, partRemoved, inEffect, activeParams, frameSockets, cueInEffect } from '../../engine/sprite.js';
+import { defineSprite, defaultParams, cleanParams, renderSheet, range, choice, color, toggle, partList, partOf, partRemoved, inEffect, frameSockets, cueInEffect } from '../../engine/sprite.js';
+
+// the keys of the controls in effect at these settings, in the order of sprite.params (what engine/sprite.js activeParams was, built from inEffect, the one rule)
+const activeParams = (sprite, p) => Object.keys(sprite.params).filter((k) => inEffect(sprite, k, p));
 
 const base = (over = {}) => ({
   id: 'test-holder', name: 'Test holder', size: [24, 24], pivot: [12, 22],

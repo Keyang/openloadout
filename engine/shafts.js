@@ -1,6 +1,6 @@
 // Shafts: holes cut through a hard floor on a top-down map, and what shows down them. The partner of
 // engine/plating.js (the floor itself) for the "hole" block of docs/style-guide.md section 6. Added with batch S13
-// (sprites/tiles-pit.js, the worked example); a vent shaft, a lift well or a reactor pit can share it.
+// (sprites/tiles-pit.json, the worked example); a vent shaft, a lift well or a reactor pit can share it.
 //
 //   import { drawBlock, textureTone, textureLight } from '../engine/tiles.js';
 //   import { dashedRim, shaftWall, depthFill, trussIn, cableRun } from '../engine/shafts.js';

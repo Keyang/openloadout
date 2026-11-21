@@ -40,7 +40,7 @@ export function ring(g, o) { ... }
 - The rest lists the arguments and anything else a caller needs. The whole comment is kept in `generated/api.json` as `doc`.
 - The argument list comes from the function itself. You do not repeat it.
 - A block of `//` lines directly above the export counts too, and so does a `//` comment at the end of a one-line export (`export const INK = '#231b33'; // default outline colour`).
-- A comment that starts with a call form (`defineSprite({ ...`) is not a sentence and does not count. Start with the sentence, then show the call.
+- A comment that starts with a call form (`defineGenerator({ ...`) is not a sentence and does not count. Start with the sentence, then show the call.
 - An export passed on from another framework module (`export { ramp } from '../engine/color.js'`) takes the description it has there.
 - Methods of an exported class are read the same way, from the comment above each method.
 
@@ -305,7 +305,7 @@ A sprite is a data file (`sprites/<id>.json`; a code sprite with a `render()` fu
 
 - List a style only if the sprite reads well in it. A sprite drawn mostly with single pixels (`dot`, `line`) does not list a style whose surface drops them; the site then never offers that style for it.
 - A generator that draws a detail layer (eyes, highlights, trim) branches on the style inside the framework and keeps the pixel branch as the `else`, so the pixel drawing is never at risk.
-- A control may have the key `style`. The chosen art style never uses that name where a control's key can appear: it is `artStyle` in a bag item, in `loadout.render` and `loadout.bag.add`, in the sheet JSON and the manifest, and `artstyle=` in a page link. Inside `render(g, ctx)` the art style is `ctx.style` and a control called `style` is `ctx.p.style`.
+- A control may have the key `style`. The chosen art style never uses that name where a control's key can appear: it is `artStyle` in a bag item, in `loadout.render` and `loadout.bag.add`, in the sheet JSON and the manifest, and `artstyle=` in a page link. Inside a renderer's `render(g, ctx)` the art style is `ctx.style` and a control called `style` is `ctx.p.style`.
 - Asking for a style a sprite does not list is an error everywhere (`renderFrame`, `renderSheet`, `exportSheet`, `loadout.render`, `loadout.bag.add`); nothing falls back to another style.
 
 ### What it costs

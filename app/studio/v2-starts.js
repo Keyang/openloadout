@@ -73,11 +73,11 @@ export function v2StartsSection({ drafts, say }) {
   async function pick(row) {
     say(`Opening a copy of ${row.name}…`);
     let text;
-    // a library sprite's data file: its catalogue src, or sprites/<id>.json when the catalogue still names a code file (the migration renames them)
+    // a library sprite's data file: its catalogue src (sprites/<id>.json)
     const src = typeof row.src === 'string' && row.src.endsWith('.json') ? row.src : `sprites/${row.id}.json`;
     try {
       const r = await fetch(src);
-      if (r.status === 404) { say(`${row.name} is not a data file yet (its code file is redrawn as data by the migration), so the studio cannot open it.`); return; }
+      if (r.status === 404) { say(`${row.name} has no data file on this site (sprites/${row.id}.json is missing), so the studio cannot open it.`); return; }
       if (!r.ok) throw new Error(`${r.status}`);
       text = await r.text();
     } catch (e) { say(`${src} could not be read (${String(e?.message ?? e)}).`); return; }

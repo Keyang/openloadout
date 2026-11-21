@@ -13,7 +13,10 @@ import { whenMatches, whenValueHolds, WHEN_BOUNDS } from '../../engine/data-rule
 import { whenHolds, resolvePalette } from '../../engine/resolve.js';
 import { validateSprite, checkMaterialPiece } from '../../catalog/sprite-schema.js';
 import { dataSprite } from '../../engine/data-sprite.js';
-import { renderFrame, defineSprite, range, toggle, choice, inEffect, cueInEffect, activeParams, defaultParams } from '../../engine/sprite.js';
+import { renderFrame, defineSprite, range, toggle, choice, inEffect, cueInEffect, defaultParams } from '../../engine/sprite.js';
+
+// the keys of the controls in effect at these settings, in the order of sprite.params (what engine/sprite.js activeParams was, built from inEffect, the one rule)
+const activeParams = (sprite, p) => Object.keys(sprite.params).filter((k) => inEffect(sprite, k, p));
 
 const SOIL = '#7a5236', GRASS = '#5aa040';
 const WEAR = { key: 'wear', kind: 'range', label: 'Wear', lo: 'New', hi: 'Worn', default: 0.35 };

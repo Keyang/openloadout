@@ -2,7 +2,7 @@
 // a snow bank, flowstone), a puddle whose edge wobbles, bubbles that swell and burst on a liquid, and veins that
 // wander and fork. The shape functions are pure and return inside(px, py) tests for g.fill / g.blob; the drawing
 // functions draw on a Surface with hard pixel edges. No Math.random: the same arguments give the same pixels.
-// Added with batch S12 (sprites/tiles-hive.js and sprites/acid-pool.js, the worked examples).
+// Added with batch S12 (sprites/tiles-hive.json and sprites/acid-pool.json, the worked examples).
 //
 //   import { drawSoftWall, puddleIn, surfaceBubbles, drawVein } from '../engine/ooze.js';
 //
