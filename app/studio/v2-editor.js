@@ -31,6 +31,7 @@ import { layersEditor } from './v2-layers.js';
 import { slicePane } from './v2-slice-pane.js';
 import { particleEditor } from './v2-particles-pane.js';
 import { tilesPane } from './v2-tiles.js';
+import { handlesUi } from './v2-handles-ui.js';
 
 /** The tabs: their address word, key and name. */
 export const V2_MODES = Object.freeze([
@@ -217,6 +218,7 @@ export function v2EditorPage(app, { id, entry, drafts, kept, query = {}, studio 
     g.drawImage(pic, ox, oy, W * z, H * z);
     if (S.stale) { g.fillStyle = 'rgba(255,255,255,0.55)'; g.fillRect(ox, oy, W * z, H * z); }
     particles.drawOver(g, layout, sprite);
+    handles.drawOver(g, layout, sprite);
   }
   function zoomBy(n) {
     const b = card.getBoundingClientRect();
@@ -229,8 +231,12 @@ export function v2EditorPage(app, { id, entry, drafts, kept, query = {}, studio 
 
   // drag the picked item on the picture: its points move by whole sprite pixels; the change is kept when the press ends
   let liveSprite = null, drag = null;
+  // the anchor, and a rig's bones and IK ends, as handles on the picture (app/studio/v2-handles-ui.js)
+  const handles = handlesUi({ state: () => S, commit, say: (t) => say(t), drawStage: () => drawStage(), setLive: (sp) => { liveSprite = sp; drawStage(); }, canvas });
+  stageCol.insertBefore(handles.bar, under);
   canvas.addEventListener('pointerdown', (e) => {
     if (particles.pointerDown(e, layout)) return;
+    if (handles.pointerDown(e, layout)) return;
     if (!S.sel || !layout || S.stale) return;
     const item = M.getAt(S.def, keyPath(S.sel));
     if (!M.moveItem(item, 0, 0)) return;
@@ -337,7 +343,7 @@ export function v2EditorPage(app, { id, entry, drafts, kept, query = {}, studio 
   const foot = el('div', { class: 'rx-foot st-foot' }, savedBox, playBtn, toBagBtn, download, bagNote);
   const panel = el('section', { class: 'rx-panel studio-panel', 'aria-label': 'Change it' }, el('div', { class: 'tune' }, el('div', { class: 'tune-head' }, tabs), pane), sayLine, foot);
 
-  function setTab(t) { if (S.tab === t) return; S.tab = t; pane.scrollTop = 0; drawPane(); saveUrl(); }
+  function setTab(t) { if (S.tab === t) return; S.tab = t; pane.scrollTop = 0; drawPane(); drawStage(); saveUrl(); }
 
   let sayTimer = null;
   function say(text) {
