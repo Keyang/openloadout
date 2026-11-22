@@ -873,12 +873,13 @@ Every track is a patch with `"category": "music"`, built like `sounds/battle-the
 | `bpm` | Tempo | the track's range | The written tempo is the default; the checker detects it |
 | `key` | Key | -5 to 6 semitones | |
 | `bars` | Length | 8, 16, 24, 32 (`"step": 8`) | **Every track offers these four lengths.** A longer version builds up section by section (8 bars each) and its last section is the full band; it is never the short version repeated |
-| `inst` | Melody instrument | `"options"`, 5 names | **Every track offers these five, in this order: "Synth lead", "Flute", "Chiptune", "Bell", "Plucked string".** The specification gives the default. All five are level-matched by measurement |
+| `inst` | Melody instrument | `"options"`, 10 names | **Every track offers these ten, in this order: "Synth lead", "Flute", "Chiptune", "Bell", "Plucked string", "Guitar", "Piano", "Violin", "Trumpet", "Bass".** The first five were the whole rule until 2026-11-22, when the owner (Keyang) decided to append the other five; the old indices never move. The specification gives the default. All ten are level-matched by measurement. All ten are synthesiser sketches: a track's name, tags and description never promise real instruments or voices (docs/music-styles.md) |
+| `along` | Plays along | `"options"`, 6 names, default None | **Every track offers these six, in this order: "None", "Guitar", "Piano", "Violin", "Trumpet", "Bass"** (decided with the ten instruments, 2026-11-22). A second instrument plays under the tune: Guitar, Piano, Violin and Trumpet play the track's chords (`tonic`, `tr`, `third`, `fifth` from `chords()`), Bass plays the chord roots. It follows `key`, `bpm` and `bars`, is quieter at low `intensity`, is part of the melody bus `<id>F` (so the tune's layer and `bright` shape it) and is set 4 dB under the tune by `--match`, so turning it on makes the bus about 1.5 dB louder than the tune alone, never more than 3.5. Along the same as the melody instrument plays nothing (one set of nodes cannot play two parts, and a second copy of one voice would only double it): the melody instrument wins. Between `inst` and `bright` |
 | `bright` | Brightness | 0 to 1, default 0.6 | |
 | `space` | Room | 0 to 0.5, default 0.08 (the specification may ask for more room) | |
-| one or two more | | | The track's own: melody level `lead` (0 to 1, default 0.8), `swing` (label "Bounce" or as the specification says, default 0.35), `grit`. The defaults in this table are those of `tools/compose/thornwood_overworld.mjs`; a track keeps them unless its specification gives others |
+| one or two more | | | The track's own (at most two now that `along` is standard): melody level `lead` (0 to 1, default 0.8), `swing` (label "Bounce" or as the specification says, default 0.35), `grit`. The defaults in this table are those of `tools/compose/thornwood_overworld.mjs`; a track keeps them unless its specification gives others |
 
-At most 10 controls. Stereo, looping, `"wrap": true`. Three styles per track, named for game moments.
+At most 10 controls (the standard eight and one or two of the track's own). Stereo, looping, `"wrap": true`. Three styles per track, named for game moments.
 
 | Bundle | Track | Role | Tempo (range, default) | Key | Mood |
 |---|---|---|---|---|---|
@@ -893,7 +894,7 @@ Rules for every new track: one 16th-note clock drives everything; the chords the
 
 Also settled by the review of the music kit:
 
-- **The melody's range is at most two octaves**, and inside the playable range of each of the five instruments (see the kit's header).
+- **The melody's range is at most two octaves**, and inside the playable range of each of the ten instruments (see the kit's header; C4 to F#6 as written plays on all ten, Bass sounding an octave lower).
 - **The melody stays audible under every look.** A whole-bundle look may set `intensity` as low as 0.5 and raise the tempo by 5%; choose the track's intensity steps so the tune is still playing at 0.5, and check the top tempo plus 5%.
 - **The kit is `sound/compose.js`** (with `tools/compose/kit.mjs` as its command line), **and `tools/compose/thornwood_overworld.mjs` is the template**: copy it for a new track. The five tracks of the kits are `tools/compose/<track>.mjs`.
 - **The kit's convention** (the header of `sound/compose.js` states it in full): three kinds of building block, one way to call each. *The piece* (clock, chords, arrangement, bus, parameters) is called with what is written and options, and has no id; *rows* (drum rows, note rows, the melody) are called with an id, then the music itself, then options; *voices and effects* are called with an id and named options only, and the same option has the same name everywhere (`trig`, `pitch`, `input`, `attack`, `decay`...). A voice's finished sound is `<id>O`. Older spellings still work and are marked deprecated; write new tracks the new way.

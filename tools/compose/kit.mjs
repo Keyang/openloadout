@@ -13,7 +13,7 @@
 //                                                             node tools/compose/verify_music.mjs /tmp/try/<id>.json 16 intensity
 //                                                             node tools/compose/kit.mjs measure /tmp/try/<id>.json
 //   node tools/compose/<track>.mjs --dry       build and check the piece, print its summary, write nothing
-//   node tools/compose/<track>.mjs --match     measure the five melody instruments and print the gains that level them
+//   node tools/compose/<track>.mjs --match     measure the ten melody instruments and the five that play along, and print the gains that level them
 //   node tools/compose/<track>.mjs --measure   print the quick report: instrument, section, intensity and layer levels,
 //                                              in under a minute on a busy machine (low sample rates, one pass)
 //   node tools/compose/<track>.mjs --measure --full   the full report: every length and every instrument at 44.1 kHz
@@ -28,7 +28,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { KitError, lint, matchGains, report } from '../../sound/compose.js';
+import { ALONG, KitError, lint, matchGains, report } from '../../sound/compose.js';
 
 export * from '../../sound/compose.js';
 
@@ -36,7 +36,7 @@ const SOUNDS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '.
 const USAGE = `usage: node tools/compose/<track>.mjs [option]
   --out <file>   write the patch to this file (use a scratch folder to experiment)
   --dry          build and check the piece, print its summary, write nothing
-  --match        measure the five melody instruments and print the gains that level them
+  --match        measure the ten melody instruments and the five that play along, and print the gains that level them
   --measure      print instrument, section, intensity and layer levels, quickly (under a minute)
   --measure --full   the same from full renders of every length and instrument (minutes)
   --help         print this
@@ -74,7 +74,8 @@ export function run(build, args = [], { log = console.log, node = 'lF', layers }
     const m = matchGains(build, { node });
     log(`before: ${m.before.map((l) => `${l.name} ${l.db.toFixed(1)}`).join(' · ')} dB`);
     log(`after:  ${m.after.map((l) => `${l.name} ${l.db.toFixed(1)}`).join(' · ')} dB`);
-    log(`gains:  [${m.gains.join(', ')}]   <- write these in as the track's gains`);
+    if (m.along) log(`along:  ${m.along.after.map((l, i) => `${ALONG[i + 1]} ${l.db.toFixed(1)}`).join(' · ')} dB (the tune alone is ${m.along.lead.toFixed(1)} dB; aimed at ${m.along.target.toFixed(1)})`);
+    log(`gains:  [${m.gains.join(', ')}]   <- write these in as the track's gains (ten instruments, then five that play along)`);
     return { action: 'match', gains: m.gains };
   }
   const patch = build();

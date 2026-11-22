@@ -342,7 +342,7 @@ test('no shared state touched: the kit\'s shared values and instruments() are wh
   assert.equal(JSON.stringify(compose.instruments('l', { gains: [1, 0.8, 1, 1, 1.5] })), instrumentsBefore);
   for (const name of NAMES) probe(name);
   for (const k of SHARED) assert.deepEqual(compose[k], sharedBefore[k], `${k}, after building every probe`);
-  // a band only reads the five instruments: every probe offers the same five, in the same order
+  // a band only reads the ten instruments: every probe offers the same ten, in the same order
   for (const name of NAMES) assert.deepEqual(probe(name).patch.params.find((p) => p.id === 'inst').options, sharedBefore.INSTRUMENTS);
 });
 
@@ -418,12 +418,14 @@ test('vel reaches the lead: every band\'s lead plays quieter at vel 0.25 than at
 
 // ---- the slow ones: levels, distinctness, cost ---------------------------------------------------------------------------------
 
-test('the five melody instruments still level on every band, and each band\'s startGains are close to what is measured', () => {
+test('the ten melody instruments still level on every band, the five that play along sit 4 dB under the tune, and each band\'s startGains are close to what is measured', () => {
   for (const name of NAMES) {
     const B = band(name);
+    assert.equal(B.startGains.length, 15, `${name}: ten instruments, then five that play along`);
     const m = matchGains((g) => bandProbe(name, g).patch, { node: B.matchNode, start: B.startGains, together: true, bars: 4 });
     const dbs = m.after.map((l) => l.db), spread = Math.max(...dbs) - Math.min(...dbs);
-    assert.ok(spread <= 1, `${name}: after matching the five are ${spread.toFixed(2)} dB apart`);
+    assert.ok(spread <= 1, `${name}: after matching the ten are ${spread.toFixed(2)} dB apart`);
+    for (const l of m.along.after) assert.ok(Math.abs(l.db - m.along.target) <= 1, `${name}: ${l.name} plays along ${(l.db - m.along.target).toFixed(2)} dB from where it is aimed`);
     m.gains.forEach((g, i) => assert.ok(Math.abs(20 * Math.log10(g / B.startGains[i])) <= 1.5, `${name}: startGains[${i}] ${B.startGains[i]} is more than 1.5 dB from the ${g} measured now`));
   }
 });
@@ -530,7 +532,7 @@ test('mix: at full intensity the tune leads what plays beside it in 300 to 1200 
 });
 
 const TRACKS = ['thornwood-overworld', 'battle-theme', 'hearthvale-village', 'hearthvale-battle', 'derelict-run', 'derelict-boss'];
-test('node budget: at most 140 nodes, one reverb of its own at most, and no slower to render than the slowest existing track', () => {
+test('node budget: at most 200 nodes (the ten instruments and Plays along are 71 of them), one reverb of its own at most, and no slower to render than the slowest existing track', () => {
   // speed is per sample, so the first 1.5 s (rendered twice over, as a looped track is) stands for 8 bars. The tracks
   // and the probes take turns, three rounds, and each keeps its fastest render: a busy machine slows them all alike
   const patches = [...TRACKS.map((id) => [id, JSON.parse(fs.readFileSync(path.join(ROOT, 'sounds', `${id}.json`), 'utf8'))]), ...NAMES.map((n) => [n, probe(n).patch])];
@@ -543,7 +545,7 @@ test('node budget: at most 140 nodes, one reverb of its own at most, and no slow
   const ownReverbs = {};
   for (const name of NAMES) {
     const { patch } = probe(name);
-    assert.ok(patch.nodes.length <= 140, `${name}: ${patch.nodes.length} nodes`);
+    assert.ok(patch.nodes.length <= 200, `${name}: ${patch.nodes.length} nodes`);
     ownReverbs[name] = patch.nodes.filter((n) => n.type === 'reverb' && n.id !== 'rv').length;
     assert.ok(ownReverbs[name] <= 1, `${name}: ${ownReverbs[name]} reverbs of its own`);
     assert.ok(best[name] >= slowest, `${name}: renders at ${best[name].toFixed(2)} times real time, slower than the slowest track (${slowest.toFixed(2)}; ${TRACKS.map((id) => `${id} ${best[id].toFixed(2)}`).join(', ')})`);

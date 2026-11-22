@@ -95,12 +95,13 @@ test('a track written by the kit carries valid metadata in the file, so writing 
 
 test('the standard controls have the fixed ids, order and choices', () => {
   const p = tiny();
-  assert.deepEqual(p.params.map((q) => q.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'bright', 'space']);
+  assert.deepEqual(p.params.map((q) => q.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space']);
   const by = Object.fromEntries(p.params.map((q) => [q.id, q]));
   assert.deepEqual([by.bpm.min, by.bpm.max, by.bpm.default, by.bpm.unit], [100, 140, 120, 'bpm']);
   assert.deepEqual([by.key.min, by.key.max, by.key.default], [-5, 6, 0]);
   assert.deepEqual([by.bars.min, by.bars.max, by.bars.step, by.bars.default], [8, 32, 8, 8]);
-  assert.deepEqual(by.inst.options, ['Synth lead', 'Flute', 'Chiptune', 'Bell', 'Plucked string']);
+  assert.deepEqual(by.inst.options.slice(0, 5), ['Synth lead', 'Flute', 'Chiptune', 'Bell', 'Plucked string'], 'the first five never move');
+  assert.deepEqual(by.inst.options.slice(5), ['Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass']);
   assert.deepEqual(by.inst.options, INSTRUMENTS);
   assert.equal(by.inst.default, 1, 'the default instrument is given by name');
   assert.deepEqual([by.space.min, by.space.max], [0, 0.5]);
@@ -122,7 +123,7 @@ test('the length control sets the length in bars at the written tempo', () => {
 
 test('extra controls come after the standard ones and a track may have at most 10', () => {
   const p = tiny({ swing: true });
-  assert.deepEqual(p.params.map((q) => q.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'bright', 'space', 'swing']);
+  assert.deepEqual(p.params.map((q) => q.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'swing']);
   const four = ['a1', 'b1', 'c1', 'd1'].map((id) => ({ id, label: id, min: 0, max: 1, default: 0.5 }));
   assert.throws(() => tiny({ over: { extraParams: four } }), (e) => e instanceof KitError && /at most 10/.test(e.message));
 });
@@ -337,20 +338,20 @@ test('every instrument option renders sound, and each sounds different', () => {
     let sq = 0; for (const s of r.samples) sq += s * s;
     assert.ok(Math.sqrt(sq / r.samples.length) > 0.01, `${INSTRUMENTS[i]}: the whole mix is silent`);
   }
-  for (let i = 0; i < 5; i++) for (let j = i + 1; j < 5; j++) {
+  for (let i = 0; i < INSTRUMENTS.length; i++) for (let j = i + 1; j < INSTRUMENTS.length; j++) {
     let d = 0; for (let k = 0; k < renders[i].samples.length; k++) d += Math.abs(renders[i].samples[k] - renders[j].samples[k]);
     assert.ok(d / renders[i].samples.length > 1e-3, `${INSTRUMENTS[i]} and ${INSTRUMENTS[j]} render the same samples`);
   }
 });
 
-test('matchGains finds gains that put all five instruments within 1 dB of each other', () => {
+test('matchGains finds gains that put all ten instruments within 1 dB of each other', () => {
   const m = matchGains((gains) => tiny({ gains }), { node: 'lF', sampleRate: 11025, params: { bpm: 140 } });
-  assert.equal(m.gains.length, 5);
+  assert.equal(m.gains.length, 15, 'ten instruments, then the five that play along');
   assert.equal(m.gains[0], 1, 'the synth lead is the reference');
   const levels = measureInstruments(tiny({ gains: m.gains }), { node: 'lF', sampleRate: 11025, params: { bpm: 140 } });
   const dbs = levels.map((l) => l.db);
   assert.ok(Math.max(...dbs) - Math.min(...dbs) < 1, `spread ${(Math.max(...dbs) - Math.min(...dbs)).toFixed(2)} dB: ${dbs.map((d) => d.toFixed(1)).join(', ')}`);
-  assert.throws(() => instruments('l', { gains: [1, 1, 1] }), /five/);
+  assert.throws(() => instruments('l', { gains: [1, 1, 1] }), /ten/);
 });
 
 test('instruments: the flute borrows the piece\'s noise when it has one, and notes can be made longer', () => {
@@ -360,7 +361,8 @@ test('instruments: the flute borrows the piece\'s noise when it has one, and not
   assert.equal(shared.find((n) => n.id === 'lFlN').in, 'nz');
   const decay = (nodes) => nodes.find((n) => n.id === 'lA').decay;
   assert.ok(Math.abs(Number(decay(instruments('l', { length: 1.5 }))) / Number(decay(instruments('l'))) - 1.5) < 1e-6);
-  assert.deepEqual(instruments('m').slice(-2).map((n) => n.id), ['mIn', 'mF'], 'the last node is the melody bus');
+  assert.equal(instruments('m').find((n) => n.id === 'mF').in, 'mIn', 'the melody bus is <id>F, made from <id>In');
+  assert.equal(instruments('m').at(-1).id, 'mAl', 'the nodes of the appended instruments come last: <id>Al, the part that plays along, is the final one');
 });
 
 // ---- the bus --------------------------------------------------------------------------------------
