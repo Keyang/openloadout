@@ -118,6 +118,8 @@ export const ALONG = ['None', 'Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass'];
 export const DEFAULT_GAINS = [1, 0.8, 1, 1, 1.5, 1.6, 0.9, 1.3, 1.2, 1.4];
 /** Starting gains for the five instruments that can play along (Guitar, Piano, Violin, Trumpet, Bass). */
 export const DEFAULT_ALONG_GAINS = [1.1, 1.1, 1.1, 1.5, 1.8];
+/** The default of the `alongLevel` control ("Plays along volume"): the level matchGains sets, 4 dB under the tune. 1 is 4.4 dB louder (about equal to the tune), 0 is silent. */
+export const ALONG_LEVEL = 0.6;
 /** How far under the tune matchGains sets the player-along, in dB (RMS of the melody bus): with it on, the bus is about 1.5 dB louder than the tune alone. */
 export const ALONG_DB = -4;
 /** How far the Key control moves a tune, in semitones: [down, up]. */
@@ -174,12 +176,12 @@ export function param(id, label, min, max, dflt, extra = {}) {
 }
 
 /**
- * The eight controls every track has, with the fixed ids, in the fixed order (style guide, section 12).
- * Arguments: { tempo: [slowest, fastest, written], defaults: { intensity, key, bars, inst (a name), along (a name), bright, space } }.
+ * The nine controls every track has, with the fixed ids, in the fixed order (style guide, section 12).
+ * Arguments: { tempo: [slowest, fastest, written], defaults: { intensity, key, bars, inst (a name), along (a name), bright, space, alongLevel } }.
  */
 export function standardParams({ tempo, defaults = {} }) {
   if (!Array.isArray(tempo) || tempo.length !== 3 || !(tempo[0] < tempo[1]) || tempo[2] < tempo[0] || tempo[2] > tempo[1]) fail('tempo: give [slowest, fastest, written], for example [120, 156, 138]');
-  const d = { intensity: 0.8, key: 0, bars: 8, inst: INSTRUMENTS[0], along: ALONG[0], bright: 0.6, space: 0.2, ...defaults };
+  const d = { intensity: 0.8, key: 0, bars: 8, inst: INSTRUMENTS[0], along: ALONG[0], bright: 0.6, space: 0.2, alongLevel: ALONG_LEVEL, ...defaults };
   const inst = typeof d.inst === 'number' ? d.inst : INSTRUMENTS.indexOf(d.inst);
   if (!(inst >= 0 && inst < INSTRUMENTS.length)) fail(`defaults.inst: "${d.inst}" is not one of the ten melody instruments (${INSTRUMENTS.join(', ')})`);
   const along = typeof d.along === 'number' ? d.along : ALONG.indexOf(d.along);
@@ -194,6 +196,8 @@ export function standardParams({ tempo, defaults = {} }) {
     param('along', 'Plays along', 0, ALONG.length - 1, along, { options: [...ALONG] }),
     param('bright', 'Brightness', 0, 1, d.bright),
     param('space', 'Room', 0, 0.5, d.space),
+    // how loud the instrument that plays along is (assemble() puts it right after the track's own "Melody" slider when it has one)
+    param('alongLevel', 'Plays along volume', 0, 1, d.alongLevel),
   ];
 }
 
@@ -497,7 +501,7 @@ function splitGains(id, gains, alongGains) {
  * instrument it plays nothing: one set of nodes cannot play two parts at once, and two copies of one voice would only double it
  * (the melody instrument always wins; `along` does not move).
  * Along plays a bar of its own for each instrument (ALONG_PARTS above) on chord tones from chords() (it needs the nodes tonic, tr, third and
- * fifth), in the key the Key control sets and at the Speed control's tempo; it is quieter at low Intensity (0.55 at 0 up to 1 at 1),
+ * fifth), in the key the Key control sets and at the Speed control's tempo; it is quieter at low Intensity (0.55 at 0 up to 1 at 1), its own control `alongLevel` ("Plays along volume") scales it (0 silent, 0.6 as matched, 1 about equal to the tune),
  * and it is part of <id>F, so the tune's own layer (its section and intensity window), Brightness and level shape it too.
  * Returns nodes ending in <id>F: the chosen instrument through a low-pass that opens with `bright`. (<id>In is the
  * same before the filter; <id>Al is the along part alone, for measuring.)
@@ -563,7 +567,7 @@ export function instruments(id = 'l', { gains = DEFAULT_GAINS, alongGains, noise
   ]);
   const sel = `along < 1.5 ? ${gate1(0)} : along < 2.5 ? ${gate1(1)} : along < 3.5 ? ${gate1(2)} : along < 4.5 ? ${gate1(3)} : ${gate1(4)}`;
   const gp = '(0.003 - bright*0.0012)';   // the guitar's pick: a little longer than the plucked string's, so a little warmer
-  const strength = (k) => `(${role(k)} ? ${lead}*${g[5 + k]} : ${roleAlong(k)} ? ${id}AlV*${ga[k]}*(0.55 + 0.45*intensity) : 0)`;
+  const strength = (k) => `(${role(k)} ? ${lead}*${g[5 + k]} : ${roleAlong(k)} ? ${id}AlV*${ga[k]}*(0.55 + 0.45*intensity)*alongLevel/${ALONG_LEVEL} : 0)`;
   const out = (k, mix) => ({ id: `${id}${APPENDED[k]}O`, type: 'expr', expr: `(${mix})*${strength(k)}` });
   const [Gu, Pi, Vi, Tr, Ba] = APPENDED.map((X) => (s) => `${id}${X}${s}`);
   const extra = [
@@ -669,14 +673,18 @@ function checkRows(nodes) {
  *   meta         the asset's metadata (Contract 1), checked against catalog/schema.js: the patch always carries it
  *   tempo        [slowest, fastest, written]
  *   defaults     { intensity, bars, inst (a name), along (a name, default None), bright, space, key }
- *   extraParams  the track's own one or two controls (param(...)), placed after the standard eight
+ *   extraParams  the track's own one or two controls (param(...)), placed after the standard nine
  *   nodes        the helpers' results and your own nodes, in order; lists inside the list are flattened
  *   presets      three styles, named for game moments. Looks change tempo by up to 10% and clamp at the range, so
  *                keep a fast style 5% under the fastest tempo and a slow one 5% over the slowest
  */
 export function assemble({ id, name, description, tags, meta, tempo, defaults, extraParams = [], nodes, presets = {}, gain = 0.85, out = ['mL', 'mR'] } = {}) {
-  const params = [...standardParams({ tempo, defaults }), ...extraParams];
-  if (params.length > 10) fail(`${params.length} controls: a track has at most 10 (the standard eight and up to two of its own)`);
+  const std = standardParams({ tempo, defaults });
+  // the volume of the instrument that plays along sits right after the track's own "Melody" slider (id lead), where the two are read together
+  const at = extraParams.findIndex((q) => q.id === 'lead');
+  const level = std.pop();
+  const params = at >= 0 ? [...std, ...extraParams.slice(0, at + 1), level, ...extraParams.slice(at + 1)] : [...std, level, ...extraParams];
+  if (params.length > 11) fail(`${params.length} controls: a track has at most 11 (the standard nine and up to two of its own)`);
   const flat = (Array.isArray(nodes) ? nodes : []).flat(Infinity);
   if (!flat.length) fail('nodes: give the piece its nodes');
   for (const n of flat) if (!n || typeof n !== 'object' || typeof n.id !== 'string' || typeof n.type !== 'string') fail(`nodes: every entry needs an id and a type; got ${JSON.stringify(n)}`);
@@ -782,14 +790,14 @@ export function lockedDoublings(patch) {
 /** What the style guide (section 12) asks of a track and a patch lacks, as a list of sentences; empty is good. Arguments: patch. */
 export function lint(patch) {
   const out = [], ids = (patch.params || []).map((p) => p.id);
-  const want = ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space'];
+  const want = ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'alongLevel'];
   for (const id of want) if (!ids.includes(id)) out.push(`no "${id}" control: every track has ${want.join(', ')}`);
   const inst = (patch.params || []).find((p) => p.id === 'inst');
   if (inst && JSON.stringify(inst.options) !== JSON.stringify(INSTRUMENTS)) out.push(`the melody instruments must be these ten, in this order: ${INSTRUMENTS.join(', ')}`);
   const along = (patch.params || []).find((p) => p.id === 'along');
   if (along && JSON.stringify(along.options) !== JSON.stringify(ALONG)) out.push(`the choices of "along" must be these six, in this order: ${ALONG.join(', ')}`);
   if (along && along.default !== 0) out.push('"along" starts at None');
-  if (ids.length > 10) out.push(`${ids.length} controls: at most 10`);
+  if (ids.length > 11) out.push(`${ids.length} controls: at most 11`);
   const styles = Object.keys(patch.presets || {});
   if (styles.length !== 3) out.push(`${styles.length} style${styles.length === 1 ? '' : 's'}: a track has three styles, named for game moments`);
   if (!Array.isArray(patch.out)) out.push('mono: a track is stereo (out: [left, right])');
@@ -924,7 +932,8 @@ export function matchGains(build, opts = {}) {
   const leadNode = alongNode.replace(/Al$/, 'F');
   const lead = nodeLevel(probe, leadNode, { ...measureOpts, params: { ...(measureOpts.params || {}), inst: 0, along: 0 } }).db;
   const target = lead + ALONG_DB;
-  const levels = (patch) => measureInstruments(patch, { ...measureOpts, node: alongNode, param: 'along', params: { ...(measureOpts.params || {}), inst: 0 } }).slice(1);
+  const node = alongNode;
+  const levels = (patch) => measureInstruments(patch, { ...measureOpts, node, param: 'along', params: { ...(measureOpts.params || {}), inst: 0 } }).slice(1);
   const alongBefore = levels(probe);
   const alongGains = startAlong.map((g, k) => Number((g * 10 ** ((target - alongBefore[k].db) / 20)).toPrecision(3)));
   const done = [...gains, ...alongGains], final = build(done);
@@ -1026,10 +1035,10 @@ export function reportPlan(patch, { quick = false, layers } = {}) {
 }
 
 /** Adds the line for the instruments that play along (their level in <id>Al against the tune's in <id>F) to a report, when the patch has `along`. */
-function alongLine(lines, patch, node, opts) {
+function alongLine(lines, patch, opts) {
   if (!(patch.params || []).some((p) => p.id === 'along') || !patch.nodes.some((n) => n.id === 'lAl')) return;
-  const f = (x) => x.toFixed(1);
-  const along = measureInstruments(patch, { ...opts, node: 'lAl', param: 'along', params: { inst: 0 }, together: true }).slice(1);
+  const f = (x) => x.toFixed(1), node = 'lAl';
+  const along = measureInstruments(patch, { ...opts, node, param: 'along', params: { inst: 0 }, together: true }).slice(1);
   const lead = nodeLevel(patch, 'lF', { ...opts, params: { inst: 0, along: 0 } }).db;
   lines.push(`plays along (RMS of lAl, against ${f(lead)} dB for the tune alone; aim ${ALONG_DB} dB under it): ${along.map((l, i) => `${ALONG[i + 1]} ${f(l.db)} dB (${l.db - lead >= 0 ? '+' : ''}${f(l.db - lead)})`).join(' · ')}`);
 }
@@ -1042,7 +1051,7 @@ function quickReport(patch, { node, layers }) {
   const dbs = inst.map((l) => l.db), spread = Math.max(...dbs) - Math.min(...dbs);
   lines.push(`melody instruments (RMS of ${node}, 8 bars, all ten in one pass): ${inst.map((l) => `${l.name} ${f(l.db)} dB`).join(' · ')}`);
   lines.push(`  spread ${spread.toFixed(2)} dB ${spread <= 1 ? '(matched within 1 dB)' : '(NOT matched: run your generator with --match and paste the gains in)'}`);
-  alongLine(lines, patch, node, { ...QUICK.instruments });
+  alongLine(lines, patch, { ...QUICK.instruments });
   // sections: the 32-bar version once, from the start; shorter versions are its last sections
   const sr = QUICK.sections.sampleRate, longest = LENGTHS[LENGTHS.length - 1], count = longest / SECTION_BARS;
   const voice = createVoice(patch, { sampleRate: sr, params: { ...defaultParams(patch), bars: longest } });
@@ -1094,7 +1103,7 @@ export function report(patch, { node = 'lF', layers, quick = false } = {}) {
   lines.push(`  spread ${spread.toFixed(2)} dB ${spread <= 1 ? '(matched within 1 dB)' : '(NOT matched: run your generator with --match and paste the gains in)'}`);
   lines.push(`  peak over RMS: ${inst.map((l) => `${l.name} ${f(l.crestDb)} dB`).join(' · ')}`);
   lines.push(`  DC offset (share of RMS) and energy below 80 Hz: ${inst.map((l) => `${l.name} ${l.dc.toFixed(3)}, ${(l.sub80 * 100).toFixed(1)}%`).join(' · ')}`);
-  alongLine(lines, patch, node, {});
+  alongLine(lines, patch, {});
   const t0 = performance.now();
   const r8 = renderPatch(patch, { params: { ...defaultParams(patch), bars: LENGTHS[0] } });
   const ms = performance.now() - t0;

@@ -24,7 +24,7 @@ export const THRESHOLDS = {
   seamJump: 0.05,           // ...and the absolute jump must also exceed this to count as a click
   tempoTolerance: 2,        // detected tempo within this many bpm of written (or half / double)
   sameSeedDb: 0.2,          // seed 1 vs seed 2 below this: every play is identical
-  minControls: 3, maxControls: 7, maxMusicControls: 10,
+  minControls: 3, maxControls: 7, maxMusicControls: 11,
   nodeSeconds: 30,          // node-level peaks are measured over at most this long
 
   // ---- added 2026-11-18. Data: every patch in sounds/ that day: 56 effects, ambiences and jingles (211 looks: each default and each style) and 2 tracks ----

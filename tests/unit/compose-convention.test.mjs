@@ -188,7 +188,7 @@ test('the quick report plans under a minute of work at real-time speed, and the 
   assert.ok(K.reportPlan(slow, { quick: true, layers: { tune: 'lF' } }).cost <= 60);
 });
 
-test('measureInstruments together: one pass gives the numbers five passes give', () => {
+test('measureInstruments together: one pass gives the numbers ten passes give', () => {
   const p = piece([{ id: 'lHs', type: 'shaper', in: 'lF*0.55', drive: 2 }, { id: 'lX', type: 'expr', expr: 'lHs/0.7' }]);
   for (const node of ['lF', 'lX']) {
     const each = K.measureInstruments(p, { node, sampleRate: 22050, params: { bpm: 140 } });
@@ -197,7 +197,7 @@ test('measureInstruments together: one pass gives the numbers five passes give',
     for (let i = 0; i < each.length; i++) for (const k of ['db', 'peak', 'crestDb', 'sub80']) assert.ok(Math.abs(once[i][k] - each[i][k]) < 1e-6, `${node}, ${each[i].name}, ${k}: ${once[i][k]} against ${each[i][k]}`);
   }
   // a node the instrument choice does not reach is measured the old way
-  assert.equal(K.measureInstruments(p, { node: 'lVib', sampleRate: 8000, together: true }).length, 5);
+  assert.equal(K.measureInstruments(p, { node: 'lVib', sampleRate: 8000, together: true }).length, K.INSTRUMENTS.length);
 });
 
 test('the quick report says what a composer needs, and says it is the quick one', () => {

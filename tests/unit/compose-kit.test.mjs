@@ -95,7 +95,7 @@ test('a track written by the kit carries valid metadata in the file, so writing 
 
 test('the standard controls have the fixed ids, order and choices', () => {
   const p = tiny();
-  assert.deepEqual(p.params.map((q) => q.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space']);
+  assert.deepEqual(p.params.map((q) => q.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'alongLevel']);
   const by = Object.fromEntries(p.params.map((q) => [q.id, q]));
   assert.deepEqual([by.bpm.min, by.bpm.max, by.bpm.default, by.bpm.unit], [100, 140, 120, 'bpm']);
   assert.deepEqual([by.key.min, by.key.max, by.key.default], [-5, 6, 0]);
@@ -121,11 +121,11 @@ test('the length control sets the length in bars at the written tempo', () => {
   }
 });
 
-test('extra controls come after the standard ones and a track may have at most 10', () => {
+test('extra controls come after the standard ones and a track may have at most 11', () => {
   const p = tiny({ swing: true });
-  assert.deepEqual(p.params.map((q) => q.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'swing']);
+  assert.deepEqual(p.params.map((q) => q.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'alongLevel', 'swing']);
   const four = ['a1', 'b1', 'c1', 'd1'].map((id) => ({ id, label: id, min: 0, max: 1, default: 0.5 }));
-  assert.throws(() => tiny({ over: { extraParams: four } }), (e) => e instanceof KitError && /at most 10/.test(e.message));
+  assert.throws(() => tiny({ over: { extraParams: four } }), (e) => e instanceof KitError && /at most 11/.test(e.message));
 });
 
 test('assemble refuses a piece with bad metadata, a wrong style or a tempo too slow for 32 bars', () => {

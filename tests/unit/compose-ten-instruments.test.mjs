@@ -71,7 +71,7 @@ test('the ten instruments, in order: the old five did not move and five were app
 
 test('the standard controls: inst has ten options and "Plays along" follows it, starting at None', () => {
   const p = tiny();
-  assert.deepEqual(p.params.map((q) => q.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space']);
+  assert.deepEqual(p.params.map((q) => q.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'alongLevel']);
   const by = Object.fromEntries(p.params.map((q) => [q.id, q]));
   assert.deepEqual(by.inst.options, INSTRUMENTS);
   assert.deepEqual([by.inst.min, by.inst.max], [0, 9]);
@@ -157,6 +157,24 @@ test('turning Plays along on makes the melody bus louder than the tune alone by 
       assert.ok(withAlong - alone > 0.5 && withAlong - alone < 3.5, `${ALONG[along]} along ${INSTRUMENTS[inst]}: ${(withAlong - alone).toFixed(2)} dB over the tune`);
     }
   }
+});
+
+test('Plays along volume: 0 is silent, the default is the matched level (4 dB under the tune), 1 is about equal to the tune', () => {
+  const p = tiny(), by = Object.fromEntries(p.params.map((q) => [q.id, q]));
+  assert.equal(by.alongLevel.label, 'Plays along volume');
+  assert.deepEqual([by.alongLevel.min, by.alongLevel.max, by.alongLevel.default], [0, 1, 0.6]);
+  assert.equal(p.params.findIndex((q) => q.id === 'alongLevel'), p.params.findIndex((q) => q.id === 'space') + 1, 'a track without its own Melody slider has it after Room');
+  const at = (alongLevel, along = 3, inst = 0) => rms(trace(p, { inst, along, alongLevel, bpm: 140, intensity: 1 }, ['lAl'], 6)[0]);
+  assert.equal(at(0), 0, 'silent at 0');
+  const lead = rms(trace(p, { inst: 0, along: 0, bpm: 140 }, ['lF'], 6)[0]);
+  const db = (x) => 20 * Math.log10(x / lead);
+  const def = at(0.6), full = at(1);
+  assert.ok(Math.abs(def / full - 0.6) < 1e-6, 'it scales the volume in proportion');
+  assert.ok(db(def) < -1 && db(def) > -9, `default: ${db(def).toFixed(1)} dB against the tune`);
+  assert.ok(Math.abs(db(full)) < 3, `at 1: ${db(full).toFixed(1)} dB against the tune, about equal`);
+  assert.ok(Math.abs(rms(trace(p, { inst: 0, along: 0, alongLevel: 1, bpm: 140 }, ['lF'], 6)[0]) / lead - 1) < 1e-9, 'it does nothing while Plays along is None');
+  const gu = (l) => rms(trace(p, { inst: 0, along: 0, alongLevel: l, bpm: 140 }, ['lAl'], 2)[0]);
+  assert.equal(gu(1), 0);
 });
 
 test('Plays along at None adds nothing at all: its part is exactly zero', () => {

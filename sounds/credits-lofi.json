@@ -137,6 +137,13 @@
    "default": 0.8
   },
   {
+   "id": "alongLevel",
+   "label": "Plays along volume",
+   "min": 0,
+   "max": 1,
+   "default": 0.6
+  },
+  {
    "id": "swing",
    "label": "Swing",
    "min": 0,
@@ -1271,27 +1278,27 @@
   {
    "id": "lGuO",
    "type": "expr",
-   "expr": "(lGuD)*(inst == 5 ? lV*2.33 : along == 1 ? lAlV*0.733*(0.55 + 0.45*intensity) : 0)"
+   "expr": "(lGuD)*(inst == 5 ? lV*2.33 : along == 1 ? lAlV*0.733*(0.55 + 0.45*intensity)*alongLevel/0.6 : 0)"
   },
   {
    "id": "lPiO",
    "type": "expr",
-   "expr": "(lPiO1*lPiA + lPiO2*lPiB*0.5 + lPiO3*lPiB*0.22)*(inst == 6 ? lV*0.831 : along == 2 ? lAlV*1*(0.55 + 0.45*intensity) : 0)"
+   "expr": "(lPiO1*lPiA + lPiO2*lPiB*0.5 + lPiO3*lPiB*0.22)*(inst == 6 ? lV*0.831 : along == 2 ? lAlV*1*(0.55 + 0.45*intensity)*alongLevel/0.6 : 0)"
   },
   {
    "id": "lViO",
    "type": "expr",
-   "expr": "(lViF*lViA + nz*lViA*0.02)*(inst == 7 ? lV*1.26 : along == 3 ? lAlV*0.784*(0.55 + 0.45*intensity) : 0)"
+   "expr": "(lViF*lViA + nz*lViA*0.02)*(inst == 7 ? lV*1.26 : along == 3 ? lAlV*0.784*(0.55 + 0.45*intensity)*alongLevel/0.6 : 0)"
   },
   {
    "id": "lTrO",
    "type": "expr",
-   "expr": "(lTrF*lTrA + nz*lTrA*0.03)*(inst == 8 ? lV*1.2 : along == 4 ? lAlV*1.65*(0.55 + 0.45*intensity) : 0)"
+   "expr": "(lTrF*lTrA + nz*lTrA*0.03)*(inst == 8 ? lV*1.2 : along == 4 ? lAlV*1.65*(0.55 + 0.45*intensity)*alongLevel/0.6 : 0)"
   },
   {
    "id": "lBaO",
    "type": "expr",
-   "expr": "((lBaO1*0.8 + lBaF*0.45)*lBaA)*(inst == 9 ? lV*1.23 : along == 5 ? lAlV*1.5*(0.55 + 0.45*intensity) : 0)"
+   "expr": "((lBaO1*0.8 + lBaF*0.45)*lBaA)*(inst == 9 ? lV*1.23 : along == 5 ? lAlV*1.5*(0.55 + 0.45*intensity)*alongLevel/0.6 : 0)"
   },
   {
    "id": "lAl",

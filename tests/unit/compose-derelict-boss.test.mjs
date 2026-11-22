@@ -27,7 +27,7 @@ test('the chords: two bars of C minor, down to F minor and G minor, then a climb
 
 test('what stayed: key, tempo, controls, styles, length, instruments and metadata', () => {
   const by = Object.fromEntries(patch.params.map((p) => [p.id, p]));
-  assert.deepEqual(patch.params.map((p) => p.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'bright', 'space', 'lead', 'grit']);
+  assert.deepEqual(patch.params.map((p) => p.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'lead', 'alongLevel', 'grit']);
   assert.deepEqual([by.bpm.min, by.bpm.max, by.bpm.default], [150, 180, 164]);
   assert.equal(by.bars.default, 8);
   assert.deepEqual(by.inst.options, INSTRUMENTS);
