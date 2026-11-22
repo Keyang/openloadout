@@ -15,6 +15,7 @@
 import { defaultParams, cleanParams, randomParams, inEffect, partList, partRemoved } from '../engine/sprite.js';
 import { shownValue, controlWords } from '../sound/words.js';
 import { isChoice, choicesOf, toValue, toUnit, snap } from './sound-params.js';
+import { PAIRS } from '../sound/pairs.js';
 
 /** The Fine-tune tabs of a sprite, in order. Sounds and Look hold no controls of the sprite: the page fills them. */
 export const SPRITE_TABS = [
@@ -114,9 +115,18 @@ export function soundModel(patch) {
   const music = patch.category === 'music';
   const kept = (settings, version) => (music ? Object.fromEntries(defs.filter((d) => isChoice(d) && !(version.params && d.id in version.params) && settings.params?.[d.id] !== undefined).map((d) => [d.id, settings.params[d.id]])) : {});
   const lengths = (settings) => (music ? Object.fromEntries(defs.filter((d) => d.step && !d.options && settings.params?.[d.id] !== undefined).map((d) => [d.id, settings.params[d.id]])) : {});
+  // The classic pairs of a track that has the choices for them: a melody instrument and an instrument that plays along
+  // (sound/pairs.js), each as the two values to set together. A track without `along` (or with other names) has none.
+  const pairs = music && byId.inst?.options && byId.along?.options
+    ? PAIRS.filter((q) => byId.inst.options.includes(q.inst) && byId.along.options.includes(q.along))
+      .map((q) => ({ label: q.label, params: { inst: byId.inst.options.indexOf(q.inst), along: byId.along.options.indexOf(q.along) } }))
+    : [];
   return {
     kind: patch.category === 'music' ? 'music' : 'sound', tabs: withTabs(SOUND_TABS, controls({ params: def })),
     controls,
+    pairs,
+    setPair: (settings, pair) => put(settings, { ...settings.params, ...pair.params }),
+    pairOn: (settings, pair) => Object.entries(pair.params).every(([k, v]) => (settings.params[k] ?? def[k]) === v),
     // a slider hands in its place from 0 to 1, a choice its own value
     set: (settings, key, value) => put(settings, { ...settings.params, [key]: isChoice(byId[key]) ? clamp(byId[key], value) : toValue(byId[key], Number(value)) }),
     reset: (settings, key) => put(settings, { ...settings.params, [key]: def[key] }),

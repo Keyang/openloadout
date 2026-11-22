@@ -1,6 +1,7 @@
 // One music track (docs/site-design.md, section 5, "Sound, music"): the same two columns as a sprite (app/asset-shell.js).
 // Left: its name and line, a big play button and how long it is. Right: the editing panel (app/panel.js) with its
-// versions (its named styles first), its sliders and its choices (how long it is, which instrument leads) in tabs, and
+// versions (its named styles first), its sliders and its choices (how long it is, which instrument leads, which plays along) in tabs, the
+// classic pairs of instruments as one-tap chips under the play button, and
 // a look of its own (Look), and the download. It plays live, so a slider is heard while it moves. Every change is saved to the bag as it is made.
 import { el, header, saveBlob } from './ui.js';
 import { soundParams, renderAsync, playRendered, wavBytes, isChoice, lengthOf } from './audio.js';
@@ -75,6 +76,25 @@ export function musicPage(app, patch, query) {
   const byId = Object.fromEntries(patch.params.map((d) => [d.id, d]));
   model.controls = (s) => controlsOf(s).map((c) => (c.kind === 'choice' && byId[c.key].unit === 'bars'
     ? { ...c, options: c.options.map((o) => ({ ...o, label: `${secondsAt({ ...s.params, [c.key]: o.value })} seconds` })) } : c));
+
+  // The classic pairs (sound/pairs.js): one tap sets the melody instrument and the instrument that plays along together.
+  // Only a track that has both choices shows them. When the two are the same instrument nothing is added (the melody wins), and the page says so.
+  const pairNote = el('span', { class: 'hint', 'aria-live': 'polite' });
+  const pairButtons = model.pairs.map((q) => el('button', { type: 'button', class: 'chip', 'data-pair': q.label, onclick: () => pickPair(q) }, q.label));
+  const pairBox = pairButtons.length
+    ? el('div', { class: 'pairs' }, el('span', { class: 'hint' }, 'Pairs that go well together'), el('span', { class: 'chips', role: 'group', 'aria-label': 'Pairs that go well together' }, pairButtons), pairNote)
+    : null;
+  const syncPairs = () => {
+    if (!pairBox) return;
+    const s = now();
+    model.pairs.forEach((q, i) => pairButtons[i].setAttribute('aria-pressed', String(model.pairOn(s, q))));
+    const inst = byId.inst.options[s.params.inst], along = byId.along.options[s.params.along];
+    pairNote.textContent = along !== 'None' && along === inst ? `${inst} is already playing the tune, so playing along adds nothing. Pick another.` : '';
+  };
+  function pickPair(q) {
+    edit.set(model.setPair(now(), q));
+    say(`${q.label}: ${byId.inst.options[q.params.inst]} plays the tune and ${byId.along.options[q.params.along]} plays along.`);
+  }
 
   const lengthNote = el('span', { class: 'hint' });
   const syncLength = () => { lengthNote.textContent = `${secondsAt(heard().params)} seconds long, then it repeats.`; };
@@ -187,17 +207,17 @@ export function musicPage(app, patch, query) {
     onDownload: download, onCopyLink: copyLink,
     onMore: () => shell && shell.openMore(),
   });
-  const offEdit = edit.onChange(() => { look.sync(); push(); syncLength(); if (!urlTimer) saveUrl(); });
+  const offEdit = edit.onChange(() => { look.sync(); push(); syncLength(); syncPairs(); if (!urlTimer) saveUrl(); });
   const flush = () => edit.flush();
   window.addEventListener('pagehide', flush);
-  syncPlay(); syncLength();
+  syncPlay(); syncLength(); syncPairs();
   if (edit.inBag()) saveUrl();
 
   const card = el('div', { class: 'stage-card tile sound-card' },
     el('span', { class: 'sound-icon' }, icon(ICON.note, { size: 18 }), 'Music'),
     el('div', { class: 'stage-tools' }, el('div', { class: 'tools-left' }, playBtn, lengthNote)));
   const under = el('div', { class: 'sound-under' }, el('p', {}, 'Press Play, then move the sliders: the music changes while it plays, the way a game would change it during a fight.'));
-  shell = assetShell({ kind: 'music', id: patch.id, name: patch.name, line: patch.description ?? '', made, edit, stage: card, under: [under], panel });
+  shell = assetShell({ kind: 'music', id: patch.id, name: patch.name, line: patch.description ?? '', made, edit, stage: card, under: [pairBox, under].filter(Boolean), panel });
   // the bag, slim, as the page's third column: this music is marked in it while it is in the bag
   const tray = bagTray({ size: 'slim', current: { kind: 'music', id: patch.id, key: edit.key() } });
   const offTray = edit.onChange(() => tray.setCurrent({ kind: 'music', id: patch.id, key: edit.key() }));

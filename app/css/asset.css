@@ -63,6 +63,9 @@ canvas.stage { position: absolute; display: block; }
 .sound-card .tile-progress { transition: none; }
 .sound-under { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s4); font-size: 13px; color: var(--ink-2); min-height: 32px; }
 .sound-under p { margin: 0; }
+/* a track's classic pairs of instruments: the existing chips, a short label before them, a hint after when they cannot both play */
+.pairs { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); font-size: 13px; color: var(--ink-2); }
+.pairs .hint:empty { display: none; }
 
 /* "More like this": a sheet over the left column, opened from the panel's menu */
 .rx-more { position: absolute; inset: 0; z-index: 12; background: var(--paper); padding: var(--s5) var(--gutter); overflow: auto; display: grid; grid-template-columns: minmax(0, 1fr); align-content: start; gap: var(--s4); }
@@ -189,6 +192,8 @@ canvas.stage { position: absolute; display: block; }
   .part .chip { height: 26px; padding: 0 var(--s2); }
   .part + .part { margin-top: 2px; padding-top: 2px; }
   main.rx .ctl .chips { gap: 4px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+  /* a track's ten instruments and six ways to play along do not fit one row: they wrap, every one in view */
+  main.rx .ctl .chips[aria-label='Melody instrument'], main.rx .ctl .chips[aria-label='Plays along'] { flex-wrap: wrap; overflow: visible; }
   .pane-note { margin-bottom: var(--s2); }
 }
 
