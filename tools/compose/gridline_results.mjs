@@ -9,7 +9,7 @@
 //   on beat 4 of every second bar. "Bounce" swings the notes between the 8ths.
 //
 //   node tools/compose/gridline_results.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/gridline_results.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/gridline_results.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/gridline_results.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/gridline_results.mjs             when it is ready: write sounds/gridline-results.json
 import { param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main, band } from './kit.mjs';
@@ -17,7 +17,7 @@ import { param, clock, chords, arrangement, drumRow, noteRow, melody, instrument
 const B = band('synthwave');
 
 // Level of each melody instrument for this tune, measured after the band's echo (lcO).
-export const GAINS = [1, 0.806, 1.06, 1.01, 1.76];
+export const GAINS = [1, 0.806, 1.06, 1.01, 1.76, 1.59, 0.843, 1.33, 1.17, 1.35, 0.711, 0.914, 0.826, 1.62, 1.37];
 
 export const CHORDS = 'Eb Cm Gm Ab | Eb Cm Ab Bb';
 

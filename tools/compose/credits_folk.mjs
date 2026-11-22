@@ -10,7 +10,7 @@
 //   Slower than menu-folk (104), with a tune of long-short pairs that rests in the second half of most bars.
 //
 //   node tools/compose/credits_folk.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_folk.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_folk.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_folk.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_folk.mjs             when it is ready: write sounds/credits-folk.json
 import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -18,7 +18,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('folk');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.811, 0.995, 0.95, 1.51];
+export const GAINS = [1, 0.811, 0.995, 0.95, 1.51, 1.83, 0.845, 1.32, 1.21, 1.29, 1.02, 1.06, 0.948, 1.64, 1.62];
 
 export const CHORDS = 'D G A D | F#m Em Bm G';
 

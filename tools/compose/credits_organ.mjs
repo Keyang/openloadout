@@ -9,7 +9,7 @@
 //   bar 7 (D over A) resolves to C# in bar 8, and the A chord carries each pass back to D.
 //
 //   node tools/compose/credits_organ.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_organ.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_organ.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_organ.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_organ.mjs             when it is ready: write sounds/credits-organ.json
 import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -18,7 +18,7 @@ import { drawbarOrgan, rotary } from '../../sound/voices.js';
 const B = band('organ');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.773, 1.03, 0.962, 1.71];
+export const GAINS = [1, 0.773, 1.03, 0.962, 1.71, 2.29, 0.823, 1.2, 1.15, 1.32, 0.777, 0.915, 0.697, 1.53, 1.34];
 
 export const CHORDS = 'D Bm G D | Em G Asus4 A';
 

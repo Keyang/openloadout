@@ -9,7 +9,7 @@
 //   Slower than menu-steelpan (108), with longer tune notes: the tune holds where the menu loop skips.
 //
 //   node tools/compose/credits_steelpan.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_steelpan.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_steelpan.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_steelpan.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_steelpan.mjs             when it is ready: write sounds/credits-steelpan.json
 import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -17,7 +17,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('steelpan');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.802, 1.06, 0.996, 1.81];
+export const GAINS = [1, 0.802, 1.06, 0.996, 1.81, 1.99, 0.863, 1.25, 1.22, 1.36, 1.04, 1.09, 1.01, 1.71, 1.73];
 
 // The commas drop G and A an octave, so every root lies from G3 to F4: the comping, which plays from middle C plus
 // the root, stays below the tune instead of climbing into it on the G and Am bars.

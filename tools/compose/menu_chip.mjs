@@ -8,7 +8,7 @@
 //   top of Intensity a narrow-pulse counter-line (its duty switched note by note) answering in the tune's gaps.
 //
 //   node tools/compose/menu_chip.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/menu_chip.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/menu_chip.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/menu_chip.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/menu_chip.mjs             when it is ready: write sounds/menu-chip.json
 import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main, eightBars } from './kit.mjs';
@@ -16,7 +16,7 @@ import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('chip');
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.804, 1, 0.97, 1.5];
+export const GAINS = [1, 0.804, 1, 0.97, 1.5, 2.37, 0.857, 1.37, 1.18, 1.33, 1.09, 0.996, 1.18, 1.59, 1.64];
 
 export const CHORDS = 'D D Bb C | D G Bb A';
 

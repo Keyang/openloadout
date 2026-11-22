@@ -9,7 +9,7 @@
 //   Slower than menu-twang (112) and with longer notes: every tune bar ends on a held note, no dotted skip.
 //
 //   node tools/compose/credits_twang.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_twang.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_twang.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_twang.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_twang.mjs             when it is ready: write sounds/credits-twang.json
 import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main, eightBars } from './kit.mjs';
@@ -17,7 +17,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('twang');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.819, 1.05, 0.977, 1.74];
+export const GAINS = [1, 0.819, 1.05, 0.977, 1.74, 1.76, 0.871, 1.21, 1.16, 1.43, 0.918, 0.937, 0.897, 1.65, 1.48];
 
 // Roots within a fourth below and a fifth above A: D up a fourth, F# and E below, so the walking bass stays low.
 export const CHORDS = 'A D A F#m | D E A E';

@@ -9,7 +9,7 @@
 //   the very top of Intensity, a tom and a low metal hit on the bar turns.
 //
 //   node tools/compose/credits_darkambient.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_darkambient.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_darkambient.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_darkambient.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_darkambient.mjs             when it is ready: write sounds/credits-darkambient.json
 import { band, param, clock, chords, arrangement, drumRow, eightBars, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -17,7 +17,7 @@ import { band, param, clock, chords, arrangement, drumRow, eightBars, melody, in
 const B = band('darkambient');
 
 // Level of each melody instrument for this tune, through the band's echo colour (`--match` on lcO).
-export const GAINS = [1, 0.768, 1.05, 1.01, 1.73];
+export const GAINS = [1, 0.768, 1.05, 1.01, 1.73, 1.41, 0.823, 1.25, 1.15, 1.26, 0.709, 0.939, 0.686, 1.4, 1.39];
 
 export const CHORDS = 'Em C G D | Am C Esus4 E';
 

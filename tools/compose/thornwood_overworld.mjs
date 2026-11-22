@@ -6,13 +6,13 @@
 //   a thin pulse arpeggio, a three-piece drum kit, two pulses holding thirds, the tune, and its echo.
 //
 //   node tools/compose/thornwood_overworld.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/thornwood_overworld.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/thornwood_overworld.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/thornwood_overworld.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/thornwood_overworld.mjs             when it is ready: write sounds/thornwood-overworld.json
 import { param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.794, 1, 0.972, 1.5];
+export const GAINS = [1, 0.794, 1, 0.972, 1.5, 1.94, 0.859, 1.32, 1.14, 1.38, 0.962, 0.993, 1.21, 1.56, 1.66];
 
 export const CHORDS = 'G G C D | Em C D D';
 

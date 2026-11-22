@@ -9,7 +9,7 @@
 //   answers with a 16th tremolo in bars 4 and 8 while the strum is doubled an octave up. "Lilt" swings the 8th notes.
 //
 //   node tools/compose/hearthvale_overworld.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/hearthvale_overworld.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/hearthvale_overworld.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/hearthvale_overworld.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/hearthvale_overworld.mjs             when it is ready: write sounds/hearthvale-overworld.json
 import { param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main, eightBars, band, strum } from './kit.mjs';
@@ -17,7 +17,7 @@ import { param, clock, chords, arrangement, drumRow, noteRow, melody, instrument
 const B = band('folk');
 
 // Level of each melody instrument for this tune (`--match` on lF).
-export const GAINS = [1, 0.827, 1.04, 1.02, 1.92];
+export const GAINS = [1, 0.827, 1.04, 1.02, 1.92, 1.48, 0.89, 1.34, 1.19, 1.47, 0.797, 1.01, 1.02, 1.65, 1.54];
 
 export const CHORDS = 'D A Bm G | Em D F#m A';
 

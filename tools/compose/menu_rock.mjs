@@ -8,7 +8,7 @@
 //   squeals back in bars 4 and 8 with tom fills down the B chord into bar 1.
 //
 //   node tools/compose/menu_rock.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/menu_rock.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/menu_rock.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/menu_rock.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/menu_rock.mjs             when it is ready: write sounds/menu-rock.json
 import { param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main, eightBars, band, hatDrum, tomDrum } from './kit.mjs';
@@ -26,7 +26,7 @@ function tune(nodes, changes) {
 }
 
 // Level of each melody instrument for this tune, measured after the rock colour (`--match` on lcO).
-export const GAINS = [1, 0.728, 1.07, 1.05, 1.52];
+export const GAINS = [1, 0.728, 1.07, 1.05, 1.52, 1.81, 0.815, 1.32, 1.19, 1.29, 1.15, 1.06, 1.3, 1.69, 1.72];
 
 export const CHORDS = 'Em C D B | Em G A B';
 

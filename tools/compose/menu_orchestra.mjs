@@ -10,7 +10,7 @@
 //   strings' top sit in the 1-4 kHz presence band.
 //
 //   node tools/compose/menu_orchestra.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/menu_orchestra.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/menu_orchestra.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/menu_orchestra.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/menu_orchestra.mjs             when it is ready: write sounds/menu-orchestra.json
 import { band, brassSection, param, clock, chords, arrangement, drumRow, eightBars, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -18,7 +18,7 @@ import { band, brassSection, param, clock, chords, arrangement, drumRow, eightBa
 const B = band('orchestra');
 
 // Level of each melody instrument for this tune (`--match` on lF; the band has no colour after the melody bus).
-export const GAINS = [1, 0.805, 1.06, 1, 1.86];
+export const GAINS = [1, 0.805, 1.06, 1, 1.86, 1.81, 0.864, 1.26, 1.2, 1.41, 0.815, 0.948, 0.827, 1.41, 1.42];
 
 export const CHORDS = 'Bb Eb Gm F | Cm Eb Fsus4 F';
 

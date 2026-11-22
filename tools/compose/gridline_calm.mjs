@@ -8,7 +8,7 @@
 //   every beat and a gated snare; and at the top the band's own lead with its echo, answering in bars 4 and 8, and a clap.
 //
 //   node tools/compose/gridline_calm.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/gridline_calm.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/gridline_calm.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/gridline_calm.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/gridline_calm.mjs             when it is ready: write sounds/gridline-calm.json
 import { param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main, band } from './kit.mjs';
@@ -16,7 +16,7 @@ import { param, clock, chords, arrangement, drumRow, noteRow, melody, instrument
 const B = band('synthwave');
 
 // Level of each melody instrument for this tune, measured after the band's echo (lcO).
-export const GAINS = [1, 0.794, 1.06, 1, 1.97];
+export const GAINS = [1, 0.794, 1.06, 1, 1.97, 1.47, 0.832, 1.21, 1.18, 1.49, 0.642, 0.76, 0.728, 1.33, 1.13];
 
 export const CHORDS = 'Dm Bb Gm C | Dm Bb F A';
 

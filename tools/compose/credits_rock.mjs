@@ -11,7 +11,7 @@
 //   Slower than menu-rock (144, E minor) and major where that one is minor.
 //
 //   node tools/compose/credits_rock.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_rock.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_rock.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_rock.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_rock.mjs             when it is ready: write sounds/credits-rock.json
 import { param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main, eightBars, band, hatDrum, tomDrum } from './kit.mjs';
@@ -29,7 +29,7 @@ function tune(nodes, changes) {
 }
 
 // Level of each melody instrument for this tune, measured after the rock colour (`--match` on lcO).
-export const GAINS = [1, 0.737, 1.12, 0.999, 1.57];
+export const GAINS = [1, 0.737, 1.12, 0.999, 1.57, 1.79, 0.795, 1.23, 1.23, 1.34, 0.686, 0.846, 0.904, 1.31, 1.22];
 
 // G drops below the home note (G2), D and E sit above it (D3, E3).
 export const CHORDS = 'A D G D | A E G D';

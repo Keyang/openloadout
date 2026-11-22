@@ -84,14 +84,34 @@
    "id": "inst",
    "label": "Melody instrument",
    "min": 0,
-   "max": 4,
+   "max": 9,
    "default": 2,
    "options": [
     "Synth lead",
     "Flute",
     "Chiptune",
     "Bell",
-    "Plucked string"
+    "Plucked string",
+    "Guitar",
+    "Piano",
+    "Violin",
+    "Trumpet",
+    "Bass"
+   ]
+  },
+  {
+   "id": "along",
+   "label": "Plays along",
+   "min": 0,
+   "max": 5,
+   "default": 0,
+   "options": [
+    "None",
+    "Guitar",
+    "Piano",
+    "Violin",
+    "Trumpet",
+    "Bass"
    ]
   },
   {
@@ -658,7 +678,7 @@
   {
    "id": "lIn",
    "type": "expr",
-   "expr": "(inst < 0.5 ? (lO1*0.6 + lO2*0.5)*lA*1 : inst < 1.5 ? (lFlO1 + lFlO2*0.18 + lFlN*0.5)*lFlA*0.798 : inst < 2.5 ? (lChO1*0.6 + lChO2*0.22)*lChA*1.03 : inst < 3.5 ? lBeC*lBeA*0.984 : lPlD*1.55)*lV"
+   "expr": "(inst < 4.5 ? (inst < 0.5 ? (lO1*0.6 + lO2*0.5)*lA*1 : inst < 1.5 ? (lFlO1 + lFlO2*0.18 + lFlN*0.5)*lFlA*0.798 : inst < 2.5 ? (lChO1*0.6 + lChO2*0.22)*lChA*1.03 : inst < 3.5 ? lBeC*lBeA*0.984 : lPlD*1.55)*lV : inst < 5.5 ? lGuO : inst < 6.5 ? lPiO : inst < 7.5 ? lViO : inst < 8.5 ? lTrO : lBaO) + lAl"
   },
   {
    "id": "lF",
@@ -771,6 +791,338 @@
    "type": "shaper",
    "in": "(ctr + muR + rv*space*2)*0.9",
    "drive": 1
+  },
+  {
+   "id": "lAlGuG",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "X..xx.x.X..xx.x."
+  },
+  {
+   "id": "lAlGuK",
+   "type": "seq",
+   "trig": "c16",
+   "loop": true,
+   "steps": "0 _ _ 1 2 _ 1 _ 0 _ _ 1 2 _ 1 _"
+  },
+  {
+   "id": "lAlPiG",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "X.x.x.x.x.x.x.x."
+  },
+  {
+   "id": "lAlPiK",
+   "type": "seq",
+   "trig": "c16",
+   "loop": true,
+   "steps": "0 _ 2 _ 1 _ 2 _ 0 _ 2 _ 1 _ 2 _"
+  },
+  {
+   "id": "lAlViG",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "X...x...x...x..."
+  },
+  {
+   "id": "lAlViK",
+   "type": "seq",
+   "trig": "c16",
+   "loop": true,
+   "steps": "0 _ _ _ 1 _ _ _ 2 _ _ _ 1 _ _ _"
+  },
+  {
+   "id": "lAlTrG",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "X.....x...x....."
+  },
+  {
+   "id": "lAlTrK",
+   "type": "seq",
+   "trig": "c16",
+   "loop": true,
+   "steps": "0 _ _ _ _ _ 2 _ _ _ 1 _ _ _ _ _"
+  },
+  {
+   "id": "lAlBaG",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "X.....x...x....."
+  },
+  {
+   "id": "lAlBaK",
+   "type": "seq",
+   "trig": "c16",
+   "loop": true,
+   "steps": "0 _ _ _ _ _ 2 _ _ _ 0 _ _ _ _ _"
+  },
+  {
+   "id": "lAlSel",
+   "type": "expr",
+   "expr": "along < 1.5 ? lAlGuG : along < 2.5 ? lAlPiG : along < 3.5 ? lAlViG : along < 4.5 ? lAlTrG : lAlBaG"
+  },
+  {
+   "id": "lAlV",
+   "type": "sah",
+   "in": "lAlSel",
+   "trig": "lAlSel"
+  },
+  {
+   "id": "lGuTg",
+   "type": "expr",
+   "expr": "inst == 5 ? lG : along == 1 ? lAlGuG : 0"
+  },
+  {
+   "id": "lGuFq",
+   "type": "expr",
+   "expr": "inst == 5 ? lP : midi(50 + ((tonic + tr + (lAlGuK < 0.5 ? 0 : lAlGuK < 1.5 ? third : fifth) - 50) % 12))"
+  },
+  {
+   "id": "lGuX",
+   "type": "env",
+   "trig": "lGuTg",
+   "points": [
+    [
+     0,
+     0
+    ],
+    [
+     "(0.003 - bright*0.0012)*0.3",
+     1
+    ],
+    [
+     "(0.003 - bright*0.0012)*0.8",
+     -0.9
+    ],
+    [
+     "(0.003 - bright*0.0012)",
+     0
+    ]
+   ]
+  },
+  {
+   "id": "lGuC",
+   "type": "ad",
+   "trig": "lGuTg",
+   "attack": 0.0003,
+   "decay": 0.008,
+   "curve": 2
+  },
+  {
+   "id": "lGuP",
+   "type": "pluck",
+   "trig": 0,
+   "in": "lGuX + nz*lGuC*0.35",
+   "freq": "lGuFq",
+   "decay": "1.4",
+   "damp": "0.42 - bright*0.12"
+  },
+  {
+   "id": "lGuB",
+   "type": "filter",
+   "mode": "bp",
+   "in": "lGuP",
+   "freq": 210,
+   "q": 1.4
+  },
+  {
+   "id": "lGuD",
+   "type": "filter",
+   "mode": "hp",
+   "in": "lGuP + lGuB*0.7",
+   "freq": "lGuFq*0.5",
+   "q": 0.7
+  },
+  {
+   "id": "lPiTg",
+   "type": "expr",
+   "expr": "inst == 6 ? lG : along == 2 ? lAlPiG : 0"
+  },
+  {
+   "id": "lPiFq",
+   "type": "expr",
+   "expr": "inst == 6 ? lP : midi(53 + ((tonic + tr + (lAlPiK < 0.5 ? 0 : lAlPiK < 1.5 ? third : fifth) - 53) % 12))"
+  },
+  {
+   "id": "lPiA",
+   "type": "ad",
+   "trig": "lPiTg",
+   "attack": 0.004,
+   "hold": 0.01,
+   "decay": "inst == 6 ? 1 : 0.28",
+   "curve": 2.4
+  },
+  {
+   "id": "lPiB",
+   "type": "ad",
+   "trig": "lPiTg",
+   "attack": 0.003,
+   "decay": "inst == 6 ? 0.35 : 0.12",
+   "curve": 2
+  },
+  {
+   "id": "lPiO1",
+   "type": "osc",
+   "freq": "lPiFq"
+  },
+  {
+   "id": "lPiO2",
+   "type": "osc",
+   "freq": "lPiFq*2.003"
+  },
+  {
+   "id": "lPiO3",
+   "type": "osc",
+   "freq": "lPiFq*3.011"
+  },
+  {
+   "id": "lViTg",
+   "type": "expr",
+   "expr": "inst == 7 ? lG : along == 3 ? lAlViG : 0"
+  },
+  {
+   "id": "lViFq",
+   "type": "expr",
+   "expr": "inst == 7 ? lP : midi(57 + ((tonic + tr + (lAlViK < 0.5 ? 0 : lAlViK < 1.5 ? third : fifth) - 57) % 12))"
+  },
+  {
+   "id": "lViA",
+   "type": "ad",
+   "trig": "lViTg",
+   "attack": 0.07,
+   "hold": "inst == 7 ? 0.15 : 60/bpm*0.9 - 0.2",
+   "decay": "inst == 7 ? 0.35 : 0.12",
+   "curve": 1.3
+  },
+  {
+   "id": "lViO1",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "lViFq*(1 + lVib*0.011)"
+  },
+  {
+   "id": "lViO2",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "lViFq*1.0035*(1 + lVib*0.011)"
+  },
+  {
+   "id": "lViF",
+   "type": "filter",
+   "mode": "lp",
+   "in": "(lViO1 + lViO2)*0.5",
+   "freq": "lViFq*3 + 700",
+   "q": 1.1
+  },
+  {
+   "id": "lTrTg",
+   "type": "expr",
+   "expr": "inst == 8 ? lG : along == 4 ? lAlTrG : 0"
+  },
+  {
+   "id": "lTrFq",
+   "type": "expr",
+   "expr": "inst == 8 ? lP : midi(55 + ((tonic + tr + (lAlTrK < 0.5 ? 0 : lAlTrK < 1.5 ? third : fifth) - 55) % 12))"
+  },
+  {
+   "id": "lTrA",
+   "type": "ad",
+   "trig": "lTrTg",
+   "attack": 0.022,
+   "hold": "inst == 8 ? 0.1 : 0.07",
+   "decay": "inst == 8 ? 0.28 : 0.14",
+   "curve": 1.4
+  },
+  {
+   "id": "lTrO1",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "lTrFq*(1 + lVib*0.004)"
+  },
+  {
+   "id": "lTrO2",
+   "type": "osc",
+   "wave": "pulse",
+   "width": 0.4,
+   "freq": "lTrFq*1.003"
+  },
+  {
+   "id": "lTrF",
+   "type": "filter",
+   "mode": "lp",
+   "in": "lTrO1*0.55 + lTrO2*0.4",
+   "freq": "lTrFq*(1.6 + 6*lTrA)",
+   "q": 1.4
+  },
+  {
+   "id": "lBaTg",
+   "type": "expr",
+   "expr": "inst == 9 ? lG : along == 5 ? lAlBaG : 0"
+  },
+  {
+   "id": "lBaFq",
+   "type": "expr",
+   "expr": "inst == 9 ? lP*0.5 : midi(36 + ((tonic + tr + (lAlBaK < 0.5 ? 0 : lAlBaK < 1.5 ? third : fifth) - 36) % 12))"
+  },
+  {
+   "id": "lBaA",
+   "type": "ad",
+   "trig": "lBaTg",
+   "attack": 0.004,
+   "hold": "0.04",
+   "decay": "inst == 9 ? 0.5 : 0.3",
+   "curve": 2
+  },
+  {
+   "id": "lBaO1",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "lBaFq"
+  },
+  {
+   "id": "lBaO2",
+   "type": "osc",
+   "wave": "saw",
+   "freq": "lBaFq*1.002"
+  },
+  {
+   "id": "lBaF",
+   "type": "filter",
+   "mode": "lp",
+   "in": "lBaO2",
+   "freq": "lBaFq*(2 + 5*lBaA)",
+   "q": 1.2
+  },
+  {
+   "id": "lGuO",
+   "type": "expr",
+   "expr": "(lGuD)*(inst == 5 ? lV*1.77 : along == 1 ? lAlV*0.961*(0.55 + 0.45*intensity) : 0)"
+  },
+  {
+   "id": "lPiO",
+   "type": "expr",
+   "expr": "(lPiO1*lPiA + lPiO2*lPiB*0.5 + lPiO3*lPiB*0.22)*(inst == 6 ? lV*0.864 : along == 2 ? lAlV*0.958*(0.55 + 0.45*intensity) : 0)"
+  },
+  {
+   "id": "lViO",
+   "type": "expr",
+   "expr": "(lViF*lViA + nz*lViA*0.02)*(inst == 7 ? lV*1.33 : along == 3 ? lAlV*1.13*(0.55 + 0.45*intensity) : 0)"
+  },
+  {
+   "id": "lTrO",
+   "type": "expr",
+   "expr": "(lTrF*lTrA + nz*lTrA*0.03)*(inst == 8 ? lV*1.15 : along == 4 ? lAlV*1.54*(0.55 + 0.45*intensity) : 0)"
+  },
+  {
+   "id": "lBaO",
+   "type": "expr",
+   "expr": "((lBaO1*0.8 + lBaF*0.45)*lBaA)*(inst == 9 ? lV*1.4 : along == 5 ? lAlV*1.57*(0.55 + 0.45*intensity) : 0)"
+  },
+  {
+   "id": "lAl",
+   "type": "expr",
+   "expr": "along > 0.5 && along != inst - 4 ? (along < 1.5 ? lGuO : along < 2.5 ? lPiO : along < 3.5 ? lViO : along < 4.5 ? lTrO : lBaO) : 0"
   }
  ],
  "out": [

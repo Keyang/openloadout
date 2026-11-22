@@ -10,7 +10,7 @@
 //   and 8. Both halves stop on B, and the tune ends on D sharp, so the loop wants to start again.
 //
 //   node tools/compose/hearthvale_dungeon.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/hearthvale_dungeon.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/hearthvale_dungeon.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/hearthvale_dungeon.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/hearthvale_dungeon.mjs             when it is ready: write sounds/hearthvale-dungeon.json
 import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -19,7 +19,7 @@ import { rotary } from '../../sound/voices.js';
 const B = band('organ');
 
 // Level of each melody instrument for this tune, from `--match`. Run `--match` again after any change to the tune.
-export const GAINS = [1, 0.798, 1.05, 0.999, 2.02];
+export const GAINS = [1, 0.798, 1.05, 0.999, 2.02, 1.43, 0.847, 1.27, 1.16, 1.29, 0.586, 0.812, 0.664, 1.32, 1.12];
 
 export const CHORDS = 'Em C Am B | Em D C B';
 

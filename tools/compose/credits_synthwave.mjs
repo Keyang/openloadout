@@ -13,7 +13,7 @@
 //   tune of few, late, held notes.
 //
 //   node tools/compose/credits_synthwave.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_synthwave.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_synthwave.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_synthwave.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_synthwave.mjs             when it is ready: write sounds/credits-synthwave.json
 import { band, param, clock, chords, arrangement, drumRow, noteRow, eightBars, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -21,7 +21,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, eightBars, m
 const B = band('synthwave');
 
 // Level of each melody instrument for this tune, measured after the band's echo (lcO), from `--match`.
-export const GAINS = [1, 0.871, 1.02, 0.92, 2.68];
+export const GAINS = [1, 0.871, 1.02, 0.92, 2.68, 4.81, 1.44, 2.11, 1.95, 2.36, 0.722, 1.21, 1.06, 1.91, 1.56];
 
 // The apostrophes lift B an octave, so every root lies from C#2 to B2 in the bass (never the B a fourth below it,
 // which is too low to be heard on a small speaker) and the pad sits from C#3 to B3, under the tune.

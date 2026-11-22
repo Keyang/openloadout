@@ -7,7 +7,7 @@
 //   answers the tune in bars 4 and 8. "Lilt" swings the 8th notes.
 //
 //   node tools/compose/hearthvale_village.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/hearthvale_village.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/hearthvale_village.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/hearthvale_village.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/hearthvale_village.mjs             when it is ready: write sounds/hearthvale-village.json
 import {
@@ -17,7 +17,7 @@ import {
 
 // Level of each melody instrument for this tune, from `--match` (all five within 0.2 dB on the melody bus).
 // Run `--match` again after any change to the tune or to the instruments.
-export const GAINS = [1, 0.805, 1.04, 0.998, 2.05];
+export const GAINS = [1, 0.805, 1.04, 0.998, 2.05, 1.57, 0.865, 1.28, 1.15, 1.31, 0.721, 1.07, 0.96, 1.65, 1.4];
 
 export const CHORDS = 'F C Dm Bb | F Bb C F';
 

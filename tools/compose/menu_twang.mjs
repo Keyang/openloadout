@@ -7,7 +7,7 @@
 //   a brushed train beat, and low twang licks answering the tune at the top of the Intensity control.
 //
 //   node tools/compose/menu_twang.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/menu_twang.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/menu_twang.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/menu_twang.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/menu_twang.mjs             when it is ready: write sounds/menu-twang.json
 import { param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main, eightBars, band } from './kit.mjs';
@@ -15,7 +15,7 @@ import { param, clock, chords, arrangement, drumRow, noteRow, melody, instrument
 const B = band('twang');
 
 // Level of each melody instrument for this tune, measured after the spring colour (`--match` on lcO).
-export const GAINS = [1, 0.832, 1, 0.982, 1.58];
+export const GAINS = [1, 0.832, 1, 0.982, 1.58, 1.53, 0.867, 1.3, 1.18, 1.42, 1.1, 1.03, 1.06, 1.62, 1.69];
 
 export const CHORDS = 'E E A E | B A E B';
 

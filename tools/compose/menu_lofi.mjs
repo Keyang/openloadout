@@ -8,7 +8,7 @@
 //   a dusty kick, snare and hat, and at the top an electric-piano answer line. A tape finish on the whole mix.
 //
 //   node tools/compose/menu_lofi.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/menu_lofi.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/menu_lofi.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/menu_lofi.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/menu_lofi.mjs             when it is ready: write sounds/menu-lofi.json
 import { param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main, band, tape } from './kit.mjs';
@@ -16,7 +16,7 @@ import { param, clock, chords, arrangement, drumRow, noteRow, melody, instrument
 const B = band('lofi');
 
 // Level of each melody instrument for this tune, measured after the band's colour chain (lcO).
-export const GAINS = [1, 0.784, 1.07, 1.06, 1.67];
+export const GAINS = [1, 0.784, 1.07, 1.06, 1.67, 1.78, 0.835, 1.23, 1.18, 1.35, 0.699, 0.974, 0.804, 1.5, 1.46];
 
 export const CHORDS = 'Fm Bbm Eb Ab | Db Bbm C Fm';
 // The sevenths, in semitones above each bar's root: Fm7 Bbm7 Eb7 Abmaj7 | Dbmaj7 Bbm7 C7 Fm7.

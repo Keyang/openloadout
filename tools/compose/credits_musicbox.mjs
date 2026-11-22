@@ -8,7 +8,7 @@
 //   Intensity, a high tine echoing the tune's phrase-ends an octave up.
 //
 //   node tools/compose/credits_musicbox.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_musicbox.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_musicbox.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_musicbox.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_musicbox.mjs             when it is ready: write sounds/credits-musicbox.json
 import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -16,7 +16,7 @@ import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('musicbox');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.767, 1.06, 1.02, 2.02];
+export const GAINS = [1, 0.767, 1.06, 1.02, 2.02, 7.94, 0.827, 1.2, 1.15, 1.36, 0.983, 1.08, 0.818, 1.62, 1.63];
 
 export const CHORDS = 'Eb Ab Eb Bb | Cm Ab Bb Eb';
 

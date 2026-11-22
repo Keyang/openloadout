@@ -8,7 +8,7 @@
 //   of Intensity the band's own thin pulse answering the tune in bars 4 and 8 while the running notes go up an octave.
 //
 //   node tools/compose/gridline_title.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/gridline_title.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/gridline_title.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/gridline_title.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/gridline_title.mjs             when it is ready: write sounds/gridline-title.json
 import { param, band, chipArp, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -16,7 +16,7 @@ import { param, band, chipArp, clock, chords, arrangement, drumRow, noteRow, mel
 const B = band('chip');
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.798, 1.03, 0.984, 1.55];
+export const GAINS = [1, 0.798, 1.03, 0.984, 1.55, 1.77, 0.864, 1.33, 1.15, 1.4, 0.961, 0.958, 1.13, 1.54, 1.57];
 
 export const CHORDS = 'F Bb C Dm | Bb Gm Am C';
 

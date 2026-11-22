@@ -10,7 +10,7 @@
 //   whole mix. Slower and in a major key where menu-lofi (76 bpm, F minor) is a rainy-night minor.
 //
 //   node tools/compose/credits_lofi.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_lofi.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_lofi.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_lofi.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_lofi.mjs             when it is ready: write sounds/credits-lofi.json
 import { param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main, band, tape } from './kit.mjs';
@@ -18,7 +18,7 @@ import { param, clock, chords, arrangement, drumRow, noteRow, melody, instrument
 const B = band('lofi');
 
 // Level of each melody instrument for this tune, measured after the band's colour chain (`--match`).
-export const GAINS = [1, 0.785, 1.06, 1.08, 1.5];
+export const GAINS = [1, 0.785, 1.06, 1.08, 1.5, 2.33, 0.831, 1.26, 1.2, 1.23, 0.733, 1, 0.784, 1.65, 1.5];
 
 export const CHORDS = 'Db Fm Bbm Gb | Ebm Ab Db Ab';
 // The sevenths, in semitones above each bar's root: Dbmaj7 Fm7 Bbm7 Gbmaj7 | Ebm7 Ab7 Dbmaj7 Ab7.

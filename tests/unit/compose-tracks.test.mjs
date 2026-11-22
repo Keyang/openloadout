@@ -1,7 +1,8 @@
 // Every track written with the music kit is exactly what its generator writes, byte for byte, and tidying the kit
 // (sound/compose.js) never changes a track. The generators are found by looking in tools/compose/.
 //
-// PINNED below is the fingerprint of each track file. When a track is re-composed on purpose, write the new
+// PINNED below is the fingerprint of each track file. (All but battle-theme were re-composed on purpose on 2026-11-22: ten
+// melody instruments and Plays along, with new level-matched gains; with Plays along at None the old five sound the same sample for sample.) When a track is re-composed on purpose, write the new
 // fingerprint here in the same change (shasum sounds/<id>.json); when it changes and nobody meant it to, the kit
 // has changed what an existing track sounds like, which is a separate task with its own review (Contract 11).
 import test from 'node:test';
@@ -18,43 +19,43 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const sha = (file) => crypto.createHash('sha1').update(fs.readFileSync(file)).digest('hex');
 const PINNED = {
   'battle-theme': '36802491ffbadb1210706224429277c408204563',
-  'thornwood-overworld': '260bca1dec6a4df9d041eb5b8ca2cec0a76aebe5',
-  'hearthvale-village': 'd363f1e661b697661e7d9f5f0888f2da4f9ab7d2',
-  'hearthvale-battle': 'b95aa7dd53a8ebbe30753cf337c0f492975f6776',
-  'derelict-run': '20a37c0f28fa108337315ffe3d5bf846f4b248ea',
-  'derelict-boss': '50eef778098eb2d73e6f1a67d18347bf2d437de1',
+  'thornwood-overworld': 'bde5eda15ccf6261b4c88b97bacb202869cfb6ad',
+  'hearthvale-village': '9a9d1103a183e3af78796609b118690493d6264c',
+  'hearthvale-battle': 'f16871540dc4405bef7a5643d6247a075026ca3d',
+  'derelict-run': 'cbe78b273ebc082357f9d43a41675cf23d64583b',
+  'derelict-boss': 'f52f2bb5b82f4f2d4de016ee14795a18e6c93175',
   // core music, part 1 (menu themes in six of the twelve bands, docs/music-styles.md)
-  'menu-darkambient': '0d7bb309d27f80541dfb9b27baa6399d26120674',
-  'menu-lofi': '51a0aa6858074bf19cf39afda3b530d4ca344ea5',
-  'menu-musicbox': 'bcdd3b002c931d09a938d4465a5baf50f3856f7f',
-  'menu-organ': '0697edc6162c7d86ed1255f508c0bdb7e25de164',
-  'menu-steelpan': '99978cee655e3b2b29f8341c3f7e00b643a092ff',
-  'menu-twang': 'a0caff30aa8f8a8e1bc2b9b5d942be7a77d4b401',
+  'menu-darkambient': '160671d5e8a8530694cb3566d44ce79b7fd88ca0',
+  'menu-lofi': '366822705205fe1361bc1cf08452ffaaefee7136',
+  'menu-musicbox': 'cf897c0061b04be9020626e8b018928ede6c616e',
+  'menu-organ': '3cf099b0f91b8c1a2c1ed41685e680c46697d25f',
+  'menu-steelpan': 'b2bec79519ed5d4c5893181900e8d45c3c39d51c',
+  'menu-twang': '096431987c45d74a669b6da2b106908b1303401c',
   // core music, part 2 (menu themes in six more bands, credits themes in six)
-  'menu-chip': '525eba25036ac2766422d49f0b8e4604de184fd3',
-  'menu-synthwave': 'e56ce16132a67a9703cfaf2b798a535de58791fa',
-  'menu-orchestra': '6acb6f74de060e099ed0587352dcf07abdb54d66',
-  'menu-folk': '3ef8b9e135709dad146f28b62c967f9d8e8b4446',
-  'menu-rock': '80c2fb495a8143da70e7369204b58eddc8365ef5',
-  'menu-marimba': '24886b3b9181ac1e8130a0b194e9905073c6ec68',
-  'credits-musicbox': '2b9c27fd1bae80db0ed0836e0748bea3bcf9d937',
-  'credits-organ': 'c87835e3c29b8ab541d557e0420181776cc2cdaa',
-  'credits-steelpan': '9cfeeef4a7865f2b0069e81aad057fab5433458b',
-  'credits-lofi': '92f5cc64a279d159d57b51f9b9fd13a5898d97b7',
-  'credits-twang': 'f98903ae6165d4194f9fbc5879f7746fe5f9abd3',
-  'credits-darkambient': '92c0f382d481e4b658140054c13e67ad8926a036',  'credits-chip': '841b6dffd5e6a19476bf7827c081343a778adda2',
-  'credits-synthwave': 'a90ff8310292f721605ab3d1f2fd4247e7ad36fa',
-  'credits-orchestra': '3e24bda49beb77bfc8177efded5a8feef3e65811',
-  'credits-folk': '70e423303ffbdd840f462270e7e691e8a2ba5237',
-  'credits-rock': '0dcd577a96fbb4469b102b4bd03ff9e7ad1b3ef1',
-  'credits-marimba': '9e21c1f94fcb9f1c669309bd68203ca52cc29a17',
-  'gridline-title': '7282480335d1616898d1de16c813840dbbb176da',
-  'gridline-calm': '8e189350acb7b1c6946ffea5f8170ed04eaa1068',
-  'gridline-rush': '65fe4b36813704738168f72de8da5b67473f482f',
-  'gridline-results': '12a395876e4561df1bc412838b7cfbb98b569035',
-  'hearthvale-overworld': '99eddf4258f68c9e698b1e5eef5a847de44e29ef',
-  'hearthvale-dungeon': 'e1e5a935f7334fa75802872a1b219b661f2e31c9',
-  'hearthvale-cave': '55d5f608a2a5a2e8bbb1a96a8aa59eda1a971f5a',
+  'menu-chip': 'dbf8efd6050f2cc3392667a25713f568a27bee04',
+  'menu-synthwave': '8698da78b213ebb1ff1a10d55bb5067efd64380c',
+  'menu-orchestra': '1963001099dbba5a4d76147784f4b60253e3a755',
+  'menu-folk': '2ae57f058734856d2a041458c43fe60a08f24c33',
+  'menu-rock': '73208c64cf4b93fc92eccb089c19a59dac7d0079',
+  'menu-marimba': '45f6a65f790b50a496632fca06501ac64c6f07e3',
+  'credits-musicbox': '284b17c558864ec82c9f4859c4a8ec44764f5579',
+  'credits-organ': 'da475a814fea49e34daf4c0feecedeb79173a5d9',
+  'credits-steelpan': '7c1603e690f991304acf993b0a8e5c06bd1b435e',
+  'credits-lofi': '736b70c1c5a4ca15e89199f2030f2aac4e5a7dfb',
+  'credits-twang': '95004b287ce3cf124e44befb11ff20a1185f18d8',
+  'credits-darkambient': '05cf03592536154f60a6575866f2debe67b930be',  'credits-chip': 'a71466bef3e93a99ed1e4ca0291f4b04db986a37',
+  'credits-synthwave': 'ac1642f399d16395296558fbf015e29029932ba1',
+  'credits-orchestra': 'b12c00955454fc3543493f2e814ce1b96aa8ed45',
+  'credits-folk': '2a769b517af14fee6ae9e961338bbee5375c0bb5',
+  'credits-rock': '9c13088d5cfa1a8c1ce6c2a0511319faa46d2c0f',
+  'credits-marimba': '4ef38145d3cf7648e854eb6695ee9d485532354f',
+  'gridline-title': 'eea53115a18da860667073019c88ed0bfdff656e',
+  'gridline-calm': '57832e134b0d3b42e7ef64433edcd9ec2d8923d9',
+  'gridline-rush': 'bfec3c2b8ba913a42e20074f01b3fb511f1b0664',
+  'gridline-results': 'f94064aa4651c3d98246113006a4d132e9aef1af',
+  'hearthvale-overworld': '46d085c63efeb107aaff18794d1ae1cfa2e194cb',
+  'hearthvale-dungeon': 'baf964960ece2b00af55b39238979f9c67b80afc',
+  'hearthvale-cave': '81a09e94a94fd13a4cfa5a1fceb8a1838790b646',
 };
 
 const generators = fs.readdirSync(path.join(ROOT, 'tools', 'compose')).filter((f) => f.endsWith('.mjs') && /\bexport (?:function|const) build\b/.test(fs.readFileSync(path.join(ROOT, 'tools', 'compose', f), 'utf8'))).sort();
