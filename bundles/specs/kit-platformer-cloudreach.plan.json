@@ -1,0 +1,3195 @@
+{
+  "id": "kit-platformer-cloudreach",
+  "name": "Cloudreach precision platformer kit",
+  "gameType": "platformer",
+  "blurb": "Everything for a side-view precision platformer in the sky: a courier with an air dash, a pinwheel that refills it, six kinds of enemy and a boss, island, cloud and temple ground, spikes, moving, crumbling and falling blocks, wind socks and vents, a letter to find in every room, checkpoints, three backdrops, dash pips and level stamps, 32 sounds and five tracks.",
+  "theme": "fantasy",
+  "view": "side",
+  "size": {
+    "sprites": [
+      42,
+      50
+    ],
+    "sounds": [
+      28,
+      34
+    ],
+    "music": [
+      4,
+      5
+    ]
+  },
+  "palette": {
+    "name": "Cloudreach",
+    "colours": {
+      "ink": "#231b33",
+      "sky": "#86c8f2",
+      "dawn": "#f4c9a0",
+      "dusk": "#7e86d6",
+      "storm": "#4a5a82",
+      "cloud": "#f0ead8",
+      "mist": "#b9cfe6",
+      "chalk": "#d8d2c0",
+      "shale": "#8a8fa6",
+      "slate": "#56607e",
+      "turf": "#74b848",
+      "fern": "#3f8f5a",
+      "teak": "#a8703e",
+      "sail": "#e8d9a8",
+      "rope": "#c9a86a",
+      "brass": "#d89a3c",
+      "copper": "#b8663a",
+      "patina": "#4fae9a",
+      "hero": "#3f6fd1",
+      "crimson": "#c9423a",
+      "gold": "#f2c230",
+      "steel": "#c2c9d6",
+      "gust": "#4fd8ee",
+      "squall": "#7a4fc4",
+      "rose": "#e2709a",
+      "skin": "#f6d3b0"
+    }
+  },
+  "sprites": [
+    {
+      "id": "cloud-courier",
+      "name": "Courier",
+      "type": "character",
+      "role": "characters/player",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        28,
+        58
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "run",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "jump",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "dodge",
+          "frames": 8,
+          "loop": false,
+          "label": "Air dash"
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "scarf",
+        "headgear",
+        "pack",
+        "hair"
+      ],
+      "reuse": false,
+      "batch": "CR1"
+    },
+    {
+      "id": "wizard",
+      "name": "Wizard",
+      "type": "character",
+      "role": "characters/player",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        28,
+        58
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true,
+          "label": "Walk"
+        },
+        {
+          "name": "run",
+          "frames": 8,
+          "loop": true,
+          "label": "Run"
+        },
+        {
+          "name": "jump",
+          "frames": 8,
+          "loop": false,
+          "label": "Jump"
+        },
+        {
+          "name": "cast",
+          "frames": 8,
+          "loop": false,
+          "label": "Cast"
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false,
+          "label": "Hurt"
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false,
+          "label": "Die"
+        },
+        {
+          "name": "victory",
+          "frames": 8,
+          "loop": true,
+          "label": "Victory"
+        },
+        {
+          "name": "talk",
+          "frames": 8,
+          "loop": true,
+          "label": "Talk"
+        }
+      ],
+      "parts": [
+        "weapon",
+        "headgear",
+        "beard"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "gust-toad",
+      "name": "Gust toad",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "hop",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false,
+          "label": "Blow"
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "horns"
+      ],
+      "reuse": false,
+      "batch": "CR1"
+    },
+    {
+      "id": "kite-ray",
+      "name": "Kite ray",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        64,
+        48
+      ],
+      "pivot": [
+        32,
+        24
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Glide"
+        },
+        {
+          "name": "dive",
+          "frames": 6,
+          "loop": false,
+          "label": "Dip"
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false
+        }
+      ],
+      "parts": [
+        "tail"
+      ],
+      "reuse": false,
+      "batch": "CR1"
+    },
+    {
+      "id": "crow-scout",
+      "name": "Crow scout",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Hover"
+        },
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true,
+          "label": "Fly"
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false,
+          "label": "Dive"
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false,
+          "label": "Hurt"
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false,
+          "label": "Die"
+        }
+      ],
+      "parts": [
+        "held"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "thicket-imp",
+      "name": "Thicket imp",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Hover"
+        },
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true,
+          "label": "Fly"
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false,
+          "label": "Claw"
+        },
+        {
+          "name": "cast",
+          "frames": 8,
+          "loop": false,
+          "label": "Hex"
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false,
+          "label": "Hurt"
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false,
+          "label": "Die"
+        }
+      ],
+      "parts": [
+        "wings",
+        "horns",
+        "tail"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "spore-hopper",
+      "name": "Spore hopper",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "hop",
+          "frames": 8,
+          "loop": true,
+          "label": "Hop"
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false,
+          "label": "Spore puff"
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false,
+          "label": "Hurt"
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false,
+          "label": "Die"
+        }
+      ],
+      "parts": [
+        "ruff"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "thorn-beetle",
+      "name": "Thorn beetle",
+      "type": "creature",
+      "role": "characters/enemy",
+      "view": "side",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        42
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "walk",
+          "frames": 8,
+          "loop": true,
+          "label": "Walk"
+        },
+        {
+          "name": "attack",
+          "frames": 8,
+          "loop": false,
+          "label": "Horn jab"
+        },
+        {
+          "name": "block",
+          "frames": 6,
+          "loop": false,
+          "label": "Curl up"
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false,
+          "label": "Hurt"
+        },
+        {
+          "name": "die",
+          "frames": 8,
+          "loop": false,
+          "label": "Die"
+        }
+      ],
+      "parts": [
+        "horns"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ember-wyrm",
+      "name": "Ember wyrm",
+      "type": "creature",
+      "role": "characters/boss",
+      "view": "side",
+      "frame": [
+        128,
+        96
+      ],
+      "pivot": [
+        56,
+        90
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "attack",
+          "frames": 12,
+          "loop": false,
+          "label": "Bite"
+        },
+        {
+          "name": "breath",
+          "frames": 12,
+          "loop": false,
+          "label": "Fire breath"
+        },
+        {
+          "name": "buffet",
+          "frames": 10,
+          "loop": false,
+          "label": "Wing buffet"
+        },
+        {
+          "name": "hurt",
+          "frames": 4,
+          "loop": false,
+          "label": "Hurt"
+        },
+        {
+          "name": "die",
+          "frames": 12,
+          "loop": false,
+          "label": "Die"
+        }
+      ],
+      "parts": [
+        "wings",
+        "horns",
+        "tail"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "tiles-skyisle",
+      "name": "Sky island ground",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "turf-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-strip-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-strip-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-strip-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-col-t",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-col-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-col-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-single",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-thin-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-thin-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-thin-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-slope-up",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-slope-down",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "turf-deco-a",
+          "frames": 1,
+          "loop": true,
+          "label": "Grass tuft"
+        },
+        {
+          "name": "turf-deco-b",
+          "frames": 1,
+          "loop": true,
+          "label": "Wind flowers"
+        },
+        {
+          "name": "turf-deco-c",
+          "frames": 1,
+          "loop": true,
+          "label": "Hanging roots"
+        },
+        {
+          "name": "turf-deco-d",
+          "frames": 1,
+          "loop": true,
+          "label": "Rock points"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CT1"
+    },
+    {
+      "id": "tiles-cloudbank",
+      "name": "Cloud tiles",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "cloud-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-strip-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-strip-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-strip-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-col-t",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-col-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-col-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-single",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-thin-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-thin-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-thin-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "cloud-deco-a",
+          "frames": 1,
+          "loop": true,
+          "label": "Curl"
+        },
+        {
+          "name": "cloud-deco-b",
+          "frames": 1,
+          "loop": true,
+          "label": "Hollow"
+        },
+        {
+          "name": "wisp-thin-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wisp-thin-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "wisp-thin-r",
+          "frames": 1,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CT1"
+    },
+    {
+      "id": "tiles-windtemple",
+      "name": "Wind temple stone",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "marble-left",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-top",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-right",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-side-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-side-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-bottom-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-bottom",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-bottom-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-inner-tl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-inner-tr",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-inner-bl",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-inner-br",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-strip-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-strip-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-strip-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-col-t",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-col-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-col-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-single",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-thin-l",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-thin-m",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-thin-r",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "marble-deco-a",
+          "frames": 1,
+          "loop": true,
+          "label": "Crack"
+        },
+        {
+          "name": "marble-deco-b",
+          "frames": 1,
+          "loop": true,
+          "label": "Patina streak"
+        },
+        {
+          "name": "nave-fill",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "nave-fill-b",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "nave-fill-c",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "column-cap",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "column-mid",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "column-foot",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "flute-window",
+          "frames": 1,
+          "loop": true,
+          "label": "Wind slot"
+        },
+        {
+          "name": "gate-l",
+          "frames": 1,
+          "loop": true,
+          "label": "Gateway, left half"
+        },
+        {
+          "name": "gate-r",
+          "frames": 1,
+          "loop": true,
+          "label": "Gateway, right half"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CT1"
+    },
+    {
+      "id": "tiles-platforms",
+      "name": "Wooden platforms and ladders",
+      "type": "tileset",
+      "role": "world/platform",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "plank-thin-l",
+          "frames": 1,
+          "loop": true,
+          "label": "Platform: left end"
+        },
+        {
+          "name": "plank-thin-m",
+          "frames": 1,
+          "loop": true,
+          "label": "Platform: middle"
+        },
+        {
+          "name": "plank-thin-r",
+          "frames": 1,
+          "loop": true,
+          "label": "Platform: right end"
+        },
+        {
+          "name": "ladder-cap",
+          "frames": 1,
+          "loop": true,
+          "label": "Ladder: top end"
+        },
+        {
+          "name": "ladder-mid",
+          "frames": 1,
+          "loop": true,
+          "label": "Ladder: middle"
+        },
+        {
+          "name": "ladder-foot",
+          "frames": 1,
+          "loop": true,
+          "label": "Ladder: bottom end"
+        },
+        {
+          "name": "vine-cap",
+          "frames": 1,
+          "loop": true,
+          "label": "Vine: top end"
+        },
+        {
+          "name": "vine-mid",
+          "frames": 1,
+          "loop": true,
+          "label": "Vine: middle"
+        },
+        {
+          "name": "vine-foot",
+          "frames": 1,
+          "loop": true,
+          "label": "Vine: bottom end"
+        },
+        {
+          "name": "post-cap",
+          "frames": 1,
+          "loop": true,
+          "label": "Post: top end"
+        },
+        {
+          "name": "post-mid",
+          "frames": 1,
+          "loop": true,
+          "label": "Post: middle"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "tiles-water",
+      "name": "Water and waterfalls",
+      "type": "tileset",
+      "role": "world/tile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "water-top",
+          "frames": 8,
+          "loop": true,
+          "label": "Pool: surface"
+        },
+        {
+          "name": "water-fill",
+          "frames": 8,
+          "loop": true,
+          "label": "Pool: body"
+        },
+        {
+          "name": "water-fill-b",
+          "frames": 8,
+          "loop": true,
+          "label": "Pool: body, version B"
+        },
+        {
+          "name": "water-fill-c",
+          "frames": 8,
+          "loop": true,
+          "label": "Pool: body, version C"
+        },
+        {
+          "name": "fall-top",
+          "frames": 8,
+          "loop": true,
+          "label": "Waterfall: top"
+        },
+        {
+          "name": "fall-fill",
+          "frames": 8,
+          "loop": true,
+          "label": "Waterfall: falling water"
+        },
+        {
+          "name": "fall-foot",
+          "frames": 8,
+          "loop": true,
+          "label": "Waterfall: foot"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "moving-platform",
+      "name": "Moving platform",
+      "type": "prop",
+      "role": "world/platform",
+      "view": "side",
+      "frame": [
+        64,
+        32
+      ],
+      "pivot": [
+        32,
+        8
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "move",
+          "frames": 8,
+          "loop": true,
+          "label": "Move"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "crumble-block",
+      "name": "Crumbling block",
+      "type": "prop",
+      "role": "world/platform",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "shake",
+          "frames": 6,
+          "loop": true,
+          "label": "Shake"
+        },
+        {
+          "name": "break",
+          "frames": 8,
+          "loop": false,
+          "label": "Break"
+        },
+        {
+          "name": "respawn",
+          "frames": 6,
+          "loop": false,
+          "label": "Grow back"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "spring-pad",
+      "name": "Spring pad",
+      "type": "prop",
+      "role": "world/platform",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "bounce",
+          "frames": 8,
+          "loop": false,
+          "label": "Bounce"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "spike-trap",
+      "name": "Spike trap",
+      "type": "prop",
+      "role": "world/hazard",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true,
+          "label": "Out"
+        },
+        {
+          "name": "retract",
+          "frames": 6,
+          "loop": false,
+          "label": "Retract"
+        },
+        {
+          "name": "warn",
+          "frames": 4,
+          "loop": true,
+          "label": "Warn"
+        },
+        {
+          "name": "attack",
+          "frames": 6,
+          "loop": false,
+          "label": "Extend"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "checkpoint-banner",
+      "name": "Checkpoint banner",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        32,
+        64
+      ],
+      "pivot": [
+        16,
+        62
+      ],
+      "clips": [
+        {
+          "name": "down",
+          "frames": 1,
+          "loop": true,
+          "label": "Inactive"
+        },
+        {
+          "name": "raise",
+          "frames": 8,
+          "loop": false,
+          "label": "Raise"
+        },
+        {
+          "name": "up",
+          "frames": 8,
+          "loop": true,
+          "label": "Active"
+        }
+      ],
+      "parts": [
+        "emblem"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "signpost",
+      "name": "Signpost",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "wobble",
+          "frames": 6,
+          "loop": false,
+          "label": "Wobble"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "wooden-door",
+      "name": "Wooden door",
+      "type": "prop",
+      "role": "world/door",
+      "view": "side",
+      "frame": [
+        48,
+        64
+      ],
+      "pivot": [
+        24,
+        62
+      ],
+      "clips": [
+        {
+          "name": "closed",
+          "frames": 1,
+          "loop": true,
+          "label": "Closed"
+        },
+        {
+          "name": "open",
+          "frames": 6,
+          "loop": false,
+          "label": "Open"
+        },
+        {
+          "name": "locked",
+          "frames": 4,
+          "loop": false,
+          "label": "Locked"
+        }
+      ],
+      "parts": [
+        "lock"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "falling-slab",
+      "name": "Falling slab",
+      "type": "prop",
+      "role": "world/platform",
+      "view": "side",
+      "frame": [
+        64,
+        48
+      ],
+      "pivot": [
+        32,
+        46
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "shake",
+          "frames": 6,
+          "loop": false,
+          "label": "About to fall"
+        },
+        {
+          "name": "fall",
+          "frames": 8,
+          "loop": true,
+          "label": "Falling"
+        },
+        {
+          "name": "land",
+          "frames": 6,
+          "loop": false,
+          "label": "Land"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CP1"
+    },
+    {
+      "id": "wind-sock",
+      "name": "Wind sock",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        60
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Calm"
+        },
+        {
+          "name": "fill",
+          "frames": 6,
+          "loop": false,
+          "label": "Wind rising"
+        },
+        {
+          "name": "full",
+          "frames": 8,
+          "loop": true,
+          "label": "Blowing"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CP1"
+    },
+    {
+      "id": "gust-vent",
+      "name": "Wind vent",
+      "type": "prop",
+      "role": "world/hazard",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Blowing"
+        },
+        {
+          "name": "stop",
+          "frames": 6,
+          "loop": false,
+          "label": "Die down"
+        },
+        {
+          "name": "off",
+          "frames": 8,
+          "loop": true,
+          "label": "Still"
+        },
+        {
+          "name": "warn",
+          "frames": 8,
+          "loop": true,
+          "label": "About to blow"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CP1"
+    },
+    {
+      "id": "post-box",
+      "name": "Post box",
+      "type": "prop",
+      "role": "world/prop",
+      "view": "side",
+      "frame": [
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Waiting"
+        },
+        {
+          "name": "deliver",
+          "frames": 8,
+          "loop": false,
+          "label": "Letter delivered"
+        },
+        {
+          "name": "full",
+          "frames": 8,
+          "loop": true,
+          "label": "Delivered"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CP1"
+    },
+    {
+      "id": "gust-pinwheel",
+      "name": "Dash pinwheel",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false
+        },
+        {
+          "name": "spent",
+          "frames": 8,
+          "loop": true,
+          "label": "Used up"
+        },
+        {
+          "name": "respawn",
+          "frames": 6,
+          "loop": false,
+          "label": "Grow back"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CP2"
+    },
+    {
+      "id": "scroll",
+      "name": "Scroll",
+      "type": "pickup",
+      "role": "items/key",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false,
+          "label": "Collect"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "star-charm",
+      "name": "Star charm",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false,
+          "label": "Collect"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "gold-key",
+      "name": "Key",
+      "type": "pickup",
+      "role": "items/key",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false,
+          "label": "Collect"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "power-orb",
+      "name": "Power orb",
+      "type": "pickup",
+      "role": "items/pickup",
+      "view": "front",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 8,
+          "loop": true,
+          "label": "Idle"
+        },
+        {
+          "name": "collect",
+          "frames": 8,
+          "loop": false,
+          "label": "Collect"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "icons-postmarks",
+      "name": "Postmark icons",
+      "type": "icon",
+      "role": "interface/icon",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "isle",
+          "frames": 1,
+          "loop": true,
+          "label": "Island level"
+        },
+        {
+          "name": "harbour",
+          "frames": 1,
+          "loop": true,
+          "label": "Harbour level"
+        },
+        {
+          "name": "temple",
+          "frames": 1,
+          "loop": true,
+          "label": "Temple level"
+        },
+        {
+          "name": "storm",
+          "frames": 1,
+          "loop": true,
+          "label": "Storm level"
+        },
+        {
+          "name": "postmark",
+          "frames": 1,
+          "loop": true,
+          "label": "Level cleared"
+        },
+        {
+          "name": "express",
+          "frames": 1,
+          "loop": true,
+          "label": "Cleared fast"
+        },
+        {
+          "name": "sealed",
+          "frames": 1,
+          "loop": true,
+          "label": "Every letter found"
+        },
+        {
+          "name": "returned",
+          "frames": 1,
+          "loop": true,
+          "label": "Not cleared"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CP2"
+    },
+    {
+      "id": "fireball",
+      "name": "Fireball",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true,
+          "label": "Fly"
+        },
+        {
+          "name": "hit",
+          "frames": 6,
+          "loop": false,
+          "label": "Hit"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "boulder-chunk",
+      "name": "Boss rock",
+      "type": "projectile",
+      "role": "effects/projectile",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "fly",
+          "frames": 8,
+          "loop": true,
+          "label": "Fly"
+        },
+        {
+          "name": "hit",
+          "frames": 8,
+          "loop": false,
+          "label": "Hit"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "dust-puff",
+      "name": "Dust puff",
+      "type": "effect",
+      "role": "effects/dust",
+      "view": "side",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        30
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 6,
+          "loop": false,
+          "label": "Burst"
+        },
+        {
+          "name": "kick",
+          "frames": 4,
+          "loop": false,
+          "label": "Kick"
+        },
+        {
+          "name": "slide",
+          "frames": 6,
+          "loop": true,
+          "label": "Slide"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "dodge-trail",
+      "name": "Dodge trail",
+      "type": "effect",
+      "role": "effects/dust",
+      "view": "top-down",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 6,
+          "loop": false,
+          "label": "Burst"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "wind-gust",
+      "name": "Wind gust",
+      "type": "effect",
+      "role": "effects/weather",
+      "view": "none",
+      "frame": [
+        64,
+        64
+      ],
+      "pivot": [
+        32,
+        32
+      ],
+      "clips": [
+        {
+          "name": "loop",
+          "frames": 8,
+          "loop": true,
+          "label": "Loop"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "pickup-sparkle",
+      "name": "Pickup sparkle",
+      "type": "effect",
+      "role": "effects/spark",
+      "view": "none",
+      "frame": [
+        32,
+        32
+      ],
+      "pivot": [
+        16,
+        16
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 8,
+          "loop": false,
+          "label": "Burst"
+        },
+        {
+          "name": "loop",
+          "frames": 8,
+          "loop": true,
+          "label": "Loop"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "enemy-poof",
+      "name": "Defeat poof",
+      "type": "effect",
+      "role": "effects/dust",
+      "view": "none",
+      "frame": [
+        48,
+        48
+      ],
+      "pivot": [
+        24,
+        24
+      ],
+      "clips": [
+        {
+          "name": "burst",
+          "frames": 8,
+          "loop": false,
+          "label": "Burst"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "bg-cloud-sea",
+      "name": "Cloud sea backdrop",
+      "type": "background",
+      "role": "environment/background",
+      "view": "side",
+      "frame": [
+        320,
+        180
+      ],
+      "pivot": [
+        160,
+        180
+      ],
+      "clips": [
+        {
+          "name": "far",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mid",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "near",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CL1"
+    },
+    {
+      "id": "bg-sky-harbour",
+      "name": "Sky harbour backdrop",
+      "type": "background",
+      "role": "environment/background",
+      "view": "side",
+      "frame": [
+        320,
+        180
+      ],
+      "pivot": [
+        160,
+        180
+      ],
+      "clips": [
+        {
+          "name": "far",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mid",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "near",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CL1"
+    },
+    {
+      "id": "bg-wind-temple",
+      "name": "Wind temple backdrop",
+      "type": "background",
+      "role": "environment/background",
+      "view": "side",
+      "frame": [
+        320,
+        180
+      ],
+      "pivot": [
+        160,
+        180
+      ],
+      "clips": [
+        {
+          "name": "far",
+          "frames": 1,
+          "loop": true
+        },
+        {
+          "name": "mid",
+          "frames": 8,
+          "loop": true
+        },
+        {
+          "name": "near",
+          "frames": 8,
+          "loop": true
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CL1"
+    },
+    {
+      "id": "ui-hud-courier",
+      "name": "Courier HUD",
+      "type": "ui",
+      "role": "interface/bar",
+      "view": "none",
+      "frame": [
+        16,
+        16
+      ],
+      "pivot": [
+        8,
+        8
+      ],
+      "clips": [
+        {
+          "name": "dash-full",
+          "frames": 1,
+          "loop": true,
+          "label": "A dash ready"
+        },
+        {
+          "name": "dash-empty",
+          "frames": 1,
+          "loop": true,
+          "label": "A dash used"
+        },
+        {
+          "name": "dash-gain",
+          "frames": 4,
+          "loop": false,
+          "label": "Dash refilled"
+        },
+        {
+          "name": "dash-lose",
+          "frames": 4,
+          "loop": false,
+          "label": "Dash spent"
+        },
+        {
+          "name": "letter",
+          "frames": 1,
+          "loop": true,
+          "label": "A letter found"
+        },
+        {
+          "name": "letter-empty",
+          "frames": 1,
+          "loop": true,
+          "label": "A letter not found yet"
+        },
+        {
+          "name": "star",
+          "frames": 1,
+          "loop": true,
+          "label": "The hidden star"
+        },
+        {
+          "name": "star-empty",
+          "frames": 1,
+          "loop": true,
+          "label": "The hidden star, not found"
+        },
+        {
+          "name": "falls",
+          "frames": 1,
+          "loop": true,
+          "label": "Falls counter"
+        },
+        {
+          "name": "clock",
+          "frames": 1,
+          "loop": true,
+          "label": "Time"
+        },
+        {
+          "name": "room",
+          "frames": 1,
+          "loop": true,
+          "label": "Room marker"
+        },
+        {
+          "name": "here",
+          "frames": 8,
+          "loop": true,
+          "label": "Checkpoint reached"
+        }
+      ],
+      "parts": [],
+      "reuse": false,
+      "batch": "CP2"
+    },
+    {
+      "id": "ui-buttons-paper",
+      "name": "Paper buttons",
+      "type": "ui",
+      "role": "interface/button",
+      "view": "none",
+      "frame": [
+        96,
+        32
+      ],
+      "pivot": [
+        48,
+        16
+      ],
+      "clips": [
+        {
+          "name": "normal",
+          "frames": 1,
+          "loop": true,
+          "label": "Normal"
+        },
+        {
+          "name": "hover",
+          "frames": 1,
+          "loop": true,
+          "label": "Hover"
+        },
+        {
+          "name": "pressed",
+          "frames": 1,
+          "loop": true,
+          "label": "Pressed"
+        },
+        {
+          "name": "disabled",
+          "frames": 1,
+          "loop": true,
+          "label": "Disabled"
+        },
+        {
+          "name": "tab",
+          "frames": 1,
+          "loop": true,
+          "label": "Tab, for a page that is not open"
+        },
+        {
+          "name": "tab-active",
+          "frames": 1,
+          "loop": true,
+          "label": "Open tab, for the page on view"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ui-panel-paper",
+      "name": "Paper panels",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        32
+      ],
+      "clips": [
+        {
+          "name": "panel",
+          "frames": 1,
+          "loop": true,
+          "label": "Panel"
+        },
+        {
+          "name": "panel-title",
+          "frames": 1,
+          "loop": true,
+          "label": "With heading"
+        },
+        {
+          "name": "inset",
+          "frames": 1,
+          "loop": true,
+          "label": "List well"
+        },
+        {
+          "name": "tooltip",
+          "frames": 1,
+          "loop": true,
+          "label": "Tooltip"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "font-rounded",
+      "name": "Rounded pixel letters",
+      "type": "ui",
+      "role": "interface/icon",
+      "view": "none",
+      "frame": [
+        16,
+        20
+      ],
+      "pivot": [
+        4,
+        13
+      ],
+      "clips": [
+        {
+          "name": "upper",
+          "frames": 26,
+          "loop": true,
+          "label": "Capitals A to Z"
+        },
+        {
+          "name": "lower",
+          "frames": 26,
+          "loop": true,
+          "label": "Small letters a to z"
+        },
+        {
+          "name": "digits",
+          "frames": 10,
+          "loop": true,
+          "label": "Digits 0 to 9"
+        },
+        {
+          "name": "marks",
+          "frames": 18,
+          "loop": true,
+          "label": "Punctuation"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "ui-timer",
+      "name": "Timer",
+      "type": "ui",
+      "role": "interface/panel",
+      "view": "none",
+      "frame": [
+        64,
+        24
+      ],
+      "pivot": [
+        32,
+        12
+      ],
+      "clips": [
+        {
+          "name": "idle",
+          "frames": 1,
+          "loop": true,
+          "label": "Showing a time"
+        },
+        {
+          "name": "tick",
+          "frames": 8,
+          "loop": true,
+          "label": "Ticking"
+        },
+        {
+          "name": "warn",
+          "frames": 8,
+          "loop": true,
+          "label": "Running out"
+        },
+        {
+          "name": "frame",
+          "frames": 1,
+          "loop": true,
+          "label": "Empty, for the game's own digits"
+        }
+      ],
+      "parts": [],
+      "reuse": true,
+      "batch": null
+    }
+  ],
+  "sounds": [
+    {
+      "id": "jump",
+      "name": "Jump",
+      "type": "sfx",
+      "role": "actions/jump",
+      "styles": [
+        "Tiny hop",
+        "Big leap"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "land-thud",
+      "name": "Landing thud",
+      "type": "sfx",
+      "role": "actions/land",
+      "styles": [
+        "Soft landing",
+        "Heavy landing",
+        "Armoured"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "footstep-grass",
+      "name": "Footstep on grass",
+      "type": "sfx",
+      "role": "characters/footstep",
+      "styles": [
+        "Grass",
+        "Tall grass",
+        "Dirt path"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "footstep-stone",
+      "name": "Footstep on stone",
+      "type": "sfx",
+      "role": "characters/footstep",
+      "styles": [
+        "Soft shoes",
+        "Heavy boots",
+        "Bare feet"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "footstep-wood",
+      "name": "Footstep on wood",
+      "type": "sfx",
+      "role": "characters/footstep",
+      "styles": [
+        "Soft shoes",
+        "Heavy boots",
+        "Bare feet"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "spring-boing",
+      "name": "Spring",
+      "type": "sfx",
+      "role": "world/machine",
+      "styles": [
+        "Spring pad",
+        "Big trampoline",
+        "Tiny bounce"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "rock-crumble",
+      "name": "Rock crumble",
+      "type": "sfx",
+      "role": "world/break",
+      "styles": [
+        "Cracked wall",
+        "Falling ledge",
+        "Cave-in"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "golem-slam",
+      "name": "Ground slam",
+      "type": "sfx",
+      "role": "effects/impact",
+      "styles": [
+        "Boss slam",
+        "Boulder drop",
+        "Distant quake"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "cloth-flap",
+      "name": "Cloth flap",
+      "type": "sfx",
+      "role": "actions/dash",
+      "styles": [
+        "Cape twirl",
+        "Flag snap",
+        "Bird wings"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "wind",
+      "name": "Wind",
+      "type": "ambience",
+      "role": "environment/weather",
+      "styles": [
+        "Breeze",
+        "Storm"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "punch",
+      "name": "Punch",
+      "type": "sfx",
+      "role": "actions/hit",
+      "styles": [
+        "Light jab",
+        "Heavy body blow"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "enemy-squish",
+      "name": "Enemy squish",
+      "type": "sfx",
+      "role": "characters/death",
+      "styles": [
+        "Squish",
+        "Pop",
+        "Crunch"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "wyrm-roar",
+      "name": "Wyrm roar",
+      "type": "sfx",
+      "role": "characters/voice",
+      "styles": [
+        "Wyrm roar",
+        "Fire breath",
+        "Distant growl"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "item-get",
+      "name": "Item get",
+      "type": "sfx",
+      "role": "items/pickup",
+      "styles": [
+        "Chiptune",
+        "Storybook",
+        "Gritty"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "star-pickup",
+      "name": "Star pickup",
+      "type": "sfx",
+      "role": "items/pickup",
+      "styles": [
+        "Chiptune",
+        "Storybook",
+        "Gritty"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "key-pickup",
+      "name": "Key pickup",
+      "type": "sfx",
+      "role": "items/pickup",
+      "styles": [
+        "Chiptune",
+        "Storybook",
+        "Gritty"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "lock-open",
+      "name": "Lock",
+      "type": "sfx",
+      "role": "world/door",
+      "styles": [
+        "Unlock door",
+        "Locked",
+        "Padlock"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "door-creak",
+      "name": "Door creak",
+      "type": "sfx",
+      "role": "world/door",
+      "styles": [
+        "Wooden door",
+        "Rusty gate",
+        "Quick hatch"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "save-chime",
+      "name": "Save chime",
+      "type": "jingle",
+      "role": "interface/reward",
+      "styles": [
+        "Save point",
+        "Level up",
+        "Item found"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "stage-clear",
+      "name": "Stage clear",
+      "type": "jingle",
+      "role": "music/victory",
+      "styles": [
+        "Chiptune",
+        "Storybook",
+        "Gritty"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "error-buzz",
+      "name": "Error buzz",
+      "type": "sfx",
+      "role": "interface/error",
+      "styles": [
+        "Soft no",
+        "Sharp deny"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "menu-harp-move",
+      "name": "Harp move",
+      "type": "sfx",
+      "role": "interface/hover",
+      "styles": [
+        "List",
+        "Grid",
+        "Tab"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "menu-harp-confirm",
+      "name": "Harp confirm",
+      "type": "sfx",
+      "role": "interface/confirm",
+      "styles": [
+        "Select",
+        "Accept",
+        "Start game"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "menu-harp-back",
+      "name": "Harp back",
+      "type": "sfx",
+      "role": "interface/click",
+      "styles": [
+        "Back",
+        "Cancel"
+      ],
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "air-dash",
+      "name": "Air dash",
+      "type": "sfx",
+      "role": "actions/dash",
+      "styles": [
+        "Dash",
+        "Second dash",
+        "Down dash"
+      ],
+      "reuse": false,
+      "batch": "CS1"
+    },
+    {
+      "id": "dash-refill",
+      "name": "Dash refill",
+      "type": "sfx",
+      "role": "items/pickup",
+      "styles": [
+        "Refill",
+        "Grow back",
+        "Double"
+      ],
+      "reuse": false,
+      "batch": "CS1"
+    },
+    {
+      "id": "wall-grab",
+      "name": "Wall grab",
+      "type": "sfx",
+      "role": "characters/footstep",
+      "styles": [
+        "Grab",
+        "Climb step",
+        "Slip"
+      ],
+      "reuse": false,
+      "batch": "CS1"
+    },
+    {
+      "id": "respawn-pop",
+      "name": "Respawn pop",
+      "type": "sfx",
+      "role": "characters/death",
+      "styles": [
+        "Burst",
+        "Back again",
+        "Spiked"
+      ],
+      "reuse": false,
+      "batch": "CS1"
+    },
+    {
+      "id": "gust-blow",
+      "name": "Gust",
+      "type": "sfx",
+      "role": "effects/magic",
+      "styles": [
+        "Gust",
+        "Toad puff",
+        "Dying"
+      ],
+      "reuse": false,
+      "batch": "CS2"
+    },
+    {
+      "id": "toad-croak",
+      "name": "Toad croak",
+      "type": "sfx",
+      "role": "characters/voice",
+      "styles": [
+        "Croak",
+        "Inflate",
+        "Squawk"
+      ],
+      "reuse": false,
+      "batch": "CS2"
+    },
+    {
+      "id": "ray-call",
+      "name": "Ray call",
+      "type": "sfx",
+      "role": "characters/voice",
+      "styles": [
+        "Call",
+        "Dip",
+        "Hurt"
+      ],
+      "reuse": false,
+      "batch": "CS2"
+    },
+    {
+      "id": "rigging-creak",
+      "name": "Rigging creak",
+      "type": "ambience",
+      "role": "environment/ambience",
+      "styles": [
+        "At anchor",
+        "Straining",
+        "Rattle"
+      ],
+      "reuse": false,
+      "batch": "CS2"
+    }
+  ],
+  "music": [
+    {
+      "id": "menu-orchestra",
+      "name": "Banners at Dawn",
+      "role": "music/menu",
+      "band": "orchestra",
+      "bpm": 88,
+      "tempo": [
+        76,
+        100
+      ],
+      "key": "B-flat major",
+      "chords": "Bb Eb Gm F Cm Eb Fsus4 F",
+      "chordOrder": "0M 5M 9m 7M 2m 5M 7(5,7) 7M",
+      "inst": "Flute",
+      "use": "title",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "cloudreach-isles",
+      "name": "Island theme",
+      "role": "music/exploration",
+      "band": "orchestra",
+      "bpm": 108,
+      "tempo": [
+        96,
+        120
+      ],
+      "key": "G major",
+      "chords": "G Bm C G Em Am C D",
+      "chordOrder": "0M 4m 5M 0M 9m 2m 5M 7M",
+      "inst": "Flute",
+      "use": "calm level",
+      "reuse": false,
+      "batch": "CM1"
+    },
+    {
+      "id": "cloudreach-gale",
+      "name": "Gale theme",
+      "role": "music/battle",
+      "band": "organ",
+      "bpm": 120,
+      "tempo": [
+        108,
+        132
+      ],
+      "key": "F-sharp minor",
+      "chords": "F#m A E Bm F#m D E C#",
+      "chordOrder": "0m 3M 10M 5m 0m 8M 10M 7M",
+      "inst": "Synth lead",
+      "use": "tense level",
+      "reuse": false,
+      "batch": "CM2"
+    },
+    {
+      "id": "battle-theme",
+      "name": "Battle theme",
+      "role": "music/battle",
+      "band": null,
+      "bpm": 160,
+      "tempo": [
+        130,
+        190
+      ],
+      "key": "D minor",
+      "chords": "Dm Dm Bb C Dm Dm Bb A",
+      "chordOrder": "0m 0m 8M 10M 0m 0m 8M 7M",
+      "inst": "Synth lead",
+      "use": "boss",
+      "reuse": true,
+      "batch": null
+    },
+    {
+      "id": "credits-orchestra",
+      "name": "The Long Road Back",
+      "role": "music/victory",
+      "band": "orchestra",
+      "bpm": 80,
+      "tempo": [
+        72,
+        92
+      ],
+      "key": "F major",
+      "chords": "F Gm Am Bb F Dm Gm C",
+      "chordOrder": "0M 2m 4m 5M 0M 9m 2m 7M",
+      "inst": "Flute",
+      "use": "ending",
+      "reuse": true,
+      "batch": null
+    }
+  ],
+  "batches": [
+    {
+      "id": "CK0",
+      "kind": "helper",
+      "assets": [
+        "engine/palettes.js: the palette \"cloudreach\" (the 26 colours of this plan), NEVER_SWATCH [\"ink\"], the BUNDLE_PALETTE line 'kit-platformer-cloudreach': 'cloudreach', and the 23 swatch lists of GROUPS.cloudreach: skin: skin, ...SKIN; hair: teak, copper, rope, slate, ...HAIR; outfit: hero, squall, fern, slate, copper, ...CLOTH; trim: brass, rose, gold, rope, patina, crimson, ...CLOTH; metal: brass, steel, copper, patina, gold, ...METAL; wood: teak, rope, copper, ...BROWN; stone: chalk, shale, slate, storm, mist, ...GREY; body: fern, squall, rose, patina, turf, dusk; accent: crimson, gold, rose, gust, squall, cloud; glow: gust, gold, cloud, rose, dawn, mist; core: cloud, gold, gust, dawn; edge: gust, brass, rose, squall; sky: sky, dawn, dusk, storm, mist, cloud; land: turf, fern, shale, slate, chalk, dusk; haze: mist, cloud, dawn, sky; gem: gust, squall, rose, gold, patina; shell: patina, copper, squall, fern, slate; grass: turf, fern, patina, gold; leaf: fern, turf, patina, rose; ground: chalk, shale, teak, slate; water: sky, gust, mist, hero, patina; face: cloud, sail, chalk, slate, storm; frame: brass, steel, teak, slate, gold",
+        "tests/unit/palettes-core.test.mjs: add cloudreach to four lists (the palette list, the BUNDLE_PALETTE object, the style guide's palettes, the shared colours)",
+        "docs/style-guide.md section 3: the table under the heading ### Palette \"Cloudreach\" (`kit-platformer-cloudreach`)"
+      ],
+      "needs": [
+        "someone who may edit the engine (not settled by this specification); blocks no asset batch, only the bundle file"
+      ],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "CS1",
+      "kind": "sounds",
+      "assets": [
+        "air-dash",
+        "dash-refill",
+        "wall-grab",
+        "respawn-pop"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "CS2",
+      "kind": "sounds",
+      "assets": [
+        "gust-blow",
+        "toad-croak",
+        "ray-call",
+        "rigging-creak"
+      ],
+      "needs": [],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "CR1",
+      "kind": "character and creatures (rig body)",
+      "assets": [
+        "cloud-courier",
+        "gust-toad",
+        "kite-ray"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "CS1",
+        "CS2"
+      ],
+      "order": 2,
+      "pathfinder": true
+    },
+    {
+      "id": "CT1",
+      "kind": "tilesets (tiles body)",
+      "assets": [
+        "tiles-skyisle",
+        "tiles-cloudbank",
+        "tiles-windtemple"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [],
+      "order": 1,
+      "pathfinder": true
+    },
+    {
+      "id": "CL1",
+      "kind": "backgrounds (layers body)",
+      "assets": [
+        "bg-cloud-sea",
+        "bg-sky-harbour",
+        "bg-wind-temple"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [],
+      "order": 1,
+      "pathfinder": true
+    },
+    {
+      "id": "CP1",
+      "kind": "props (pictures body)",
+      "assets": [
+        "falling-slab",
+        "wind-sock",
+        "gust-vent",
+        "post-box"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "CS2"
+      ],
+      "order": 2,
+      "pathfinder": true
+    },
+    {
+      "id": "CP2",
+      "kind": "pickup, glyphs and icons (pictures body)",
+      "assets": [
+        "gust-pinwheel",
+        "ui-hud-courier",
+        "icons-postmarks"
+      ],
+      "needs": [
+        "palettes"
+      ],
+      "after": [
+        "CS1"
+      ],
+      "order": 2
+    },
+    {
+      "id": "CM1",
+      "kind": "music",
+      "assets": [
+        "cloudreach-isles"
+      ],
+      "needs": [
+        "compose-kit",
+        "band orchestra heard by a person"
+      ],
+      "after": [],
+      "order": 1
+    },
+    {
+      "id": "CM2",
+      "kind": "music",
+      "assets": [
+        "cloudreach-gale"
+      ],
+      "needs": [
+        "compose-kit",
+        "band organ heard by a person"
+      ],
+      "after": [],
+      "order": 1
+    }
+  ],
+  "reusedChanges": []
+}
