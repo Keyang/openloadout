@@ -346,7 +346,7 @@ test('every instrument option renders sound, and each sounds different', () => {
 
 test('matchGains finds gains that put all ten instruments within 1 dB of each other', () => {
   const m = matchGains((gains) => tiny({ gains }), { node: 'lF', sampleRate: 11025, params: { bpm: 140 } });
-  assert.equal(m.gains.length, 15, 'ten instruments, then the five that play along');
+  assert.equal(m.gains.length, 16, 'ten instruments, then the six that play along');
   assert.equal(m.gains[0], 1, 'the synth lead is the reference');
   const levels = measureInstruments(tiny({ gains: m.gains }), { node: 'lF', sampleRate: 11025, params: { bpm: 140 } });
   const dbs = levels.map((l) => l.db);

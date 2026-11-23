@@ -320,16 +320,16 @@ const NEEDS_NOISE = new Set([SPEC.organ.lead, SPEC.organ.bass, SPEC.rock.bass, S
 /** The level factor of a chord voice: 1, or 1 minus its `dip` expression. */
 function dipOf(o) { return o.dip === undefined || o.dip === 0 ? '1' : `(1 - (${o.dip}))`; }
 
-// Gains that level the ten melody instruments on each band's probe, then the five that play along (Guitar, Piano, Violin,
-// Trumpet, Bass), fifteen numbers (matchGains from DEFAULT_GAINS, 4 bars at 44.1 kHz). The first five were measured 2026-11-19
+// Gains that level the ten melody instruments on each band's probe, then the six that play along (Guitar, Piano, Violin,
+// Trumpet, Bass, Drums), sixteen numbers (the Drums one added 2026-11-23, measured against the tune) (matchGains from DEFAULT_GAINS, 4 bars at 44.1 kHz). The first five were measured 2026-11-19
 // (rock, whose colour is a shaper, took a second pass; darkambient re-measured after its heartbeat went to every beat,
 // unchanged at 3 significant figures) and came out the same on 2026-11-22, when the other ten were added (rock took two
 // passes again). A new track starts from these and measures its own (`--match`): level depends on the tune.
 const START_GAINS = {
-  chip: [1, 0.825, 1.05, 1.02, 1.71, 2.82, 0.898, 1.36, 1.17, 1.37, 0.992, 1.01, 1.23, 1.57, 1.73], synthwave: [1, 0.766, 1.04, 0.998, 1.62, 3.11, 0.833, 1.21, 1.12, 1.31, 0.988, 0.997, 0.943, 1.86, 1.67], orchestra: [1, 0.754, 1, 0.959, 1.52, 3.02, 0.823, 1.2, 1.14, 1.26, 0.972, 0.961, 1.01, 1.53, 1.67],
-  folk: [1, 0.778, 1.04, 0.988, 1.6, 2.98, 0.85, 1.23, 1.13, 1.31, 0.989, 0.994, 0.981, 1.57, 1.71], musicbox: [1, 0.795, 1.08, 1.01, 1.73, 2.69, 0.859, 1.21, 1.22, 1.38, 1.09, 1.03, 0.85, 1.67, 1.68], organ: [1, 0.787, 1.06, 1.01, 1.67, 3.05, 0.856, 1.23, 1.19, 1.32, 0.973, 1.02, 0.927, 1.94, 1.67],
-  twang: [1, 0.784, 0.97, 0.955, 1.56, 2.55, 0.921, 1.22, 1.19, 1.24, 1.04, 0.962, 1.15, 1.51, 1.67], steelpan: [1, 0.794, 1.05, 0.999, 1.65, 2.79, 0.866, 1.25, 1.2, 1.37, 1.01, 1, 1.06, 1.66, 1.76], lofi: [1, 0.769, 1.09, 1.13, 1.62, 3.66, 0.828, 1.17, 1.24, 1.34, 0.93, 1.04, 0.861, 1.69, 1.71],
-  darkambient: [1, 0.78, 1.1, 1.08, 1.59, 3.65, 0.84, 1.22, 1.21, 1.33, 0.9, 1.04, 0.804, 1.59, 1.74], rock: [1, 0.676, 1.11, 1.12, 1.44, 2.99, 0.74, 1.3, 1.17, 1.21, 0.918, 0.947, 1.16, 1.49, 1.61], marimba: [1, 0.759, 1.03, 0.971, 1.58, 3.04, 0.824, 1.19, 1.16, 1.31, 0.874, 0.983, 0.872, 1.54, 1.6],
+  chip: [1, 0.825, 1.05, 1.02, 1.71, 2.82, 0.898, 1.36, 1.17, 1.37, 0.992, 1.01, 1.23, 1.57, 1.73, 2.1], synthwave: [1, 0.766, 1.04, 0.998, 1.62, 3.11, 0.833, 1.21, 1.12, 1.31, 0.988, 0.997, 0.943, 1.86, 1.67, 2.09], orchestra: [1, 0.754, 1, 0.959, 1.52, 3.02, 0.823, 1.2, 1.14, 1.26, 0.972, 0.961, 1.01, 1.53, 1.67, 2.01],
+  folk: [1, 0.778, 1.04, 0.988, 1.6, 2.98, 0.85, 1.23, 1.13, 1.31, 0.989, 0.994, 0.981, 1.57, 1.71, 2.07], musicbox: [1, 0.795, 1.08, 1.01, 1.73, 2.69, 0.859, 1.21, 1.22, 1.38, 1.09, 1.03, 0.85, 1.67, 1.68, 2.16], organ: [1, 0.787, 1.06, 1.01, 1.67, 3.05, 0.856, 1.23, 1.19, 1.32, 0.973, 1.02, 0.927, 1.94, 1.67, 2.13],
+  twang: [1, 0.784, 0.97, 0.955, 1.56, 2.55, 0.921, 1.22, 1.19, 1.24, 1.04, 0.962, 1.15, 1.51, 1.67, 2.01], steelpan: [1, 0.794, 1.05, 0.999, 1.65, 2.79, 0.866, 1.25, 1.2, 1.37, 1.01, 1, 1.06, 1.66, 1.76, 2.1], lofi: [1, 0.769, 1.09, 1.13, 1.62, 3.66, 0.828, 1.17, 1.24, 1.34, 0.93, 1.04, 0.861, 1.69, 1.71, 2.18],
+  darkambient: [1, 0.78, 1.1, 1.08, 1.59, 3.65, 0.84, 1.22, 1.21, 1.33, 0.9, 1.04, 0.804, 1.59, 1.74, 2.18], rock: [1, 0.676, 1.11, 1.12, 1.44, 2.99, 0.74, 1.3, 1.17, 1.21, 0.918, 0.947, 1.16, 1.49, 1.61, 1.99], marimba: [1, 0.759, 1.03, 0.971, 1.58, 3.04, 0.824, 1.19, 1.16, 1.31, 0.874, 0.983, 0.872, 1.54, 1.6, 2.06],
 };
 
 /** The twelve bands, as plain data: { name: { name, label, tempo, room, defaults, range, roles, tags, words, startGains, mix } }. */
@@ -438,7 +438,7 @@ const ROLE_LETTERS = 'kshqdwjxyzuvnio';
 
 /**
  * One fixed 8-bar track built with a band (chords C Am | F G twice, a drum row per role, a bass row, a tune, an answer on the band's lead), to measure it.
- * Arguments: name (a band); gains: the fifteen melody instrument gains, ten and then the five that play along (default: the band's startGains).
+ * Arguments: name (a band); gains: the sixteen melody instrument gains, ten and then the six that play along (default: the band's startGains).
  * Returns { patch, parts }: the assembled patch, with three styles (calm, busy, full at intensity 0.3, 0.7 and 1),
  * and parts: { drums, bass, chords, lead }, one expression per part over the patch's nodes, for measureLayers.
  */

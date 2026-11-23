@@ -17,7 +17,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('steelpan');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.802, 1.06, 0.996, 1.81, 1.99, 0.863, 1.25, 1.22, 1.36, 1.04, 1.09, 1.01, 1.71, 1.73];
+export const GAINS = [1, 0.802, 1.06, 0.996, 1.81, 1.99, 0.863, 1.25, 1.22, 1.36, 1.04, 1.09, 1.01, 1.71, 1.73, 2.28];
 
 // The commas drop G and A an octave, so every root lies from G3 to F4: the comping, which plays from middle C plus
 // the root, stays below the tune instead of climbing into it on the G and Am bars.

@@ -11,16 +11,18 @@ const track = (over = {}) => ({
   params: [
     { id: 'bars', label: 'Length', min: 8, max: 32, step: 8, default: 8, unit: 'bars' },
     { id: 'inst', label: 'Melody instrument', min: 0, max: 9, default: 0, options: [...INSTRUMENTS] },
-    { id: 'along', label: 'Plays along', min: 0, max: 5, default: 0, options: [...ALONG] },
+    { id: 'along', label: 'Plays along', min: 0, max: 6, default: 0, options: [...ALONG] },
   ],
   presets: {}, ...over,
 });
 const start = (patch) => ({ params: Object.fromEntries(patch.params.map((d) => [d.id, d.default])), style: null });
 
-test('a track with both choices offers the six pairs, in order, each as two values to set together', () => {
+test('a track with both choices offers the eight pairs, in order, each as two values to set together', () => {
   const m = soundModel(track());
   assert.deepEqual(m.pairs.map((q) => q.label), PAIRS.map((q) => q.label));
-  assert.equal(m.pairs.length, 6);
+  assert.equal(m.pairs.length, 8);
+  assert.deepEqual(m.pairs[6].params, { inst: 5, along: 6 });
+  assert.deepEqual(m.pairs[7].params, { inst: 6, along: 6 });
   const gb = m.pairs[0];
   assert.deepEqual(gb.params, { inst: INSTRUMENTS.indexOf('Guitar'), along: ALONG.indexOf('Bass') });
   assert.deepEqual(gb.params, { inst: 5, along: 5 });
@@ -32,7 +34,7 @@ test('a tap sets both choices, keeps the rest, and the pair reads as on; changin
   assert.ok(m.pairs.every((q) => !m.pairOn(s, q)));
   s = m.setPair(s, m.pairs[1]);
   assert.deepEqual([s.params.inst, s.params.along, s.params.bars], [INSTRUMENTS.indexOf('Piano'), ALONG.indexOf('Violin'), 16]);
-  assert.deepEqual(m.pairs.map((q) => m.pairOn(s, q)), [false, true, false, false, false, false]);
+  assert.deepEqual(m.pairs.map((q) => m.pairOn(s, q)), [false, true, false, false, false, false, false, false]);
   s = m.set(s, 'inst', 1);
   assert.ok(m.pairs.every((q) => !m.pairOn(s, q)));
 });

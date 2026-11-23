@@ -18,7 +18,7 @@ import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('chip');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.805, 0.958, 0.918, 1.47, 2.16, 0.855, 1.37, 1.13, 1.26, 0.677, 1.21, 1.33, 1.86, 1.44];
+export const GAINS = [1, 0.805, 0.958, 0.918, 1.47, 2.16, 0.855, 1.37, 1.13, 1.26, 0.677, 1.21, 1.33, 1.86, 1.44, 2.53];
 
 // The commas drop F an octave, so every root lies from F3 to Eb4 and the arpeggio stays under the tune.
 export const CHORDS = 'Bb F, Eb Bb | Gm Dm Eb F,';

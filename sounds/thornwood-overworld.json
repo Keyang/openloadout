@@ -101,7 +101,7 @@
    "id": "along",
    "label": "Plays along",
    "min": 0,
-   "max": 5,
+   "max": 6,
    "default": 0,
    "options": [
     "None",
@@ -109,7 +109,8 @@
     "Piano",
     "Violin",
     "Trumpet",
-    "Bass"
+    "Bass",
+    "Drums"
    ]
   },
   {
@@ -1103,9 +1104,83 @@
    "expr": "((lBaO1*0.8 + lBaF*0.45)*lBaA)*(inst == 9 ? lV*1.38 : along == 5 ? lAlV*1.66*(0.55 + 0.45*intensity)*alongLevel/0.6 : 0)"
   },
   {
+   "id": "lDrK",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "X.......x......."
+  },
+  {
+   "id": "lDrS",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "....X.......X..."
+  },
+  {
+   "id": "lDrH",
+   "type": "pattern",
+   "trig": "c16",
+   "steps": "x.x.x.x.x.x.x.x."
+  },
+  {
+   "id": "lDrKA",
+   "type": "ad",
+   "trig": "lDrK",
+   "attack": 0.001,
+   "decay": 0.22,
+   "curve": 2.5
+  },
+  {
+   "id": "lDrKW",
+   "type": "osc",
+   "freq": "50 + lDrKA*110"
+  },
+  {
+   "id": "lDrSA",
+   "type": "ad",
+   "trig": "lDrS",
+   "attack": 0.001,
+   "decay": 0.16,
+   "curve": 2.2
+  },
+  {
+   "id": "lDrSN",
+   "type": "filter",
+   "mode": "bp",
+   "in": "nz",
+   "freq": 1800,
+   "q": 0.8
+  },
+  {
+   "id": "lDrST",
+   "type": "osc",
+   "wave": "tri",
+   "freq": "175 + lDrSA*60"
+  },
+  {
+   "id": "lDrHA",
+   "type": "ad",
+   "trig": "lDrH",
+   "attack": 0.001,
+   "decay": 0.045,
+   "curve": 3
+  },
+  {
+   "id": "lDrHN",
+   "type": "filter",
+   "mode": "hp",
+   "in": "nz",
+   "freq": 7000,
+   "q": 0.7
+  },
+  {
+   "id": "lDrO",
+   "type": "expr",
+   "expr": "(lDrKW*lDrKA*(intensity > 0.3 ? 0.9 : 0) + (lDrSN*0.7 + lDrST*0.3)*lDrSA*(intensity > 0.65 ? 1 : 0) + lDrHN*lDrHA*0.35)*2.08*(0.55 + 0.45*intensity)*alongLevel/0.6"
+  },
+  {
    "id": "lAl",
    "type": "expr",
-   "expr": "along > 0.5 && along != inst - 4 ? (along < 1.5 ? lGuO : along < 2.5 ? lPiO : along < 3.5 ? lViO : along < 4.5 ? lTrO : lBaO) : 0"
+   "expr": "along > 0.5 && along != inst - 4 ? (along < 1.5 ? lGuO : along < 2.5 ? lPiO : along < 3.5 ? lViO : along < 4.5 ? lTrO : along < 5.5 ? lBaO : lDrO) : 0"
   }
  ],
  "out": [

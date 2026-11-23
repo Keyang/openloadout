@@ -17,7 +17,7 @@ import { band, param, clock, chords, arrangement, drumRow, eightBars, melody, in
 const B = band('darkambient');
 
 // Level of each melody instrument for this tune, through the band's echo colour (`--match` on lcO).
-export const GAINS = [1, 0.768, 1.05, 1.01, 1.73, 1.41, 0.823, 1.25, 1.15, 1.26, 0.709, 0.939, 0.686, 1.4, 1.39];
+export const GAINS = [1, 0.768, 1.05, 1.01, 1.73, 1.41, 0.823, 1.25, 1.15, 1.26, 0.709, 0.939, 0.686, 1.4, 1.39, 1.97];
 
 export const CHORDS = 'Em C G D | Am C Esus4 E';
 

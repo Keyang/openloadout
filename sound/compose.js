@@ -112,12 +112,12 @@ export const MAX_SECONDS = 120;
  * the owner, Keyang), so the old indices never moved. All ten are synthesiser sketches, not recordings of real instruments.
  */
 export const INSTRUMENTS = ['Synth lead', 'Flute', 'Chiptune', 'Bell', 'Plucked string', 'Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass'];
-/** The choices of the `along` control ("Plays along"): none, or one of the five appended instruments. The index is the value of `along`. */
-export const ALONG = ['None', 'Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass'];
+/** The choices of the `along` control ("Plays along"): none, or one of the five appended instruments. The index is the value of `along`. Drums (appended 2026-11-23, Keyang's request) is a choice of `along` only: a drum cannot carry a tune. */
+export const ALONG = ['None', 'Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass', 'Drums'];
 /** Starting gains for the ten instruments; each track measures its own with matchGains, because level depends on the tune. */
 export const DEFAULT_GAINS = [1, 0.8, 1, 1, 1.5, 1.6, 0.9, 1.3, 1.2, 1.4];
-/** Starting gains for the five instruments that can play along (Guitar, Piano, Violin, Trumpet, Bass). */
-export const DEFAULT_ALONG_GAINS = [1.1, 1.1, 1.1, 1.5, 1.8];
+/** Starting gains for the six that can play along (Guitar, Piano, Violin, Trumpet, Bass, Drums). */
+export const DEFAULT_ALONG_GAINS = [1.1, 1.1, 1.1, 1.5, 1.8, 1.5];
 /** The default of the `alongLevel` control ("Plays along volume"): the level matchGains sets, 4 dB under the tune. 1 is 4.4 dB louder (about equal to the tune), 0 is silent. */
 export const ALONG_LEVEL = 0.6;
 /** How far under the tune matchGains sets the player-along, in dB (RMS of the melody bus): with it on, the bus is about 1.5 dB louder than the tune alone. */
@@ -479,11 +479,12 @@ const APPENDED = ['Gu', 'Pi', 'Vi', 'Tr', 'Ba'];
 
 /** The gains instruments() was given, as { inst: ten, along: five }: five numbers (the old tracks) are padded, fifteen carry both. */
 function splitGains(id, gains, alongGains) {
-  const bad = !Array.isArray(gains) || ![5, 10, 15].includes(gains.length) || gains.some((g) => !(g > 0));
-  if (bad) fail(`instruments "${id}": gains must be ten positive numbers, one per instrument (${INSTRUMENTS.join(', ')}); five (the first five, the older tracks) or fifteen (with the five along gains: ${ALONG.slice(1).join(', ')}) are accepted too`);
+  const bad = !Array.isArray(gains) || ![5, 10, 15, 16].includes(gains.length) || gains.some((g) => !(g > 0));
+  if (bad) fail(`instruments "${id}": gains must be ten positive numbers, one per instrument (${INSTRUMENTS.join(', ')}); five (the first five, the older tracks), fifteen or sixteen (with the along gains: ${ALONG.slice(1).join(', ')}; a missing Drums gain starts from the default) are accepted too`);
   const inst = [...gains.slice(0, INSTRUMENTS.length), ...DEFAULT_GAINS.slice(gains.length > 10 ? 10 : gains.length)].slice(0, INSTRUMENTS.length);
-  const along = alongGains || (gains.length === 15 ? gains.slice(10) : DEFAULT_ALONG_GAINS);
-  if (!Array.isArray(along) || along.length !== 5 || along.some((g) => !(g > 0))) fail(`instruments "${id}": alongGains must be five positive numbers (${ALONG.slice(1).join(', ')})`);
+  const given = alongGains || (gains.length >= 15 ? gains.slice(10) : []);
+  if (!Array.isArray(given) || given.length > 6 || given.some((g) => !(g > 0)) || (alongGains && given.length < 5)) fail(`instruments "${id}": alongGains must be six positive numbers (${ALONG.slice(1).join(', ')}); the first five alone are accepted too`);
+  const along = [...given, ...DEFAULT_ALONG_GAINS.slice(given.length)];
   return { inst, along };
 }
 
@@ -611,7 +612,20 @@ export function instruments(id = 'l', { gains = DEFAULT_GAINS, alongGains, noise
     out(2, `${Vi('F')}*${Vi('A')} + ${nz}*${Vi('A')}*0.02`),
     out(3, `${Tr('F')}*${Tr('A')} + ${nz}*${Tr('A')}*0.03`),
     out(4, `(${Ba('O1')}*0.8 + ${Ba('F')}*0.45)*${Ba('A')}`),
-    { id: `${id}Al`, type: 'expr', expr: `along > 0.5 && along != inst - 4 ? (along < 1.5 ? ${Gu('O')} : along < 2.5 ? ${Pi('O')} : along < 3.5 ? ${Vi('O')} : along < 4.5 ? ${Tr('O')} : ${Ba('O')}) : 0` },
+    // 10 drums (along only): kick, snare and hat on the clock (so swing follows the track's own), a plain beat: hat from the start,
+    // the kick from intensity 0.3, the snare from 0.65. A track's own drums play on as they are; this is a light beat beside them.
+    { id: `${id}DrK`, type: 'pattern', trig: 'c16', steps: 'X.......x.......' },
+    { id: `${id}DrS`, type: 'pattern', trig: 'c16', steps: '....X.......X...' },
+    { id: `${id}DrH`, type: 'pattern', trig: 'c16', steps: 'x.x.x.x.x.x.x.x.' },
+    { id: `${id}DrKA`, type: 'ad', trig: `${id}DrK`, attack: 0.001, decay: 0.22, curve: 2.5 },
+    { id: `${id}DrKW`, type: 'osc', freq: `50 + ${id}DrKA*110` },
+    { id: `${id}DrSA`, type: 'ad', trig: `${id}DrS`, attack: 0.001, decay: 0.16, curve: 2.2 },
+    { id: `${id}DrSN`, type: 'filter', mode: 'bp', in: nz, freq: 1800, q: 0.8 },
+    { id: `${id}DrST`, type: 'osc', wave: 'tri', freq: `175 + ${id}DrSA*60` },
+    { id: `${id}DrHA`, type: 'ad', trig: `${id}DrH`, attack: 0.001, decay: 0.045, curve: 3 },
+    { id: `${id}DrHN`, type: 'filter', mode: 'hp', in: nz, freq: 7000, q: 0.7 },
+    { id: `${id}DrO`, type: 'expr', expr: `(${id}DrKW*${id}DrKA*(intensity > 0.3 ? 0.9 : 0) + (${id}DrSN*0.7 + ${id}DrST*0.3)*${id}DrSA*(intensity > 0.65 ? 1 : 0) + ${id}DrHN*${id}DrHA*0.35)*${ga[5]}*(0.55 + 0.45*intensity)*alongLevel/${ALONG_LEVEL}` },
+    { id: `${id}Al`, type: 'expr', expr: `along > 0.5 && along != inst - 4 ? (along < 1.5 ? ${Gu('O')} : along < 2.5 ? ${Pi('O')} : along < 3.5 ? ${Vi('O')} : along < 4.5 ? ${Tr('O')} : along < 5.5 ? ${Ba('O')} : ${id}DrO) : 0` },
   ];
   return [...old, ...late(extra)];
 }
@@ -795,7 +809,7 @@ export function lint(patch) {
   const inst = (patch.params || []).find((p) => p.id === 'inst');
   if (inst && JSON.stringify(inst.options) !== JSON.stringify(INSTRUMENTS)) out.push(`the melody instruments must be these ten, in this order: ${INSTRUMENTS.join(', ')}`);
   const along = (patch.params || []).find((p) => p.id === 'along');
-  if (along && JSON.stringify(along.options) !== JSON.stringify(ALONG)) out.push(`the choices of "along" must be these six, in this order: ${ALONG.join(', ')}`);
+  if (along && JSON.stringify(along.options) !== JSON.stringify(ALONG)) out.push(`the choices of "along" must be these seven, in this order: ${ALONG.join(', ')}`);
   if (along && along.default !== 0) out.push('"along" starts at None');
   if (ids.length > 11) out.push(`${ids.length} controls: at most 11`);
   const styles = Object.keys(patch.presets || {});
@@ -901,7 +915,7 @@ export function measureInstruments(patch, { node = 'lF', param = 'inst', sampleR
 }
 
 /** The RMS level of one node over the 8-bar version (or the first `bars` bars), in dB: { db, peak }. Arguments: patch; node; { sampleRate, params, bars }. */
-function nodeLevel(patch, node, { sampleRate = 44100, params = {}, bars = LENGTHS[0] } = {}) {
+export function nodeLevel(patch, node, { sampleRate = 44100, params = {}, bars = LENGTHS[0] } = {}) {
   const voice = createVoice(patch, { sampleRate, params: { ...params, bars: LENGTHS[0] } });
   const k = voice.nodeIds.indexOf(node);
   if (k < 0) fail(`no node "${node}" to measure (nodes: ${voice.nodeIds.join(' ')})`);
@@ -913,18 +927,19 @@ function nodeLevel(patch, node, { sampleRate = 44100, params = {}, bars = LENGTH
 
 /**
  * Finds the gains that level the melody instruments and the instruments that play along. Arguments: build(gains), which must
- * return the patch made with those gains (fifteen numbers: the ten instruments, then Guitar, Piano, Violin, Trumpet and Bass
+ * return the patch made with those gains (sixteen numbers: the ten instruments, then Guitar, Piano, Violin, Trumpet, Bass and Drums
  * for `along`); { node, sampleRate, params, start, alongNode } as for measureInstruments (start: the gains to begin from, ten
  * or fifteen, or the five of an older track; alongNode: the along part alone, <id>Al, 'lAl').
  * The first instrument (Synth lead) keeps gain 1 and the other nine are matched to it. Each instrument that plays along is
  * then set ALONG_DB (4 dB) under the Synth lead, RMS over the same eight bars, measured in <id>Al before the melody's low-pass.
- * Returns { gains (fifteen), before, after, along: { before, after, lead, target } }: before and after are measureInstruments
- * results for the ten instruments; along holds the five that play along (and is absent when the patch has no `along` control).
+ * Returns { gains (sixteen), before, after, along: { before, after, lead, target } }: before and after are measureInstruments
+ * results for the ten instruments; along holds the six that play along (and is absent when the patch has no `along` control).
  */
 export function matchGains(build, opts = {}) {
   const raw = opts.start || DEFAULT_GAINS, { alongNode = 'lAl', start: _start, ...given } = opts, measureOpts = { together: true, ...given };   // together: one pass for all ten (the same numbers)
   const first = [...raw.slice(0, INSTRUMENTS.length), ...DEFAULT_GAINS.slice(raw.length >= INSTRUMENTS.length ? INSTRUMENTS.length : raw.length)].slice(0, INSTRUMENTS.length);
-  const startAlong = raw.length >= INSTRUMENTS.length + 5 ? raw.slice(INSTRUMENTS.length, INSTRUMENTS.length + 5) : DEFAULT_ALONG_GAINS;
+  const had = raw.length >= INSTRUMENTS.length + 5 ? raw.slice(INSTRUMENTS.length, INSTRUMENTS.length + 6) : [];
+  const startAlong = [...had, ...DEFAULT_ALONG_GAINS.slice(had.length)];
   const before = measureInstruments(build([...first, ...startAlong]), measureOpts);
   const gains = first.map((g, i) => Number(((g / first[0]) * 10 ** ((before[0].db - before[i].db) / 20)).toPrecision(3)));
   const probe = build([...gains, ...startAlong]);

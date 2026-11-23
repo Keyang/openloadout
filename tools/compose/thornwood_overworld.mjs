@@ -12,7 +12,7 @@
 import { param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.794, 1, 0.972, 1.5, 1.94, 0.859, 1.32, 1.14, 1.38, 0.962, 0.993, 1.21, 1.56, 1.66];
+export const GAINS = [1, 0.794, 1, 0.972, 1.5, 1.94, 0.859, 1.32, 1.14, 1.38, 0.962, 0.993, 1.21, 1.56, 1.66, 2.08];
 
 export const CHORDS = 'G G C D | Em C D D';
 

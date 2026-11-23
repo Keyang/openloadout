@@ -19,7 +19,7 @@ import { rotary } from '../../sound/voices.js';
 const B = band('organ');
 
 // Level of each melody instrument for this tune, from `--match`. Run `--match` again after any change to the tune.
-export const GAINS = [1, 0.798, 1.05, 0.999, 2.02, 1.43, 0.847, 1.27, 1.16, 1.29, 0.586, 0.812, 0.664, 1.32, 1.12];
+export const GAINS = [1, 0.798, 1.05, 0.999, 2.02, 1.43, 0.847, 1.27, 1.16, 1.29, 0.586, 0.812, 0.664, 1.32, 1.12, 1.7];
 
 export const CHORDS = 'Em C Am B | Em D C B';
 

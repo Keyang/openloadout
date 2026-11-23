@@ -18,7 +18,7 @@ import { band, brassSection, param, clock, chords, arrangement, drumRow, eightBa
 const B = band('orchestra');
 
 // Level of each melody instrument for this tune (`--match` on lF; the band has no colour after the melody bus).
-export const GAINS = [1, 0.805, 1.06, 1, 1.86, 1.81, 0.864, 1.26, 1.2, 1.41, 0.815, 0.948, 0.827, 1.41, 1.42];
+export const GAINS = [1, 0.805, 1.06, 1, 1.86, 1.81, 0.864, 1.26, 1.2, 1.41, 0.815, 0.948, 0.827, 1.41, 1.42, 1.99];
 
 export const CHORDS = 'Bb Eb Gm F | Cm Eb Fsus4 F';
 
