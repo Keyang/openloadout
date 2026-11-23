@@ -17,7 +17,7 @@ import {
 } from './kit.mjs';
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.795, 1.04, 0.981, 2.02, 2.39, 0.867, 1.3, 1.15, 1.37, 0.598, 0.842, 0.939, 1.3, 1.09];
+export const GAINS = [1, 0.795, 1.04, 0.981, 2.02, 2.39, 0.867, 1.3, 1.15, 1.37, 0.598, 0.842, 0.939, 1.3, 1.09, 1.76];
 
 export const CHORDS = 'Em Em C D | Em Em G F';
 

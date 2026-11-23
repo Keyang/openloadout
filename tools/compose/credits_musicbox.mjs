@@ -16,7 +16,7 @@ import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('musicbox');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.767, 1.06, 1.02, 2.02, 7.94, 0.827, 1.2, 1.15, 1.36, 0.983, 1.08, 0.818, 1.62, 1.63];
+export const GAINS = [1, 0.767, 1.06, 1.02, 2.02, 7.94, 0.827, 1.2, 1.15, 1.36, 0.983, 1.08, 0.818, 1.62, 1.63, 2.25];
 
 export const CHORDS = 'Eb Ab Eb Bb | Cm Ab Bb Eb';
 

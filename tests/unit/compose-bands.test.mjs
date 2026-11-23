@@ -418,10 +418,10 @@ test('vel reaches the lead: every band\'s lead plays quieter at vel 0.25 than at
 
 // ---- the slow ones: levels, distinctness, cost ---------------------------------------------------------------------------------
 
-test('the ten melody instruments still level on every band, the five that play along sit 4 dB under the tune, and each band\'s startGains are close to what is measured', () => {
+test('the ten melody instruments still level on every band, the six that play along sit 4 dB under the tune, and each band\'s startGains are close to what is measured', () => {
   for (const name of NAMES) {
     const B = band(name);
-    assert.equal(B.startGains.length, 15, `${name}: ten instruments, then five that play along`);
+    assert.equal(B.startGains.length, 16, `${name}: ten instruments, then six that play along`);
     const m = matchGains((g) => bandProbe(name, g).patch, { node: B.matchNode, start: B.startGains, together: true, bars: 4 });
     const dbs = m.after.map((l) => l.db), spread = Math.max(...dbs) - Math.min(...dbs);
     assert.ok(spread <= 1, `${name}: after matching the ten are ${spread.toFixed(2)} dB apart`);

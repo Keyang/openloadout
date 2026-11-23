@@ -16,7 +16,7 @@ import { param, band, chipArp, clock, chords, arrangement, drumRow, noteRow, mel
 const B = band('chip');
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.798, 1.03, 0.984, 1.55, 1.77, 0.864, 1.33, 1.15, 1.4, 0.961, 0.958, 1.13, 1.54, 1.57];
+export const GAINS = [1, 0.798, 1.03, 0.984, 1.55, 1.77, 0.864, 1.33, 1.15, 1.4, 0.961, 0.958, 1.13, 1.54, 1.57, 2.01];
 
 export const CHORDS = 'F Bb C Dm | Bb Gm Am C';
 

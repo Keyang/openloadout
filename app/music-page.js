@@ -89,7 +89,8 @@ export function musicPage(app, patch, query) {
     const s = now();
     model.pairs.forEach((q, i) => pairButtons[i].setAttribute('aria-pressed', String(model.pairOn(s, q))));
     const inst = byId.inst.options[s.params.inst], along = byId.along.options[s.params.along];
-    pairNote.textContent = along !== 'None' && along === inst ? `${inst} is already playing the tune, so playing along adds nothing. Pick another.` : '';
+    pairNote.textContent = along === 'None' ? '' : along === inst ? `${inst} is already playing the tune, so playing along adds nothing. Pick another.`
+      : along === 'Drums' ? 'Plays along: one at a time. Drums replace the chords or the bass, and any drums the track has play on beside them.' : 'Plays along: one at a time.';
   };
   function pickPair(q) {
     edit.set(model.setPair(now(), q));

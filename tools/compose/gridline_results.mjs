@@ -17,7 +17,7 @@ import { param, clock, chords, arrangement, drumRow, noteRow, melody, instrument
 const B = band('synthwave');
 
 // Level of each melody instrument for this tune, measured after the band's echo (lcO).
-export const GAINS = [1, 0.806, 1.06, 1.01, 1.76, 1.59, 0.843, 1.33, 1.17, 1.35, 0.711, 0.914, 0.826, 1.62, 1.37];
+export const GAINS = [1, 0.806, 1.06, 1.01, 1.76, 1.59, 0.843, 1.33, 1.17, 1.35, 0.711, 0.914, 0.826, 1.62, 1.37, 1.91];
 
 export const CHORDS = 'Eb Cm Gm Ab | Eb Cm Ab Bb';
 

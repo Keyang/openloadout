@@ -17,7 +17,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('twang');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.819, 1.05, 0.977, 1.74, 1.76, 0.871, 1.21, 1.16, 1.43, 0.918, 0.937, 0.897, 1.65, 1.48];
+export const GAINS = [1, 0.819, 1.05, 0.977, 1.74, 1.76, 0.871, 1.21, 1.16, 1.43, 0.918, 0.937, 0.897, 1.65, 1.48, 1.96];
 
 // Roots within a fourth below and a fifth above A: D up a fourth, F# and E below, so the walking bass stays low.
 export const CHORDS = 'A D A F#m | D E A E';

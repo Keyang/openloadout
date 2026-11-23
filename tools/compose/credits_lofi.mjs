@@ -18,7 +18,7 @@ import { param, clock, chords, arrangement, drumRow, noteRow, melody, instrument
 const B = band('lofi');
 
 // Level of each melody instrument for this tune, measured after the band's colour chain (`--match`).
-export const GAINS = [1, 0.785, 1.06, 1.08, 1.5, 2.33, 0.831, 1.26, 1.2, 1.23, 0.733, 1, 0.784, 1.65, 1.5];
+export const GAINS = [1, 0.785, 1.06, 1.08, 1.5, 2.33, 0.831, 1.26, 1.2, 1.23, 0.733, 1, 0.784, 1.65, 1.5, 2.1];
 
 export const CHORDS = 'Db Fm Bbm Gb | Ebm Ab Db Ab';
 // The sevenths, in semitones above each bar's root: Dbmaj7 Fm7 Bbm7 Gbmaj7 | Ebm7 Ab7 Dbmaj7 Ab7.

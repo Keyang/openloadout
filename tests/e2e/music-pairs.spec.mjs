@@ -7,16 +7,16 @@ const pairs = (page) => page.getByRole('group', { name: 'Pairs that go well toge
 const choice = (page, name) => page.getByRole('group', { name, exact: true }).getByRole('button');
 
 test.describe('music pairs', () => {
-  test('six chips; a tap sets the melody instrument and the instrument that plays along, the link and the saved state follow', async ({ page }) => {
+  test('eight chips; a tap sets the melody instrument and the instrument that plays along, the link and the saved state follow', async ({ page }) => {
     await openRoute(page, '/music/menu-folk');
-    await expect(pairs(page)).toHaveText(['Guitar + Bass', 'Piano + Violin', 'Piano + Bass', 'Flute + Guitar', 'Trumpet + Piano', 'Bell + Piano']);
+    await expect(pairs(page)).toHaveText(['Guitar + Bass', 'Piano + Violin', 'Piano + Bass', 'Flute + Guitar', 'Trumpet + Piano', 'Bell + Piano', 'Guitar + Drums', 'Piano + Drums']);
     for (const chip of await pairs(page).all()) await expect(chip).toHaveAttribute('aria-pressed', 'false');
     await pairs(page).first().click();
     await expect(pairs(page).first()).toHaveAttribute('aria-pressed', 'true');
     await showControl(page, 'inst');
     await expect(choice(page, 'Melody instrument').nth(5)).toHaveAttribute('aria-pressed', 'true');
     await expect(choice(page, 'Melody instrument')).toHaveCount(10);
-    await expect(choice(page, 'Plays along')).toHaveText(['None', 'Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass']);
+    await expect(choice(page, 'Plays along')).toHaveText(['None', 'Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass', 'Drums']);
     await expect(choice(page, 'Plays along').nth(5)).toHaveAttribute('aria-pressed', 'true');
     await expect.poll(() => hashNow(page)).toContain('inst=5');
     await expect.poll(() => hashNow(page)).toContain('along=5');
@@ -30,6 +30,20 @@ test.describe('music pairs', () => {
     // choosing an instrument by hand leaves the pair: the chip lets go
     await choice(page, 'Melody instrument').nth(1).click();
     await expect(pairs(page).nth(4)).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('Guitar + Drums and Piano + Drums set Drums along, and the page says one plays along at a time', async ({ page }) => {
+    await openRoute(page, '/music/menu-folk');
+    await pairs(page).nth(6).click();
+    await expect(pairs(page).nth(6)).toHaveAttribute('aria-pressed', 'true');
+    await showControl(page, 'inst');
+    await expect(choice(page, 'Melody instrument').nth(5)).toHaveAttribute('aria-pressed', 'true');
+    await expect(choice(page, 'Plays along').nth(6)).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => hashNow(page)).toContain('along=6');
+    await expect(page.locator('.pairs .hint').last()).toContainText('one at a time');
+    await pairs(page).nth(7).click();
+    await expect(choice(page, 'Melody instrument').nth(6)).toHaveAttribute('aria-pressed', 'true');
+    await expect(choice(page, 'Plays along').nth(6)).toHaveAttribute('aria-pressed', 'true');
   });
 
   test('Plays along volume is a slider right after Melody, and moving it changes the link', async ({ page }) => {
@@ -49,6 +63,8 @@ test.describe('music pairs', () => {
     await choice(page, 'Plays along').nth(1).click();
     await expect(page.locator('.pairs .hint').last()).toContainText('Guitar is already playing the tune');
     await choice(page, 'Plays along').nth(5).click();
+    await expect(page.locator('.pairs .hint').last()).toHaveText('Plays along: one at a time.');
+    await choice(page, 'Plays along').nth(0).click();
     await expect(page.locator('.pairs .hint').last()).toHaveText('');
   });
 
@@ -61,7 +77,7 @@ test.describe('music pairs', () => {
   test('the chips wrap on a phone without scrolling the page sideways', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 800 });
     await openRoute(page, '/music/menu-folk');
-    await expect(pairs(page)).toHaveCount(6);
+    await expect(pairs(page)).toHaveCount(8);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   });
 });

@@ -17,7 +17,7 @@ import { drawbarOrgan, rotary } from '../../sound/voices.js';
 const B = band('organ');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.783, 1.04, 0.973, 1.79, 2.14, 0.832, 1.2, 1.15, 1.27, 0.707, 0.856, 0.711, 1.42, 1.28];
+export const GAINS = [1, 0.783, 1.04, 0.973, 1.79, 2.14, 0.832, 1.2, 1.15, 1.27, 0.707, 0.856, 0.711, 1.42, 1.28, 1.79];
 
 export const CHORDS = 'Am F C G | Dm Am E E';
 

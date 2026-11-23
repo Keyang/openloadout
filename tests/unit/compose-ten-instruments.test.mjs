@@ -63,9 +63,10 @@ test('the ten instruments, in order: the old five did not move and five were app
   assert.deepEqual(Object.keys(INSTRUMENT_RANGES), INSTRUMENTS);
   assert.equal(DEFAULT_GAINS.length, 10);
   assert.ok(DEFAULT_GAINS.every((g) => g > 0));
-  assert.deepEqual(DEFAULT_ALONG_GAINS.length, 5);
-  assert.deepEqual(ALONG, ['None', 'Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass']);
-  assert.deepEqual(ALONG.slice(1), INSTRUMENTS.slice(5), 'along offers the appended instruments');
+  assert.deepEqual(DEFAULT_ALONG_GAINS.length, 6);
+  assert.deepEqual(ALONG, ['None', 'Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass', 'Drums']);
+  assert.deepEqual(ALONG.slice(1, 6), INSTRUMENTS.slice(5), 'along offers the appended instruments, then Drums last (a drum cannot carry a tune: not in inst)');
+  assert.ok(!INSTRUMENTS.includes('Drums'));
   for (const n of INSTRUMENTS.slice(5)) assert.ok(INSTRUMENT_RANGES[n][0] <= 55 && INSTRUMENT_RANGES[n][1] >= 96, `${n} plays the whole written range C4 to F#6 at every Key setting`);
 });
 
@@ -76,8 +77,8 @@ test('the standard controls: inst has ten options and "Plays along" follows it, 
   assert.deepEqual(by.inst.options, INSTRUMENTS);
   assert.deepEqual([by.inst.min, by.inst.max], [0, 9]);
   assert.equal(by.along.label, 'Plays along');
-  assert.deepEqual(by.along.options, ['None', 'Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass']);
-  assert.deepEqual([by.along.min, by.along.max, by.along.default], [0, 5, 0]);
+  assert.deepEqual(by.along.options, ['None', 'Guitar', 'Piano', 'Violin', 'Trumpet', 'Bass', 'Drums']);
+  assert.deepEqual([by.along.min, by.along.max, by.along.default], [0, 6, 0]);
   assert.deepEqual(lint(p), []);
   assert.equal(standardParams({ tempo: [100, 140, 120], defaults: { along: 'Piano' } }).find((q) => q.id === 'along').default, 2);
   assert.throws(() => standardParams({ tempo: [100, 140, 120], defaults: { along: 'Tuba' } }), (e) => e instanceof KitError && /along/.test(e.message));
@@ -89,11 +90,11 @@ test('instruments() takes ten gains (five and fifteen too) and says which number
   const ten = [1.11, 1.12, 1.13, 1.14, 1.15, 1.16, 1.17, 1.18, 1.19, 1.21];
   const text = JSON.stringify(instruments('l', { gains: ten }));
   for (const g of ten) assert.ok(text.includes(String(g)), `gain ${g} is in the nodes`);
-  const fifteen = [...ten, 2.11, 2.12, 2.13, 2.14, 2.15];
+  const fifteen = [...ten, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16];
   const t15 = JSON.stringify(instruments('l', { gains: fifteen }));
   for (const g of fifteen.slice(10)) assert.ok(t15.includes(String(g)), `along gain ${g} is in the nodes`);
   assert.ok(JSON.stringify(instruments('l', { gains: [1, 0.8, 1, 1, 1.5] })).includes(String(DEFAULT_GAINS[5])), 'five gains: the new five start from the defaults');
-  for (const bad of [[1, 1, 1], [], [1, 1, 1, 1, 0], Array(11).fill(1)]) assert.throws(() => instruments('l', { gains: bad }), (e) => e instanceof KitError && /ten/.test(e.message));
+  for (const bad of [[1, 1, 1], [], [1, 1, 1, 1, 0], Array(12).fill(1)]) assert.throws(() => instruments('l', { gains: bad }), (e) => e instanceof KitError && /ten/.test(e.message));
   assert.throws(() => instruments('l', { alongGains: [1, 1] }), /alongGains/);
 });
 
@@ -105,6 +106,19 @@ test('the appended instruments come after everything else, so older nodes keep t
   assert.ok(at('lGuP') > at('mR') && at('lBaF') > at('mR'), 'the new voices are after the mix');
   const old = instruments('l').slice(0, 25).map((n) => n.id);
   assert.deepEqual(ids.filter((id) => old.includes(id)), old, 'the original nodes are still in their order');
+});
+
+test('the older ways of playing along are unchanged by Drums: menu-folk with Guitar to Bass along renders as it did before', () => {
+  const before = JSON.parse(fs.readFileSync(path.join(ROOT, 'tests', 'fixtures', 'compose', 'before-drums-menu-folk.json'), 'utf8'));
+  const after = JSON.parse(fs.readFileSync(path.join(ROOT, 'sounds', 'menu-folk.json'), 'utf8'));
+  assert.deepEqual(after.params.find((q) => q.id === 'along').options.slice(0, 6), before.params.find((q) => q.id === 'along').options, 'the old indices did not move');
+  assert.ok(after.nodes.length > before.nodes.length);
+  for (const along of [0, 1, 2, 3, 4, 5]) {
+    const a = renderPatch(before, { sampleRate: 8000, maxSeconds: 4, params: { inst: along === 5 ? 6 : 0, along } }).channels[0];
+    const b = renderPatch(after, { sampleRate: 8000, maxSeconds: 4, params: { inst: along === 5 ? 6 : 0, along } }).channels[0];
+    let worst = 0; for (let i = 0; i < a.length; i++) worst = Math.max(worst, Math.abs(a[i] - b[i]));
+    assert.ok(worst < 1e-4, `along ${along}: largest difference ${worst}`);
+  }
 });
 
 test('with Plays along at None the old tracks sound as they did: the same samples for inst 0 to 4 on two old track files', () => {
@@ -129,7 +143,7 @@ test('every instrument and every way of playing along renders sound that is not 
     assert.ok(rms(r.channels[0]) > 0.02, `${INSTRUMENTS[inst]}: the whole mix is silent`);
     assert.ok(r.rawPeak < 0.95, `${INSTRUMENTS[inst]}: peak ${r.rawPeak}`);
   }
-  for (let along = 1; along < 6; along++) for (const inst of [0, 6]) {
+  for (let along = 1; along < 7; along++) for (const inst of [0, 6]) {
     const r = renderPatch(p, { sampleRate: 8000, params: { inst, along, bpm: 140 } });
     assert.equal(r.badSamples, 0, `${ALONG[along]} along ${INSTRUMENTS[inst]}`);
     assert.ok(rms(r.channels[0]) > 0.02 && r.rawPeak < 0.95, `${ALONG[along]} along ${INSTRUMENTS[inst]}: peak ${r.rawPeak}`);
@@ -138,20 +152,20 @@ test('every instrument and every way of playing along renders sound that is not 
 
 test('matchGains levels all ten instruments within 1 dB and sets each that plays along ALONG_DB under the tune', () => {
   const m = matchedGains();
-  assert.equal(m.gains.length, 15);
+  assert.equal(m.gains.length, 16);
   assert.equal(m.gains[0], 1, 'the synth lead is the reference');
   assert.equal(ALONG_DB, -4);
   const dbs = measureInstruments(matchedPatch(), OPTS).map((l) => l.db);
   assert.equal(dbs.length, 10);
   assert.ok(Math.max(...dbs) - Math.min(...dbs) < 1, `spread ${(Math.max(...dbs) - Math.min(...dbs)).toFixed(2)} dB: ${dbs.map((d) => d.toFixed(1)).join(', ')}`);
-  assert.equal(m.along.after.length, 5);
+  assert.equal(m.along.after.length, 6);
   for (const [i, l] of m.along.after.entries()) assert.ok(Math.abs(l.db - m.along.target) < 1, `${ALONG[i + 1]} plays along at ${l.db.toFixed(1)} dB, wanted ${m.along.target.toFixed(1)}`);
 });
 
 test('turning Plays along on makes the melody bus louder than the tune alone by 0.5 to 3.5 dB, never more', () => {
   for (const inst of [0, 4, 6, 9]) {
     const alone = levelsWith(0)[inst].db;
-    for (let along = 1; along < 6; along++) {
+    for (let along = 1; along < 7; along++) {
       if (along + 4 === inst) continue;
       const withAlong = levelsWith(along)[inst].db;
       assert.ok(withAlong - alone > 0.5 && withAlong - alone < 3.5, `${ALONG[along]} along ${INSTRUMENTS[inst]}: ${(withAlong - alone).toFixed(2)} dB over the tune`);
@@ -175,6 +189,27 @@ test('Plays along volume: 0 is silent, the default is the matched level (4 dB un
   assert.ok(Math.abs(rms(trace(p, { inst: 0, along: 0, alongLevel: 1, bpm: 140 }, ['lF'], 6)[0]) / lead - 1) < 1e-9, 'it does nothing while Plays along is None');
   const gu = (l) => rms(trace(p, { inst: 0, along: 0, alongLevel: l, bpm: 140 }, ['lAl'], 2)[0]);
   assert.equal(gu(1), 0);
+});
+
+test('Drums along: the steady beat is silent at 0, sparser at low intensity, follows speed and length, and is the one along voice', () => {
+  const p = tiny(), D = 6;
+  assert.equal(rms(trace(p, { along: D, alongLevel: 0, bpm: 140 }, ['lAl'], 5)[0]), 0, 'silent at 0');
+  const lvl = (intensity, alongLevel = 0.6) => rms(trace(p, { along: D, intensity, alongLevel, bpm: 140 }, ['lAl'], 6)[0]);
+  assert.ok(lvl(1) > 0.01, 'not silent');
+  assert.ok(lvl(0.5) < lvl(1) && lvl(0.1) < lvl(0.5) && lvl(0.1) > 0, 'only the hat at the bottom, kick in the middle, kick, snare and hat at full');
+  assert.ok(Math.abs(lvl(1, 1) / lvl(1) - 1 / 0.6) < 1e-6);
+  const hits = (id, params, sr = 4000) => { const v = run(p, params, sr), i = v.nodeIds.indexOf(id); let n = 0, first = []; for (let s = 0, m = Math.round(v.duration * sr); s < m; s++) { v.tick(); if (v.nodeValues[i] > 0) { n++; if (first.length < 3) first.push(s / sr); } } return { n, first }; };
+  assert.equal(hits('lDrK', { along: D, bars: 16, bpm: 140 }).n, 16 * 2, 'two kicks a bar for the whole length');
+  assert.equal(hits('lDrS', { along: D, bars: 8, bpm: 140 }).n, 8 * 2);
+  assert.equal(hits('lDrH', { along: D, bars: 8, bpm: 140 }).n, 8 * 8);
+  const a = hits('lDrH', { along: D, bpm: 100 }).first[1], b = hits('lDrH', { along: D, bpm: 140 }).first[1];
+  assert.ok(Math.abs(a / b - 1.4) < 0.02, 'follows Speed');
+  // one along voice at a time: Drums replace a chord or bass along, and the melody instrument may be any
+  for (let inst = 0; inst < 10; inst++) {
+    const r = renderPatch(p, { sampleRate: 6000, params: { inst, along: D, bpm: 140 } });
+    assert.ok(r.badSamples === 0 && rms(r.channels[0]) > 0.02 && r.rawPeak < 0.95, `${INSTRUMENTS[inst]} with drums along`);
+  }
+  assert.equal(trace(p, { inst: 6, along: D, bpm: 140 }, ['lPiO'], 1)[0].some((x) => x !== 0), true, 'the melody instrument still plays');
 });
 
 test('Plays along at None adds nothing at all: its part is exactly zero', () => {
@@ -233,7 +268,7 @@ test('Bass plays the tune an octave lower than the other instruments', () => {
 });
 
 test('the six pairs name real choices, and each sounds sensible: levelled, not clipping, and no louder than 3.5 dB over the melody', () => {
-  assert.deepEqual(PAIRS.map((q) => q.label), ['Guitar + Bass', 'Piano + Violin', 'Piano + Bass', 'Flute + Guitar', 'Trumpet + Piano', 'Bell + Piano']);
+  assert.deepEqual(PAIRS.map((q) => q.label), ['Guitar + Bass', 'Piano + Violin', 'Piano + Bass', 'Flute + Guitar', 'Trumpet + Piano', 'Bell + Piano', 'Guitar + Drums', 'Piano + Drums']);
   const p = matchedPatch(), solo = levelsWith(0);
   for (const pair of PAIRS) {
     const inst = INSTRUMENTS.indexOf(pair.inst), along = ALONG.indexOf(pair.along);

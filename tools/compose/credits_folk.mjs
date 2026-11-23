@@ -18,7 +18,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('folk');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.811, 0.995, 0.95, 1.51, 1.83, 0.845, 1.32, 1.21, 1.29, 1.02, 1.06, 0.948, 1.64, 1.62];
+export const GAINS = [1, 0.811, 0.995, 0.95, 1.51, 1.83, 0.845, 1.32, 1.21, 1.29, 1.02, 1.06, 0.948, 1.64, 1.62, 2.21];
 
 export const CHORDS = 'D G A D | F#m Em Bm G';
 

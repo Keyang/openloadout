@@ -17,7 +17,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('marimba');
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.785, 1.03, 0.977, 1.54, 2.28, 0.843, 1.24, 1.13, 1.35, 1.11, 1.16, 0.998, 1.86, 1.88];
+export const GAINS = [1, 0.785, 1.03, 0.977, 1.54, 2.28, 0.843, 1.24, 1.13, 1.35, 1.11, 1.16, 0.998, 1.86, 1.88, 2.43];
 
 // The commas drop a root an octave, so the broken chords stay from E3 to D5 and leave C5 to A5 to the tune.
 export const CHORDS = 'C | Am, | Dm | G, | Em, | Am, | F, | G,';

@@ -23,7 +23,7 @@ import {
 
 // Level of each melody instrument for this tune, from `--match` repeated until it settles (the tune goes through a
 // shaper, so one pass is not enough): all five within 1 dB on the melody bus lX.
-export const GAINS = [1, 0.714, 1.19, 0.961, 1.48, 6.06, 0.773, 1.26, 1.17, 1.41, 0.865, 0.707, 0.989, 1.1, 1.21];
+export const GAINS = [1, 0.714, 1.19, 0.961, 1.48, 6.06, 0.773, 1.26, 1.17, 1.41, 0.865, 0.707, 0.989, 1.1, 1.21, 1.48];
 
 // A comma drops that bar's root an octave: the bass falls to F and G under the C it started on, then climbs.
 export const CHORDS = 'Cm Cm Fm, Gm, | Cm Eb F#dim G';

@@ -26,7 +26,7 @@ function tune(nodes, changes) {
 }
 
 // Level of each melody instrument for this tune, measured after the rock colour (`--match` on lcO).
-export const GAINS = [1, 0.728, 1.07, 1.05, 1.52, 1.81, 0.815, 1.32, 1.19, 1.29, 1.15, 1.06, 1.3, 1.69, 1.72];
+export const GAINS = [1, 0.728, 1.07, 1.05, 1.52, 1.81, 0.815, 1.32, 1.19, 1.29, 1.15, 1.06, 1.3, 1.69, 1.72, 2.23];
 
 export const CHORDS = 'Em C D B | Em G A B';
 
