@@ -239,8 +239,8 @@
       "batch": "CR1"
     },
     {
-      "id": "kite-ray",
-      "name": "Kite ray",
+      "id": "gale-gull",
+      "name": "Gale gull",
       "type": "creature",
       "role": "characters/enemy",
       "view": "side",
@@ -2923,8 +2923,8 @@
       "batch": "CS2"
     },
     {
-      "id": "ray-call",
-      "name": "Ray call",
+      "id": "gull-call",
+      "name": "Gull call",
       "type": "sfx",
       "role": "characters/voice",
       "styles": [
@@ -3075,7 +3075,7 @@
       "assets": [
         "gust-blow",
         "toad-croak",
-        "ray-call",
+        "gull-call",
         "rigging-creak"
       ],
       "needs": [],
@@ -3088,7 +3088,7 @@
       "assets": [
         "cloud-courier",
         "gust-toad",
-        "kite-ray"
+        "gale-gull"
       ],
       "needs": [
         "palettes"
