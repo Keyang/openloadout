@@ -1421,13 +1421,14 @@ export const towers2 = defineGenerator({
 });
 
 /**
- * banners@2: a row of swallow-tailed banners as banners@1, measured so they fit above a low edge: `length` and `short`
+ * fitted.banners@1: a row of swallow-tailed banners as banners@1 (a different drawing, so its own name, not a version
+ * of it), measured so they fit above a low edge: `length` and `short`
  * are px from the rope to the tips, `tail` how deep the notch is cut, and the marks fit the cloth above the notch (a
  * diamond on the long ones, two bands on the short ones). `sway`: over a looping clip each banner's tips hang that
  * many px lower for half its cycle, out of step with its neighbours, so the last frame leads into the first. Wraps.
  */
-export const banners2 = defineGenerator({
-  id: 'banners', v: 2, family: 'backdrop', wraps: true,
+export const fittedBanners = defineGenerator({
+  id: 'fitted.banners', v: 1, family: 'backdrop', wraps: true,
   about: 'A row of swallow-tailed banners measured to their tips, with a notch of a chosen depth, that can sway a px over a looping clip.',
   args: {
     count: count(1, 16, { default: 4, about: 'Banners across the layer' }),

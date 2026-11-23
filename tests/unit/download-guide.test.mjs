@@ -291,7 +291,7 @@ test('a tileset with thin platforms: they are stood on from above only, in the J
     assert.match(godot, /collision shape.*One Way/, m.def.id);
     // what the text said before is a fault
     const first = m.json.tiles.groups.find((x) => x.kind === 'platform');
-    const wrong = guideFaults({ ...m, text: m.text.replace(/Platform Effector 2D/g, 'collider') });
+    const wrong = guideFaults({ ...m, text: m.text.replace(/Platform\s+Effector\s+2D/g, 'collider') });
     assert.ok(wrong.some((f) => /Unity: it has platforms to stand on/.test(f)), `${m.def.id}: a text with no one-way step for Unity is caught`);
     const unmarked = { ...m.json, tiles: { ...m.json.tiles, groups: m.json.tiles.groups.map((g) => { const { oneWay, ...rest } = g; return rest; }) } };
     assert.ok(guideFaults({ ...m, json: unmarked }).some((f) => f.includes(`does not mark the platform "${first.name}"`)), `${m.def.id}: a JSON that does not mark the platform is caught`);

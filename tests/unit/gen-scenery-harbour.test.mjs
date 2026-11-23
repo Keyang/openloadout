@@ -1,8 +1,8 @@
-// towers@2 and banners@2 (engine/gen/scenery.js), added for bg-sky-harbour. Held to here:
+// towers@2 and fitted.banners@1 (engine/gen/scenery.js), added for bg-sky-harbour. Held to here:
 //   - the goldens harness for both (pinned primitives, determinism, argument fuzz, cost, loop closure)
 //   - towers@2 with no `dark` and no `bright` paints exactly the pixels of towers@1; with them it paints the same
 //     silhouette, and every tower has a `dark` column on its left and a `bright` one on its right
-//   - banners@2: no banner hangs below top + length (+ sway); the notch is `tail` px deep; over a loop the tips move
+//   - fitted.banners@1: no banner hangs below top + length (+ sway); the notch is `tail` px deep; over a loop the tips move
 //     `sway` px and the last frame leads back into the first
 //   - towers@1 and banners@1 are unchanged (their goldens: tests/unit/gen-backdrop-scenery.test.mjs)
 import test from 'node:test';
@@ -55,16 +55,16 @@ test('towers@2 with dark and bright keeps the silhouette and shades every tower:
 const BANNERS = { count: 5, offset: 0.5, top: 133, width: 14, length: 22, short: 17, tail: 6, cloth: 'cloth', dark: 'shade', trim: 'trim' };
 const lowest = (g, x0 = 0, x1 = W) => { for (let y = H - 1; y >= 0; y--) for (let x = x0; x < x1; x++) if (g.get(x, y) >>> 24) return y; return -1; };
 
-test('banners@2 passes the goldens harness', () => {
-  checkGeneratorContract(registry, registry.generator('banners', 2), { cases: [
+test('fitted.banners@1 passes the goldens harness', () => {
+  checkGeneratorContract(registry, registry.generator('fitted.banners', 1), { cases: [
     { args: { cloth: 'cloth', dark: 'shade', trim: 'trim' } },
     { args: BANNERS, ctx: SIZE },
     { args: { ...BANNERS, sway: 1 }, ctx: { size: [W, H], t: 0.375, loop: true, frames: 8, frame: 3 } },
     { args: { count: 4, top: 0, width: 22, length: 48, short: 40, tail: 8, cloth: 'cloth', dark: 'shade', trim: 'trim' }, ctx: SIZE } ] });
 });
 
-test('banners@2: nothing hangs below top + length, the long ones reach it, and the notch is `tail` deep', () => {
-  const g = pixels(run('banners', 2, BANNERS));
+test('fitted.banners@1: nothing hangs below top + length, the long ones reach it, and the notch is `tail` deep', () => {
+  const g = pixels(run('fitted.banners', 1, BANNERS));
   assert.equal(lowest(g), BANNERS.top + BANNERS.length - 1);
   // banner 0 (long) is centred on column 32, banner 1 (short) on 96
   assert.equal(lowest(g, 25, 39), BANNERS.top + BANNERS.length - 1);
@@ -73,8 +73,8 @@ test('banners@2: nothing hangs below top + length, the long ones reach it, and t
   for (let y = 0; y < BANNERS.top; y++) for (let x = 0; x < W; x++) assert.equal(g.get(x, y) >>> 24, 0, 'nothing above the rope');
 });
 
-test('banners@2 sways: tips move `sway` px over a loop, out of step, and the loop closes', () => {
-  const at = (f) => pixels(run('banners', 2, { ...BANNERS, sway: 1 }, { size: [W, H], t: f / 8, loop: true, frames: 8, frame: f % 8 }));
+test('fitted.banners@1 sways: tips move `sway` px over a loop, out of step, and the loop closes', () => {
+  const at = (f) => pixels(run('fitted.banners', 1, { ...BANNERS, sway: 1 }, { size: [W, H], t: f / 8, loop: true, frames: 8, frame: f % 8 }));
   const lows = [0, 1, 2, 3, 4, 5, 6, 7, 8].map((f) => [0, 1, 2, 3, 4].map((k) => lowest(at(f), 25 + 64 * k, 39 + 64 * k)));
   assert.deepEqual(lows[8], lows[0]);
   for (let k = 0; k < 5; k++) {
@@ -84,5 +84,5 @@ test('banners@2 sways: tips move `sway` px over a loop, out of step, and the loo
   }
   assert.ok(lows.slice(0, 8).some((r) => new Set(r.map((y, k) => y - (k % 2 ? BANNERS.short : BANNERS.length))).size > 1), 'not all in step');
   // no loop: still
-  assert.equal(lowest(pixels(run('banners', 2, { ...BANNERS, sway: 1 }))), BANNERS.top + BANNERS.length - 1);
+  assert.equal(lowest(pixels(run('fitted.banners', 1, { ...BANNERS, sway: 1 }))), BANNERS.top + BANNERS.length - 1);
 });
