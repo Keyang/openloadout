@@ -9,6 +9,7 @@
 // control, with a second random seed, and with every preset. A music track takes minutes.
 // A control that fails the one-seed spectral test is looked at twice more before it is called
 // inaudible: do its note starts move, and does it change how much random takes differ.
+// A control that changes nothing at the defaults is tried under the other choices of each choice control first.
 // Every threshold is in THRESHOLDS and written down in docs/quality-bar.md.
 
 import { validatePatch, renderPatch, createVoice, defaultParams } from '../sound/sfx-engine.js';
@@ -24,7 +25,7 @@ export const THRESHOLDS = {
   seamJump: 0.05,           // ...and the absolute jump must also exceed this to count as a click
   tempoTolerance: 2,        // detected tempo within this many bpm of written (or half / double)
   sameSeedDb: 0.2,          // seed 1 vs seed 2 below this: every play is identical
-  minControls: 3, maxControls: 7, maxMusicControls: 10,
+  minControls: 3, maxControls: 7, maxMusicControls: 11,
   nodeSeconds: 30,          // node-level peaks are measured over at most this long
 
   // ---- added 2026-11-18. Data: every patch in sounds/ that day: 56 effects, ambiences and jingles (211 looks: each default and each style) and 2 tracks ----
@@ -309,9 +310,28 @@ export function checkSound(patch, { validateMeta } = {}) {
     const hi = renderPatch(patch, { seed: 1, params: { [p.id]: p.max } });
     const secs = Math.max(lo.duration, hi.duration);
     const fpLo = fingerprint(lo.samples, lo.sampleRate, secs), fpHi = fingerprint(hi.samples, hi.sampleRate, secs);
-    const d = fingerprintDistance(fpLo, fpHi);
+    let d = fingerprintDistance(fpLo, fpHi);
     const flags = [], more = {};
-    if (d < T.audibleChangeDb) {
+    if (d < T.deadControlDb) {
+      // A-control-choice: nothing at the defaults. It may set a layer that the default of a choice control leaves
+      // silent (the music kit's "Plays along volume" under "Plays along: None"), so try the other choices.
+      const x0 = now();
+      // Every choice control's last choice first, then each one's next to last, and so on: a layer switch is found in a few renders.
+      const choices = params.filter((c) => c.id !== p.id && Array.isArray(c.options));
+      const tries = [];
+      for (let back = 1; back <= Math.max(0, ...choices.map((c) => c.options.length)); back++) for (const c of choices) { const v = c.options.length - back; if (v >= 0 && v !== c.default) tries.push([c, v]); }
+      const d0 = d;
+      for (const [c, v] of tries) {
+        if (more.heardWith && c.id !== more.heardWith.id) continue;   // found the control that switches it on: only its other choices can score higher
+        const l = renderPatch(patch, { seed: 1, params: { [c.id]: v, [p.id]: p.min } }), h = renderPatch(patch, { seed: 1, params: { [c.id]: v, [p.id]: p.max } });
+        const s2 = Math.max(l.duration, h.duration);
+        const dc = fingerprintDistance(fingerprint(l.samples, l.sampleRate, s2), fingerprint(h.samples, h.sampleRate, s2));
+        if (dc >= T.deadControlDb && (!more.heardWith || dc > d)) { more.heardWith = { id: c.id, value: v, choice: c.options[v], distanceAtDefaults: d0 }; d = dc; }
+        if (d >= T.audibleChangeDb) break;
+      }
+      extraMs += now() - x0;
+    }
+    if (d < T.audibleChangeDb && !more.heardWith) {
       // One seed and an average over the spectrum miss two things: notes that move in time, and a wider random pick.
       const x0 = now();
       const shift = onsetShift(onsets(lo.samples, lo.sampleRate), onsets(hi.samples, hi.sampleRate));

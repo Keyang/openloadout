@@ -844,6 +844,32 @@ function argValue(C, place, name, v, info, { depth = 0, key = '' } = {}) {
   return undefined;
 }
 
+/**
+ * A tile edge's inset or ragged profile: a profile (profileRef) or a pick of one by a choice or an on/off,
+ * { from, pick: { option: profile } }, so a style can change the shape of an outline and not only how far it wanders.
+ * Every option needs a profile; a table (map) and a slider are refused. Marks the control used. Returns the name, the
+ * list or the cleaned binding (engine/resolve.js gives engine/gen/tiles.js the picked one), or undefined after an error.
+ */
+function profileOrPick(C, place, name, v) {
+  if (!isObj(v)) return profileRef(C, place, name, v);
+  knownOnly(C, `${place}, ${name}`, v, ['from', 'pick']);
+  const d = typeof v.from === 'string' ? C.table.get(v.from) : undefined;
+  if (!d) { C.err(`${place}: ${name} is picked by ${q(v.from)}, which is not one of the sprite's controls (${someOf([...C.table.keys()].filter((k) => C.table.get(k).kind !== 'colour'))})`); return undefined; }
+  C.used.add(v.from);
+  if (d.kind !== 'choice' && d.kind !== 'toggle') { C.err(`${place}: ${name} can be picked by a choice or an on/off only, and ${q(v.from)} is a ${d.kind}; write pick: { option: profile } from one of those, and bind the amount to a slider`); return undefined; }
+  if (!isObj(v.pick)) { C.err(`${place}: ${name} must be the name of a profile, a list of numbers or { from, pick: { option: profile } }; got ${say(v)}`); return undefined; }
+  const options = d.kind === 'toggle' ? ['true', 'false'] : d.values, pick = {};
+  let ok = true;
+  for (const [k, x] of Object.entries(v.pick)) {
+    if (!options.includes(k)) { C.err(`${place}: ${name}'s pick names ${q(k)}, which ${q(v.from)} never is (${someOf(options.map(q))})`); ok = false; continue; }
+    const pr = profileRef(C, place, `${name} (for ${q(k)})`, x);
+    if (pr === undefined) ok = false; else pick[k] = pr;
+  }
+  const missing = options.filter((o) => !Object.hasOwn(v.pick, o));
+  if (missing.length) { C.err(`${place}: ${name}'s pick gives no value for ${someOf(missing.map(q))}; give every ${d.kind === 'toggle' ? 'side of the on/off' : 'option'} a profile`); ok = false; }
+  return ok ? { from: v.from, pick } : undefined;
+}
+
 function profileRef(C, place, name, v) {
   if (typeof v === 'string') {
     if (!C.profiles || !C.profiles.has(v)) { C.err(`${place}: ${name}: ${q(v)} is not a profile of this sprite${C.profiles?.size ? ` (${someOf([...C.profiles.keys()])})` : ' (it has none; give the numbers as a list)'}`); return undefined; }
@@ -1976,7 +2002,7 @@ function materialOf(C, place, m, T) {
           const x = e[f];
           if (!isObj(x)) { C.err(`${ep}: ${f} must be { profile, amount }; got ${say(x)}`); continue; }
           knownOnly(C, `${ep}, ${f}`, x, ['profile', 'amount']);
-          const pr = profileRef(C, `${ep}, ${f}`, 'profile', x.profile);
+          const pr = profileOrPick(C, `${ep}, ${f}`, 'profile', x.profile);
           const am = numOrBind(C, `${ep}, ${f}`, 'amount', x.amount ?? 1, 0, T);
           if (pr !== undefined && am) o[f] = { profile: pr, amount: am.value };
         }

@@ -1371,3 +1371,102 @@ export const SCENERY_COLOUR_RULES = Object.freeze({ 'stand.apart@1': standApartR
 /** The generators of this module, every one a frame generator (engine/gen/scenery-frame.js): "<id>@<v>" -> its entry. */
 export const SCENERY_GENERATORS = Object.freeze(Object.fromEntries([tidy, tallTrees, roundTrees, towers, farHouse, castleWall, battlements, arcade, pillars, banners, wallTorches, groundMarks, pavedCourse, railFence, castleColumns, edgeBand, tufts].map((e) => [`${e.id}@${e.v}`, e])));
 
+
+// ---- added for the Cloudreach kit's bg-sky-harbour: towers and banners that take a light and fit a low rope ----------
+
+/**
+ * towers@2: towers@1's towers, pixel for pixel, each with a shaded column down its left (`dark`) and a sunlit one down
+ * its right (`bright`), `edge` px wide, on the shaft and on a crenellated top's band, so they are shaded like the
+ * things beside them (the light is from the right). With both clear it draws exactly as towers@1. Arguments as
+ * towers@1, and dark, bright, edge. Wraps.
+ */
+export const towers2 = defineGenerator({
+  id: 'towers', v: 2, family: 'backdrop', wraps: true,
+  about: 'Small far towers as towers@1 draws them, each with a shaded column down its left and a sunlit one down its right.',
+  args: {
+    ground: GROUND('The ground they stand on: set from `on`, or written out'),
+    base: px(-360, 720, { default: 120, about: 'The row of a flat ground' }),
+    count: count(0, 24, { default: 9, about: 'How many towers' }),
+    seed: seed({ default: 6, about: 'Which towers' }),
+    jitter: share({ default: 0.5, about: '0 evenly spaced, 1 anywhere in its share of the width' }),
+    sink: px(-32, 32, { default: 6, about: 'How far below the ground line they stand' }),
+    lit: count(0, 24, { default: 0, about: 'How many of them show a lit window' }),
+    stone: paint({ about: 'The towers' }),
+    lamp: paint({ about: 'A lit window' }),
+    dark: paint({ default: 'clear', about: 'The shaded column down each tower\'s left (clear: none)' }),
+    bright: paint({ default: 'clear', about: 'The sunlit column down each tower\'s right (clear: none)' }),
+    edge: count(1, 3, { default: 1, about: 'px across each of those columns' }),
+    wrap: flag({ default: true, about: 'Over an edge it comes back on the other side' }),
+  },
+  cost: (a) => a.count * COPIES * 10,
+  run(a, ctx) {
+    const [W] = ctx.size, out = [];
+    const ground = groundOutline(a.ground, W, a.base);
+    for (const t of spots(a.count, a.seed, { jitter: a.jitter }, W)) {
+      const w = 8 + Math.round(t.u * 5), foot = Math.round(ground(t.x)) + a.sink, top = foot - 18 - Math.round(t.v * 14);
+      for (const x of copiesAt(t.x, w + 4, W, a.wrap)) {
+        const flat = !(t.w < 0.5);
+        // the columns towers@1's rects paint: a pixel is painted where its centre lies inside
+        const l = Math.ceil(x - w / 2 - 0.5), r = Math.ceil(x + w / 2 - 0.5), cl = Math.ceil(x - w / 2 - 2.5), cr = Math.ceil(x + w / 2 + 1.5);
+        out.push(rect(x - w / 2, top, w, foot - top + 8, a.stone));
+        if (!flat) out.push(poly([[x - w / 2 - 2, top], [x + w / 2 + 2, top], [x, top - w - 2]], a.stone));
+        else out.push(rect(x - w / 2 - 2, top - 3, w + 4, 5, a.stone), rect(x - w / 2 - 2, top - 6, 3, 3, a.stone), rect(x - 1, top - 6, 3, 3, a.stone), rect(x + w / 2 - 1, top - 6, 3, 3, a.stone));
+        if (a.dark !== 'clear') { out.push(rect(l, flat ? top + 2 : top, a.edge, foot - top + 8 - (flat ? 2 : 0), a.dark)); if (flat) out.push(rect(cl, top - 3, a.edge, 5, a.dark)); }
+        if (a.bright !== 'clear') { out.push(rect(r - a.edge, flat ? top + 2 : top, a.edge, foot - top + 8 - (flat ? 2 : 0), a.bright)); if (flat) out.push(rect(cr - a.edge, top - 3, a.edge, 5, a.bright)); }
+        if (t.i < a.lit) out.push(rect(x - 2, top + 6, 3, 5, a.lamp));
+      }
+    }
+    return out;
+  },
+});
+
+/**
+ * banners@2: a row of swallow-tailed banners as banners@1, measured so they fit above a low edge: `length` and `short`
+ * are px from the rope to the tips, `tail` how deep the notch is cut, and the marks fit the cloth above the notch (a
+ * diamond on the long ones, two bands on the short ones). `sway`: over a looping clip each banner's tips hang that
+ * many px lower for half its cycle, out of step with its neighbours, so the last frame leads into the first. Wraps.
+ */
+export const banners2 = defineGenerator({
+  id: 'banners', v: 2, family: 'backdrop', wraps: true,
+  about: 'A row of swallow-tailed banners measured to their tips, with a notch of a chosen depth, that can sway a px over a looping clip.',
+  args: {
+    count: count(1, 16, { default: 4, about: 'Banners across the layer' }),
+    offset: share({ default: 0, about: 'Moved right by this share of the spacing: 0 a banner on the join' }),
+    top: px(-360, 720, { default: 0, about: 'The row they hang from' }),
+    width: px(8, 64, { default: 22, about: 'px across a banner' }),
+    length: px(12, 160, { default: 48, about: 'The long ones, px from the rope to the tips' }),
+    short: px(12, 160, { default: 40, about: 'Every other one, px from the rope to the tips' }),
+    tail: px(2, 32, { default: 8, about: 'How deep the notch is cut, px (never more than half the banner)' }),
+    sway: count(0, 2, { default: 0, about: 'Over a looping clip the tips hang this many px lower for half of each banner\'s cycle' }),
+    cloth: paint({ about: 'The cloth' }),
+    dark: paint({ about: 'The shadow down its left side' }),
+    trim: paint({ about: 'The bands and the diamond' }),
+    wrap: flag({ default: true, about: 'Over an edge it comes back on the other side' }),
+  },
+  cost: (a) => a.count * COPIES * 5,
+  run(a, ctx) {
+    const W = ctx.size[0], span = W / a.count, bw = Math.round(a.width), out = [], y0 = Math.round(a.top);
+    const t = ctx.loop === true && fin(ctx.t) ? ((ctx.t % 1) + 1) % 1 : -1;
+    const s = Math.max(2, Math.round(bw / 5));                                   // the shadow's width
+    for (let k = 0; k < a.count; k++) {
+      const drop = Math.round(k % 2 ? a.short : a.length), tail = Math.min(Math.round(a.tail), Math.floor(drop / 2));
+      const low = t >= 0 && a.sway && (((t + hash(k, 61)) % 1) < 0.5) ? a.sway : 0;
+      const h = drop - tail, end = y0 + drop + low, notch = end - tail;         // the marks keep to the still banner's cloth
+      for (const cx of copiesAt(Math.round((k + a.offset) * span), bw / 2 + 2, W, a.wrap)) {
+        const bl = cx - bw / 2;
+        out.push(poly([[bl, y0], [bl + bw, y0], [bl + bw, end], [cx, notch], [bl, end]], a.cloth));
+        out.push(poly([[bl, y0], [bl + s, y0], [bl + s, end - tail * (s / (bw / 2))], [bl, end]], a.dark));
+        if (k % 2) {
+          const b = h >= 24 ? 4 : 2, lower = y0 + h - 2 - b, upper = lower - 2 * b;
+          out.push(rect(bl + s, lower, bw - s, b, a.trim));
+          if (upper >= y0 + 2) out.push(rect(bl + s, upper, bw - s, b, a.trim));
+        } else {
+          const rx = Math.max(2, Math.floor((bw - s) / 2) - 1), ry = Math.max(2, Math.min(Math.floor(h / 2) - 2, Math.round(rx * 1.6)));
+          const mx = bl + s + (bw - s) / 2, my = y0 + Math.round(h / 2);
+          out.push(poly([[mx, my - ry], [mx + rx, my], [mx, my + ry], [mx - rx, my]], a.trim));
+        }
+      }
+    }
+    return out;
+  },
+});

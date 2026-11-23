@@ -1,0 +1,45 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "respawn-pop",
+  "name": "Respawn pop",
+  "category": "magic",
+  "description": "A hero turning into a puff of cloud: a soft hollow tone that falls and breaks into quick pieces, faster and faster, after a small puff of air. Set Drop below the middle and it climbs and gathers instead, with the puff at the end, for coming back. Change its pitch, length, drop, brightness and the number of pieces.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/death",
+    "themes": ["fantasy", "neutral"],
+    "gameTypes": ["platformer", "arcade"],
+    "words": ["respawn", "pop", "poof", "vanish", "death", "die", "retry", "restart", "checkpoint", "reappear", "scatter", "puff", "cloud", "airy"],
+    "license": "draft"
+  },
+  "duration": "length + 0.03",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 300, "max": 1200, "default": 700, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.15, "max": 0.5, "default": 0.25, "scale": "log" },
+    { "id": "drop", "label": "Drop", "unit": "semitones", "min": -12, "max": 14, "default": 9 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "pieces", "label": "Pieces", "min": 3, "max": 8, "default": 5, "step": 1 }
+  ],
+  "nodes": [
+    { "id": "glide", "type": "env", "points": [[0, "pitch"], ["length", "pitch * semi(-drop)", "exp"]] },
+    { "id": "wobble", "type": "rand", "lo": 0.9, "hi": 1.1 },
+    { "id": "clk", "type": "clock", "rate": "pieces / (1.5 * length) * (1 + t / length) * wobble", "jitter": 0.18, "count": "pieces" },
+    { "id": "chop", "type": "ad", "attack": 0.002, "decay": "length / pieces * 1.5", "curve": 1.4, "trig": "clk" },
+    { "id": "fade", "type": "env", "points": [[0, "drop < 0 ? 0.55 : 1"], ["length * 0.8", "drop < 0 ? 1 : 0.6"], ["length + 0.02", 0]] },
+    { "id": "body", "type": "osc", "wave": "tri", "freq": "glide" },
+    { "id": "edge", "type": "osc", "wave": "tri", "freq": "glide * 3" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "body + edge * bright * 0.45", "freq": "glide * (1.3 + bright * bright * 9)", "q": 0.7 },
+    { "id": "air", "type": "noise" },
+    { "id": "puffClk", "type": "clock", "rate": 1, "count": 1, "delay": "drop < 0 ? length * 0.72 : 0" },
+    { "id": "puffAmp", "type": "ad", "attack": "drop < 0 ? 0.02 : 0.003", "decay": "0.05 + length * 0.12", "curve": 2, "trig": "puffClk" },
+    { "id": "puff", "type": "filter", "mode": "lp", "in": "air", "freq": "1200 + bright * 1600", "q": 0.6 },
+    { "id": "sum", "type": "expr", "expr": "tone * chop * fade * 0.8 + puff * puffAmp * (0.5 + bright * 0.3)" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 200, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Burst": {},
+    "Back again": { "drop": -9, "pitch": 440, "length": 0.3 },
+    "Spiked": { "drop": 14, "length": 0.18, "bright": 0.8, "pieces": 3 }
+  }
+}

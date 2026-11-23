@@ -1236,3 +1236,71 @@ export const layers = defineGenerator({
 
 /** The generators of this module that work in frame pixels by design (engine/gen/index.js FRAME_GENERATORS), each with why: "<id>@<v>" -> reason (kept in engine/gen/backdrop-frame.js, which imports nothing, so loading this module first never trips over a half-loaded engine/gen/index.js). */
 export { BACKDROP_FRAME_GENERATORS } from './backdrop-frame.js';
+
+/** columnPolys kept to each run of painted columns: no polygon reaches over columns that paint nothing (columnPolys starts at column 0 and ends at the last, so its boxes span the layer). Arguments: y0, y1, paint, as columnPolys. */
+function ownColumnPolys(y0, y1, paintRef) {
+  const W = Math.min(y0.length, y1.length), out = [];
+  for (let a = 0; a < W;) {
+    if (!(y1[a] > y0[a])) { a++; continue; }
+    let b = a + 1;
+    while (b < W && y1[b] > y0[b]) b++;
+    for (const p of columnPolys(y0.slice(a, b), y1.slice(a, b), paintRef)) out.push({ ...p, points: p.points.map(([x, y]) => [x + a, y]) });
+    a = b;
+  }
+  return out;
+}
+
+/**
+ * cloud@2: cloud@1's cloud, pixel for pixel, in polygons kept to its own columns (cloud@1's run from column 0 to the
+ * layer's right edge, so a cloud written alone in a layer asked up to a twentieth of the frame's work), and `sway`:
+ * over a looping clip it slides that many whole px and back, out of step with other clouds by its seed, so the last
+ * frame leads into the first (scatter@1's `drift` jumps back once a loop). Arguments as cloud@1, and sway. Wraps.
+ */
+export const cloud2 = defineGenerator({
+  id: 'cloud', v: 2, family: 'backdrop', wraps: true,
+  about: 'A flat-bottomed cartoon cloud (cloud@1\'s, in polygons kept to its own columns) that can sway a few px there and back over a looping clip.',
+  args: {
+    at: point({ about: 'The middle of its flat underside' }),
+    size: px(8, 96, { default: 40, about: 'Its width, px' }),
+    vary: share({ default: 0.3, about: 'How much the width varies with the seed' }),
+    seed: seed({ default: 0, about: 'Which bumps, and where in its sway it starts' }),
+    sway: px(-16, 16, { default: 0, about: 'Over a looping clip it slides this many px and back (0: still)' }),
+    paint: paint({ about: 'The cloud' }),
+    under: paint({ default: 'clear', about: 'Its bottom three rows (clear: none)' }),
+    wrap: flag({ default: true, about: 'Over an edge it comes back on the other side' }),
+  },
+  cost: (a) => 2 * (polyBound(Math.ceil(a.size * 1.75) + 8) + 3),
+  run(a, ctx) {
+    const [W, H] = ctx.size;
+    // there and back at a steady pace: 0 at one end of the swing, `sway` at the other, the same at t = 0 and t = 1
+    const slide = ctx.loop === true && a.sway ? Math.round(a.sway * (1 - Math.abs(2 * fract(phase(ctx.t) + hash(a.seed, 47)) - 1))) : 0;
+    const x0 = Math.round(a.at[0]) + slide, y = Math.round(a.at[1]);
+    const w = a.size * lerp(1 - a.vary / 2, 1 + a.vary / 2, hash(a.seed, 40));
+    const r = Math.max(3, Math.round(w * 0.13));
+    const bumps = [
+      [-w * lerp(0.2, 0.28, hash(a.seed, 41)), w * lerp(0.15, 0.2, hash(a.seed, 42))],
+      [w * lerp(-0.04, 0.06, hash(a.seed, 43)), w * lerp(0.22, 0.27, hash(a.seed, 44))],
+      [w * lerp(0.2, 0.28, hash(a.seed, 45)), w * lerp(0.14, 0.19, hash(a.seed, 46))],
+    ];
+    const body = capsuleIn(x0 - w / 2 + r, y - 1, x0 + w / 2 - r, y - 1, r, r);
+    const lobes = bumps.map(([dx, br]) => ellipseIn(Math.round(x0 + dx), y - Math.round(br * 0.45), br, br));
+    const inside = (px, py) => body(px, py) || lobes.some((f) => f(px, py));
+    const top = Math.floor(y - Math.max(r + 2, ...bumps.map(([, br]) => br * 1.45 + 2)));
+    const y0 = new Array(W).fill(0), y1 = new Array(W).fill(0), u0 = new Array(W).fill(0), u1 = new Array(W).fill(0);
+    const reach = Math.ceil(w / 2 + 2 + Math.max(...bumps.map(([dx, br]) => Math.abs(dx) + br - w / 2), 0));
+    for (let xx = x0 - reach; xx <= x0 + reach; xx++) {
+      const fx = a.wrap ? mod(xx, W) : xx;
+      if (fx < 0 || fx >= W) continue;
+      let lo = Infinity, hi = -Infinity, ulo = Infinity;
+      for (let py = Math.max(top, 0); py < y; py++) {
+        if (inside(xx + 0.5, py + 0.5)) { if (py < lo) lo = py; hi = py; }
+        if (py >= y - 3 && ulo === Infinity && body(xx + 0.5, py + 0.5)) ulo = py;
+      }
+      if (hi >= lo) { y0[fx] = Math.max(0, lo); y1[fx] = Math.min(H, hi + 1); }
+      if (ulo !== Infinity) { u0[fx] = Math.max(0, ulo); u1[fx] = Math.min(H, y); }
+    }
+    const out = ownColumnPolys(y0, y1, a.paint);
+    if (a.under !== 'clear') out.push(...ownColumnPolys(u0, u1, a.under));
+    return out;
+  },
+});

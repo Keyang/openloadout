@@ -1,0 +1,55 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "rigging-creak",
+  "name": "Rigging creak",
+  "category": "ambience",
+  "description": "Rope and timber creaking on a moored airship in a light wind, as a loop. Change the pitch of the creaks, how many there are, the brightness and how much something loose rattles.",
+  "meta": {
+    "type": "ambience",
+    "role": "environment/ambience",
+    "themes": ["fantasy", "neutral"],
+    "gameTypes": ["platformer", "arcade"],
+    "words": ["creak", "rigging", "rope", "timber", "ship", "airship", "groan", "rattle", "moored", "deck", "mast", "strain", "creaky", "wood"],
+    "license": "draft"
+  },
+  "loop": true,
+  "duration": 6,
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 200, "max": 900, "default": 420, "scale": "log", "hint": "How high the creaks are." },
+    { "id": "speed", "label": "Speed", "min": 0, "max": 2, "default": 1, "options": ["Few", "Some", "Many"], "hint": "How many creaks there are in the loop. The loop stays the same length." },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.45 },
+    { "id": "rattle", "label": "Rattle", "min": 0, "max": 1, "default": 0.15, "hint": "How much something loose shakes and ticks." }
+  ],
+  "nodes": [
+    { "id": "beat", "type": "clock", "rate": "3 * pow(2, speed) / 6", "delay": 0.06 },
+    { "id": "lvl", "type": "rand", "lo": 0.35, "hi": 1, "trig": "beat" },
+    { "id": "bend", "type": "rand", "lo": -1, "hi": 1, "trig": "beat" },
+    { "id": "cenv", "type": "ad", "trig": "beat", "attack": 0.06, "hold": "0.08 + 0.1 * (2 - speed)", "decay": "0.25 + 0.2 * (2 - speed)", "curve": 1.6 },
+    { "id": "wclk", "type": "clock", "rate": 2.5, "jitter": 0.5 },
+    { "id": "wr", "type": "rand", "lo": -1, "hi": 1, "trig": "wclk" },
+    { "id": "sway", "type": "lag", "in": "wr", "time": 0.3 },
+    { "id": "f", "type": "expr", "expr": "pitch * semi(sway * 2.5 + bend * 1.5 + cenv * 1.5)" },
+    { "id": "fibres", "type": "dust", "density": "25 + 150 * cenv * lvl", "spread": 0.6 },
+    { "id": "low", "type": "filter", "mode": "bp", "in": "fibres", "freq": "f", "q": 16 },
+    { "id": "high", "type": "filter", "mode": "bp", "in": "fibres", "freq": "f * 2.6", "q": 11 },
+    { "id": "creaks", "type": "expr", "expr": "(low + high * (0.5 + bright * 1.1)) * cenv * lvl" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "creaks", "freq": "1600 + bright * 7000" },
+    { "id": "n", "type": "noise", "color": "pink" },
+    { "id": "airLp", "type": "filter", "mode": "lp", "in": "n", "freq": "450 + bright * 900" },
+    { "id": "air", "type": "filter", "mode": "hp", "in": "airLp", "freq": 180 },
+    { "id": "tclk", "type": "clock", "rate": "14 + 12 * rattle", "jitter": 0.7 },
+    { "id": "tlvl", "type": "rand", "lo": 0.2, "hi": 1, "trig": "tclk" },
+    { "id": "tamp", "type": "ad", "trig": "tclk", "attack": 0.0003, "decay": 0.002, "curve": 1.5 },
+    { "id": "tn", "type": "noise" },
+    { "id": "shake", "type": "expr", "expr": "0.3 + 0.7 * pow(abs(sin(pi * t * 5 / 6)), 2)" },
+    { "id": "ticks", "type": "filter", "mode": "bp", "in": "tn * tamp * tlvl * shake", "freq": "3500 * rnd(0.92, 1.08)", "q": 2.5 },
+    { "id": "sum", "type": "expr", "expr": "tone * 1 + air * 0.05 + ticks * rattle * 1" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 30 }
+  ],
+  "out": "clean",
+  "presets": {
+    "At anchor": {},
+    "Straining": { "speed": 2, "pitch": 300, "bright": 0.6 },
+    "Rattle": { "rattle": 1, "speed": 0, "pitch": 700 }
+  }
+}

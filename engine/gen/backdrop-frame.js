@@ -16,6 +16,7 @@ export const BACKDROP_FRAME_GENERATORS = Object.freeze({
   'mist.band@1': 'fills whole columns of the layer under a waving line: name it in a layers body, not on a node',
   'treeline@1': 'trees across the layer\'s width on an outline that repeats: name it in a layers body, not on a node',
   'cloud@1': 'wraps at the layer\'s edges, so it works in frame columns: name it in a layers body, not on a node',
+  'cloud@2': 'wraps at the layer\'s edges, so it works in frame columns: name it in a layers body, not on a node',
   'disc@1': 'wraps at the layer\'s edges, so it works in frame columns: name it in a layers body, not on a node',
   'stars@1': 'places stars across the layer\'s width and wraps them: name it in a layers body, not on a node',
   'nebula@1': 'wraps at the layer\'s edges, so it works in frame columns: name it in a layers body, not on a node',

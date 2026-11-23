@@ -1,0 +1,138 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "post-box",
+ "name": "Post box",
+ "blurb": "A post box on a post where letters are delivered: its flap opens, the letter goes in, the box hops and its flag goes up. Change its style, size, emblem, vines and colours.",
+ "meta": {"type":"prop","role":"world/prop","themes":["fantasy"],"gameTypes":["platformer","farming-sim","top-down-rpg"],"view":"side","words":["postbox","mailbox","letter","deliver","goal","mail","slot","flag","finish","post","drop","courier"],"license":"draft"},
+ "size": [32,48],
+ "pivot": [16,46],
+ "preview": "idle",
+ "styles": ["pixel"],
+ "versions": [
+  {"name":"Island post","params":{}},
+  {"name":"Red harbour box","params":{"style":"lantern","body":"#c9423a","metal":"#c2c9d6","mark":"star"}},
+  {"name":"Mossy dock chest","params":{"style":"crate","body":"#3f8f5a","mossy":true,"mark":"none","accent":"#f0ead8"}},
+  {"name":"Small night drop","params":{"size":0,"body":"#56607e","accent":"#4fd8ee","mark":"diamond"}}
+ ],
+ "palette": [
+  {"id":"body","label":"Box","default":"#3f6fd1","material":"paint","swatches":["#3f6fd1","#c9423a","#3f8f5a","#7a4fc4","#56607e"]},
+  {"id":"metal","label":"Fittings","default":"#d89a3c","material":"metal","swatches":["#d89a3c","#c2c9d6","#c9a86a","#e8d9a8"]},
+  {"id":"accent","label":"Flag","default":"#f2c230","material":"signal","swatches":["#f2c230","#f0ead8","#e2709a","#4fd8ee"]},
+  {"id":"wood","default":"#a8703e","material":"wood","detail":true},
+  {"id":"roof","default":"#b8663a","material":"metal","detail":true},
+  {"id":"vine","default":"#3f8f5a","material":"plant","detail":true},
+  {"id":"letter","default":"#f0ead8","material":"paint","detail":true},
+  {"id":"shine","default":"#ffffff","material":"light","detail":true}
+ ],
+ "controls": [
+  {"key":"size","kind":"range","label":"Size","lo":"Small","hi":"Big","default":0.5},
+  {"key":"style","kind":"choice","label":"Style","options":["pillar","lantern","crate"],"default":"pillar"},
+  {"key":"mark","kind":"choice","label":"Emblem","options":["star","sun","diamond","none"],"default":"sun"},
+  {"key":"mossy","kind":"toggle","label":"Vines","default":false},
+  {"key":"body","kind":"colour","label":"Box"},
+  {"key":"metal","kind":"colour","label":"Fittings"},
+  {"key":"accent","kind":"colour","label":"Flag"},
+  {"key":"speed","standard":"speed"}
+ ],
+ "body": { "pictures": {
+  "nodes": [
+   {"id":"stand","parent":null,"at":[16,{"from":"size","map":[[0,30],[1,28]],"round":"px"}]},
+   {"id":"box","parent":"stand","at":[0,{"from":"style","pick":{"pillar":0,"lantern":1,"crate":0}}]},
+   {"id":"flag","parent":"box","at":[{"from":"style","pick":{"pillar":8,"lantern":7,"crate":8}},-8]}
+  ],
+  "draw": [
+   {"id":"post","kind":"rect","at":[14,28],"size":[4,18],"paint":"wood","shade":0,"when":{"style":["pillar","lantern"]}},
+   {"id":"post-dark","kind":"rect","at":[14,28],"size":[1,18],"paint":"wood.dark","when":{"style":["pillar","lantern"]}},
+   {"id":"post-light","kind":"rect","at":[17,28],"size":[1,18],"paint":"wood.light","when":{"style":["pillar","lantern"]}},
+   {"id":"leg-l","kind":"rect","at":[9,28],"size":[2,18],"paint":"wood","shade":0,"when":{"style":["crate"]}},
+   {"id":"leg-r","kind":"rect","at":[21,28],"size":[2,18],"paint":"wood","shade":0,"when":{"style":["crate"]}},
+   {"id":"leg-l-dark","kind":"rect","at":[9,28],"size":[1,18],"paint":"wood.dark","when":{"style":["crate"]}},
+   {"id":"leg-r-light","kind":"rect","at":[22,28],"size":[1,18],"paint":"wood.light","when":{"style":["crate"]}},
+   {"id":"rail","kind":"rect","at":[11,39],"size":[10,2],"paint":"wood.dark","when":{"style":["crate"]}},
+   {"id":"vine-post","kind":"stamp","at":[13,46],"anchor":"bl","when":{"mossy":[true],"style":["pillar","lantern"]},"key":{"v":"vine","L":"vine.light"},"rows":[".v....",".vv...","..v...","..vv.L","...vv.","...v..","L.vv..",".vv...",".v....",".vv...","..vv..","...v.L","..vv..",".vv..."]},
+   {"id":"vine-leg","kind":"stamp","at":[8,46],"anchor":"bl","when":{"mossy":[true],"style":["crate"]},"key":{"v":"vine","L":"vine.light"},"rows":[".v..",".vv.","..v.","..vL",".vv.",".v..","Lv..",".vv.","..v.","..v.",".vv.",".v.L",".vv.","..v."]},
+   {"id":"cap","kind":"rect","on":"box","at":[-3,0],"size":[6,2],"paint":"metal","when":{"style":["pillar","lantern"]}},
+   {"id":"cap-dark","kind":"rect","on":"box","at":[-3,1],"size":[6,1],"paint":"metal.dark","when":{"style":["pillar","lantern"]}},
+   {"id":"cap-l","kind":"rect","on":"box","at":[-8,0],"size":[4,1],"paint":"metal.dark","when":{"style":["crate"]}},
+   {"id":"cap-r","kind":"rect","on":"box","at":[4,0],"size":[4,1],"paint":"metal.dark","when":{"style":["crate"]}},
+   {"id":"pillar-body","kind":"rect","on":"box","at":[-8,-12],"size":[16,12],"paint":"body","shade":2,"group":"pillar-g","when":{"style":["pillar"]}},
+   {"id":"pillar-dome","kind":"ellipse","on":"box","at":[0,-12],"r":[8,6],"paint":"body","shade":2,"group":"pillar-g","when":{"style":["pillar"]}},
+   {"id":"pillar-shine","kind":"stamp","on":"box","at":[2,-17],"anchor":"tl","rows":["lll.","..ll","...l"],"key":{"l":"body.light"},"when":{"style":["pillar"]}},
+   {"id":"lantern-body","kind":"rect","on":"box","at":[-7,-12],"size":[14,12],"paint":"body","shade":0,"when":{"style":["lantern"]}},
+   {"id":"lantern-left","kind":"rect","on":"box","at":[-7,-12],"size":[2,12],"paint":"body.dark","when":{"style":["lantern"]}},
+   {"id":"lantern-right","kind":"rect","on":"box","at":[5,-12],"size":[2,12],"paint":"body.light","when":{"style":["lantern"]}},
+   {"id":"lantern-eave","kind":"rect","on":"box","at":[-8,-13],"size":[16,1],"paint":"ink","when":{"style":["lantern"]}},
+   {"id":"roof","kind":"poly","on":"box","points":[[-8.5,-13],[8.5,-13],[1.5,-19],[-1.5,-19]],"paint":"roof","shade":1,"when":{"style":["lantern"]}},
+   {"id":"roof-shine","kind":"stamp","on":"box","at":[2,-17],"anchor":"tl","rows":["l..",".l.","..l"],"key":{"l":"roof.light"},"when":{"style":["lantern"]}},
+   {"id":"crate-body","kind":"rect","on":"box","at":[-8,-12],"size":[16,12],"paint":"body","shade":2,"when":{"style":["crate"]}},
+   {"id":"crate-planks","kind":"stamp","on":"box","at":[-8,-8],"anchor":"tl","key":{"d":"body.dark"},"when":{"style":["crate"]},"rows":[".dd..........dd.","................","................","................",".dd..........dd."]},
+   {"id":"crate-eave","kind":"rect","on":"box","at":[-8,-13],"size":[16,1],"paint":"ink","when":{"style":["crate"]}},
+   {"id":"lid","kind":"poly","on":"box","points":[[-9,-13],[9,-13],[9,-15],[-9,-18]],"paint":"body.light","shade":0,"when":{"style":["crate"]}},
+   {"id":"lid-edge","kind":"line","on":"box","from":[-8.5,-17.5],"to":[8.5,-14.5],"paint":"body","when":{"style":["crate"]}},
+   {"id":"band","kind":"rect","on":"box","at":[{"from":"style","pick":{"pillar":-8,"lantern":-7,"crate":-8}},-2],"size":[{"from":"style","pick":{"pillar":16,"lantern":14,"crate":16}},2],"paint":"metal"},
+   {"id":"band-rivets","kind":"stamp","on":"box","at":[-6,-2],"anchor":"tl","rows":["llllllllllll","d....dd....d"],"key":{"l":"metal.light","d":"metal.dark"}},
+   {"id":"plate","kind":"stamp","on":"box","at":[-5,-12],"anchor":"tl","key":{"l":"metal.light","m":"metal","d":"metal.dark","k":"ink"},"rows":["mmmmmmmmmm","mkkkkkkkkm","dddddddddd"],"variants":{"open":["mkkkkkkkkm","mkkkkkkkkm","dkkkkkkkkd"]}},
+   {"id":"flap","kind":"stamp","on":"box","at":[-5,-15],"anchor":"tl","key":{"l":"metal.light","d":"metal.dark"},"hidden":true,"rows":["llllllllll","dddddddddd"]},
+   {"id":"letter","kind":"stamp","on":"box","at":[-3,-12],"anchor":"tl","key":{"c":"letter","d":"letter.dark"},"hidden":true,"rows":["ccccc","cdddc","ccccc"],"variants":{"half":["ccccc","cdddc","....."]}},
+   {"id":"emblem","gen":"mark","v":1,"on":"box","at":[0,-6],"size":7,"paint":"metal","name":{"from":"mark","pick":{"star":"star","sun":"sun","diamond":"diamond","none":"star"}},"when":{"mark":["star","sun","diamond"]}},
+   {"id":"vine-shoulder","kind":"stamp","on":"box","at":[{"from":"style","pick":{"pillar":-9,"lantern":-8,"crate":-9}},{"from":"style","pick":{"pillar":-14,"lantern":-12,"crate":-12}}],"anchor":"tl","when":{"mossy":[true]},"key":{"v":"vine","L":"vine.light"},"rows":["..vv.",".vvLv","vv...","vL...",".v...","vv...",".v..."]},
+   {"id":"flag-down","kind":"stamp","on":"flag","at":[0,0],"anchor":"tl","key":{"a":"accent.dark","c":"accent"},"when":{"clip":["idle","deliver"]},"rows":["aa..","a...","a...","accc","accc","accc","accc"]},
+   {"id":"flag-mid","kind":"stamp","on":"flag","at":[0,-1],"anchor":"tl","key":{"a":"accent.dark","c":"accent"},"hidden":true,"when":{"clip":["deliver"]},"rows":["aaaa",".ccc",".ccc",".ccc"]},
+   {"id":"flag-raised","kind":"stamp","on":"flag","at":[0,-9],"anchor":"tl","key":{"a":"accent.dark","c":"accent"},"hidden":true,"when":{"clip":["deliver"]},"rows":["cccc","cccc","cccc","acc.","a...","a...","a...","a...","aa.."]},
+   {"id":"flag-up","kind":"stamp","on":"flag","at":[0,-9],"anchor":"tl","key":{"a":"accent.dark","c":"accent"},"when":{"clip":["full"]},"rows":["cccc","cccc","cccc","acc.","a...","a...","a...","a...","aa.."],"variants":{"wave":["ccc.","cccc","cccc","accc","a...","a...","a...","a...","aa.."]}},
+   {"kind":"outline","paint":"ink"},
+   {"id":"glint-a","kind":"dot","on":"box","at":[-4,-12],"paint":"shine","hidden":true,"when":{"clip":["idle"]}},
+   {"id":"glint-b","kind":"dot","on":"box","at":[-2,-12],"paint":"shine","hidden":true,"when":{"clip":["idle"]}},
+   {"id":"glint-c","kind":"dot","on":"box","at":[0,-12],"paint":"shine","hidden":true,"when":{"clip":["idle"]}},
+   {"id":"glint-d","kind":"dot","on":"box","at":[2,-12],"paint":"shine","hidden":true,"when":{"clip":["idle"]}},
+   {"id":"gleam","gen":"gleam","v":1,"on":"box","clip":["idle"],"at":[4,-12],"paint":"metal.light","core":"shine","peak":0.875,"big":1}
+  ],
+  "motion": [
+   {"gen":"node.size","v":1,"node":"box","scale":{"from":"size","map":[[0,0.9],[1,1.1]]}}
+  ],
+  "emitters": [
+   {"id":"ring","gen":"spark.ring","v":1,"on":"flag","at":[2,-7],"clip":["deliver"],"count":6,"r0":3,"r1":6,"rise":1,"style":"plus","reach":1,"seed":3,"paints":["shine","accent.light","accent.light","accent.dark"],"core":"shine","begin":0.7,"end":1,"area":{"x0":1,"y0":1,"x1":31,"y1":47},"glow":true},
+   {"id":"spark","gen":"twinkle","v":2,"on":"flag","at":[4,-9],"clip":["full"],"size":1,"paint":"accent.light","core":"shine","area":{"x0":1,"y0":1,"x1":31,"y1":47},"glow":true}
+  ]
+ } },
+ "clips": {
+  "idle": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Waiting",
+   "frameEdits": {"3":{"show":["glint-a"]},"4":{"show":["glint-b"]},"5":{"show":["glint-c"]},"6":{"show":["glint-d"]}}
+  },
+  "deliver": {
+   "frames": 8,
+   "fps": 12,
+   "loop": false,
+   "label": "Letter delivered",
+   "keys": [
+    {"t":0,"ease":"hold","root":[0,0],"emit":{"ring":{"amount":0}}},
+    {"t":0.5714,"ease":"hold","root":[0,-2],"emit":{"ring":{"amount":0}}},
+    {"t":0.714,"ease":"hold","root":[0,0],"emit":{"ring":{"amount":0}}},
+    {"t":0.857,"ease":"hold","root":[0,0],"emit":{"ring":{"amount":1}}},
+    {"t":1,"root":[0,0],"emit":{"ring":{"amount":0}}}
+   ],
+   "frameEdits": {"1":{"swap":{"plate":"open"},"show":["flap"]},"2":{"swap":{"plate":"open"},"show":["flap","letter"]},"3":{"swap":{"plate":"open","letter":"half"},"show":["flap","letter"]},"5":{"hide":["flag-down"],"show":["flag-mid"]},"6":{"hide":["flag-down"],"show":["flag-raised"]},"7":{"hide":["flag-down"],"show":["flag-raised"]}},
+   "sounds": [
+    {"sound":"door-creak","preset":"Quick hatch","frame":0,"volume":0.8},
+    {"sound":"save-chime","preset":"Item found","frame":5,"volume":0.8}
+   ]
+  },
+  "full": {
+   "frames": 8,
+   "fps": 8,
+   "label": "Delivered",
+   "keys": [
+    {"t":0,"ease":"hold","emit":{"spark":{"amount":0}}},
+    {"t":0.25,"ease":"hold","emit":{"spark":{"amount":1}}},
+    {"t":0.375,"ease":"hold","emit":{"spark":{"amount":0}}},
+    {"t":0.75,"ease":"hold","emit":{"spark":{"amount":1}}},
+    {"t":0.875,"ease":"hold","emit":{"spark":{"amount":0}}}
+   ],
+   "frameEdits": {"4":{"swap":{"flag-up":"wave"}},"5":{"swap":{"flag-up":"wave"}},"6":{"swap":{"flag-up":"wave"}},"7":{"swap":{"flag-up":"wave"}}}
+  }
+ }
+}

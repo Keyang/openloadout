@@ -1,0 +1,43 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "dash-refill",
+ "name": "Dash refill",
+ "category": "pickup",
+ "description": "Wind caught in a small glass bell: one to three rising glass notes over a soft breath of air, with a little room, for a dash given back. Change its pitch, how long it rings, the shimmer of the glass, the breath and the number of notes. The same every time.",
+ "meta": {
+  "type": "sfx",
+  "role": "items/pickup",
+  "themes": ["fantasy", "neutral"],
+  "gameTypes": ["platformer", "arcade"],
+  "words": ["refill", "recharge", "dash", "pickup", "collect", "chime", "bell", "glass", "wind", "breath", "restore", "respawn", "airy"],
+  "license": "draft"
+ },
+ "duration": "(notes - 1) * 0.07 + ring * 0.65 + 0.185",
+ "params": [
+  { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 500, "max": 2000, "default": 880, "scale": "log", "hint": "The first note" },
+  { "id": "ring", "label": "Ring", "unit": "s", "min": 0.12, "max": 0.6, "default": 0.3 },
+  { "id": "shimmer", "label": "Shimmer", "min": 0, "max": 1, "default": 0.5, "hint": "The high sparkle of the glass" },
+  { "id": "breath", "label": "Breath", "min": 0, "max": 1, "default": 0.5, "hint": "How much air is heard" },
+  { "id": "notes", "label": "Notes", "min": 1, "max": 3, "default": 2, "step": 1 }
+ ],
+ "nodes": [
+  { "id": "hit1", "type": "clock", "rate": 1, "count": 1 },
+  { "id": "hit2", "type": "clock", "rate": 1, "count": 1, "delay": 0.07 },
+  { "id": "hit3", "type": "clock", "rate": 1, "count": 1, "delay": 0.14 },
+  { "id": "glass1", "type": "modal", "in": "hit1", "freq": "pitch", "ratios": [1, 2.76, 5.4], "gains": [1, "0.12 + shimmer * 0.7", "0.02 + shimmer * 0.6"], "decay": "ring", "tilt": "0.9 - shimmer * 0.5" },
+  { "id": "glass2", "type": "modal", "in": "hit2 * (notes >= 2 ? 1 : 0)", "freq": "pitch * semi(5)", "ratios": [1, 2.76, 5.4], "gains": [1, "0.12 + shimmer * 0.7", "0.02 + shimmer * 0.6"], "decay": "ring", "tilt": "0.9 - shimmer * 0.5" },
+  { "id": "glass3", "type": "modal", "in": "hit3 * (notes >= 3 ? 1 : 0)", "freq": "pitch * semi(7)", "ratios": [1, 2.76, 5.4], "gains": [1, "0.12 + shimmer * 0.7", "0.02 + shimmer * 0.6"], "decay": "ring", "tilt": "0.9 - shimmer * 0.5" },
+  { "id": "hiss", "type": "noise", "seed": 7 },
+  { "id": "air", "type": "filter", "mode": "bp", "in": "hiss", "freq": 3000, "q": 1.6 },
+  { "id": "swell", "type": "env", "points": [[0, 0], [0.08, 1, 0.7], ["0.08 + (notes - 1) * 0.07 + ring * 0.75", 0, 0.5]] },
+  { "id": "dry", "type": "expr", "expr": "glass1 + glass2 * 0.95 + glass3 * 0.9 + air * swell * breath * 0.5" },
+  { "id": "room", "type": "reverb", "in": "dry", "size": 0.45, "damp": 0.3, "mix": 0.12 },
+  { "id": "clean", "type": "filter", "mode": "hp", "in": "room", "freq": 250, "q": 0.7 }
+ ],
+ "out": "clean",
+ "presets": {
+  "Refill": {},
+  "Grow back": { "notes": 1, "pitch": 660, "breath": 0.8, "ring": 0.2 },
+  "Double": { "notes": 3, "ring": 0.45, "shimmer": 0.8 }
+ }
+}

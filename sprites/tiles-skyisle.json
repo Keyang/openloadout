@@ -1,0 +1,1034 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-skyisle",
+ "name": "Sky island ground",
+ "blurb": "Pale rock under a cap of bright grass for islands that hang in the sky, with a ragged underside, a ledge, slopes, flowers, roots and points of rock; change the colours, the grass edge, the bumps, the underside, the texture and the wear.",
+ "size": [32,32],
+ "pivot": [16,16],
+ "grounded": false,
+ "preview": "turf-top",
+ "styles": [
+  "pixel"
+ ],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "fantasy",
+   "forest"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "island",
+   "ground",
+   "grass",
+   "rock",
+   "cliff",
+   "floating",
+   "ledge",
+   "slope",
+   "turf",
+   "chalk",
+   "terrain",
+   "walk"
+  ],
+  "license": "draft"
+ },
+ "versions": [
+  {
+   "name": "Chalk isle",
+   "params": {}
+  },
+  {
+   "name": "Fern over steel",
+   "params": {
+    "grass": "#3f8f5a",
+    "stone": "#c2c9d6",
+    "jagged": 1
+   }
+  },
+  {
+   "name": "Rose heath",
+   "params": {
+    "grass": "#e2709a",
+    "flowers": "#f2c230",
+    "edge": 9,
+    "bumps": 3
+   }
+  },
+  {
+   "name": "Smooth canvas dune",
+   "params": {
+    "grass": "#d89a3c",
+    "stone": "#e8d9a8",
+    "jagged": 0,
+    "bumps": 0
+   }
+  }
+ ],
+ "palette": [
+  {
+   "id": "grass",
+   "label": "Grass",
+   "default": "#74b848",
+   "material": "plant",
+   "swatches": [
+    "#74b848",
+    "#3f8f5a",
+    "#4fae9a",
+    "#e2709a",
+    "#d89a3c"
+   ]
+  },
+  {
+   "id": "stone",
+   "label": "Rock",
+   "default": "#d8d2c0",
+   "material": "stone",
+   "swatches": [
+    "#d8d2c0",
+    "#e8d9a8",
+    "#b9cfe6",
+    "#c2c9d6"
+   ]
+  },
+  {
+   "id": "flowers",
+   "label": "Flowers",
+   "default": "#f0ead8",
+   "material": "plant",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#c9423a",
+    "#7a4fc4",
+    "#4fd8ee"
+   ]
+  },
+  {
+   "id": "mark",
+   "material": "stone",
+   "derive": {
+    "rule": "textureTone",
+    "of": "stone"
+   }
+  },
+  {
+   "id": "mark-lit",
+   "material": "stone",
+   "derive": {
+    "rule": "mix",
+    "of": "stone",
+    "with": "mark",
+    "amount": 0.4
+   }
+  },
+  {
+   "id": "root",
+   "default": "#a8703e",
+   "material": "wood",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "edge",
+   "kind": "range",
+   "label": "Edge",
+   "lo": "Thin",
+   "hi": "Deep",
+   "min": 5,
+   "max": 9,
+   "step": 1,
+   "default": 6
+  },
+  {
+   "key": "bumps",
+   "kind": "range",
+   "label": "Bumps",
+   "lo": "Flat",
+   "hi": "Bumpy",
+   "min": 0,
+   "max": 3,
+   "step": 1,
+   "default": 1
+  },
+  {
+   "key": "jagged",
+   "kind": "range",
+   "label": "Underside",
+   "lo": "Smooth",
+   "hi": "Jagged",
+   "default": 0.6
+  },
+  {
+   "key": "texture",
+   "kind": "range",
+   "label": "Texture",
+   "lo": "Plain",
+   "hi": "Busy",
+   "default": 0.5
+  },
+  {
+   "key": "wear",
+   "kind": "range",
+   "label": "Wear",
+   "lo": "New",
+   "hi": "Worn",
+   "default": 0.3
+  },
+  {
+   "key": "grass",
+   "kind": "colour",
+   "label": "Grass"
+  },
+  {
+   "key": "stone",
+   "kind": "colour",
+   "label": "Rock"
+  },
+  {
+   "key": "flowers",
+   "kind": "colour",
+   "label": "Flowers"
+  }
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "profiles": {
+    "dips": [0,0,0,0.3,0.67,1,1,0.67,0.3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.3,0.67,1,1,0.67,0.3,0,0,0],
+    "hang": [1,2,1,0,0,1,2,3,2,0,0,1,1,0,2,3,1,0,0,1,2,1,0,0,1,3,2,1,0,0,2,1],
+    "rag": [2,1,2,2.5,2.5,2,1,0,1,2.5,2.5,2,2,2.5,1,0,2,2.5,2.5,2,1,2,2.5,2.5,2,0,1,2,2.5,2.5,1,2],
+    "under": [0,0,0,0,0,0,0,0,1,3,2,0,0,0,0,0,0,0,1,3,2,1,0,0,0,0,0,0,2,0,0,0],
+    "under-ledge": [0,0,1,1,1,1,0,1,1,1,1,1,1,0,0,1,1,1,1,0,1,1,1,1,1,1,0,0,1,1,0,0],
+    "rag-b": [2,2,2,1,2,2,2,2,2,1,0,1,2,2,2,2,1,2,2,2,1,0,1,2,2,2,2,2,2,1,2,2],
+    "rag-l": [2,2,2,1,2,2,2,2,0,1,2,2,2,2,2,1,1,2,2,2,2,2,2,0,0,1,2,2,2,1,2,2],
+    "rag-r": [1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,0,0,1,1,1],
+    "notch-l": [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0],
+    "notch-r": [0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+   },
+   "groups": [
+    {
+     "name": "turf",
+     "kind": "block",
+     "use": "ground",
+     "pieces": [
+      "block",
+      "narrow",
+      "thin",
+      "slope"
+     ],
+     "fills": 3,
+     "thickness": 12,
+     "under": {
+      "depth": 2,
+      "inset": {
+       "profile": "under-ledge",
+       "amount": {
+        "from": "jagged",
+        "map": [
+         [0,0],
+         [1,1]
+        ],
+        "round": "none"
+       }
+      },
+      "bands": [
+       {
+        "rows": [1,99],
+        "paint": "stone.dark"
+       }
+      ]
+     },
+     "material": {
+      "fill": {
+       "base": "stone",
+       "versions": [
+        [],
+        [
+         {
+          "kind": "stamp",
+          "at": [6,9],
+          "rows": [
+           "aaaaa"
+          ],
+          "key": {
+           "a": "mark"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.17
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [20,14],
+          "rows": [
+           ".ab",
+           "aaa"
+          ],
+          "key": {
+           "a": "mark",
+           "b": "mark-lit"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.17
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [15,23],
+          "rows": [
+           "aaaaa"
+          ],
+          "key": {
+           "a": "mark"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [8,19],
+          "rows": [
+           ".ab",
+           "aaa"
+          ],
+          "key": {
+           "a": "mark",
+           "b": "mark-lit"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.83
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [21,6],
+          "rows": [
+           "aaaaa"
+          ],
+          "key": {
+           "a": "mark"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.83
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [5,11],
+          "rows": [
+           "aa.......",
+           "..aa.....",
+           "....a....",
+           "....aaa..",
+           ".......aa"
+          ],
+          "key": {
+           "a": "mark"
+          },
+          "when": {
+           "wear": [
+            {
+             "atLeast": 0.35
+            }
+           ]
+          }
+         }
+        ],
+        [
+         {
+          "kind": "stamp",
+          "at": [6,7],
+          "rows": [
+           ".ab",
+           "aaa"
+          ],
+          "key": {
+           "a": "mark",
+           "b": "mark-lit"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.17
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [18,11],
+          "rows": [
+           "aaaaa"
+          ],
+          "key": {
+           "a": "mark"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.17
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [22,24],
+          "rows": [
+           ".ab",
+           "aaa"
+          ],
+          "key": {
+           "a": "mark",
+           "b": "mark-lit"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [7,25],
+          "rows": [
+           "aaaaa"
+          ],
+          "key": {
+           "a": "mark"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.83
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [14,17],
+          "rows": [
+           ".ab",
+           "aaa"
+          ],
+          "key": {
+           "a": "mark",
+           "b": "mark-lit"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.83
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [15,4],
+          "rows": [
+           ".......aa",
+           ".....aa..",
+           "....a....",
+           "..aaa....",
+           "aa......."
+          ],
+          "key": {
+           "a": "mark"
+          },
+          "when": {
+           "wear": [
+            {
+             "atLeast": 0.7
+            }
+           ]
+          }
+         }
+        ]
+       ]
+      },
+      "round": 2,
+      "edges": {
+       "top": {
+        "depth": {
+         "from": "edge",
+         "map": [
+          [5,5],
+          [9,9]
+         ],
+         "round": "px"
+        },
+        "wrap": 4,
+        "tuck": true,
+        "inset": {
+         "profile": "dips",
+         "amount": {
+          "from": "bumps",
+          "map": [
+           [0,0],
+           [3,3]
+          ],
+          "round": "px"
+         }
+        },
+        "ragged": {
+         "profile": "rag",
+         "amount": {
+          "from": "edge",
+          "map": [
+           [5,0.55],
+           [5.4999,0.55],
+           [5.5,0.9],
+           [6.4999,0.9],
+           [6.5,1],
+           [9,1]
+          ],
+          "round": "none"
+         }
+        },
+        "bands": [
+         {
+          "rows": "last",
+          "paint": "stone.dark"
+         },
+         {
+          "rows": [1,1],
+          "paint": "grass.light"
+         },
+         {
+          "rows": "last-1",
+          "paint": "grass.dark"
+         },
+         {
+          "rows": [2,2],
+          "where": {
+           "profile": "hang",
+           "in": [0]
+          },
+          "paint": "grass.light"
+         },
+         {
+          "rows": [3,4],
+          "where": {
+           "profile": "hang",
+           "in": [2]
+          },
+          "paint": "grass",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 8.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [3,3],
+          "where": {
+           "profile": "hang",
+           "in": [2]
+          },
+          "paint": "grass",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 7.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [3,5],
+          "where": {
+           "profile": "hang",
+           "in": [3]
+          },
+          "paint": "grass",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 8.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [3,4],
+          "where": {
+           "profile": "hang",
+           "in": [3]
+          },
+          "paint": "grass",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 7.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [3,3],
+          "where": {
+           "profile": "hang",
+           "in": [3]
+          },
+          "paint": "grass",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 6.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [3,99],
+          "where": {
+           "profile": "hang",
+           "in": [2,3]
+          },
+          "paint": "grass.dark"
+         },
+         {
+          "rows": [1,99],
+          "paint": "grass"
+         }
+        ]
+       },
+       "left": {
+        "depth": 3,
+        "inset": {
+         "profile": "notch-l",
+         "amount": {
+          "from": "wear",
+          "map": [
+           [0,0],
+           [0.6999,0],
+           [0.7,2],
+           [1,2]
+          ],
+          "round": "px"
+         }
+        },
+        "ragged": {
+         "profile": "rag-l",
+         "amount": 1
+        },
+        "bands": [
+         {
+          "rows": [1,99],
+          "paint": "stone.dark"
+         }
+        ]
+       },
+       "right": {
+        "depth": 2,
+        "inset": {
+         "profile": "notch-r",
+         "amount": {
+          "from": "wear",
+          "map": [
+           [0,0],
+           [0.6999,0],
+           [0.7,2],
+           [1,2]
+          ],
+          "round": "px"
+         }
+        },
+        "ragged": {
+         "profile": "rag-r",
+         "amount": 1
+        },
+        "bands": [
+         {
+          "rows": [1,99],
+          "paint": "stone.dark"
+         }
+        ]
+       },
+       "bottom": {
+        "depth": 4,
+        "tuck": 2,
+        "inset": {
+         "profile": "under",
+         "amount": {
+          "from": "jagged",
+          "map": [
+           [0,0],
+           [1,1]
+          ],
+          "round": "none"
+         }
+        },
+        "ragged": {
+         "profile": "rag-b",
+         "amount": 1
+        },
+        "bands": [
+         {
+          "rows": [1,99],
+          "paint": "stone.dark"
+         }
+        ]
+       }
+      }
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "above",
+       "label": "Grass tuft",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [10,23],
+         "rows": [
+          ".....a......",
+          ".....b.a....",
+          "...a.b.b....",
+          "...cabab.a..",
+          ".a.cbbcbac..",
+          ".bacbbcbbc..",
+          "abbcbbcbbca.",
+          "cbbcbbcbbcba",
+          "cbbcbbcbbcbb"
+         ],
+         "key": {
+          "a": "grass.light",
+          "b": "grass",
+          "c": "grass.dark"
+         }
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "above",
+       "label": "Wind flowers",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [8,17],
+         "rows": [
+          "...........rrr......",
+          "..........rfflr.....",
+          "..........rfcfr.....",
+          "....rrr...rfffr.....",
+          "...rfflr...rrr..rrr.",
+          "...rfcfr...s...rfflr",
+          "...rfffr..s....rfcfr",
+          "....rrr...s....rfffr",
+          "....s....s......rrr.",
+          "...s.....s......s...",
+          "...s.....s.g...s....",
+          "..s.g....sg....s....",
+          "..sg.....s....s.g...",
+          "..s.....gs....sg....",
+          "..s......s....s....."
+         ],
+         "key": {
+          "r": "flowers.dark",
+          "f": "flowers",
+          "l": "flowers.light",
+          "c": "flowers.dark",
+          "s": "grass.dark",
+          "g": "grass"
+         }
+        }
+       ]
+      },
+      {
+       "name": "c",
+       "place": "below",
+       "label": "Hanging roots",
+       "outline": true,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [3,0],
+         "rows": [
+          "ba........ba.........ba.",
+          "ba........ba.........ba.",
+          ".a........ba.........ba.",
+          "..a.......ba...........a",
+          "..b.........a..........a",
+          "..b.........a..........b",
+          "............a..........b",
+          ".............a..........",
+          ".............b..........",
+          ".............b.........."
+         ],
+         "key": {
+          "a": "root",
+          "b": "root.dark"
+         }
+        }
+       ]
+      },
+      {
+       "name": "d",
+       "place": "below",
+       "label": "Rock points",
+       "outline": true,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [3,0],
+         "rows": [
+          "ddaa.....ddaaa......ddaa",
+          "daa.......ddaa.......daa",
+          ".a........daa........da.",
+          "...........da.........a.",
+          "...........a............"
+         ],
+         "key": {
+          "a": "stone",
+          "d": "stone.dark"
+         },
+         "when": {
+          "jagged": [
+           {
+            "below": 0.2
+           }
+          ]
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [3,0],
+         "rows": [
+          "ddaa.....ddaaa......ddaa",
+          "daa.......ddaa.......daa",
+          ".da.......daa........daa",
+          ".a........daa........da.",
+          "...........da.........a.",
+          "...........a............"
+         ],
+         "key": {
+          "a": "stone",
+          "d": "stone.dark"
+         },
+         "when": {
+          "jagged": [
+           {
+            "atLeast": 0.2,
+            "below": 0.4
+           }
+          ]
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [3,0],
+         "rows": [
+          "ddaa.....ddaaa......ddaa",
+          "daa.......ddaa.......daa",
+          ".da.......ddaa.......daa",
+          ".a........daa........da.",
+          "...........da.........a.",
+          "...........da...........",
+          "...........a............"
+         ],
+         "key": {
+          "a": "stone",
+          "d": "stone.dark"
+         },
+         "when": {
+          "jagged": [
+           {
+            "atLeast": 0.4,
+            "below": 0.6
+           }
+          ]
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [3,0],
+         "rows": [
+          "ddaa.....ddaaa......ddaa",
+          "daa.......ddaa.......daa",
+          "daa.......ddaa.......daa",
+          ".da.......daa........da.",
+          ".a........daa........da.",
+          "...........da.........a.",
+          "...........da...........",
+          "...........a............"
+         ],
+         "key": {
+          "a": "stone",
+          "d": "stone.dark"
+         },
+         "when": {
+          "jagged": [
+           {
+            "atLeast": 0.6,
+            "below": 0.8
+           }
+          ]
+         }
+        },
+        {
+         "kind": "stamp",
+         "at": [3,0],
+         "rows": [
+          "ddaa.....ddaaa......ddaa",
+          "daa......ddaaa......ddaa",
+          "daa.......ddaa.......daa",
+          ".da.......ddaa.......daa",
+          ".a........daa........da.",
+          "..........daa........da.",
+          "...........da.........a.",
+          "...........da...........",
+          "...........a............"
+         ],
+         "key": {
+          "a": "stone",
+          "d": "stone.dark"
+         },
+         "when": {
+          "jagged": [
+           {
+            "atLeast": 0.8
+           }
+          ]
+         }
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "turf-left": {
+   "label": "Turf: top left corner"
+  },
+  "turf-top": {
+   "label": "Turf: top"
+  },
+  "turf-right": {
+   "label": "Turf: top right corner"
+  },
+  "turf-side-l": {
+   "label": "Turf: left side"
+  },
+  "turf-fill": {
+   "label": "Turf: middle"
+  },
+  "turf-fill-b": {
+   "label": "Turf: middle, version B"
+  },
+  "turf-fill-c": {
+   "label": "Turf: middle, version C"
+  },
+  "turf-side-r": {
+   "label": "Turf: right side"
+  },
+  "turf-bottom-l": {
+   "label": "Turf: bottom left corner"
+  },
+  "turf-bottom": {
+   "label": "Turf: bottom"
+  },
+  "turf-bottom-r": {
+   "label": "Turf: bottom right corner"
+  },
+  "turf-inner-tl": {
+   "label": "Turf: inside corner, top left"
+  },
+  "turf-inner-tr": {
+   "label": "Turf: inside corner, top right"
+  },
+  "turf-inner-bl": {
+   "label": "Turf: inside corner, bottom left"
+  },
+  "turf-inner-br": {
+   "label": "Turf: inside corner, bottom right"
+  },
+  "turf-strip-l": {
+   "label": "Turf: strip, left end"
+  },
+  "turf-strip-m": {
+   "label": "Turf: strip, middle"
+  },
+  "turf-strip-r": {
+   "label": "Turf: strip, right end"
+  },
+  "turf-col-t": {
+   "label": "Turf: column, top"
+  },
+  "turf-col-m": {
+   "label": "Turf: column, middle"
+  },
+  "turf-col-b": {
+   "label": "Turf: column, bottom"
+  },
+  "turf-single": {
+   "label": "Turf: single tile"
+  },
+  "turf-thin-l": {
+   "label": "Turf ledge: left end"
+  },
+  "turf-thin-m": {
+   "label": "Turf ledge: middle"
+  },
+  "turf-thin-r": {
+   "label": "Turf ledge: right end"
+  },
+  "turf-slope-up": {
+   "label": "Turf: slope up"
+  },
+  "turf-slope-down": {
+   "label": "Turf: slope down"
+  },
+  "turf-deco-a": {
+   "label": "Grass tuft"
+  },
+  "turf-deco-b": {
+   "label": "Wind flowers"
+  },
+  "turf-deco-c": {
+   "label": "Hanging roots"
+  },
+  "turf-deco-d": {
+   "label": "Rock points"
+  }
+ }
+}

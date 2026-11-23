@@ -29,6 +29,8 @@
 //   edges    { top, left, right, bottom }: { depth, wrap, tuck (true or px), inset { profile, amount }, ragged { profile,
 //            amount }, bands: [band rules] }. A profile is a name in body.tiles.profiles or a list; its value at u (the
 //            position along the edge, repeating) times amount is the inset (rounded, 0..3; 0..8 soft) or the ragged px
+//            (an inset's or a ragged's profile may also be picked by a choice or an on/off, { from, pick: { option:
+//            profile } }: engine/resolve.js hands this layout the picked one; tests/unit/tiles-profile-binding.test.mjs)
 //   band     { rows: [from, to] | "last" | "last-1" | { profile }, where?: { profile, in: [values] }, paint, when? }: d px
 //            in from the outline (1 = the first), first match wins, "last" is the band's deepest row (the shadow it
 //            casts) and "last-1" the row above it, { profile } rows 1 to the profile's value at that column (a run

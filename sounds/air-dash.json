@@ -1,0 +1,54 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "air-dash",
+  "name": "Air dash",
+  "category": "movement",
+  "description": "A quick breath of rushing air with a short zip at the start, for a dash through the sky. Change its pitch, length, glide, brightness and snap.",
+  "meta": {
+    "type": "sfx",
+    "role": "actions/dash",
+    "themes": ["fantasy", "neutral"],
+    "gameTypes": ["platformer", "arcade"],
+    "words": ["dash", "air dash", "dodge", "rush", "whoosh", "zip", "burst", "wind", "breath", "swish", "boost", "fast"],
+    "license": "draft"
+  },
+  "duration": "length + 0.02",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 300, "max": 1200, "default": 520, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.12, "max": 0.4, "default": 0.22, "scale": "log" },
+    { "id": "rise", "label": "Glide", "unit": "semitones", "min": -12, "max": 19, "default": 12 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "snap", "label": "Snap", "min": 0, "max": 1, "default": 0.5 }
+  ],
+  "nodes": [
+    { "id": "air", "type": "noise" },
+    { "id": "sweep", "type": "env", "points": [
+      [0, 900],
+      ["length * 0.35", "(2600 + bright * 4000) * rnd(0.95, 1.05)", "exp"],
+      ["length", "sqrt(900 * (2600 + bright * 4000))", "exp"]
+    ] },
+    { "id": "swell", "type": "env", "points": [
+      [0, "0.1 + snap * 0.6"],
+      ["length * 0.3", 1, 0.7],
+      ["length", 0, 1.6]
+    ] },
+    { "id": "rush", "type": "filter", "mode": "bp", "in": "air", "freq": "sweep", "q": 1.3 },
+    { "id": "sheen", "type": "filter", "mode": "hp", "in": "air", "freq": 6000 },
+    { "id": "zipnote", "type": "env", "points": [
+      [0, "pitch * rnd(0.97, 1.03)"],
+      [0.06, "pitch * semi(rise)", "exp"]
+    ] },
+    { "id": "zip", "type": "osc", "wave": "sine", "freq": "zipnote" },
+    { "id": "zipamp", "type": "ad", "attack": 0.002, "decay": "min(0.115, length - 0.004)", "curve": 1.6 },
+    { "id": "click", "type": "ad", "attack": 0.0003, "decay": 0.004, "curve": 2 },
+    { "id": "sum", "type": "expr", "expr": "rush * swell * 1.6 + sheen * swell * bright * 0.35 + zip * zipamp * 0.75 + air * click * snap * 2.6" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 280, "q": 0.7 },
+    { "id": "cleaner", "type": "filter", "mode": "hp", "in": "clean", "freq": 250, "q": 0.7 }
+  ],
+  "out": "cleaner",
+  "presets": {
+    "Dash": {},
+    "Second dash": { "pitch": 780, "rise": 16, "length": 0.18 },
+    "Down dash": { "rise": -9, "length": 0.26, "bright": 0.45 }
+  }
+}

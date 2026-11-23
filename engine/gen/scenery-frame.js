@@ -27,5 +27,7 @@ export const SCENERY_FRAME_GENERATORS = Object.freeze({
   'castle.columns@1': WRAPS,
   'edge.band@1': FILLS,
   'tufts@1': FILLS,
+  'towers@2': WRAPS,
+  'banners@2': WRAPS,
   'stand.apart@1': 'a colour rule: its sample is a swatch of the whole frame',
 });

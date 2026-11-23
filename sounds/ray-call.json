@@ -1,0 +1,46 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "ray-call",
+  "name": "Ray call",
+  "category": "magic",
+  "description": "A long soft whistle from something large and gentle, sliding down or up and fading into a wide room. Change its pitch, length, drop, brightness and waver.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/voice",
+    "themes": ["fantasy", "neutral"],
+    "gameTypes": ["platformer", "arcade"],
+    "words": ["ray", "call", "whistle", "cry", "song", "creature", "animal", "bird", "whale", "sky", "gentle", "hurt", "dive", "voice"],
+    "license": "draft"
+  },
+  "duration": "length",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 400, "max": 1600, "default": 900, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.3, "max": 0.9, "default": 0.5, "scale": "log" },
+    { "id": "drop", "label": "Drop", "unit": "semitones", "min": -9, "max": 12, "default": 5, "hint": "Below the middle the call rises instead" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.45 },
+    { "id": "waver", "label": "Waver", "min": 0, "max": 1, "default": 0.4 }
+  ],
+  "nodes": [
+    { "id": "vibRate", "type": "rand", "lo": 4.2, "hi": 6.2 },
+    { "id": "glide", "type": "env", "points": [[0, "pitch"], ["length * 0.18", "pitch * semi(-drop * 0.68)", "exp"], ["length * 0.42", "pitch * semi(-drop * 0.92)", "exp"], ["length * 0.7", "pitch * semi(-drop)", "exp"]] },
+    { "id": "vib", "type": "osc", "wave": "sine", "freq": "vibRate" },
+    { "id": "vibIn", "type": "env", "points": [[0, 0.25], ["length * 0.35", 1]] },
+    { "id": "f", "type": "expr", "expr": "glide * semi(vib * vibIn * waver * 2)" },
+    { "id": "v1", "type": "osc", "wave": "sine", "freq": "f" },
+    { "id": "v2", "type": "osc", "wave": "sine", "freq": "f * 1.5" },
+    { "id": "swell", "type": "env", "points": [[0, 0], [0.004, 0.2], [0.04, 1], ["length * 0.4", 0.85], ["length * 0.64", 0, 1.6]] },
+    { "id": "voice", "type": "expr", "expr": "(v1 + v2 * 0.333) * 0.75 * swell * (1 + vib * vibIn * waver * 0.45)" },
+    { "id": "air", "type": "noise", "color": "white" },
+    { "id": "breathBp", "type": "filter", "mode": "bp", "in": "air", "freq": "f * (2 + bright * 2)", "q": "4 - bright * 2.5" },
+    { "id": "breath", "type": "expr", "expr": "breathBp * swell * (0.06 + bright * 0.9)" },
+    { "id": "dry", "type": "expr", "expr": "voice + breath" },
+    { "id": "room", "type": "reverb", "in": "dry", "size": 0.65, "damp": "0.6 - bright * 0.3", "mix": 0.32 },
+    { "id": "fin", "type": "env", "points": [[0, 1], ["length * 0.78", 1], ["length * 0.995", 0, 1.4]] }
+  ],
+  "out": "room * fin",
+  "presets": {
+    "Call": {},
+    "Dip": { "length": 0.35, "drop": 9, "waver": 0.1 },
+    "Hurt": { "pitch": 1300, "drop": -6, "length": 0.3, "waver": 0.9, "bright": 0.7 }
+  }
+}

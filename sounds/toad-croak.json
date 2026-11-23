@@ -1,0 +1,46 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "toad-croak",
+  "name": "Toad croak",
+  "category": "impact",
+  "description": "A made-up toad's voice: a wet, ribbed croak that bends upward, a long creak as it puffs up, or a quick squawk. Change its pitch, length, rise, grit and ribbit.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/voice",
+    "themes": ["fantasy", "forest"],
+    "gameTypes": ["platformer", "arcade"],
+    "words": ["toad", "frog", "croak", "ribbit", "squawk", "creak", "animal", "creature", "enemy", "puff", "hurt", "throat", "wet"],
+    "license": "draft"
+  },
+  "duration": "length + 0.02",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 120, "max": 400, "default": 190, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.15, "max": 0.7, "default": 0.3, "scale": "log" },
+    { "id": "rise", "label": "Rise", "unit": "semitones", "min": 0, "max": 14, "default": 3 },
+    { "id": "grit", "label": "Grit", "min": 0, "max": 1, "default": 0.4 },
+    { "id": "ratchet", "label": "Ribbit", "min": 0, "max": 1, "default": 0.6 }
+  ],
+  "nodes": [
+    { "id": "pv", "type": "rand", "lo": 0.97, "hi": 1.03 },
+    { "id": "rv", "type": "rand", "lo": 0.95, "hi": 1.05 },
+    { "id": "bend", "type": "env", "points": [[0, "pitch"], ["length * 0.9", "pitch * semi(rise)", "exp"]] },
+    { "id": "throat", "type": "osc", "wave": "pulse", "width": 0.2, "freq": "bend * pv" },
+    { "id": "rib", "type": "osc", "freq": "(20 + ratchet * 40) * rv" },
+    { "id": "chop", "type": "expr", "expr": "1 - (1 - pow(1 - ratchet, 1.6)) * 0.96 * (0.5 - 0.5 * tanh(rib * 3))" },
+    { "id": "rasp", "type": "shaper", "in": "throat", "drive": "1 + grit * 4", "mode": "tanh" },
+    { "id": "sac1", "type": "filter", "mode": "bp", "in": "rasp", "freq": 500, "q": 3 },
+    { "id": "sac2", "type": "filter", "mode": "bp", "in": "rasp", "freq": 1300, "q": 4 },
+    { "id": "air", "type": "noise", "color": "pink" },
+    { "id": "breath", "type": "filter", "mode": "bp", "in": "air", "freq": 1600, "q": 0.9 },
+    { "id": "voice", "type": "expr", "expr": "(sac1 + sac2 * (0.8 + grit * 1.2) + rasp * 0.05 + breath * (0.25 + grit * 0.35)) * chop" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "voice", "freq": "1500 + grit * 5500" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "tone", "freq": 250, "q": 0.7 },
+    { "id": "amp", "type": "env", "points": [[0, 0], [0.004, 1], ["length * 0.6", 0.85], ["length", 0, 1.6]] }
+  ],
+  "out": "clean * amp",
+  "presets": {
+    "Croak": {},
+    "Inflate": { "length": 0.6, "rise": 8, "ratchet": 0.9, "pitch": 150 },
+    "Squawk": { "pitch": 320, "rise": 12, "length": 0.2, "ratchet": 0.15, "grit": 0.7 }
+  }
+}

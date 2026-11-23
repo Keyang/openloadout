@@ -1,4 +1,4 @@
-// The four palettes (the three bundle palettes of docs/style-guide.md section 3, and
+// The five palettes (the four bundle palettes of docs/style-guide.md section 3, and
 // Gridline of bundles/specs/kit-puzzle-gridline.md) and the swatch lists
 // for colour controls built from them. Pure data and functions: runs in Node and
 // in the browser.
@@ -13,7 +13,7 @@
 //
 // Palette keys (lower case, like every colour name: PALETTE.Thornwood is undefined):
 // `thornwood` (kit-platformer-fantasy), `hearthvale` (kit-rpg-fantasy),
-// `derelict` (kit-roguelite-scifi), `gridline` (kit-puzzle-gridline; by its key only, its bundle id is no alias). The functions accept any case for bundle, material and lead. The bundle ids and the short names `platformer`,
+// `derelict` (kit-roguelite-scifi), `cloudreach` (kit-platformer-cloudreach), `gridline` (kit-puzzle-gridline; by its key only, its bundle id is no alias). The functions accept any case for bundle, material and lead. The bundle ids and the short names `platformer`,
 // `rpg`, `roguelite` / `scifi` also work everywhere a palette is named, but are not
 // listed by Object.keys(PALETTE).
 //
@@ -63,23 +63,34 @@ const gridline = {
   skin: '#f6d3b0',
 };
 
+// kit-platformer-cloudreach (bundles/specs/kit-platformer-cloudreach.md): open sky, sunlit cloud and pale stone,
+// with brass, teak and canvas. The world is light; what a player must see is darker or saturated.
+const cloudreach = {
+  ink: '#231b33', sky: '#86c8f2', dawn: '#f4c9a0', dusk: '#7e86d6', storm: '#4a5a82', cloud: '#f0ead8',
+  mist: '#b9cfe6', chalk: '#d8d2c0', shale: '#8a8fa6', slate: '#56607e', turf: '#74b848', fern: '#3f8f5a',
+  teak: '#a8703e', sail: '#e8d9a8', rope: '#c9a86a', brass: '#d89a3c', copper: '#b8663a', patina: '#4fae9a',
+  hero: '#3f6fd1', crimson: '#c9423a', gold: '#f2c230', steel: '#c2c9d6', gust: '#4fd8ee', squall: '#7a4fc4',
+  rose: '#e2709a', skin: '#f6d3b0',
+};
+
 /** Maps each bundle id to its palette key ('kit-platformer-fantasy' -> 'thornwood'). No arguments: a frozen object. */
 export const BUNDLE_PALETTE = Object.freeze({
   'kit-platformer-fantasy': 'thornwood',
   'kit-rpg-fantasy': 'hearthvale',
   'kit-roguelite-scifi': 'derelict',
+  'kit-platformer-cloudreach': 'cloudreach',
 });
 
 const ALIASES = { ...BUNDLE_PALETTE, platformer: 'thornwood', rpg: 'hearthvale', roguelite: 'derelict', scifi: 'derelict' };
 
-const P = { thornwood: Object.freeze(thornwood), hearthvale: Object.freeze(hearthvale), derelict: Object.freeze(derelict), gridline: Object.freeze(gridline) };
+const P = { thornwood: Object.freeze(thornwood), hearthvale: Object.freeze(hearthvale), derelict: Object.freeze(derelict), gridline: Object.freeze(gridline), cloudreach: Object.freeze(cloudreach) };
 for (const [alias, name] of Object.entries(ALIASES)) Object.defineProperty(P, alias, { value: P[name], enumerable: false });
 
-/** The four palettes as frozen { name: '#rrggbb' } objects, keyed thornwood, hearthvale, derelict, gridline (aliases: bundle ids, platformer, rpg, roguelite, scifi). No arguments. */
+/** The five palettes as frozen { name: '#rrggbb' } objects, keyed thornwood, hearthvale, derelict, gridline, cloudreach (aliases: bundle ids, platformer, rpg, roguelite, scifi). No arguments. */
 export const PALETTE = Object.freeze(P);
 
 /** Per palette key, the colour names that are never swatches: the outline and "background only" colours. No arguments: frozen lists. */
-export const NEVER_SWATCH = Object.freeze({ thornwood: Object.freeze(['ink']), hearthvale: Object.freeze(['ink']), derelict: Object.freeze(['ink', 'void']), gridline: Object.freeze(['ink', 'void']) });
+export const NEVER_SWATCH = Object.freeze({ thornwood: Object.freeze(['ink']), hearthvale: Object.freeze(['ink']), derelict: Object.freeze(['ink', 'void']), gridline: Object.freeze(['ink', 'void']), cloudreach: Object.freeze(['ink']) });
 
 // ---- swatch groups -----------------------------------------------------------
 // Each material lists palette colour names (first, in order of fit) and then extra
@@ -198,6 +209,32 @@ const GROUPS = {
     face: ['well', 'line', 'deep', 'plum'],
     frame: ['steel', 'cyan', 'lemon', 'pearl', 'mist'],
   },
+  // the 23 lists of bundles/specs/kit-platformer-cloudreach.md ("GROUPS.cloudreach"), in its order
+  cloudreach: {
+    skin: ['skin', ...SKIN],
+    hair: ['teak', 'copper', 'rope', 'slate', ...HAIR],
+    outfit: ['hero', 'squall', 'fern', 'slate', 'copper', ...CLOTH],
+    trim: ['brass', 'rose', 'gold', 'rope', 'patina', 'crimson', ...CLOTH],
+    metal: ['brass', 'steel', 'copper', 'patina', 'gold', ...METAL],
+    wood: ['teak', 'rope', 'copper', ...BROWN],
+    stone: ['chalk', 'shale', 'slate', 'storm', 'mist', ...GREY],
+    body: ['fern', 'squall', 'rose', 'patina', 'turf', 'dusk'],
+    accent: ['crimson', 'gold', 'rose', 'gust', 'squall', 'cloud'],
+    glow: ['gust', 'gold', 'cloud', 'rose', 'dawn', 'mist'],
+    core: ['cloud', 'gold', 'gust', 'dawn'],
+    edge: ['gust', 'brass', 'rose', 'squall'],
+    sky: ['sky', 'dawn', 'dusk', 'storm', 'mist', 'cloud'],
+    land: ['turf', 'fern', 'shale', 'slate', 'chalk', 'dusk'],
+    haze: ['mist', 'cloud', 'dawn', 'sky'],
+    gem: ['gust', 'squall', 'rose', 'gold', 'patina'],
+    shell: ['patina', 'copper', 'squall', 'fern', 'slate'],
+    grass: ['turf', 'fern', 'patina', 'gold'],
+    leaf: ['fern', 'turf', 'patina', 'rose'],
+    ground: ['chalk', 'shale', 'teak', 'slate'],
+    water: ['sky', 'gust', 'mist', 'hero', 'patina'],
+    face: ['cloud', 'sail', 'chalk', 'slate', 'storm'],
+    frame: ['brass', 'steel', 'teak', 'slate', 'gold'],
+  },
 };
 
 // Spec words that mean one of the materials above.
@@ -206,12 +243,12 @@ const SAME_AS = { rock: 'stone', cloth: 'outfit', fur: 'body', light: 'glow', en
 const MIN_BRIGHTNESS = 0.18;
 const HEX = /^#[0-9a-f]{6}$/i;
 
-/** Returns the palette key ('thornwood', 'hearthvale', 'derelict', 'gridline'); throws for an unknown name. Arguments: bundle: a palette key, bundle id or short name, any case. */
+/** Returns the palette key ('thornwood', 'hearthvale', 'derelict', 'gridline', 'cloudreach'); throws for an unknown name. Arguments: bundle: a palette key, bundle id or short name, any case. */
 export function paletteName(bundle) {
   const key = String(bundle).toLowerCase();
   if (key in GROUPS) return key;
   if (key in ALIASES) return ALIASES[key];
-  throw new Error(`unknown bundle "${bundle}": use thornwood, hearthvale, derelict, gridline or a bundle id (${Object.keys(BUNDLE_PALETTE).join(', ')})`);
+  throw new Error(`unknown bundle "${bundle}": use thornwood, hearthvale, derelict, gridline, cloudreach or a bundle id (${Object.keys(BUNDLE_PALETTE).join(', ')})`);
 }
 
 /** Returns the frozen palette object. Arguments: bundle: a palette key, bundle id or short name, any case. */

@@ -78,7 +78,7 @@ Other rules of scale:
 
 ### How a sprite's colour controls relate to its bundle's palette
 
-Each kit has one named palette (the tables below). They live in `engine/palettes.js` (helper `palettes`, section 14), and **a colour is always written `PALETTE.<palette>.<name>`**: `PALETTE.thornwood.grass`, `PALETTE.hearthvale.wheat`, `PALETTE.derelict.cyan`. The palette keys are `thornwood`, `hearthvale` and `derelict`. The code also accepts the bundle ids (`PALETTE['kit-platformer-fantasy']`) and the short names `platformer`, `rpg`, `roguelite` and `scifi` as aliases for the same three objects; this guide and the specifications use only the palette keys, and so should a sprite. A specification that says "default grass" means `PALETTE.<that bundle's palette>.grass`.
+Each kit has one named palette (the tables below). They live in `engine/palettes.js` (helper `palettes`, section 14), and **a colour is always written `PALETTE.<palette>.<name>`**: `PALETTE.thornwood.grass`, `PALETTE.hearthvale.wheat`, `PALETTE.derelict.cyan`, `PALETTE.cloudreach.brass`. The palette keys are `thornwood`, `hearthvale`, `derelict` and `cloudreach`. The code also accepts the bundle ids (`PALETTE['kit-platformer-fantasy']`) and the short names `platformer`, `rpg`, `roguelite` and `scifi` as aliases for the same objects (and `PALETTE['kit-platformer-cloudreach']` for Cloudreach, which has no short name); this guide and the specifications use only the palette keys, and so should a sprite. A specification that says "default grass" means `PALETTE.<that bundle's palette>.grass`.
 
 1. **Defaults come from the bundle palette.** The default of every colour control is a palette colour **by name**, and the specification says which. A specification never asks for "a darker slate" or "a dull purple": if a default is not in the table, the table gets a new named row first.
 2. **Swatches start with the palette.** A colour control offers 4 to 8 swatches from `swatches(palette, material, { lead })` (below). The first three or more are palette colours that suit that material; the rest may come from the engine lists (`SKIN`, `HAIR`, `CLOTH`, `METAL`). Every swatch must look right with every other control's swatches, because random looks combine them.
@@ -86,7 +86,7 @@ Each kit has one named palette (the tables below). They live in `engine/palettes
 4. **Tones are derived, never typed.** Use `ramp`, `farRamp`, `tone` and `mix` on the base colour. Do not type a shadow hex. On a base darker than brightness 0.4 (`slate`, `cavern`, `panel`, `plate`, `deck`) the `dark` tone comes close to the outline: carry the form with `light` and `base`, and keep `dark` for creases one pixel wide. **Interface panel faces in `panel` use the base and light tones only, never `dark`.**
 5. **No swatch darker than brightness 0.18** (the checker warns under 0.14: the shape turns into a black blob). Palette colours marked "background only" are never swatches.
 6. **2 to 5 colour controls per sprite.**
-7. **The same four colours mean the same thing in every bundle:** ink `#231b33`; reward gold `#f2c230`; steel `#c2c9d6`; skin `#f6d3b0`. Danger is always a red, healing always a green, friendly energy always a cyan, and the player's own cloth is the same blue `#3f6fd1` in all three (`hero` in the fantasy palettes, `signal` in Derelict).
+7. **The same four colours mean the same thing in every bundle:** ink `#231b33`; reward gold `#f2c230`; steel `#c2c9d6`; skin `#f6d3b0`. Danger is always a red, healing always a green, friendly energy always a cyan, and the player's own cloth is the same blue `#3f6fd1` in all four (`hero` in the fantasy palettes and Cloudreach, `signal` in Derelict).
 8. **Neighbouring materials differ in value, not only in hue.** Two materials that touch on a sprite (cloth against skin, a shell against its legs, a shape against the band behind it in a background) must be told apart by how light or dark they are, so that a whole-bundle look (`THEME_PRESETS` in `engine/theme.js`, which shifts, tints or removes hue) cannot merge them. Check by rendering under at least the looks Sunset, Night, Handheld and Mono. The default colours in the specifications are chosen this way; keep it true for every swatch you offer.
 
 ### What `swatches` accepts
@@ -95,7 +95,7 @@ Each kit has one named palette (the tables below). They live in `engine/palettes
 
 | Argument | What to pass |
 |---|---|
-| `palette` | `'thornwood'`, `'hearthvale'` or `'derelict'` (the aliases above also work) |
+| `palette` | `'thornwood'`, `'hearthvale'`, `'derelict'` or `'cloudreach'` (the aliases above also work) |
 | `material` | One word saying what is coloured. `materials(palette)` lists every word that palette accepts. **In every palette:** the colour keys of section 10 (`skin`, `hair`, `outfit`, `trim`, `metal`, `wood`, `stone`, `body`, `accent`, `glow`, `core`, `edge`, `sky`, `land`, `haze`), plus `gem`, `shell`, `grass`, `leaf`, `ground`, `water`, `face`, `frame`. **Only in Hearthvale:** `roof`. **Only in Derelict:** `floor`, `wall`, `flesh`. **Other words for the same lists:** `rock` and `wall` (= `stone`), `cloth` (= `outfit`), `fur` (= `body`), `light` and `energy` (= `glow`), `crystal` (= `gem`), `liquid` (= `water`), `growth` and `foliage` (= `leaf`), `earth`, `dirt` and `floor` (= `ground`). **Or any colour name of that palette** (`'crimson'`, `'acid'`): that colour comes first, then the lists it belongs to. Any other word throws an error that lists the accepted ones |
 | `lead` | Optional: the control's default, as a palette colour name (`{ lead: 'goblin' }`) or a hex. It is put first. Pass it whenever the default is not already the first colour of the material's list |
 
@@ -204,6 +204,39 @@ Cold steel station, lit by small strong lights. Station bodies are dark and desa
 | nebula | `#6660b6` | nebula clouds in space (backgrounds) |
 | cream | `#f0ead8` | the white-hot core of shots, flashes and explosions |
 | skin | `#f6d3b0` | human skin |
+
+### Palette "Cloudreach" (`kit-platformer-cloudreach`)
+
+Open sky, sunlit cloud and pale stone, with warm brass, teak and canvas for what people built. **The world is light and the things in it are dark or saturated**: the sky, the clouds and the rock are all brighter than 0.7, so everything a player must see (the hero, enemies, hazards, pickups) is darker than 0.65 or carries an ink line against it. The pairs that may touch and the swatch list of every material are in `bundles/specs/kit-platformer-cloudreach.md`.
+
+| Name | Hex | Used for |
+|---|---|---|
+| ink | `#231b33` | outlines (never a swatch) |
+| sky | `#86c8f2` | day sky (backgrounds) |
+| dawn | `#f4c9a0` | the warm band at the horizon, lit cloud edges (backgrounds) |
+| dusk | `#7e86d6` | evening sky (backgrounds) |
+| storm | `#4a5a82` | storm sky, thunderheads, the dark of a cloud's belly |
+| cloud | `#f0ead8` | cloud tops, paper, the white of a flash (the shared `cream`) |
+| mist | `#b9cfe6` | cloud shadow, haze, far islands |
+| chalk | `#d8d2c0` | island rock, temple stone |
+| shale | `#8a8fa6` | rock in shadow, temple back walls |
+| slate | `#56607e` | dark stone, iron, the deepest wall |
+| turf | `#74b848` | grass |
+| fern | `#3f8f5a` | dark leaves, hanging growth |
+| teak | `#a8703e` | ship timber, posts, leather |
+| sail | `#e8d9a8` | canvas, sails, the mailbag |
+| rope | `#c9a86a` | rope, straw, sand-coloured cloth |
+| brass | `#d89a3c` | brass fittings, the courier's scarf |
+| copper | `#b8663a` | copper roofs and pipes, warm cloth |
+| patina | `#4fae9a` | weathered copper: temple trim, vanes |
+| hero | `#3f6fd1` | the courier's cloth (the shared player blue) |
+| crimson | `#c9423a` | **danger**: spike tips, warning lights (shared) |
+| gold | `#f2c230` | **reward** (shared) |
+| steel | `#c2c9d6` | bright metal (shared) |
+| gust | `#4fd8ee` | **the courier's wind**: a ready dash, the pinwheel (the shared friendly cyan) |
+| squall | `#7a4fc4` | enemy accent: storm things, a storm toad's sac |
+| rose | `#e2709a` | flowers, pennants, a second cloth, the toad's sac |
+| skin | `#f6d3b0` | human skin (shared) |
 
 `engine/palettes.js` holds exactly these tables (a unit test reads them out of this file), and no sprite types a palette hex: a colour changed here and there reaches every sprite.
 
@@ -949,7 +982,7 @@ The helpers are the framework (Contract 11). When an asset needs generic code a 
 
 | For | Modules | Worked example |
 |---|---|---|
-| Colours | `engine/palettes.js` (the three palettes of section 3 and `swatches`), `engine/color.js` (`ramp`, `tone`, `mix`, `pick`) | any sprite |
+| Colours | `engine/palettes.js` (the four palettes of section 3 and `swatches`), `engine/color.js` (`ramp`, `tone`, `mix`, `pick`) | any sprite |
 | Characters, side view | `base:person-side` and its part pieces (`pieces/`); the code rig that drew it (`rigs/humanoid.js`, `humanoid-figure.js`) was deleted in R2b, 2026-11-21 (`docs/architecture.md` Contract 13); `node tools/piece.mjs` | `sprites/knight.json` |
 | Characters, top-down | the base pieces `base:person-topdown*` with the `part:topdown-*` and `held:topdown-*` pieces (`pieces/`; the top-down rig `rigs/topdown.js` was deleted in R2); `node tools/piece.mjs` | `sprites/hero-walker.json` |
 | Other bodies | the creature and robot generators (`engine/gen/creatures.js`, `creature-c1.js`, `robots.js`; the rigs they were ported from were deleted in R2); `node skills/sprite-forge/context.mjs generators` | the creature or boss that uses each |

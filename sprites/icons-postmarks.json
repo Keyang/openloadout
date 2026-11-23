@@ -1,0 +1,3940 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "icons-postmarks",
+ "name": "Postmark icons",
+ "blurb": "Eight postage marks for a level-select card and an end-of-level tally: a stamp for an island, a harbour, a temple and a storm level, and a postmark, an express ticket, a sealed letter and a returned letter; show them bare or on plates and change their shine, size and colours.",
+ "meta": {
+  "type": "icon",
+  "role": "interface/icon",
+  "themes": [
+   "neutral",
+   "fantasy"
+  ],
+  "gameTypes": [
+   "platformer",
+   "arcade",
+   "puzzle"
+  ],
+  "view": "none",
+  "words": [
+   "stamp",
+   "postmark",
+   "level",
+   "chapter",
+   "badge",
+   "medal",
+   "rank",
+   "complete",
+   "seal",
+   "select",
+   "mail",
+   "award"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "isle",
+ "styles": [
+  "pixel"
+ ],
+ "palette": [
+  {
+   "id": "face",
+   "label": "Paper",
+   "default": "#f0ead8",
+   "material": "interface",
+   "swatches": [
+    "#f0ead8",
+    "#e8d9a8",
+    "#d8d2c0",
+    "#f4c9a0"
+   ]
+  },
+  {
+   "id": "body",
+   "label": "Stamp",
+   "default": "#3f6fd1",
+   "material": "paint",
+   "swatches": [
+    "#3f6fd1",
+    "#c9423a",
+    "#3f8f5a",
+    "#7a4fc4",
+    "#b8663a"
+   ]
+  },
+  {
+   "id": "accent",
+   "label": "Ink",
+   "default": "#56607e",
+   "material": "paint",
+   "swatches": [
+    "#56607e",
+    "#4a5a82",
+    "#a8703e",
+    "#4fae9a"
+   ]
+  },
+  {
+   "id": "plate",
+   "label": "Plate",
+   "default": "#8a8fa6",
+   "material": "interface",
+   "swatches": [
+    "#8a8fa6",
+    "#d89a3c",
+    "#c9a86a",
+    "#7e86d6"
+   ]
+  },
+  {
+   "id": "white",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "backing",
+   "kind": "choice",
+   "label": "Plate",
+   "options": [
+    "none",
+    {
+     "value": "hex",
+     "label": "Hexagon"
+    },
+    "circle"
+   ],
+   "default": "none"
+  },
+  {
+   "key": "shine",
+   "kind": "toggle",
+   "label": "Shine",
+   "default": true
+  },
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "face",
+   "kind": "colour",
+   "label": "Paper"
+  },
+  {
+   "key": "body",
+   "kind": "colour",
+   "label": "Stamp"
+  },
+  {
+   "key": "accent",
+   "kind": "colour",
+   "label": "Ink"
+  },
+  {
+   "key": "plate",
+   "kind": "colour",
+   "label": "Plate",
+   "when": {
+    "backing": [
+     "hex",
+     "circle"
+    ]
+   }
+  }
+ ],
+ "versions": [
+  {
+   "name": "Blue post",
+   "params": {}
+  },
+  {
+   "name": "Red airmail",
+   "params": {
+    "body": "#c9423a",
+    "accent": "#4a5a82"
+   }
+  },
+  {
+   "name": "Round sand badges",
+   "params": {
+    "backing": "circle",
+    "plate": "#c9a86a",
+    "face": "#e8d9a8",
+    "body": "#3f8f5a"
+   }
+  },
+  {
+   "name": "Matte purple album",
+   "params": {
+    "backing": "hex",
+    "shine": false,
+    "body": "#7a4fc4",
+    "plate": "#7e86d6"
+   }
+  },
+  {
+   "name": "Large copper set",
+   "params": {
+    "size": 1,
+    "body": "#b8663a",
+    "accent": "#4fae9a",
+    "face": "#f4c9a0"
+   }
+  }
+ ],
+ "body": {
+  "pictures": {
+   "draw": [],
+   "pictures": {
+    "isle": {
+     "label": "Island level",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "span": [
+        21,
+        27
+       ],
+       "tilt": false,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "plate",
+       "tidy": false,
+       "fill": {
+        "from": "backing",
+        "pick": {
+         "none": 1,
+         "hex": 0.9,
+         "circle": 1
+        }
+       },
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -7.7,
+           -9.7
+          ],
+          [
+           7.7,
+           -9.7
+          ],
+          [
+           7.7,
+           9.7
+          ],
+          [
+           -7.7,
+           9.7
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           -11
+          ],
+          [
+           -7.1,
+           -11
+          ],
+          [
+           -7.1,
+           -9.7
+          ],
+          [
+           -9,
+           -9.7
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           9.7
+          ],
+          [
+           -7.1,
+           9.7
+          ],
+          [
+           -7.1,
+           11
+          ],
+          [
+           -9,
+           11
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.78,
+           -11
+          ],
+          [
+           -3.88,
+           -11
+          ],
+          [
+           -3.88,
+           -9.7
+          ],
+          [
+           -5.78,
+           -9.7
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.78,
+           9.7
+          ],
+          [
+           -3.88,
+           9.7
+          ],
+          [
+           -3.88,
+           11
+          ],
+          [
+           -5.78,
+           11
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.56,
+           -11
+          ],
+          [
+           -0.66,
+           -11
+          ],
+          [
+           -0.66,
+           -9.7
+          ],
+          [
+           -2.56,
+           -9.7
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.56,
+           9.7
+          ],
+          [
+           -0.66,
+           9.7
+          ],
+          [
+           -0.66,
+           11
+          ],
+          [
+           -2.56,
+           11
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           0.66,
+           -11
+          ],
+          [
+           2.56,
+           -11
+          ],
+          [
+           2.56,
+           -9.7
+          ],
+          [
+           0.66,
+           -9.7
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           0.66,
+           9.7
+          ],
+          [
+           2.56,
+           9.7
+          ],
+          [
+           2.56,
+           11
+          ],
+          [
+           0.66,
+           11
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           3.88,
+           -11
+          ],
+          [
+           5.78,
+           -11
+          ],
+          [
+           5.78,
+           -9.7
+          ],
+          [
+           3.88,
+           -9.7
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           3.88,
+           9.7
+          ],
+          [
+           5.78,
+           9.7
+          ],
+          [
+           5.78,
+           11
+          ],
+          [
+           3.88,
+           11
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           7.1,
+           -11
+          ],
+          [
+           9,
+           -11
+          ],
+          [
+           9,
+           -9.7
+          ],
+          [
+           7.1,
+           -9.7
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           7.1,
+           9.7
+          ],
+          [
+           9,
+           9.7
+          ],
+          [
+           9,
+           11
+          ],
+          [
+           7.1,
+           11
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           -11
+          ],
+          [
+           -7.7,
+           -11
+          ],
+          [
+           -7.7,
+           -9.1
+          ],
+          [
+           -9,
+           -9.1
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           7.7,
+           -11
+          ],
+          [
+           9,
+           -11
+          ],
+          [
+           9,
+           -9.1
+          ],
+          [
+           7.7,
+           -9.1
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           -7.65
+          ],
+          [
+           -7.7,
+           -7.65
+          ],
+          [
+           -7.7,
+           -5.75
+          ],
+          [
+           -9,
+           -5.75
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           7.7,
+           -7.65
+          ],
+          [
+           9,
+           -7.65
+          ],
+          [
+           9,
+           -5.75
+          ],
+          [
+           7.7,
+           -5.75
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           -4.3
+          ],
+          [
+           -7.7,
+           -4.3
+          ],
+          [
+           -7.7,
+           -2.4
+          ],
+          [
+           -9,
+           -2.4
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           7.7,
+           -4.3
+          ],
+          [
+           9,
+           -4.3
+          ],
+          [
+           9,
+           -2.4
+          ],
+          [
+           7.7,
+           -2.4
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           -0.95
+          ],
+          [
+           -7.7,
+           -0.95
+          ],
+          [
+           -7.7,
+           0.95
+          ],
+          [
+           -9,
+           0.95
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           7.7,
+           -0.95
+          ],
+          [
+           9,
+           -0.95
+          ],
+          [
+           9,
+           0.95
+          ],
+          [
+           7.7,
+           0.95
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           2.4
+          ],
+          [
+           -7.7,
+           2.4
+          ],
+          [
+           -7.7,
+           4.3
+          ],
+          [
+           -9,
+           4.3
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           7.7,
+           2.4
+          ],
+          [
+           9,
+           2.4
+          ],
+          [
+           9,
+           4.3
+          ],
+          [
+           7.7,
+           4.3
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           5.75
+          ],
+          [
+           -7.7,
+           5.75
+          ],
+          [
+           -7.7,
+           7.65
+          ],
+          [
+           -9,
+           7.65
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           7.7,
+           5.75
+          ],
+          [
+           9,
+           5.75
+          ],
+          [
+           9,
+           7.65
+          ],
+          [
+           7.7,
+           7.65
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           9.1
+          ],
+          [
+           -7.7,
+           9.1
+          ],
+          [
+           -7.7,
+           11
+          ],
+          [
+           -9,
+           11
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           7.7,
+           9.1
+          ],
+          [
+           9,
+           9.1
+          ],
+          [
+           9,
+           11
+          ],
+          [
+           7.7,
+           11
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -6,
+             -8
+            ],
+            [
+             6,
+             -8
+            ],
+            [
+             6,
+             8
+            ],
+            [
+             -6,
+             8
+            ]
+           ],
+           "paint": "body"
+          }
+         ],
+         "paint": "body",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -3.15,
+           -7.15
+          ],
+          [
+           0.15,
+           -7.15
+          ],
+          [
+           0.15,
+           -5.85
+          ],
+          [
+           -3.15,
+           -5.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.15,
+           -6.15
+          ],
+          [
+           1.15,
+           -6.15
+          ],
+          [
+           1.15,
+           -4.85
+          ],
+          [
+           -4.15,
+           -4.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.15,
+           -5.15
+          ],
+          [
+           1.15,
+           -5.15
+          ],
+          [
+           1.15,
+           -3.85
+          ],
+          [
+           -4.15,
+           -3.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -3.15,
+           -4.15
+          ],
+          [
+           0.15,
+           -4.15
+          ],
+          [
+           0.15,
+           -2.85
+          ],
+          [
+           -3.15,
+           -2.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.15,
+           -3.15
+          ],
+          [
+           -0.85,
+           -3.15
+          ],
+          [
+           -0.85,
+           -1.85
+          ],
+          [
+           -2.15,
+           -1.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.15,
+           -2.15
+          ],
+          [
+           -0.85,
+           -2.15
+          ],
+          [
+           -0.85,
+           -0.85
+          ],
+          [
+           -2.15,
+           -0.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.15,
+           -1.15
+          ],
+          [
+           5.15,
+           -1.15
+          ],
+          [
+           5.15,
+           0.15
+          ],
+          [
+           -5.15,
+           0.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.15,
+           -0.15
+          ],
+          [
+           5.15,
+           -0.15
+          ],
+          [
+           5.15,
+           1.15
+          ],
+          [
+           -5.15,
+           1.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.15,
+           0.85
+          ],
+          [
+           4.15,
+           0.85
+          ],
+          [
+           4.15,
+           2.15
+          ],
+          [
+           -4.15,
+           2.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.15,
+           1.85
+          ],
+          [
+           3.15,
+           1.85
+          ],
+          [
+           3.15,
+           3.15
+          ],
+          [
+           -4.15,
+           3.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -3.15,
+           2.85
+          ],
+          [
+           2.15,
+           2.85
+          ],
+          [
+           2.15,
+           4.15
+          ],
+          [
+           -3.15,
+           4.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.15,
+           3.85
+          ],
+          [
+           2.15,
+           3.85
+          ],
+          [
+           2.15,
+           5.15
+          ],
+          [
+           -2.15,
+           5.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1.15,
+           4.85
+          ],
+          [
+           1.15,
+           4.85
+          ],
+          [
+           1.15,
+           6.15
+          ],
+          [
+           -1.15,
+           6.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1.15,
+           5.85
+          ],
+          [
+           0.15,
+           5.85
+          ],
+          [
+           0.15,
+           7.15
+          ],
+          [
+           -1.15,
+           7.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "isle"
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          -5,
+          -1
+         ],
+         "corner": true,
+         "paint": "white"
+        }
+       ]
+      }
+     ]
+    },
+    "harbour": {
+     "label": "Harbour level",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "span": [
+        19,
+        25
+       ],
+       "tilt": false,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "plate",
+       "draw": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          0
+         ],
+         "r": [
+          8.6,
+          8.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -8.4
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          3.64,
+          -7.57
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          6.57,
+          -5.24
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          8.19,
+          -1.87
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          8.19,
+          1.87
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          6.57,
+          5.24
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          3.64,
+          7.57
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          8.4
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -3.64,
+          7.57
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -6.57,
+          5.24
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -8.19,
+          1.87
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -8.19,
+          -1.87
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -6.57,
+          -5.24
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -3.64,
+          -7.57
+         ],
+         "r": [
+          1.6,
+          1.6
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "ellipse",
+           "at": [
+            0,
+            0
+           ],
+           "r": [
+            7.6,
+            7.6
+           ],
+           "paint": "body"
+          }
+         ],
+         "paint": "body",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -6.15,
+           -4.15
+          ],
+          [
+           -4.85,
+           -4.15
+          ],
+          [
+           -4.85,
+           -2.85
+          ],
+          [
+           -6.15,
+           -2.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.15,
+           -4.15
+          ],
+          [
+           4.15,
+           -4.15
+          ],
+          [
+           4.15,
+           -2.85
+          ],
+          [
+           -2.15,
+           -2.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -6.15,
+           -3.15
+          ],
+          [
+           6.15,
+           -3.15
+          ],
+          [
+           6.15,
+           -1.85
+          ],
+          [
+           -6.15,
+           -1.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -6.15,
+           -2.15
+          ],
+          [
+           6.15,
+           -2.15
+          ],
+          [
+           6.15,
+           -0.85
+          ],
+          [
+           -6.15,
+           -0.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -6.15,
+           -1.15
+          ],
+          [
+           6.15,
+           -1.15
+          ],
+          [
+           6.15,
+           0.15
+          ],
+          [
+           -6.15,
+           0.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -6.15,
+           -0.15
+          ],
+          [
+           -4.85,
+           -0.15
+          ],
+          [
+           -4.85,
+           1.15
+          ],
+          [
+           -6.15,
+           1.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.15,
+           -0.15
+          ],
+          [
+           4.15,
+           -0.15
+          ],
+          [
+           4.15,
+           1.15
+          ],
+          [
+           -2.15,
+           1.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1.15,
+           0.85
+          ],
+          [
+           0.15,
+           0.85
+          ],
+          [
+           0.15,
+           2.15
+          ],
+          [
+           -1.15,
+           2.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           1.85,
+           0.85
+          ],
+          [
+           3.15,
+           0.85
+          ],
+          [
+           3.15,
+           2.15
+          ],
+          [
+           1.85,
+           2.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.15,
+           1.85
+          ],
+          [
+           4.15,
+           1.85
+          ],
+          [
+           4.15,
+           3.15
+          ],
+          [
+           -2.15,
+           3.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1.15,
+           2.85
+          ],
+          [
+           3.15,
+           2.85
+          ],
+          [
+           3.15,
+           4.15
+          ],
+          [
+           -1.15,
+           4.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "ship"
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          -2,
+          -3
+         ],
+         "corner": true,
+         "paint": "white"
+        }
+       ]
+      }
+     ]
+    },
+    "temple": {
+     "label": "Temple level",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "span": [
+        19,
+        25
+       ],
+       "tilt": false,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "plate",
+       "tidy": false,
+       "fill": {
+        "from": "backing",
+        "pick": {
+         "none": 1,
+         "hex": 0.9,
+         "circle": 1
+        }
+       },
+       "draw": [
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          -1
+         ],
+         "r": [
+          9,
+          9
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           -1
+          ],
+          [
+           9,
+           -1
+          ],
+          [
+           9,
+           8.7
+          ],
+          [
+           -9,
+           8.7
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           8.7
+          ],
+          [
+           -7.1,
+           8.7
+          ],
+          [
+           -7.1,
+           10
+          ],
+          [
+           -9,
+           10
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.78,
+           8.7
+          ],
+          [
+           -3.88,
+           8.7
+          ],
+          [
+           -3.88,
+           10
+          ],
+          [
+           -5.78,
+           10
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.56,
+           8.7
+          ],
+          [
+           -0.66,
+           8.7
+          ],
+          [
+           -0.66,
+           10
+          ],
+          [
+           -2.56,
+           10
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           0.66,
+           8.7
+          ],
+          [
+           2.56,
+           8.7
+          ],
+          [
+           2.56,
+           10
+          ],
+          [
+           0.66,
+           10
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           3.88,
+           8.7
+          ],
+          [
+           5.78,
+           8.7
+          ],
+          [
+           5.78,
+           10
+          ],
+          [
+           3.88,
+           10
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           7.1,
+           8.7
+          ],
+          [
+           9,
+           8.7
+          ],
+          [
+           9,
+           10
+          ],
+          [
+           7.1,
+           10
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "ellipse",
+           "at": [
+            0,
+            -1
+           ],
+           "r": [
+            6.6,
+            6.6
+           ],
+           "paint": "body"
+          },
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -6.6,
+             -1
+            ],
+            [
+             6.6,
+             -1
+            ],
+            [
+             6.6,
+             7
+            ],
+            [
+             -6.6,
+             7
+            ]
+           ],
+           "paint": "body"
+          }
+         ],
+         "paint": "body",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -3.15,
+           -6.15
+          ],
+          [
+           -0.85,
+           -6.15
+          ],
+          [
+           -0.85,
+           -4.85
+          ],
+          [
+           -3.15,
+           -4.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "wave"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           0.85,
+           -6.15
+          ],
+          [
+           3.15,
+           -6.15
+          ],
+          [
+           3.15,
+           -4.85
+          ],
+          [
+           0.85,
+           -4.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "wave"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.15,
+           -5.15
+          ],
+          [
+           -2.85,
+           -5.15
+          ],
+          [
+           -2.85,
+           -3.85
+          ],
+          [
+           -4.15,
+           -3.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "wave"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1.15,
+           -5.15
+          ],
+          [
+           1.15,
+           -5.15
+          ],
+          [
+           1.15,
+           -3.85
+          ],
+          [
+           -1.15,
+           -3.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "wave"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           2.85,
+           -5.15
+          ],
+          [
+           4.15,
+           -5.15
+          ],
+          [
+           4.15,
+           -3.85
+          ],
+          [
+           2.85,
+           -3.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "wave"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5,
+           -3
+          ],
+          [
+           5,
+           -3
+          ],
+          [
+           5,
+           -1
+          ],
+          [
+           -5,
+           -1
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "fane"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4,
+           -1
+          ],
+          [
+           -2,
+           -1
+          ],
+          [
+           -2,
+           5
+          ],
+          [
+           -4,
+           5
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "fane"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           2,
+           -1
+          ],
+          [
+           4,
+           -1
+          ],
+          [
+           4,
+           5
+          ],
+          [
+           2,
+           5
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "fane"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5,
+           5
+          ],
+          [
+           5,
+           5
+          ],
+          [
+           5,
+           6
+          ],
+          [
+           -5,
+           6
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "fane"
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          -5,
+          -3
+         ],
+         "corner": true,
+         "paint": "white"
+        }
+       ]
+      }
+     ]
+    },
+    "storm": {
+     "label": "Storm level",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "span": [
+        21,
+        27
+       ],
+       "tilt": false,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "plate",
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.5,
+           -10
+          ],
+          [
+           5.5,
+           -10
+          ],
+          [
+           11,
+           0
+          ],
+          [
+           5.5,
+           10
+          ],
+          [
+           -5.5,
+           10
+          ],
+          [
+           -11,
+           0
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             -4.3,
+             -7.6
+            ],
+            [
+             4.3,
+             -7.6
+            ],
+            [
+             8.6,
+             0
+            ],
+            [
+             4.3,
+             7.6
+            ],
+            [
+             -4.3,
+             7.6
+            ],
+            [
+             -8.6,
+             0
+            ]
+           ],
+           "paint": "body"
+          }
+         ],
+         "paint": "body",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -0.15,
+           -7.15
+          ],
+          [
+           3.15,
+           -7.15
+          ],
+          [
+           3.15,
+           -5.85
+          ],
+          [
+           -0.15,
+           -5.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "cloud"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -3.15,
+           -6.15
+          ],
+          [
+           4.15,
+           -6.15
+          ],
+          [
+           4.15,
+           -4.85
+          ],
+          [
+           -3.15,
+           -4.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "cloud"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -4.15,
+           -5.15
+          ],
+          [
+           5.15,
+           -5.15
+          ],
+          [
+           5.15,
+           -3.85
+          ],
+          [
+           -4.15,
+           -3.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "cloud"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.15,
+           -4.15
+          ],
+          [
+           6.15,
+           -4.15
+          ],
+          [
+           6.15,
+           -2.85
+          ],
+          [
+           -5.15,
+           -2.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "cloud"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -5.15,
+           -3.15
+          ],
+          [
+           6.15,
+           -3.15
+          ],
+          [
+           6.15,
+           -1.85
+          ],
+          [
+           -5.15,
+           -1.85
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "cloud"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           0.85,
+           -1.15
+          ],
+          [
+           4.15,
+           -1.15
+          ],
+          [
+           4.15,
+           0.15
+          ],
+          [
+           0.85,
+           0.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "bolt"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -0.15,
+           -0.15
+          ],
+          [
+           3.15,
+           -0.15
+          ],
+          [
+           3.15,
+           1.15
+          ],
+          [
+           -0.15,
+           1.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "bolt"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1.15,
+           0.85
+          ],
+          [
+           4.15,
+           0.85
+          ],
+          [
+           4.15,
+           2.15
+          ],
+          [
+           -1.15,
+           2.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "bolt"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           0.85,
+           1.85
+          ],
+          [
+           3.15,
+           1.85
+          ],
+          [
+           3.15,
+           3.15
+          ],
+          [
+           0.85,
+           3.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "bolt"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -0.15,
+           2.85
+          ],
+          [
+           2.15,
+           2.85
+          ],
+          [
+           2.15,
+           4.15
+          ],
+          [
+           -0.15,
+           4.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "bolt"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1.15,
+           3.85
+          ],
+          [
+           1.15,
+           3.85
+          ],
+          [
+           1.15,
+           5.15
+          ],
+          [
+           -1.15,
+           5.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "bolt"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -1.15,
+           4.85
+          ],
+          [
+           0.15,
+           4.85
+          ],
+          [
+           0.15,
+           6.15
+          ],
+          [
+           -1.15,
+           6.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "bolt"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2.15,
+           1.85
+          ],
+          [
+           -0.85,
+           1.85
+          ],
+          [
+           -0.85,
+           3.15
+          ],
+          [
+           -2.15,
+           3.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "bolt"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -3.15,
+           2.85
+          ],
+          [
+           -1.85,
+           2.85
+          ],
+          [
+           -1.85,
+           4.15
+          ],
+          [
+           -3.15,
+           4.15
+          ]
+         ],
+         "paint": "body",
+         "shade": 0,
+         "light": 0,
+         "group": "bolt"
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          -3,
+          -5
+         ],
+         "corner": true,
+         "paint": "white"
+        }
+       ]
+      }
+     ]
+    },
+    "postmark": {
+     "label": "Level cleared",
+     "draw": [
+      {
+       "gen": "icon.plate",
+       "v": 1,
+       "shape": {
+        "from": "backing",
+        "pick": {
+         "none": "hex",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "face": "plate",
+       "shine": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "when": {
+        "backing": [
+         "hex",
+         "circle"
+        ]
+       }
+      },
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "span": [
+        23,
+        29
+       ],
+       "tilt": false,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": "none",
+       "face": "plate",
+       "ink": {
+        "from": "backing",
+        "pick": {
+         "none": "clear",
+         "hex": "plate",
+         "circle": "plate"
+        }
+       },
+       "fill": {
+        "from": "backing",
+        "pick": {
+         "none": 1,
+         "hex": 0.8,
+         "circle": 0.8
+        }
+       },
+       "draw": [
+        {
+         "kind": "ellipse",
+         "at": [
+          -2,
+          0
+         ],
+         "r": [
+          10,
+          10
+         ],
+         "paint": {
+          "from": "backing",
+          "pick": {
+           "none": "accent",
+           "hex": "accent.deep",
+           "circle": "accent.deep"
+          }
+         },
+         "shade": 0,
+         "light": 0,
+         "group": "outer"
+        },
+        {
+         "kind": "cut",
+         "from": "outer",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           -2,
+           0
+          ],
+          "r": [
+           8.2,
+           8.2
+          ],
+          "paint": "accent"
+         }
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -2,
+          0
+         ],
+         "r": [
+          6,
+          6
+         ],
+         "paint": {
+          "from": "backing",
+          "pick": {
+           "none": "accent",
+           "hex": "accent.deep",
+           "circle": "accent.deep"
+          }
+         },
+         "shade": 0,
+         "light": 0,
+         "group": "inner"
+        },
+        {
+         "kind": "cut",
+         "from": "inner",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           -2,
+           0
+          ],
+          "r": [
+           4.6,
+           4.6
+          ],
+          "paint": "accent"
+         }
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -2,
+          0
+         ],
+         "r": [
+          1.4,
+          1.4
+         ],
+         "paint": {
+          "from": "backing",
+          "pick": {
+           "none": "accent",
+           "hex": "accent.deep",
+           "circle": "accent.deep"
+          }
+         },
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           1,
+           -5.1
+          ],
+          [
+           4.25,
+           -6.9
+          ],
+          [
+           7.5,
+           -5.1
+          ],
+          [
+           10.75,
+           -6.9
+          ],
+          [
+           14,
+           -5.1
+          ],
+          [
+           14,
+           -3.1
+          ],
+          [
+           10.75,
+           -4.9
+          ],
+          [
+           7.5,
+           -3.1
+          ],
+          [
+           4.25,
+           -4.9
+          ],
+          [
+           1,
+           -3.1
+          ]
+         ],
+         "paint": {
+          "from": "backing",
+          "pick": {
+           "none": "accent",
+           "hex": "accent.deep",
+           "circle": "accent.deep"
+          }
+         },
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           1,
+           -0.1
+          ],
+          [
+           4.25,
+           -1.9
+          ],
+          [
+           7.5,
+           -0.1
+          ],
+          [
+           10.75,
+           -1.9
+          ],
+          [
+           14,
+           -0.1
+          ],
+          [
+           14,
+           1.9
+          ],
+          [
+           10.75,
+           0.1
+          ],
+          [
+           7.5,
+           1.9
+          ],
+          [
+           4.25,
+           0.1
+          ],
+          [
+           1,
+           1.9
+          ]
+         ],
+         "paint": {
+          "from": "backing",
+          "pick": {
+           "none": "accent",
+           "hex": "accent.deep",
+           "circle": "accent.deep"
+          }
+         },
+         "shade": 0,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           1,
+           4.9
+          ],
+          [
+           4.25,
+           3.1
+          ],
+          [
+           7.5,
+           4.9
+          ],
+          [
+           10.75,
+           3.1
+          ],
+          [
+           14,
+           4.9
+          ],
+          [
+           14,
+           6.9
+          ],
+          [
+           10.75,
+           5.1
+          ],
+          [
+           7.5,
+           6.9
+          ],
+          [
+           4.25,
+           5.1
+          ],
+          [
+           1,
+           6.9
+          ]
+         ],
+         "paint": {
+          "from": "backing",
+          "pick": {
+           "none": "accent",
+           "hex": "accent.deep",
+           "circle": "accent.deep"
+          }
+         },
+         "shade": 0,
+         "light": 0
+        }
+       ]
+      }
+     ]
+    },
+    "express": {
+     "label": "Cleared fast",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "span": [
+        23,
+        29
+       ],
+       "tilt": false,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "plate",
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -9,
+           -6
+          ],
+          [
+           13,
+           -6
+          ],
+          [
+           13,
+           6
+          ],
+          [
+           -9,
+           6
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 1,
+         "group": "ticket"
+        },
+        {
+         "kind": "cut",
+         "from": "ticket",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           13,
+           0
+          ],
+          "r": [
+           1.8,
+           1.8
+          ],
+          "paint": "face"
+         }
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           9.6,
+           -6
+          ],
+          [
+           13,
+           -6
+          ],
+          [
+           13,
+           6
+          ],
+          [
+           9.6,
+           6
+          ]
+         ],
+         "paint": "body",
+         "shade": 1,
+         "light": 1,
+         "group": "stub"
+        },
+        {
+         "kind": "cut",
+         "from": "stub",
+         "shape": {
+          "kind": "ellipse",
+          "at": [
+           13,
+           0
+          ],
+          "r": [
+           1.8,
+           1.8
+          ],
+          "paint": "body"
+         }
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2,
+           -5
+          ],
+          [
+           -14,
+           -5
+          ],
+          [
+           -12.5,
+           -3.4
+          ],
+          [
+           -11,
+           -2.4
+          ],
+          [
+           -2,
+           -2.4
+          ]
+         ],
+         "paint": "accent",
+         "shade": 1,
+         "light": 0,
+         "group": "wing"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2,
+           -2.4
+          ],
+          [
+           -11.6,
+           -2.4
+          ],
+          [
+           -10,
+           -0.8
+          ],
+          [
+           -8.6,
+           0.2
+          ],
+          [
+           -2,
+           0.2
+          ]
+         ],
+         "paint": "accent",
+         "shade": 1,
+         "light": 0,
+         "group": "wing"
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -2,
+           0.2
+          ],
+          [
+           -9,
+           0.2
+          ],
+          [
+           -7.6,
+           1.8
+          ],
+          [
+           -6,
+           2.8
+          ],
+          [
+           -2,
+           2.8
+          ]
+         ],
+         "paint": "accent",
+         "shade": 1,
+         "light": 0,
+         "group": "wing"
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          -2.6,
+          -1.1
+         ],
+         "r": [
+          2.4,
+          4.2
+         ],
+         "paint": "accent",
+         "shade": 1,
+         "light": 0,
+         "group": "wing"
+        },
+        {
+         "kind": "line",
+         "from": [
+          -11,
+          -2.5
+         ],
+         "to": [
+          -4,
+          -2.5
+         ],
+         "paint": "accent.deep"
+        },
+        {
+         "kind": "line",
+         "from": [
+          -8.6,
+          0.5
+         ],
+         "to": [
+          -4,
+          0.5
+         ],
+         "paint": "accent.deep"
+        },
+        {
+         "kind": "line",
+         "from": [
+          2,
+          -2.5
+         ],
+         "to": [
+          8,
+          -2.5
+         ],
+         "paint": "accent"
+        },
+        {
+         "kind": "line",
+         "from": [
+          4,
+          1.5
+         ],
+         "to": [
+          8,
+          1.5
+         ],
+         "paint": "accent"
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          10.2,
+          -5.5
+         ],
+         "corner": true,
+         "paint": "white"
+        }
+       ]
+      }
+     ]
+    },
+    "sealed": {
+     "label": "Every letter found",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "span": [
+        19,
+        25
+       ],
+       "tilt": false,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "plate",
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -10,
+           -7
+          ],
+          [
+           10,
+           -7
+          ],
+          [
+           10,
+           7
+          ],
+          [
+           -10,
+           7
+          ]
+         ],
+         "paint": "face",
+         "shade": 2,
+         "light": 1,
+         "group": "paper"
+        },
+        {
+         "kind": "line",
+         "from": [
+          -10,
+          -7
+         ],
+         "to": [
+          0,
+          1
+         ],
+         "paint": "face.deep"
+        },
+        {
+         "kind": "line",
+         "from": [
+          9.5,
+          -7
+         ],
+         "to": [
+          0,
+          1
+         ],
+         "paint": "face.deep"
+        },
+        {
+         "kind": "line",
+         "from": [
+          -10,
+          6.5
+         ],
+         "to": [
+          -3.5,
+          1.5
+         ],
+         "paint": "face.dark"
+        },
+        {
+         "kind": "line",
+         "from": [
+          9.5,
+          6.5
+         ],
+         "to": [
+          3.5,
+          1.5
+         ],
+         "paint": "face.dark"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "ellipse",
+           "at": [
+            0,
+            1.2
+           ],
+           "r": [
+            3,
+            3
+           ],
+           "paint": "body"
+          }
+         ],
+         "paint": "body.deep",
+         "over": true
+        },
+        {
+         "kind": "ellipse",
+         "at": [
+          0,
+          1.2
+         ],
+         "r": [
+          3,
+          3
+         ],
+         "paint": "body",
+         "shade": 1,
+         "light": 1
+        },
+        {
+         "gen": "icon.glint",
+         "v": 2,
+         "at": [
+          1,
+          -0.6
+         ],
+         "corner": true,
+         "paint": "white"
+        }
+       ]
+      }
+     ]
+    },
+    "returned": {
+     "label": "Not cleared",
+     "draw": [
+      {
+       "gen": "icon.fitted",
+       "v": 1,
+       "room": 32,
+       "size": {
+        "from": "size",
+        "map": [
+         [
+          0,
+          0
+         ],
+         [
+          1,
+          1
+         ]
+        ]
+       },
+       "span": [
+        21,
+        27
+       ],
+       "tilt": false,
+       "shiny": {
+        "from": "shine",
+        "pick": {
+         "true": true,
+         "false": false
+        }
+       },
+       "plate": {
+        "from": "backing",
+        "pick": {
+         "none": "none",
+         "hex": "hex",
+         "circle": "circle"
+        }
+       },
+       "face": "plate",
+       "draw": [
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -10,
+           -7
+          ],
+          [
+           10,
+           -7
+          ],
+          [
+           10,
+           7
+          ],
+          [
+           -10,
+           7
+          ]
+         ],
+         "paint": "face",
+         "shade": 2,
+         "light": 1,
+         "group": "env"
+        },
+        {
+         "kind": "cut",
+         "from": "env",
+         "shape": {
+          "kind": "poly",
+          "points": [
+           [
+            5,
+            -7.2
+           ],
+           [
+            10.2,
+            -7.2
+           ],
+           [
+            10.2,
+            -2
+           ]
+          ],
+          "paint": "face"
+         }
+        },
+        {
+         "kind": "line",
+         "from": [
+          -10,
+          -7
+         ],
+         "to": [
+          0,
+          1
+         ],
+         "paint": "face.deep"
+        },
+        {
+         "kind": "line",
+         "from": [
+          5,
+          -3
+         ],
+         "to": [
+          0,
+          1
+         ],
+         "paint": "face.deep"
+        },
+        {
+         "gen": "icon.rim",
+         "v": 1,
+         "shapes": [
+          {
+           "kind": "poly",
+           "points": [
+            [
+             5,
+             -7
+            ],
+            [
+             5,
+             -2
+            ],
+            [
+             10,
+             -2
+            ]
+           ],
+           "paint": "face"
+          }
+         ],
+         "paint": "face.deep",
+         "over": true
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           5,
+           -7
+          ],
+          [
+           5,
+           -2
+          ],
+          [
+           10,
+           -2
+          ]
+         ],
+         "paint": "face",
+         "shade": 1,
+         "light": 0
+        },
+        {
+         "kind": "poly",
+         "points": [
+          [
+           -10.7,
+           -9.1
+          ],
+          [
+           -12.3,
+           -6.7
+          ],
+          [
+           10.7,
+           9.1
+          ],
+          [
+           12.3,
+           6.7
+          ]
+         ],
+         "paint": "accent",
+         "shade": 1,
+         "light": 0
+        }
+       ]
+      }
+     ]
+    }
+   }
+  }
+ },
+ "clips": {
+  "isle": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Island level"
+  },
+  "harbour": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Harbour level"
+  },
+  "temple": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Temple level"
+  },
+  "storm": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Storm level"
+  },
+  "postmark": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Level cleared"
+  },
+  "express": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Cleared fast"
+  },
+  "sealed": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Every letter found"
+  },
+  "returned": {
+   "frames": 1,
+   "fps": 1,
+   "label": "Not cleared"
+  }
+ }
+}

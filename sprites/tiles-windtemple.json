@@ -1,0 +1,4728 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "tiles-windtemple",
+ "name": "Wind temple stone",
+ "blurb": "Pale carved stone for a side-view temple, with a copper trim cut with a wave, a back wall with wind slots, a fluted column and a gateway; change the courses, the trim, the wear, the vines and the colours.",
+ "size": [
+  32,
+  32
+ ],
+ "pivot": [
+  16,
+  16
+ ],
+ "grounded": false,
+ "preview": "marble-top",
+ "styles": [
+  "pixel"
+ ],
+ "meta": {
+  "type": "tileset",
+  "role": "world/tile",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "platformer"
+  ],
+  "view": "side",
+  "words": [
+   "temple",
+   "stone",
+   "marble",
+   "ruin",
+   "column",
+   "wall",
+   "floor",
+   "shrine",
+   "copper",
+   "arch",
+   "carved",
+   "ancient"
+  ],
+  "license": "draft"
+ },
+ "versions": [
+  {
+   "name": "Pale shrine",
+   "params": {}
+  },
+  {
+   "name": "Brass and night",
+   "params": {
+    "trim": "#d89a3c",
+    "wall": "#4a5a82",
+    "style": "slabs"
+   }
+  },
+  {
+   "name": "Overgrown ruin",
+   "params": {
+    "wear": 1,
+    "mossy": true,
+    "stone": "#e8d9a8",
+    "trim": "#b8663a"
+   }
+  },
+  {
+   "name": "Steel masonry",
+   "params": {
+    "style": "bricks",
+    "stone": "#c2c9d6",
+    "wall": "#56607e",
+    "edge": 8
+   }
+  }
+ ],
+ "palette": [
+  {
+   "id": "stone",
+   "label": "Stone",
+   "default": "#d8d2c0",
+   "material": "stone",
+   "swatches": [
+    "#d8d2c0",
+    "#e8d9a8",
+    "#c2c9d6",
+    "#f0ead8"
+   ]
+  },
+  {
+   "id": "wall",
+   "label": "Back wall",
+   "default": "#8a8fa6",
+   "material": "stone",
+   "swatches": [
+    "#8a8fa6",
+    "#56607e",
+    "#4a5a82",
+    "#7e86d6"
+   ]
+  },
+  {
+   "id": "trim",
+   "label": "Copper trim",
+   "default": "#4fae9a",
+   "material": "metal",
+   "swatches": [
+    "#4fae9a",
+    "#b8663a",
+    "#d89a3c",
+    "#7a4fc4"
+   ]
+  },
+  {
+   "id": "vine",
+   "default": "#3f8f5a",
+   "material": "plant",
+   "detail": true
+  },
+  {
+   "id": "joint",
+   "material": "stone",
+   "derive": {
+    "rule": "textureTone",
+    "of": "stone"
+   }
+  },
+  {
+   "id": "mortar",
+   "material": "stone",
+   "derive": {
+    "rule": "textureTone",
+    "of": "wall"
+   }
+  },
+  {
+   "id": "chip",
+   "material": "stone",
+   "derive": {
+    "rule": "textureLight",
+    "of": "stone"
+   }
+  }
+ ],
+ "controls": [
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Courses",
+   "options": [
+    "blocks",
+    "slabs",
+    "bricks"
+   ],
+   "default": "blocks"
+  },
+  {
+   "key": "edge",
+   "kind": "range",
+   "label": "Edge",
+   "lo": "Thin",
+   "hi": "Deep",
+   "min": 4,
+   "max": 8,
+   "step": 1,
+   "default": 5
+  },
+  {
+   "key": "texture",
+   "kind": "range",
+   "label": "Texture",
+   "lo": "Plain",
+   "hi": "Busy",
+   "default": 0.5
+  },
+  {
+   "key": "wear",
+   "kind": "range",
+   "label": "Wear",
+   "lo": "New",
+   "hi": "Worn",
+   "default": 0.4
+  },
+  {
+   "key": "mossy",
+   "kind": "toggle",
+   "label": "Vines",
+   "default": false
+  },
+  {
+   "key": "stone",
+   "kind": "colour",
+   "label": "Stone"
+  },
+  {
+   "key": "wall",
+   "kind": "colour",
+   "label": "Back wall"
+  },
+  {
+   "key": "trim",
+   "kind": "colour",
+   "label": "Copper trim"
+  }
+ ],
+ "body": {
+  "tiles": {
+   "tile": 32,
+   "profiles": {
+    "wave": [
+     1,
+     1,
+     0,
+     0,
+     2,
+     2,
+     0,
+     0
+    ],
+    "vine": [
+     0,
+     0,
+     3,
+     6,
+     2,
+     0,
+     0,
+     0,
+     0,
+     0,
+     4,
+     9,
+     5,
+     1,
+     0,
+     0,
+     0,
+     0,
+     2,
+     5,
+     3,
+     0,
+     0,
+     0,
+     0,
+     7,
+     4,
+     1,
+     3,
+     0,
+     0,
+     0
+    ],
+    "vine-tone": [
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     0,
+     1,
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "groups": [
+    {
+     "name": "marble",
+     "kind": "block",
+     "use": "ground",
+     "pieces": [
+      "block",
+      "narrow",
+      "thin"
+     ],
+     "fills": 3,
+     "thickness": 12,
+     "under": {
+      "depth": 7,
+      "bands": [
+       {
+        "rows": [
+         1,
+         2
+        ],
+        "paint": "stone.dark"
+       },
+       {
+        "rows": [
+         3,
+         7
+        ],
+        "paint": "stone"
+       }
+      ]
+     },
+     "material": {
+      "fill": {
+       "base": "stone",
+       "versions": [
+        [
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           16,
+           16
+          ],
+          "joints": [
+           3,
+           19,
+           11,
+           27
+          ],
+          "counts": [
+           2,
+           2
+          ],
+          "shift": 13,
+          "paint": "joint",
+          "when": {
+           "style": [
+            "blocks"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           32
+          ],
+          "joints": [
+           11
+          ],
+          "counts": [
+           1
+          ],
+          "shift": 21,
+          "paint": "joint",
+          "when": {
+           "style": [
+            "slabs"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           8,
+           8,
+           8,
+           8
+          ],
+          "joints": [
+           3,
+           19,
+           11,
+           27,
+           3,
+           19,
+           11,
+           27
+          ],
+          "counts": [
+           2,
+           2,
+           2,
+           2
+          ],
+          "shift": 5,
+          "paint": "joint",
+          "when": {
+           "style": [
+            "bricks"
+           ]
+          }
+         }
+        ],
+        [
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           16,
+           16
+          ],
+          "joints": [
+           3,
+           19,
+           11,
+           27
+          ],
+          "counts": [
+           2,
+           2
+          ],
+          "shift": 13,
+          "paint": "joint",
+          "when": {
+           "style": [
+            "blocks"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           32
+          ],
+          "joints": [
+           11
+          ],
+          "counts": [
+           1
+          ],
+          "shift": 21,
+          "paint": "joint",
+          "when": {
+           "style": [
+            "slabs"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           8,
+           8,
+           8,
+           8
+          ],
+          "joints": [
+           3,
+           19,
+           11,
+           27,
+           3,
+           19,
+           11,
+           27
+          ],
+          "counts": [
+           2,
+           2,
+           2,
+           2
+          ],
+          "shift": 5,
+          "paint": "joint",
+          "when": {
+           "style": [
+            "bricks"
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           24,
+           22
+          ],
+          "rows": [
+           "bb",
+           ".a"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           7,
+           13
+          ],
+          "size": [
+           1,
+           9
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "blocks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           4,
+           21
+          ],
+          "size": [
+           3,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "blocks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           21,
+           21
+          ],
+          "size": [
+           1,
+           7
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "slabs"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           12,
+           28
+          ],
+          "size": [
+           10,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "slabs"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           24,
+           13
+          ],
+          "size": [
+           1,
+           7
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "bricks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           7,
+           21
+          ],
+          "size": [
+           1,
+           7
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "bricks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           25,
+           6
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           9,
+           25
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           5,
+           24
+          ],
+          "rows": [
+           "bb",
+           ".a"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           13,
+           23
+          ],
+          "rows": [
+           "bbb",
+           ".ba"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           6,
+           7
+          ],
+          "rows": [
+           "b.",
+           "bb"
+          ],
+          "key": {
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           28,
+           16
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           17,
+           10
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           14,
+           7
+          ],
+          "rows": [
+           "bb",
+           ".a"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           20,
+           16
+          ],
+          "rows": [
+           "bbb",
+           ".ba"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           23,
+           8
+          ],
+          "size": [
+           1,
+           4
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "blocks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           5,
+           13
+          ],
+          "size": [
+           1,
+           7
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "slabs"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           9,
+           5
+          ],
+          "size": [
+           1,
+           7
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "bricks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           16,
+           25
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           9,
+           17
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           25,
+           10
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           13,
+           18
+          ],
+          "rows": [
+           "bbb",
+           ".ba"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           20,
+           9
+          ],
+          "rows": [
+           "bbb",
+           ".ba"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           16,
+           5
+          ],
+          "rows": [
+           "b.",
+           "bb"
+          ],
+          "key": {
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           22,
+           26
+          ],
+          "rows": [
+           "b.",
+           "bb"
+          ],
+          "key": {
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           28,
+           18
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           5,
+           18
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           26,
+           23
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           12,
+           6
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           12,
+           9
+          ],
+          "rows": [
+           "a......",
+           ".a.....",
+           ".a.....",
+           "..aa...",
+           "....a..",
+           "....a..",
+           ".....aa"
+          ],
+          "key": {
+           "a": "joint"
+          },
+          "when": {
+           "wear": [
+            {
+             "atLeast": 0.35
+            }
+           ]
+          }
+         }
+        ],
+        [
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           16,
+           16
+          ],
+          "joints": [
+           3,
+           19,
+           11,
+           27
+          ],
+          "counts": [
+           2,
+           2
+          ],
+          "shift": 13,
+          "paint": "joint",
+          "when": {
+           "style": [
+            "blocks"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           32
+          ],
+          "joints": [
+           11
+          ],
+          "counts": [
+           1
+          ],
+          "shift": 21,
+          "paint": "joint",
+          "when": {
+           "style": [
+            "slabs"
+           ]
+          }
+         },
+         {
+          "gen": "tile.courses",
+          "v": 1,
+          "heights": [
+           8,
+           8,
+           8,
+           8
+          ],
+          "joints": [
+           3,
+           19,
+           11,
+           27,
+           3,
+           19,
+           11,
+           27
+          ],
+          "counts": [
+           2,
+           2,
+           2,
+           2
+          ],
+          "shift": 5,
+          "paint": "joint",
+          "when": {
+           "style": [
+            "bricks"
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           22,
+           24
+          ],
+          "rows": [
+           "bb",
+           ".a"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           14,
+           19
+          ],
+          "size": [
+           1,
+           9
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "blocks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           15,
+           19
+          ],
+          "size": [
+           2,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "blocks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           3,
+           13
+          ],
+          "size": [
+           1,
+           7
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "slabs"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           3,
+           13
+          ],
+          "size": [
+           8,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "slabs"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           14,
+           5
+          ],
+          "size": [
+           1,
+           7
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "bricks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           15,
+           13
+          ],
+          "size": [
+           1,
+           7
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "bricks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           17,
+           8
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           26,
+           17
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           23,
+           6
+          ],
+          "rows": [
+           "bb",
+           ".a"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           5,
+           14
+          ],
+          "rows": [
+           "bbb",
+           ".ba"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           16,
+           23
+          ],
+          "rows": [
+           "b.",
+           "bb"
+          ],
+          "key": {
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           9,
+           6
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           28,
+           22
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           6,
+           9
+          ],
+          "rows": [
+           "bb",
+           ".a"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           20,
+           15
+          ],
+          "rows": [
+           "bbb",
+           ".ba"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           15,
+           8
+          ],
+          "size": [
+           1,
+           4
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "blocks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           24,
+           13
+          ],
+          "size": [
+           1,
+           7
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "slabs"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           25,
+           21
+          ],
+          "size": [
+           1,
+           7
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "style": [
+            "bricks"
+           ],
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           12,
+           25
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           25,
+           10
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           4,
+           24
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           12,
+           14
+          ],
+          "rows": [
+           "bbb",
+           ".ba"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           4,
+           6
+          ],
+          "rows": [
+           "bbb",
+           ".ba"
+          ],
+          "key": {
+           "a": "chip",
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           20,
+           8
+          ],
+          "rows": [
+           "b.",
+           "bb"
+          ],
+          "key": {
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           25,
+           26
+          ],
+          "rows": [
+           "b.",
+           "bb"
+          ],
+          "key": {
+           "b": "joint"
+          },
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           17,
+           17
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           28,
+           8
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           13,
+           6
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           8,
+           27
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "joint",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "stamp",
+          "at": [
+           6,
+           17
+          ],
+          "rows": [
+           "......a",
+           ".....a.",
+           "...aa..",
+           "..a....",
+           "..a....",
+           ".a.....",
+           "a......",
+           "a......"
+          ],
+          "key": {
+           "a": "joint"
+          },
+          "when": {
+           "wear": [
+            {
+             "atLeast": 0.7
+            }
+           ]
+          }
+         }
+        ]
+       ]
+      },
+      "edges": {
+       "top": {
+        "depth": 10,
+        "bands": [
+         {
+          "rows": {
+           "profile": "vine"
+          },
+          "where": {
+           "profile": "vine-tone",
+           "in": [
+            1
+           ]
+          },
+          "paint": "vine.dark",
+          "when": {
+           "mossy": [
+            true
+           ]
+          }
+         },
+         {
+          "rows": {
+           "profile": "vine"
+          },
+          "paint": "vine",
+          "when": {
+           "mossy": [
+            true
+           ]
+          }
+         },
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "paint": "stone.light"
+         },
+         {
+          "rows": [
+           2,
+           2
+          ],
+          "where": {
+           "profile": "wave",
+           "in": [
+            1
+           ]
+          },
+          "paint": "trim.dark"
+         },
+         {
+          "rows": [
+           3,
+           3
+          ],
+          "where": {
+           "profile": "wave",
+           "in": [
+            2
+           ]
+          },
+          "paint": "trim.dark"
+         },
+         {
+          "rows": [
+           2,
+           3
+          ],
+          "paint": "trim"
+         },
+         {
+          "rows": [
+           4,
+           7
+          ],
+          "paint": "stone",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 7.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [
+           8,
+           8
+          ],
+          "paint": "stone.dark",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 7.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [
+           4,
+           6
+          ],
+          "paint": "stone",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 6.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [
+           7,
+           7
+          ],
+          "paint": "stone.dark",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 6.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [
+           4,
+           5
+          ],
+          "paint": "stone",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 5.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [
+           6,
+           6
+          ],
+          "paint": "stone.dark",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 5.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [
+           4,
+           4
+          ],
+          "paint": "stone",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 4.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [
+           5,
+           5
+          ],
+          "paint": "stone.dark",
+          "when": {
+           "edge": [
+            {
+             "atLeast": 4.5
+            }
+           ]
+          }
+         },
+         {
+          "rows": [
+           4,
+           4
+          ],
+          "paint": "stone.dark"
+         }
+        ]
+       },
+       "left": {
+        "depth": 1,
+        "bands": [
+         {
+          "rows": [
+           1,
+           1
+          ],
+          "paint": "stone.dark"
+         }
+        ]
+       },
+       "bottom": {
+        "depth": 2,
+        "bands": [
+         {
+          "rows": [
+           1,
+           2
+          ],
+          "paint": "stone.dark"
+         }
+        ]
+       }
+      }
+     },
+     "decals": [
+      {
+       "name": "a",
+       "place": "on",
+       "label": "Crack",
+       "outline": false,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [
+          9,
+          8
+         ],
+         "key": {
+          "a": "joint",
+          "b": "chip"
+         },
+         "rows": [
+          "....a........",
+          "....a........",
+          ".....a.......",
+          ".....ab......",
+          "..aaa.a......",
+          ".a.....a.....",
+          "a......a.....",
+          "........aa...",
+          "..........a..",
+          "..........ab.",
+          "...........a.",
+          "...........a.",
+          "............a"
+         ]
+        }
+       ]
+      },
+      {
+       "name": "b",
+       "place": "below",
+       "label": "Patina streak",
+       "outline": true,
+       "draw": [
+        {
+         "kind": "stamp",
+         "at": [
+          13,
+          0
+         ],
+         "key": {
+          "a": "trim",
+          "b": "trim.light",
+          "c": "trim.dark"
+         },
+         "rows": [
+          "caaaa",
+          "cabaa",
+          "cabaa",
+          ".cba.",
+          ".cba.",
+          ".caa.",
+          "..a..",
+          "..a..",
+          "..c.."
+         ]
+        }
+       ]
+      }
+     ],
+     "pictures": {
+      "left": [
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         0
+        ],
+        "size": [
+         32,
+         32
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "gen": "tile.courses",
+        "v": 1,
+        "heights": [
+         16,
+         16
+        ],
+        "joints": [
+         3,
+         19,
+         11,
+         27
+        ],
+        "counts": [
+         2,
+         2
+        ],
+        "shift": 13,
+        "paint": "joint",
+        "when": {
+         "style": [
+          "blocks"
+         ]
+        }
+       },
+       {
+        "gen": "tile.courses",
+        "v": 1,
+        "heights": [
+         32
+        ],
+        "joints": [
+         11
+        ],
+        "counts": [
+         1
+        ],
+        "shift": 21,
+        "paint": "joint",
+        "when": {
+         "style": [
+          "slabs"
+         ]
+        }
+       },
+       {
+        "gen": "tile.courses",
+        "v": 1,
+        "heights": [
+         8,
+         8,
+         8,
+         8
+        ],
+        "joints": [
+         3,
+         19,
+         11,
+         27,
+         3,
+         19,
+         11,
+         27
+        ],
+        "counts": [
+         2,
+         2,
+         2,
+         2
+        ],
+        "shift": 5,
+        "paint": "joint",
+        "when": {
+         "style": [
+          "bricks"
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         4
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "below": 4.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         4
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 4.5,
+           "below": 5.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         5
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 4.5,
+           "below": 5.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         4
+        ],
+        "size": [
+         32,
+         2
+        ],
+        "paint": "stone",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 5.5,
+           "below": 6.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         6
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 5.5,
+           "below": 6.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         4
+        ],
+        "size": [
+         32,
+         3
+        ],
+        "paint": "stone",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 6.5,
+           "below": 7.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         7
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 6.5,
+           "below": 7.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         4
+        ],
+        "size": [
+         32,
+         4
+        ],
+        "paint": "stone",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 7.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         8
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 7.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         1
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         2
+        ],
+        "size": [
+         32,
+         2
+        ],
+        "paint": "trim",
+        "shade": 0
+       },
+       {
+        "kind": "stamp",
+        "at": [
+         0,
+         2
+        ],
+        "rows": [
+         "aa......aa......aa......aa......",
+         "....aa......aa......aa......aa.."
+        ],
+        "key": {
+         "a": "trim.dark"
+        }
+       },
+       {
+        "kind": "stamp",
+        "at": [
+         0,
+         1
+        ],
+        "rows": [
+         "..baa.....aaba....baa....abaa...",
+         "..baa.....aab.....baa....ab.a...",
+         "..ba......aab......aa....ab.a...",
+         "...a......aab......a.....ab.....",
+         "...a.......ab......a.....a......",
+         "...a.......a.............a......",
+         "...........a.............a......",
+         "...........a....................",
+         "...........a...................."
+        ],
+        "key": {
+         "a": "vine",
+         "b": "vine.dark"
+        },
+        "when": {
+         "mossy": [
+          true
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         1,
+         2
+        ],
+        "size": [
+         1,
+         30
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         0
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "ink",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         0
+        ],
+        "size": [
+         1,
+         32
+        ],
+        "paint": "ink",
+        "shade": 0
+       },
+       {
+        "kind": "stamp",
+        "at": [
+         0,
+         0
+        ],
+        "rows": [
+         "xxxxx",
+         "xxxxx",
+         "xxxx.",
+         "xx...",
+         "x...."
+        ],
+        "key": {
+         "x": "clear"
+        },
+        "when": {
+         "wear": [
+          {
+           "atLeast": 0.35
+          }
+         ]
+        }
+       },
+       {
+        "kind": "stamp",
+        "at": [
+         1,
+         1
+        ],
+        "rows": [
+         "....cc",
+         "...cc.",
+         "...c..",
+         ".cc...",
+         "cc...."
+        ],
+        "key": {
+         "c": "chip"
+        },
+        "when": {
+         "wear": [
+          {
+           "atLeast": 0.35
+          }
+         ]
+        }
+       }
+      ],
+      "right": [
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         0
+        ],
+        "size": [
+         32,
+         32
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "gen": "tile.courses",
+        "v": 1,
+        "heights": [
+         16,
+         16
+        ],
+        "joints": [
+         3,
+         19,
+         11,
+         27
+        ],
+        "counts": [
+         2,
+         2
+        ],
+        "shift": 13,
+        "paint": "joint",
+        "when": {
+         "style": [
+          "blocks"
+         ]
+        }
+       },
+       {
+        "gen": "tile.courses",
+        "v": 1,
+        "heights": [
+         32
+        ],
+        "joints": [
+         11
+        ],
+        "counts": [
+         1
+        ],
+        "shift": 21,
+        "paint": "joint",
+        "when": {
+         "style": [
+          "slabs"
+         ]
+        }
+       },
+       {
+        "gen": "tile.courses",
+        "v": 1,
+        "heights": [
+         8,
+         8,
+         8,
+         8
+        ],
+        "joints": [
+         3,
+         19,
+         11,
+         27,
+         3,
+         19,
+         11,
+         27
+        ],
+        "counts": [
+         2,
+         2,
+         2,
+         2
+        ],
+        "shift": 5,
+        "paint": "joint",
+        "when": {
+         "style": [
+          "bricks"
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         4
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "below": 4.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         4
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 4.5,
+           "below": 5.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         5
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 4.5,
+           "below": 5.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         4
+        ],
+        "size": [
+         32,
+         2
+        ],
+        "paint": "stone",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 5.5,
+           "below": 6.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         6
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 5.5,
+           "below": 6.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         4
+        ],
+        "size": [
+         32,
+         3
+        ],
+        "paint": "stone",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 6.5,
+           "below": 7.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         7
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 6.5,
+           "below": 7.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         4
+        ],
+        "size": [
+         32,
+         4
+        ],
+        "paint": "stone",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 7.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         8
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "edge": [
+          {
+           "atLeast": 7.5
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         1
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         2
+        ],
+        "size": [
+         32,
+         2
+        ],
+        "paint": "trim",
+        "shade": 0
+       },
+       {
+        "kind": "stamp",
+        "at": [
+         0,
+         2
+        ],
+        "rows": [
+         "aa......aa......aa......aa......",
+         "....aa......aa......aa......aa.."
+        ],
+        "key": {
+         "a": "trim.dark"
+        }
+       },
+       {
+        "kind": "stamp",
+        "at": [
+         0,
+         1
+        ],
+        "rows": [
+         "..baa.....aaba....baa....abaa...",
+         "..baa.....aab.....baa....ab.a...",
+         "..ba......aab......aa....ab.a...",
+         "...a......aab......a.....ab.....",
+         "...a.......ab......a.....a......",
+         "...a.......a.............a......",
+         "...........a.............a......",
+         "...........a....................",
+         "...........a...................."
+        ],
+        "key": {
+         "a": "vine",
+         "b": "vine.dark"
+        },
+        "when": {
+         "mossy": [
+          true
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         0,
+         0
+        ],
+        "size": [
+         32,
+         1
+        ],
+        "paint": "ink",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         31,
+         0
+        ],
+        "size": [
+         1,
+         32
+        ],
+        "paint": "ink",
+        "shade": 0
+       },
+       {
+        "kind": "stamp",
+        "at": [
+         27,
+         0
+        ],
+        "rows": [
+         "xxxxx",
+         "xxxxx",
+         ".xxxx",
+         "...xx",
+         "....x"
+        ],
+        "key": {
+         "x": "clear"
+        },
+        "when": {
+         "wear": [
+          {
+           "atLeast": 0.35
+          }
+         ]
+        }
+       },
+       {
+        "kind": "stamp",
+        "at": [
+         25,
+         1
+        ],
+        "rows": [
+         "cc....",
+         ".cc...",
+         "..c...",
+         "...cc.",
+         "....cc"
+        ],
+        "key": {
+         "c": "chip"
+        },
+        "when": {
+         "wear": [
+          {
+           "atLeast": 0.35
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "name": "nave",
+     "kind": "floor",
+     "fills": 3,
+     "label": "Back wall",
+     "material": {
+      "ink": "none",
+      "fill": {
+       "base": "wall",
+       "versions": [
+        [],
+        [
+         {
+          "kind": "stamp",
+          "at": [
+           5,
+           7
+          ],
+          "rows": [
+           "aaaaaaaaaaaa",
+           "a..........a",
+           "a..........a",
+           "a..........a",
+           "a..........a",
+           "a..........a",
+           "a..........a",
+           "aaaaaaaaaaaa"
+          ],
+          "key": {
+           "a": "mortar"
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           22,
+           20
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           10,
+           24
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           20,
+           4
+          ],
+          "size": [
+           3,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           20,
+           5
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           26,
+           12
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           8,
+           19
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           27,
+           26
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           14,
+           4
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           18,
+           20
+          ],
+          "size": [
+           8,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           18,
+           21
+          ],
+          "size": [
+           1,
+           4
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         }
+        ],
+        [
+         {
+          "kind": "stamp",
+          "at": [
+           15,
+           17
+          ],
+          "rows": [
+           "aaaaaaaaaaaa",
+           "a..........a",
+           "a..........a",
+           "a..........a",
+           "a..........a",
+           "a..........a",
+           "a..........a",
+           "aaaaaaaaaaaa"
+          ],
+          "key": {
+           "a": "mortar"
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           6,
+           8
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           24,
+           10
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.25
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           6,
+           23
+          ],
+          "size": [
+           3,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           6,
+           22
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           10,
+           12
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.5
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           20,
+           5
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           27,
+           13
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           9,
+           27
+          ],
+          "size": [
+           1,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 0.75
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           5,
+           10
+          ],
+          "size": [
+           8,
+           1
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         },
+         {
+          "kind": "rect",
+          "at": [
+           12,
+           11
+          ],
+          "size": [
+           1,
+           4
+          ],
+          "paint": "mortar",
+          "shade": 0,
+          "when": {
+           "texture": [
+            {
+             "atLeast": 1
+            }
+           ]
+          }
+         }
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "name": "column",
+     "kind": "stack",
+     "pieces": [
+      "cap",
+      "mid",
+      "foot"
+     ],
+     "label": "Column",
+     "pictures": {
+      "cap": [
+       {
+        "kind": "rect",
+        "at": [
+         2,
+         0
+        ],
+        "size": [
+         28,
+         5
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         2,
+         1
+        ],
+        "size": [
+         28,
+         1
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         3,
+         5
+        ],
+        "size": [
+         26,
+         2
+        ],
+        "paint": "trim",
+        "shade": 0
+       },
+       {
+        "kind": "stamp",
+        "at": [
+         3,
+         5
+        ],
+        "rows": [
+         "aa......aa......aa......aa",
+         "....aa......aa......aa...."
+        ],
+        "key": {
+         "a": "trim.dark"
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         3,
+         7
+        ],
+        "size": [
+         26,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         4,
+         8
+        ],
+        "size": [
+         24,
+         3
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         4,
+         8
+        ],
+        "size": [
+         24,
+         1
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         5,
+         11
+        ],
+        "size": [
+         22,
+         2
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         5,
+         12
+        ],
+        "size": [
+         22,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         6,
+         13
+        ],
+        "size": [
+         20,
+         19
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         6,
+         13
+        ],
+        "size": [
+         2,
+         19
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         10,
+         14
+        ],
+        "size": [
+         1,
+         18
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         15,
+         14
+        ],
+        "size": [
+         1,
+         18
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         20,
+         14
+        ],
+        "size": [
+         1,
+         18
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         23,
+         13
+        ],
+        "size": [
+         1,
+         19
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "stamp",
+        "at": [
+         1,
+         1
+        ],
+        "when": {
+         "mossy": [
+          true
+         ]
+        },
+        "key": {
+         "a": "vine",
+         "b": "vine.dark",
+         "c": "vine.light"
+        },
+        "rows": [
+         "..cc.....................caa..",
+         ".aaac...cc..........cc..ccab..",
+         ".ab.aaaaaabaa....aaabaaaaa.a..",
+         ".a...b......aaaaaa.....b...a..",
+         ".a...a.................a...b..",
+         ".b...a.................a...a..",
+         ".a.........................a..",
+         ".a............................",
+         ".b............................"
+        ]
+       }
+      ],
+      "mid": [
+       {
+        "kind": "rect",
+        "at": [
+         6,
+         0
+        ],
+        "size": [
+         20,
+         18
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         6,
+         18
+        ],
+        "size": [
+         14,
+         4
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         20,
+         18
+        ],
+        "size": [
+         6,
+         4
+        ],
+        "paint": "stone",
+        "shade": 0,
+        "when": {
+         "wear": [
+          {
+           "below": 0.7
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         6,
+         22
+        ],
+        "size": [
+         20,
+         10
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         6,
+         0
+        ],
+        "size": [
+         2,
+         32
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         10,
+         0
+        ],
+        "size": [
+         1,
+         32
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         15,
+         0
+        ],
+        "size": [
+         1,
+         32
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         20,
+         0
+        ],
+        "size": [
+         1,
+         18
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         20,
+         18
+        ],
+        "size": [
+         1,
+         4
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "wear": [
+          {
+           "below": 0.7
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         20,
+         22
+        ],
+        "size": [
+         1,
+         10
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         23,
+         0
+        ],
+        "size": [
+         1,
+         18
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         23,
+         18
+        ],
+        "size": [
+         1,
+         4
+        ],
+        "paint": "stone.light",
+        "shade": 0,
+        "when": {
+         "wear": [
+          {
+           "below": 0.7
+          }
+         ]
+        }
+       },
+       {
+        "kind": "rect",
+        "at": [
+         23,
+         22
+        ],
+        "size": [
+         1,
+         10
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         6,
+         15
+        ],
+        "size": [
+         20,
+         1
+        ],
+        "paint": "joint",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         18,
+         18
+        ],
+        "size": [
+         2,
+         4
+        ],
+        "paint": "stone.dark",
+        "shade": 0,
+        "when": {
+         "wear": [
+          {
+           "atLeast": 0.7
+          }
+         ]
+        }
+       }
+      ],
+      "foot": [
+       {
+        "kind": "rect",
+        "at": [
+         6,
+         0
+        ],
+        "size": [
+         20,
+         21
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         6,
+         0
+        ],
+        "size": [
+         2,
+         21
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         10,
+         0
+        ],
+        "size": [
+         1,
+         19
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         15,
+         0
+        ],
+        "size": [
+         1,
+         19
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         20,
+         0
+        ],
+        "size": [
+         1,
+         19
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         23,
+         0
+        ],
+        "size": [
+         1,
+         21
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         5,
+         20
+        ],
+        "size": [
+         22,
+         3
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         5,
+         20
+        ],
+        "size": [
+         22,
+         1
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         5,
+         22
+        ],
+        "size": [
+         22,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         4,
+         23
+        ],
+        "size": [
+         24,
+         4
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         4,
+         23
+        ],
+        "size": [
+         24,
+         1
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         4,
+         26
+        ],
+        "size": [
+         24,
+         1
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         2,
+         27
+        ],
+        "size": [
+         28,
+         5
+        ],
+        "paint": "stone",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         2,
+         27
+        ],
+        "size": [
+         28,
+         1
+        ],
+        "paint": "stone.light",
+        "shade": 0
+       },
+       {
+        "kind": "rect",
+        "at": [
+         2,
+         27
+        ],
+        "size": [
+         2,
+         5
+        ],
+        "paint": "stone.dark",
+        "shade": 0
+       }
+      ]
+     }
+    }
+   ],
+   "extra": [
+    {
+     "name": "flute-window",
+     "label": "Wind slot",
+     "draw": [
+      {
+       "kind": "rect",
+       "at": [
+        0,
+        0
+       ],
+       "size": [
+        32,
+        7
+       ],
+       "paint": "wall",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        0,
+        25
+       ],
+       "size": [
+        32,
+        7
+       ],
+       "paint": "wall",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        0,
+        7
+       ],
+       "size": [
+        5,
+        18
+       ],
+       "paint": "wall",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        9,
+        7
+       ],
+       "size": [
+        5,
+        18
+       ],
+       "paint": "wall",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        18,
+        7
+       ],
+       "size": [
+        5,
+        18
+       ],
+       "paint": "wall",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        27,
+        7
+       ],
+       "size": [
+        5,
+        18
+       ],
+       "paint": "wall",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        4,
+        6
+       ],
+       "size": [
+        6,
+        1
+       ],
+       "paint": "mortar",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        4,
+        7
+       ],
+       "size": [
+        1,
+        18
+       ],
+       "paint": "mortar",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        4,
+        25
+       ],
+       "size": [
+        6,
+        1
+       ],
+       "paint": "wall.light",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        13,
+        6
+       ],
+       "size": [
+        6,
+        1
+       ],
+       "paint": "mortar",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        13,
+        7
+       ],
+       "size": [
+        1,
+        18
+       ],
+       "paint": "mortar",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        13,
+        25
+       ],
+       "size": [
+        6,
+        1
+       ],
+       "paint": "wall.light",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        22,
+        6
+       ],
+       "size": [
+        6,
+        1
+       ],
+       "paint": "mortar",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        22,
+        7
+       ],
+       "size": [
+        1,
+        18
+       ],
+       "paint": "mortar",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        22,
+        25
+       ],
+       "size": [
+        6,
+        1
+       ],
+       "paint": "wall.light",
+       "shade": 0
+      }
+     ]
+    },
+    {
+     "name": "gate-l",
+     "label": "Gateway, left half",
+     "draw": [
+      {
+       "kind": "poly",
+       "points": [
+        [
+         0,
+         0
+        ],
+        [
+         32,
+         0
+        ],
+        [
+         32,
+         4
+        ],
+        [
+         27.1,
+         4.4
+        ],
+        [
+         22.4,
+         5.7
+        ],
+        [
+         18,
+         7.75
+        ],
+        [
+         14,
+         10.55
+        ],
+        [
+         10.55,
+         14
+        ],
+        [
+         7.75,
+         18
+        ],
+        [
+         5.7,
+         22.4
+        ],
+        [
+         4.4,
+         27.1
+        ],
+        [
+         4,
+         32
+        ],
+        [
+         0,
+         32
+        ]
+       ],
+       "paint": "wall",
+       "shade": 0
+      },
+      {
+       "kind": "arc",
+       "at": [
+        32,
+        32
+       ],
+       "r": 30,
+       "a0": 180,
+       "a1": 270,
+       "thick": 3,
+       "paint": "stone"
+      },
+      {
+       "kind": "arc",
+       "at": [
+        32,
+        32
+       ],
+       "r": 28,
+       "a0": 180,
+       "a1": 270,
+       "thick": 1,
+       "paint": "ink"
+      },
+      {
+       "kind": "rect",
+       "at": [
+        29,
+        1
+       ],
+       "size": [
+        3,
+        5
+       ],
+       "paint": "trim",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        29,
+        1
+       ],
+       "size": [
+        3,
+        1
+       ],
+       "paint": "trim.light",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        29,
+        5
+       ],
+       "size": [
+        3,
+        1
+       ],
+       "paint": "trim.dark",
+       "shade": 0
+      }
+     ]
+    },
+    {
+     "name": "gate-r",
+     "label": "Gateway, right half",
+     "draw": [
+      {
+       "kind": "poly",
+       "points": [
+        [
+         32,
+         0
+        ],
+        [
+         0,
+         0
+        ],
+        [
+         0,
+         4
+        ],
+        [
+         4.899999999999999,
+         4.4
+        ],
+        [
+         9.600000000000001,
+         5.7
+        ],
+        [
+         14,
+         7.75
+        ],
+        [
+         18,
+         10.55
+        ],
+        [
+         21.45,
+         14
+        ],
+        [
+         24.25,
+         18
+        ],
+        [
+         26.3,
+         22.4
+        ],
+        [
+         27.6,
+         27.1
+        ],
+        [
+         28,
+         32
+        ],
+        [
+         32,
+         32
+        ]
+       ],
+       "paint": "wall",
+       "shade": 0
+      },
+      {
+       "kind": "arc",
+       "at": [
+        0,
+        32
+       ],
+       "r": 30,
+       "a0": 90,
+       "a1": 180,
+       "thick": 3,
+       "paint": "stone"
+      },
+      {
+       "kind": "arc",
+       "at": [
+        0,
+        32
+       ],
+       "r": 28,
+       "a0": 90,
+       "a1": 180,
+       "thick": 1,
+       "paint": "ink"
+      },
+      {
+       "kind": "rect",
+       "at": [
+        0,
+        1
+       ],
+       "size": [
+        3,
+        5
+       ],
+       "paint": "trim",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        0,
+        1
+       ],
+       "size": [
+        3,
+        1
+       ],
+       "paint": "trim.light",
+       "shade": 0
+      },
+      {
+       "kind": "rect",
+       "at": [
+        0,
+        5
+       ],
+       "size": [
+        3,
+        1
+       ],
+       "paint": "trim.dark",
+       "shade": 0
+      }
+     ]
+    }
+   ]
+  }
+ },
+ "clips": {
+  "marble-left": {
+   "label": "Marble: top left corner"
+  },
+  "marble-top": {
+   "label": "Marble: top"
+  },
+  "marble-right": {
+   "label": "Marble: top right corner"
+  },
+  "marble-side-l": {
+   "label": "Marble: left side"
+  },
+  "marble-fill": {
+   "label": "Marble: middle"
+  },
+  "marble-fill-b": {
+   "label": "Marble: middle, version B"
+  },
+  "marble-fill-c": {
+   "label": "Marble: middle, version C"
+  },
+  "marble-side-r": {
+   "label": "Marble: right side"
+  },
+  "marble-bottom-l": {
+   "label": "Marble: bottom left corner"
+  },
+  "marble-bottom": {
+   "label": "Marble: bottom"
+  },
+  "marble-bottom-r": {
+   "label": "Marble: bottom right corner"
+  },
+  "marble-inner-tl": {
+   "label": "Marble: inside corner, top left"
+  },
+  "marble-inner-tr": {
+   "label": "Marble: inside corner, top right"
+  },
+  "marble-inner-bl": {
+   "label": "Marble: inside corner, bottom left"
+  },
+  "marble-inner-br": {
+   "label": "Marble: inside corner, bottom right"
+  },
+  "marble-strip-l": {
+   "label": "Marble: strip, left end"
+  },
+  "marble-strip-m": {
+   "label": "Marble: strip, middle"
+  },
+  "marble-strip-r": {
+   "label": "Marble: strip, right end"
+  },
+  "marble-col-t": {
+   "label": "Marble: column, top"
+  },
+  "marble-col-m": {
+   "label": "Marble: column, middle"
+  },
+  "marble-col-b": {
+   "label": "Marble: column, bottom"
+  },
+  "marble-single": {
+   "label": "Marble: single tile"
+  },
+  "marble-thin-l": {
+   "label": "Marble ledge: left end"
+  },
+  "marble-thin-m": {
+   "label": "Marble ledge: middle"
+  },
+  "marble-thin-r": {
+   "label": "Marble ledge: right end"
+  },
+  "marble-deco-a": {
+   "label": "Crack"
+  },
+  "marble-deco-b": {
+   "label": "Patina streak"
+  },
+  "nave-fill": {
+   "label": "Back wall"
+  },
+  "nave-fill-b": {
+   "label": "Back wall, version B"
+  },
+  "nave-fill-c": {
+   "label": "Back wall, version C"
+  },
+  "column-cap": {
+   "label": "Column: cap"
+  },
+  "column-mid": {
+   "label": "Column: shaft"
+  },
+  "column-foot": {
+   "label": "Column: foot"
+  },
+  "flute-window": {
+   "label": "Wind slot"
+  },
+  "gate-l": {
+   "label": "Gateway, left half"
+  },
+  "gate-r": {
+   "label": "Gateway, right half"
+  }
+ }
+}

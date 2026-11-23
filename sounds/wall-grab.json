@@ -1,0 +1,39 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "wall-grab",
+  "name": "Wall grab",
+  "category": "movement",
+  "description": "A gloved hand patting onto rock, with a short scuff after it. Change its pitch, length, brightness and how much it slides.",
+  "meta": {
+    "type": "sfx",
+    "role": "characters/footstep",
+    "themes": ["fantasy", "neutral"],
+    "gameTypes": ["platformer", "arcade"],
+    "words": ["wall", "grab", "climb", "cling", "catch", "hand", "glove", "pat", "scuff", "slide", "slip", "rock", "ledge", "grip"],
+    "license": "draft"
+  },
+  "duration": "length + 0.02",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 150, "max": 600, "default": 300, "scale": "log" },
+    { "id": "length", "label": "Length", "unit": "s", "min": 0.06, "max": 0.3, "default": 0.1, "scale": "log" },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "scuff", "label": "Scuff", "min": 0, "max": 1, "default": 0.3 }
+  ],
+  "nodes": [
+    { "id": "n", "type": "noise" },
+    { "id": "patEnv", "type": "ad", "attack": 0.0005, "decay": 0.005, "curve": 1.5 },
+    { "id": "pat", "type": "filter", "mode": "lp", "in": "n * patEnv", "freq": "700 + bright * 2600" },
+    { "id": "knock", "type": "modal", "in": "pat", "freq": "pitch", "ratios": [1, 2.4], "gains": [0.6, 1.6], "decay": 0.04, "tilt": 0.6 },
+    { "id": "n2", "type": "noise" },
+    { "id": "slideEnv", "type": "env", "points": [[0, 0], [0.006, 1], ["length", 0, 2]] },
+    { "id": "slide", "type": "filter", "mode": "bp", "in": "n2 * slideEnv", "freq": "(1300 + bright * 1000) * rnd(0.88, 1.14)", "q": 1.4 },
+    { "id": "sum", "type": "expr", "expr": "(knock * 0.11 + pat * 1.6) * rnd(0.75, 1.1) * (1 - scuff * 0.55) + slide * (0.04 + scuff) * 1.6" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 60 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Grab": {},
+    "Climb step": { "length": 0.07, "scuff": 0.1, "pitch": 360 },
+    "Slip": { "length": 0.28, "scuff": 1, "bright": 0.7 }
+  }
+}

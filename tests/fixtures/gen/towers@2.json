@@ -1,0 +1,1167 @@
+{
+ "id": "towers",
+ "v": 2,
+ "cases": [
+  {
+   "args": {
+    "base": 30,
+    "count": 2,
+    "stone": "stone",
+    "lamp": "lamp"
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      3.5,
+      11
+     ],
+     "size": [
+      9,
+      33
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       1.5,
+       11
+      ],
+      [
+       14.5,
+       11
+      ],
+      [
+       8,
+       0
+      ]
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      35.5,
+      11
+     ],
+     "size": [
+      9,
+      33
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       33.5,
+       11
+      ],
+      [
+       46.5,
+       11
+      ],
+      [
+       40,
+       0
+      ]
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      17.5,
+      12
+     ],
+     "size": [
+      9,
+      32
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      15.5,
+      9
+     ],
+     "size": [
+      13,
+      5
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      15.5,
+      6
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      21,
+      6
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      25.5,
+      6
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -14.5,
+      12
+     ],
+     "size": [
+      9,
+      32
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -16.5,
+      9
+     ],
+     "size": [
+      13,
+      5
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -16.5,
+      6
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -11,
+      6
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      -6.5,
+      6
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "base": 150,
+    "count": 6,
+    "seed": 31,
+    "jitter": 0.7,
+    "sink": 6,
+    "lit": 3,
+    "stone": "stone",
+    "lamp": "lamp",
+    "dark": "dark",
+    "bright": "bright"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      4.5,
+      137
+     ],
+     "size": [
+      9,
+      27
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2.5,
+      134
+     ],
+     "size": [
+      13,
+      5
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2.5,
+      131
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      8,
+      131
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      12.5,
+      131
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      4,
+      139
+     ],
+     "size": [
+      1,
+      25
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      2,
+      134
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      12,
+      139
+     ],
+     "size": [
+      1,
+      25
+     ],
+     "paint": "bright",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      14,
+      134
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "bright",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      7,
+      143
+     ],
+     "size": [
+      3,
+      5
+     ],
+     "paint": "lamp",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      324.5,
+      137
+     ],
+     "size": [
+      9,
+      27
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      322.5,
+      134
+     ],
+     "size": [
+      13,
+      5
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      322.5,
+      131
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      328,
+      131
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      332.5,
+      131
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      324,
+      139
+     ],
+     "size": [
+      1,
+      25
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      322,
+      134
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      332,
+      139
+     ],
+     "size": [
+      1,
+      25
+     ],
+     "paint": "bright",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      334,
+      134
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "bright",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      327,
+      143
+     ],
+     "size": [
+      3,
+      5
+     ],
+     "paint": "lamp",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      65.5,
+      131
+     ],
+     "size": [
+      11,
+      33
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      63.5,
+      128
+     ],
+     "size": [
+      15,
+      5
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      63.5,
+      125
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      70,
+      125
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      75.5,
+      125
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      65,
+      133
+     ],
+     "size": [
+      1,
+      31
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      63,
+      128
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      75,
+      133
+     ],
+     "size": [
+      1,
+      31
+     ],
+     "paint": "bright",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      77,
+      128
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "bright",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      69,
+      137
+     ],
+     "size": [
+      3,
+      5
+     ],
+     "paint": "lamp",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      118,
+      125
+     ],
+     "size": [
+      8,
+      39
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       116,
+       125
+      ],
+      [
+       128,
+       125
+      ],
+      [
+       122,
+       115
+      ]
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      118,
+      125
+     ],
+     "size": [
+      1,
+      39
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      125,
+      125
+     ],
+     "size": [
+      1,
+      39
+     ],
+     "paint": "bright",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      120,
+      131
+     ],
+     "size": [
+      3,
+      5
+     ],
+     "paint": "lamp",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      165,
+      130
+     ],
+     "size": [
+      10,
+      34
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      163,
+      127
+     ],
+     "size": [
+      14,
+      5
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      163,
+      124
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      169,
+      124
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      174,
+      124
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      165,
+      132
+     ],
+     "size": [
+      1,
+      32
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      163,
+      127
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      174,
+      132
+     ],
+     "size": [
+      1,
+      32
+     ],
+     "paint": "bright",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      176,
+      127
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "bright",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      248.5,
+      136
+     ],
+     "size": [
+      9,
+      28
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       246.5,
+       136
+      ],
+      [
+       259.5,
+       136
+      ],
+      [
+       253,
+       125
+      ]
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      248,
+      136
+     ],
+     "size": [
+      1,
+      28
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      256,
+      136
+     ],
+     "size": [
+      1,
+      28
+     ],
+     "paint": "bright",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      278,
+      132
+     ],
+     "size": [
+      10,
+      32
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       276,
+       132
+      ],
+      [
+       290,
+       132
+      ],
+      [
+       283,
+       120
+      ]
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      278,
+      132
+     ],
+     "size": [
+      1,
+      32
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      287,
+      132
+     ],
+     "size": [
+      1,
+      32
+     ],
+     "paint": "bright",
+     "shade": 0
+    }
+   ]
+  },
+  {
+   "args": {
+    "base": 100,
+    "count": 3,
+    "seed": 2,
+    "jitter": 1,
+    "lit": 3,
+    "stone": "stone",
+    "lamp": "lamp",
+    "wrap": false,
+    "dark": "dark"
+   },
+   "ctx": {
+    "size": [
+     320,
+     180
+    ]
+   },
+   "primitives": [
+    {
+     "kind": "rect",
+     "at": [
+      44,
+      83
+     ],
+     "size": [
+      10,
+      31
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       42,
+       83
+      ],
+      [
+       56,
+       83
+      ],
+      [
+       49,
+       71
+      ]
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      44,
+      83
+     ],
+     "size": [
+      1,
+      31
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      47,
+      89
+     ],
+     "size": [
+      3,
+      5
+     ],
+     "paint": "lamp",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      154.5,
+      76
+     ],
+     "size": [
+      11,
+      38
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      152.5,
+      73
+     ],
+     "size": [
+      15,
+      5
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      152.5,
+      70
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      159,
+      70
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      164.5,
+      70
+     ],
+     "size": [
+      3,
+      3
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      154,
+      78
+     ],
+     "size": [
+      1,
+      36
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      152,
+      73
+     ],
+     "size": [
+      1,
+      5
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      158,
+      82
+     ],
+     "size": [
+      3,
+      5
+     ],
+     "paint": "lamp",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      211.5,
+      87
+     ],
+     "size": [
+      9,
+      27
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "poly",
+     "points": [
+      [
+       209.5,
+       87
+      ],
+      [
+       222.5,
+       87
+      ],
+      [
+       216,
+       76
+      ]
+     ],
+     "paint": "stone",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      211,
+      87
+     ],
+     "size": [
+      1,
+      27
+     ],
+     "paint": "dark",
+     "shade": 0
+    },
+    {
+     "kind": "rect",
+     "at": [
+      214,
+      93
+     ],
+     "size": [
+      3,
+      5
+     ],
+     "paint": "lamp",
+     "shade": 0
+    }
+   ]
+  }
+ ]
+}
