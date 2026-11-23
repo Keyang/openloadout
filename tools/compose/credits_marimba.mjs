@@ -10,7 +10,7 @@
 //   menu-marimba (C, 88 bpm) plays its bars in even 8ths and a busy clicking tune; this one skips and holds.
 //
 //   node tools/compose/credits_marimba.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_marimba.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_marimba.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_marimba.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_marimba.mjs             when it is ready: write sounds/credits-marimba.json
 import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -18,7 +18,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('marimba');
 
 // Level of each melody instrument for this tune, from `--match`.
-export const GAINS = [1, 0.796, 1.07, 1.01, 1.78];
+export const GAINS = [1, 0.796, 1.07, 1.01, 1.78, 2.76, 0.846, 1.23, 1.17, 1.38, 0.71, 0.79, 0.663, 1.24, 1.2];
 
 // The commas drop the roots an octave (D sits a fourth below the home note by itself), so the broken chords, which
 // play from the G above middle C plus the root, lie from D3 to D5 and leave the notes above to the tune.

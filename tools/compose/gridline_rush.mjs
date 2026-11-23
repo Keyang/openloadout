@@ -9,7 +9,7 @@
 //   the band's own thin pulse playing the tune an octave up as well.
 //
 //   node tools/compose/gridline_rush.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/gridline_rush.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/gridline_rush.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/gridline_rush.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/gridline_rush.mjs             when it is ready: write sounds/gridline-rush.json
 import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -17,7 +17,7 @@ import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('chip');
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.819, 0.984, 0.96, 1.58];
+export const GAINS = [1, 0.819, 0.984, 0.96, 1.58, 1.49, 0.862, 1.42, 1.16, 1.32, 0.934, 0.996, 1.29, 1.55, 1.64];
 
 export const CHORDS = 'A E F#m D | A C D E';
 

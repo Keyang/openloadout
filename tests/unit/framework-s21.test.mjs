@@ -223,7 +223,7 @@ test('derelict-run: the file in sounds/ is what the generator writes, with valid
   assert.deepEqual(lint(onDisk), []);
 });
 
-test('derelict-run: identity, metadata, nine controls and three styles are the specification row', () => {
+test('derelict-run: identity, metadata, eleven controls and three styles are the specification row', () => {
   assert.equal(track.id, 'derelict-run');
   assert.equal(track.name, 'Station run theme');
   assert.equal(track.category, 'music');
@@ -231,7 +231,7 @@ test('derelict-run: identity, metadata, nine controls and three styles are the s
   assert.deepEqual([track.meta.type, track.meta.role, track.meta.themes[0], track.meta.gameTypes[0], track.meta.license], ['music', 'music/exploration', 'sci-fi', 'roguelike-action', 'draft']);
   assert.ok(track.meta.words.length >= 6 && track.meta.words.length <= 14);
   for (const w of ['derelict', 'music', 'sci-fi', 'roguelite']) assert.ok(!track.meta.words.includes(w), `"${w}" repeats the bundle, type or theme`);
-  assert.deepEqual(track.params.map((p) => p.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'bright', 'space', 'lead', 'grit']);
+  assert.deepEqual(track.params.map((p) => p.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'lead', 'alongLevel', 'grit']);
   const by = Object.fromEntries(track.params.map((p) => [p.id, p]));
   assert.deepEqual([by.bpm.min, by.bpm.max, by.bpm.default], [112, 140, 126]);
   assert.deepEqual([by.key.min, by.key.max, by.key.default], [-5, 6, 0]);

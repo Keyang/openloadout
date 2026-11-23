@@ -8,7 +8,7 @@
 //   is in) and a tom fill at the end of bar 8.
 //
 //   node tools/compose/hearthvale_battle.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/hearthvale_battle.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/hearthvale_battle.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/hearthvale_battle.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/hearthvale_battle.mjs             when it is ready: write sounds/hearthvale-battle.json
 import {
@@ -17,7 +17,7 @@ import {
 } from './kit.mjs';
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.8, 0.996, 0.96, 1.7];
+export const GAINS = [1, 0.8, 0.996, 0.96, 1.7, 1.78, 0.859, 1.33, 1.18, 1.41, 0.943, 0.962, 1.27, 1.55, 1.52];
 
 export const CHORDS = 'Am Am F G | Am C D E';
 

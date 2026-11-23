@@ -198,7 +198,7 @@ test('hearthvale-battle: the file in sounds/ is what the generator writes, with 
   assert.deepEqual(lint(onDisk), []);
 });
 
-test('hearthvale-battle: identity, metadata, nine controls and three styles are the specification row', () => {
+test('hearthvale-battle: identity, metadata, eleven controls and three styles are the specification row', () => {
   assert.equal(track.id, 'hearthvale-battle');
   assert.equal(track.name, 'Party battle theme');
   assert.equal(track.category, 'music');
@@ -206,7 +206,7 @@ test('hearthvale-battle: identity, metadata, nine controls and three styles are 
   assert.deepEqual([track.meta.type, track.meta.role, track.meta.themes[0], track.meta.gameTypes[0], track.meta.license], ['music', 'music/battle', 'fantasy', 'turn-based-rpg', 'draft']);
   assert.ok(track.meta.words.length >= 6 && track.meta.words.length <= 14);
   for (const w of ['hearthvale', 'music', 'fantasy']) assert.ok(!track.meta.words.includes(w), `"${w}" repeats the bundle, type or theme`);
-  assert.deepEqual(track.params.map((p) => p.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'bright', 'space', 'lead', 'grit']);
+  assert.deepEqual(track.params.map((p) => p.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'lead', 'alongLevel', 'grit']);
   const by = Object.fromEntries(track.params.map((p) => [p.id, p]));
   assert.deepEqual([by.bpm.min, by.bpm.max, by.bpm.default], [140, 172, 152]);
   assert.deepEqual([by.key.min, by.key.max, by.key.default], [-5, 6, 0]);

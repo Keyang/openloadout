@@ -7,7 +7,7 @@
 //   on whichever melody instrument is chosen (Bell by default), and at the top of Intensity a high tine answering it.
 //
 //   node tools/compose/menu_musicbox.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/menu_musicbox.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/menu_musicbox.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/menu_musicbox.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/menu_musicbox.mjs             when it is ready: write sounds/menu-musicbox.json
 import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -15,7 +15,7 @@ import { param, band, clock, chords, arrangement, drumRow, noteRow, melody, inst
 const B = band('musicbox');
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.774, 1.06, 1.01, 1.99];
+export const GAINS = [1, 0.774, 1.06, 1.01, 1.99, 6.45, 0.844, 1.23, 1.18, 1.4, 0.917, 1.08, 0.819, 1.79, 1.61];
 
 export const CHORDS = 'F Dm Bb C | Am Bb Gm C';
 

@@ -8,7 +8,7 @@
 //   tune with a dotted-8th echo, and a noise riser in the last bar of each section.
 //
 //   node tools/compose/derelict_run.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/derelict_run.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/derelict_run.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/derelict_run.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/derelict_run.mjs             when it is ready: write sounds/derelict-run.json
 import {
@@ -17,7 +17,7 @@ import {
 } from './kit.mjs';
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.795, 1.04, 0.981, 2.02];
+export const GAINS = [1, 0.795, 1.04, 0.981, 2.02, 2.39, 0.867, 1.3, 1.15, 1.37, 0.598, 0.842, 0.939, 1.3, 1.09];
 
 export const CHORDS = 'Em Em C D | Em Em G F';
 

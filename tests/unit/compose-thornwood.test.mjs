@@ -41,8 +41,8 @@ test('identity and metadata are the specification row', () => {
   for (const w of ['thornwood', 'music', 'fantasy', 'forest']) assert.ok(!patch.meta.words.includes(w), `"${w}" repeats the bundle, type or theme`);
 });
 
-test('nine controls: the standard seven, then Melody and Bounce', () => {
-  assert.deepEqual(patch.params.map((p) => p.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'bright', 'space', 'lead', 'swing']);
+test('eleven controls: the standard nine, then Melody and Bounce', () => {
+  assert.deepEqual(patch.params.map((p) => p.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'lead', 'alongLevel', 'swing']);
   const by = Object.fromEntries(patch.params.map((p) => [p.id, p]));
   assert.deepEqual([by.bpm.min, by.bpm.max, by.bpm.default], [120, 156, 138]);
   assert.deepEqual([by.key.min, by.key.max, by.key.default], [-5, 6, 0]);

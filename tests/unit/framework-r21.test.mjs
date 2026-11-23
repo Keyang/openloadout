@@ -317,7 +317,7 @@ test('hearthvale-village: identity, controls and styles are the specification ro
   assert.deepEqual([vPatch.loop, vPatch.wrap, vPatch.normalize], [true, true, false]);
   assert.deepEqual([vPatch.meta.type, vPatch.meta.role, vPatch.meta.themes[0], vPatch.meta.gameTypes[0], vPatch.meta.license], ['music', 'music/exploration', 'fantasy', 'turn-based-rpg', 'draft']);
   for (const w of ['hearthvale', 'music', 'fantasy', 'farm', 'rpg']) assert.ok(!vPatch.meta.words.includes(w), `"${w}" repeats the bundle, type or theme`);
-  assert.deepEqual(vPatch.params.map((p) => p.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'bright', 'space', 'lead', 'swing']);
+  assert.deepEqual(vPatch.params.map((p) => p.id), ['intensity', 'bpm', 'key', 'bars', 'inst', 'along', 'bright', 'space', 'lead', 'alongLevel', 'swing']);
   const by = Object.fromEntries(vPatch.params.map((p) => [p.id, p]));
   assert.deepEqual([by.bpm.min, by.bpm.max, by.bpm.default], [80, 108, 92]);
   assert.deepEqual([by.bars.min, by.bars.max, by.bars.step, by.bars.default], [8, 32, 8, 16]);

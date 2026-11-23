@@ -247,6 +247,14 @@ input[type='range']:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(
 /* a line under a control, when something else decides it (a track's look that sets its intensity) */
 .ctl-note { grid-column: 2 / -1; margin-top: -6px; padding-bottom: 4px; font-size: 12px; line-height: 1.35; color: var(--ink-2); }
 .ctl-note[hidden] { display: none; }
+/* a control's hint (app/hints.js): a small ? by its name opens one line under it saying what it is and what its value stands for */
+.help-btn { flex: none; width: 16px; height: 16px; padding: 0; border: 1px solid var(--line-2); border-radius: 50%; font-size: 11px; line-height: 14px; text-align: center; color: var(--ink-2); background: var(--paper); cursor: help; }
+
+.help-btn::before { content: '?'; }
+.help-btn:hover, .help-btn[aria-expanded="true"] { color: var(--ink); border-color: var(--ink); }
+.ctl-help { grid-column: 2 / -1; margin-top: -6px; padding-bottom: 4px; font-size: 12px; line-height: 1.4; color: var(--ink-2); }
+.ctl-help[hidden] { display: none; }
+.ctl-help .help-now { color: var(--ink); }
 .ctl-body { display: flex; flex-wrap: wrap; align-items: center; gap: 6px var(--s3); min-width: 0; padding: 4px 0; }
 .slide { display: grid; grid-template-columns: 68px minmax(60px, 1fr) 68px; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-2); width: 100%; }
 .slide .lo { text-align: right; }
@@ -366,6 +374,7 @@ input[type='range']:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(
   .pane { overflow: visible; }
   .ctl, .part .ctl { grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--s3); padding: var(--s2) 0; min-height: 0; }
   .ctl > .ctl-body, .ctl > .slide, .ctl > .chips { grid-column: 1 / -1; grid-row: 2; }
+  .ctl-help, .ctl-note { grid-column: 1 / -1; margin-top: 0; }
   .slide { grid-template-columns: auto minmax(60px, 1fr) auto; }
   .rx-foot { flex-wrap: wrap; }
   .saved { flex-basis: 100%; }

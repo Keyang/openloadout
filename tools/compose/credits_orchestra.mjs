@@ -12,7 +12,7 @@
 //   this one falls by step.
 //
 //   node tools/compose/credits_orchestra.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/credits_orchestra.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/credits_orchestra.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/credits_orchestra.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/credits_orchestra.mjs             when it is ready: write sounds/credits-orchestra.json
 import { band, brassSection, param, clock, chords, arrangement, drumRow, eightBars, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -20,7 +20,7 @@ import { band, brassSection, param, clock, chords, arrangement, drumRow, eightBa
 const B = band('orchestra');
 
 // Level of each melody instrument for this tune (`--match` on lF; the band has no colour after the melody bus).
-export const GAINS = [1, 0.806, 1.07, 0.998, 1.86];
+export const GAINS = [1, 0.806, 1.07, 0.998, 1.86, 1.9, 0.85, 1.27, 1.19, 1.55, 0.612, 0.769, 0.618, 1.24, 1.14];
 
 // Roots, counted from F: 0 2 4 5 | 0 -3 2 -5. The first four climb by step; D and C lie below the home note.
 export const CHORDS = 'F Gm Am Bb | F Dm Gm C';

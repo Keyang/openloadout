@@ -7,7 +7,7 @@
 //   from the pans), conga on the chord root with a son clave, then pan answers and a cowbell on the beats.
 //
 //   node tools/compose/menu_steelpan.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/menu_steelpan.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/menu_steelpan.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/menu_steelpan.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/menu_steelpan.mjs             when it is ready: write sounds/menu-steelpan.json
 import { band, param, clock, chords, arrangement, drumRow, noteRow, chordTone, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -15,7 +15,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, chordTone, m
 const B = band('steelpan');
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.79, 1.06, 0.99, 1.78];
+export const GAINS = [1, 0.79, 1.06, 0.99, 1.78, 1.87, 0.853, 1.26, 1.15, 1.34, 1.16, 1.07, 1.05, 1.62, 1.7];
 
 // The commas drop C an octave (D already sits below G), so every root lies from C to A: the pan comping, which plays
 // from middle C plus the root, stays at G4 to E5 at most instead of climbing into the tune's register on C.

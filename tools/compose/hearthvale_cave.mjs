@@ -10,7 +10,7 @@
 //   notes of every two-bar phrase an octave up, in the bar the tune holds.
 //
 //   node tools/compose/hearthvale_cave.mjs --out <scratch file>   write the patch somewhere to try it (see kit.mjs)
-//   node tools/compose/hearthvale_cave.mjs --match     measure the five melody instruments, print matching gains
+//   node tools/compose/hearthvale_cave.mjs --match     measure the ten melody instruments and the five that play along, print matching gains
 //   node tools/compose/hearthvale_cave.mjs --measure   print instrument, section, intensity and layer levels
 //   node tools/compose/hearthvale_cave.mjs             when it is ready: write sounds/hearthvale-cave.json
 import { band, param, clock, chords, arrangement, drumRow, noteRow, eightBars, melody, instruments, bus, assemble, main } from './kit.mjs';
@@ -18,7 +18,7 @@ import { band, param, clock, chords, arrangement, drumRow, noteRow, eightBars, m
 const B = band('marimba');
 
 // Level of each melody instrument for this tune, from `--match` (all five within 1 dB on the melody bus).
-export const GAINS = [1, 0.747, 0.981, 0.937, 1.81];
+export const GAINS = [1, 0.747, 0.981, 0.937, 1.81, 1.28, 0.796, 1.18, 1.09, 1.3, 0.733, 0.834, 0.74, 1.3, 1.25];
 
 // Every root is dropped an octave (the commas), so the broken chords sit low, from F#3 to B4, and the bass bar
 // (written from B3) plays F#2 to E3.

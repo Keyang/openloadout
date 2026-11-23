@@ -39,6 +39,7 @@ import { renderPixels } from '../engine/sprite.js';
 import { colorName } from '../engine/color.js';
 import { el } from './ui.js';
 import { makeMagic } from './magic.js';
+import { controlHint } from './hints.js';
 import { spriteModel, soundModel, SPRITE_TABS } from './panel-model.js';
 import { versionsFor } from './versions.js';
 import { bag as siteBag, themeFor, lookOf } from './bag.js';
@@ -281,17 +282,31 @@ export function editPanel({
     const label = c.kind === 'range' || c.kind === 'toggle' ? el('label', { for: id }, c.label) : el('span', {}, c.label);
     // a line under the control, when something else decides it (a track's look that sets its intensity)
     const note = el('span', { class: 'ctl-note', id: `${id}-note`, hidden: true });
+    // a hint: what the control is and what its value stands for (app/hints.js). A small ? opens it under the control; the
+    // "Now" part follows the value as it moves
+    const helpId = `${id}-help`;
+    const helpWhat = el('span', { class: 'help-what' }), helpNow = el('span', { class: 'help-now', 'aria-live': 'polite' });
+    const help = el('span', { class: 'ctl-help', id: helpId, hidden: true }, helpWhat, ' ', helpNow);
+    const helpBtn = el('button', { type: 'button', class: 'help-btn', 'aria-label': `What ${c.label} does`, 'aria-expanded': 'false', 'aria-controls': helpId,
+      onclick: () => { const open = help.hidden; help.hidden = !open; helpBtn.setAttribute('aria-expanded', String(open)); } });      // (the ? is drawn by the style sheet, so the label's text stays its name)
+    const showHint = (now) => {
+      const h = controlHint(now, kind, { colourName: colourWord });
+      helpWhat.textContent = [h.what, h.scale].filter(Boolean).join(' ');
+      helpNow.textContent = h.now;
+      helpBtn.title = [h.what, h.now].filter(Boolean).join(' ');
+    };
+    showHint(c);
     const row = el('div', { class: 'ctl' + (c.main ? ' is-main' : ''), 'data-control': c.key },
-      el('span', { class: 'ctl-label' }, label, el('span', { class: 'dot', title: 'Changed', 'aria-hidden': 'true' })),
+      el('span', { class: 'ctl-label' }, label, helpBtn, el('span', { class: 'dot', title: 'Changed', 'aria-hidden': 'true' })),
       body,
       el('button', { type: 'button', class: 'reset', 'aria-label': `Put ${c.label} back`, onclick: () => act('control', model.reset(edit.settings(), c.key)) }, 'Reset'),
-      note);
+      note, help);
     const say = (text) => {
       note.textContent = text ?? ''; note.hidden = !text;
       const input = row.querySelector('input');
       if (input) { if (text) input.setAttribute('aria-describedby', note.id); else input.removeAttribute('aria-describedby'); }
     };
-    return { row, sync, note: say };
+    return { row, sync: (now) => { sync(now); showHint(now); }, note: say };
   }
 
   const first = model.controls(settings);
