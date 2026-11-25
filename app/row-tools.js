@@ -39,9 +39,17 @@ export function surpriseItem(key, asset) {
   return bag.update(key, model.surprise({ ...standardOf(item.kind, asset), ...item.settings }));
 }
 
-/** "Surprise me" for one row: the magic button as a star alone, named after the thing. */
+/**
+ * "Surprise me" for one row: the magic button as a star alone, named after the thing. asset: the sprite or patch, or a
+ * function that gives it (or a promise of it), for a list that has not loaded every asset it shows (the tray).
+ */
 export function surpriseButton(item, asset, name, { onDone = () => {} } = {}) {
-  const b = makeMagic(el('button', { type: 'button', class: 'btn row-surprise', 'aria-label': `Surprise me: ${name}`, title: 'Surprise me', onclick: () => { if (surpriseItem(item.key, asset)) onDone(); } }));
+  const run = async () => {
+    let a = asset;
+    try { if (typeof a === 'function') a = await a(); } catch (e) { console.warn(`surprise ${item.id}:`, e); return; }
+    if (surpriseItem(item.key, a)) onDone();
+  };
+  const b = makeMagic(el('button', { type: 'button', class: 'btn row-surprise', 'aria-label': `Surprise me: ${name}`, title: 'Surprise me', onclick: run }));
   b.classList.add('is-icon');
   return b;
 }

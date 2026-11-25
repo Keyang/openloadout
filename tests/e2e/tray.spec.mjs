@@ -85,6 +85,36 @@ for (const [w, h] of [[1440, 900], [1024, 768]]) {
       await expect(card.locator('.card-add')).not.toHaveClass(/in-bag/);
     });
 
+    test('each row has the bag list\'s icon buttons: Surprise me changes it at once, Duplicate puts a copy after it, Remove takes it out', async ({ page }) => {
+      await openRoute(page, '/');
+      await page.evaluate(async () => { const { bag } = await import('/app/bag.js'); bag.clear();
+        for (const id of ['knight', 'slime']) bag.add({ kind: 'sprite', id, settings: { params: {}, cues: null, scale: 1 } });
+        bag.add({ kind: 'sound', id: 'coin-pickup', settings: { params: {}, style: null, seed: 1 } }); });
+      await openLibrary(page);
+      await expect(rows(page)).toHaveCount(3);
+      const hero = rows(page).first(), name = C.byId.knight.name;
+      // icons only: every button in the row is named for a screen reader and has no words on it
+      const words = await hero.locator('button').evaluateAll((bs) => bs.map((b) => b.textContent.trim()).join(''));
+      expect(words).toBe('');
+      const magic = hero.getByRole('button', { name: `Surprise me: ${name}` });
+      await expect(magic).toHaveClass(/btn-magic/);
+      const before = JSON.stringify((await bagItems(page))[0].settings.params);
+      await magic.click();
+      await expect.poll(async () => JSON.stringify((await bagItems(page))[0].settings.params)).not.toBe(before);
+      await expect(page).toHaveURL(/#\/browse/);                                    // it changed the item; it did not open its page
+      await rows(page).first().getByRole('button', { name: `Duplicate ${name}` }).click();
+      await expect(rows(page)).toHaveCount(4);
+      expect((await bagItems(page)).map((i) => i.id)).toEqual(['knight', 'knight', 'slime', 'coin-pickup']);
+      await rows(page).nth(1).getByRole('button', { name: `Take ${name} out of your bag` }).click();
+      await expect(rows(page)).toHaveCount(3);
+      // a sound's row has them too (its patch may not be loaded yet: Surprise me brings it)
+      const snd = rows(page).last();
+      const was = JSON.stringify((await bagItems(page))[2].settings.params);
+      await snd.getByRole('button', { name: /^Surprise me: / }).click();
+      await expect.poll(async () => JSON.stringify((await bagItems(page))[2].settings.params)).not.toBe(was);
+      expect(await hasHorizontalScroll(page)).toBe(false);
+    });
+
     test('Download in the tray saves the whole bag as one package', async ({ page }) => {
       await addKit(page, KIT);
       await openLibrary(page);

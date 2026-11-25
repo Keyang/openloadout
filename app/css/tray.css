@@ -34,7 +34,7 @@
   .tray-full { display: flex; flex-direction: column; gap: var(--s3); position: fixed; right: 0; top: var(--top); bottom: 0; width: 320px; z-index: 15; padding: var(--s4); background: var(--paper); border-left: 1px solid var(--line); }
   #app:has(> .tray-full) > main.lib { margin: 0 320px 0 auto; }
   .tray-full .tray-list { flex: 1 1 auto; overflow-y: auto; scrollbar-width: thin; margin: 0 calc(-1 * var(--s2)); padding: 0 var(--s2); }
-  .tray-full .tray-list > li { display: grid; grid-template-columns: minmax(0, 1fr) 28px; align-items: center; gap: var(--s1); border-bottom: 1px solid var(--line); }
+  .tray-full .tray-list > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--s1); border-bottom: 1px solid var(--line); }
   .tray-full .tray-list > li:last-child { border-bottom: 0; }
   .tray-full .tray-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: var(--s3); padding: 6px 0; min-width: 0; }
   .tray-full .tray-pic { width: 44px; height: 44px; }
@@ -43,8 +43,10 @@
   .tray-full .tray-type { font-size: 12px; color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .tray-full .tray-row:hover .tray-name { text-decoration: underline; text-underline-offset: 3px; }
   .tray-full .tray-dot { display: inline-flex; padding-right: 2px; }
-  .tray-x { width: 28px; height: 28px; display: grid; place-items: center; border-radius: var(--r); color: var(--ink-2); }
-  .tray-x:hover { color: var(--ink); background: var(--shelf); }
+  /* the bag list's icon buttons (app/row-tools.js, base.css .row-icon), a little smaller to fit the 320 px panel */
+  .tray-acts { display: inline-flex; align-items: center; gap: 2px; }
+  .tray-acts .row-icon, .tray-acts .btn-magic.is-icon { width: 28px; height: 28px; }
+  .tray-acts .btn-magic.is-icon .magic-star { width: 16px; height: 16px; }
 }
 
 /* ---------- slim: an asset page's third column ---------- */

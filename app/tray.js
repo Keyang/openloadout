@@ -1,7 +1,8 @@
 // The bag tray (docs/playground-tray-workbench.md, section 2): the bag always on screen at the right edge, filling up as
 // the creator adds things. Two sizes:
 //   'full'  the library (1024 px and wider): "Your bag", the count, Download; a short live scene of the bag that opens
-//           the playground (app/bag-scene.js); then the list: picture, name, type, change dot, × to take it out. A row
+//           the playground (app/bag-scene.js); then the list: picture, name, type, change dot, and the bag list's icon
+//           buttons (Surprise me, Duplicate, Remove: app/row-tools.js). A row
 //           opens that thing's page with its bag item. An empty bag says what to do in one sentence.
 //   'slim'  the asset pages (1280 px and wider): the count, Download, then the pictures with their change dots; the
 //           thing on the page is marked; "+N more" when they do not fit.
@@ -11,7 +12,7 @@
 //   const t = bagTray({ size: 'full' });   app.append(t.node);   ...   t.stop();
 import { el, saveBlob } from './ui.js';
 import { bag, lookOf } from './bag.js';
-import { assetById, spriteNow, loadSprite } from './catalog.js';
+import { assetById, spriteNow, loadSprite, loadSound } from './catalog.js';
 import { soundById } from './audio.js';
 import { labelFor } from '../catalog/schema.js';
 import { cleanParams } from '../engine/sprite.js';
@@ -23,9 +24,9 @@ import { zip } from './zip.js';
 import { packageWords } from './changes.js';
 import { icon, ICON } from './asset-shell.js';
 import { bagScene } from './bag-scene.js';
+import { surpriseButton, duplicateButton, removeButton } from './row-tools.js';
 
 const DOWN = 'M8 2.5v8M4.5 7.5 8 11l3.5-3.5M3 13.5h10';
-const X = 'M4 4l8 8M12 4l-8 8';
 export const EMPTY = 'Press + on anything and it lands here.';
 const things = (n) => (n === 1 ? 'thing' : 'things');
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -147,8 +148,12 @@ export function bagTray({ size = 'full', current = null } = {}) {
         el('span', { class: 'tray-words' }, el('span', { class: 'tray-name' }, name), el('span', { class: 'tray-type' }, labelFor('type', row?.type) || (item.kind === 'music' ? 'Music' : 'Sound'))),
         dot ? el('span', { class: 'tray-dot' }, dot, el('span', { class: 'sr' }, ', changed')) : null)
       : el('a', { class: 'tray-row', href: itemHref(item), title: name, 'aria-label': label }, pic);
+    // the same icon buttons as the bag's list; Surprise me brings the asset first when it is not here yet
+    const assetFor = () => assetNow(item) ?? (item.kind === 'sprite' ? loadSprite(item.id) : loadSound(item.id));
+    const out = full ? removeButton(`Take ${name} out of your bag`, () => takeOut(item.key)) : null;
+    if (out) out.classList.add('tray-x');
     const li = el('li', { 'data-key': item.key, 'data-id': item.id, 'data-kind': item.kind }, link,
-      full ? el('button', { type: 'button', class: 'tray-x', 'aria-label': `Take ${name} out of your bag`, title: 'Take it out', onclick: () => takeOut(item.key) }, icon(X)) : null);
+      full ? el('span', { class: 'tray-acts' }, surpriseButton(item, assetFor, name), duplicateButton(item, name), out) : null);
     rows.set(item.key, { li, sig });
     return li;
   }
