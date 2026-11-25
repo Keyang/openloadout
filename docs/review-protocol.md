@@ -8,6 +8,8 @@ All paths are relative to `lab/sprite-forge/`. Run commands from there.
 
 You get: the asset id, its kind (sprite, sound or music), and its **brief**: `name`, `blurb` or `description`, and `meta` from the asset file. That is all you judge against.
 
+**Craft guides.** The checklists in `docs/craft/sprites.md` §17, `docs/craft/sounds.md` §8 and `docs/craft/music.md` §15 say, per rubric line, what earns a 3 rather than a 2. Use them to name the fix that would raise a score; they add no rule.
+
 Do not read the maker's report, notes or chat before you have scored. Do not edit the asset. Do not run `git` write commands. Write rendered files only under `out/`.
 
 ## 1. Run the automatic checks
