@@ -1,0 +1,32 @@
+# Netlify: Loadout is a static site. The site is built locally (node tools/build.mjs --dist, about 25 minutes with the
+# quality bar and a 24 MB search model download), then uploaded with the CLI:
+#
+#   netlify deploy --dir dist            a draft URL to check
+#   netlify deploy --dir dist --prod     the live site
+#
+# No build runs on Netlify (no build command), so a Git-connected deploy would only publish what is in dist/.
+
+[build]
+  publish = "dist"
+
+# The search runtime and model: large and rarely changed, so browsers keep them for a day.
+[[headers]]
+  for = "/vendor/*"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/*.wasm"
+  [headers.values]
+    Content-Type = "application/wasm"
+
+[[headers]]
+  for = "/*.onnx"
+  [headers.values]
+    Content-Type = "application/octet-stream"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

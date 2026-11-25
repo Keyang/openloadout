@@ -2,6 +2,8 @@
 
 Loadout is a website of pixel-art sprites, sound effects and music for 2D games. Every asset is made by code, not stored as a picture or a recording: a sound is a patch the sound engine plays, and a sprite is a data definition the framework draws (every sprite is a data file; the build refuses a program). Each one has plain-language sliders ("taller", "brighter", "faster"), so a game maker can change it before using it. The site is static files only: it needs no server of its own.
 
+**Live site:** https://openloadout.netlify.app · **Source:** https://github.com/Keyang/openloadout
+
 It is for people who make small 2D games and do not draw, record or write code. They search for what the game needs, change it, put it in a bag, try the bag in a playground, and download one zip. Agents can use the same code to make new assets. The folder (`lab/sprite-forge`), the skill id (`sprite-forge`) and the preview entry keep the project's first name, Sprite Forge; Keyang decided on 2026-11-18 to leave them. This is Keyang's own lab experiment, not part of the Innovation Lab project.
 
 ## What is in it today
@@ -163,7 +165,7 @@ The last full runs are in the counts table above. Neither suite was run for this
 - **Nobody has listened to any sound or track.** They were tuned and judged by measurement and spectrograms.
 - **Nobody has judged the art by eye** except the orchestrating agent looking at renders, plus second agents working from renders.
 - **Firefox and Safari are untested.** Only Chromium is installed. The safety rules for made assets must be checked there before any public release (`docs/framework-api.md`, "Before a public release").
-- **No hosting.** The site runs from a local server. The source is at https://github.com/Keyang/openloadout; nothing is deployed yet.
+- **Hosting:** live at https://openloadout.netlify.app, deployed by hand with the Netlify CLI from a locally built `dist/` (`netlify.toml` says how). No deploy runs on push.
 - **Unity package export is not built.** The zip is engine-neutral with written Unity steps; it has never been imported into Unity.
 - **The MCP server is not built.** `window.loadout` and its description exist.
 - **A second art style is not built.** The framework seam exists and is tested with test-only styles (`docs/architecture.md`, Contract 12).
