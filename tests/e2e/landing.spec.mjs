@@ -303,3 +303,40 @@ test('the Hero is centred in its tile whatever the tile\'s size', async ({ page 
   expect(Math.abs(at.dy)).toBeLessThanOrEqual(1);
   expect(Number.isInteger(at.k)).toBe(true);
 });
+
+test('the first screen\'s Hero changes by itself until the visitor takes the controls, which are real', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const demo = page.locator('.hero .hero-demo');
+  const hero = demo.locator('canvas.demo-hero');
+  await drawn(hero);
+  const tools = demo.getByRole('toolbar', { name: 'Change the Hero' });
+  await expect(tools.getByRole('button')).toHaveCount(3);
+  // the pointer turns the height by itself: the Hero is drawn another way, and the link carries the change
+  const cursor = demo.locator('.demo-cursor');
+  await expect(cursor).toBeVisible({ timeout: 5_000 });
+  const carry = demo.getByRole('link', { name: /^Open it with these changes/ });
+  await expect(carry).toHaveAttribute('href', /^#\/sprite\/knight\?.*height=/, { timeout: 8_000 });
+  // the visitor takes over: the pointer goes, and a weapon picked is the weapon kept
+  await tools.getByRole('button', { name: 'Weapon' }).click();
+  await expect(cursor).toBeHidden();
+  await demo.getByRole('radiogroup', { name: 'Weapon' }).getByRole('radio', { name: 'Axe' }).click();
+  await expect(carry).toHaveAttribute('href', /weapon=axe/);
+  await page.waitForTimeout(2500);
+  await expect(carry).toHaveAttribute('href', /weapon=axe/);
+  await expect(tools.getByRole('button', { name: 'Weapon' })).toHaveAttribute('aria-pressed', 'true');
+});
+
+test('with reduced motion the first screen\'s Hero waits for the visitor', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.waitForLoadState('networkidle');      // nothing still loading is cut off by the reload
+  await page.reload();
+  await page.waitForSelector('.hero .hero-demo');
+  const demo = page.locator('.hero .hero-demo');
+  await drawn(demo.locator('canvas.demo-hero'));
+  await page.waitForTimeout(2500);
+  await expect(demo.locator('.demo-cursor')).toBeHidden();
+  await expect(demo.getByRole('link', { name: /^Open it with these changes/ })).toHaveAttribute('href', '#/sprite/knight');
+  await demo.getByRole('slider', { name: 'How tall' }).fill('1');
+  await expect(demo.getByRole('link', { name: /^Open it with these changes/ })).toHaveAttribute('href', /height=/);
+});

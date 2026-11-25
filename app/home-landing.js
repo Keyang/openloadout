@@ -4,7 +4,7 @@
 import { labelFor } from '../catalog/schema.js';
 import { THEME_PRESETS } from '../engine/theme.js';
 import { makeMagic } from './magic.js';
-import { el, header, footer } from './ui.js';
+import { el, header, footer, reduceMotion } from './ui.js';
 import { currentCatalog, loadSprite, loadSound } from './catalog.js';
 import { soundById, soundParams, renderAsync, playRendered, playLive } from './audio.js';
 import { cardFor } from './cards.js';
@@ -63,7 +63,118 @@ const ICON = {
   stop: () => icon('M4.5 4.5h7v7h-7z', { fill: true }),
   sound: () => icon('M2.5 6.2v3.6h2.3L8 12.5v-9L4.8 6.2H2.5ZM10.6 5.8a3 3 0 0 1 0 4.4M12.4 4a5.5 5.5 0 0 1 0 8'),
   note: () => icon('M6 12V3.5l6-1.5v8.5M6 12a1.8 1.8 0 1 1-3.6 0A1.8 1.8 0 0 1 6 12Zm6-1.5a1.8 1.8 0 1 1-3.6 0 1.8 1.8 0 0 1 3.6 0Z'),
+  height: () => icon('M8 2v12M5.2 4.8 8 2l2.8 2.8M5.2 11.2 8 14l2.8-2.8'),
+  colour: () => icon('M8 2a6 6 0 1 0 0 12c1 0 1.4-.7 1.1-1.4-.3-.9.3-1.6 1.2-1.6H12a2.3 2.3 0 0 0 2-2.4A6.3 6.3 0 0 0 8 2ZM5 7.2v.01M7.2 4.8v.01M10.4 5.4v.01'),
+  weapon: () => icon('M13.5 2.5 6.8 9.2M13.5 2.5H11M13.5 2.5V5M4.6 8.4l3 3M5.8 10.2 2.5 13.5'),
 };
+
+// The first screen's Hero: big, with three of his real controls beside him. Until the visitor touches them, a pointer
+// turns them by itself (taller, shorter; another outfit; another weapon), so the first thing seen is a sprite changing.
+// With "reduce motion" nothing moves by itself. demo: [control key, its icon, the tool's name, the values the pointer tries]
+const DEMO = [
+  ['height', 'height', 'How tall', [0.92, 0.12, 0.5]],
+  ['outfit', 'colour', 'Clothes colour', ['#c9423a', '#4f9d57', '#7a4fc4', '#3f6fd1']],
+  ['weapon', 'weapon', 'Weapon', ['axe', 'spear', 'sword']],
+];
+function heroDemo(live, hero) {
+  const mine = live.sprite(hero, { clip: 'idle', scale: 0 });
+  mine.node.classList.add('demo-hero');
+  // drawn big, with its feet (its pivot) standing near the bottom of the stage, whatever the frame around it
+  for (const [k, v] of [['--fw', hero.tech.frame[0]], ['--fh', hero.tech.frame[1]], ['--px', hero.tech.pivot[0]], ['--py', hero.tech.pivot[1]]]) mine.node.style.setProperty(k, v);
+  let tool = DEMO[0][0], auto = !reduceMotion.matches, alive = true, inView = false;
+  const box = el('div', { class: 'demo-box' });
+  const tools = el('div', { class: 'demo-tools', role: 'toolbar', 'aria-label': `Change the ${hero.name}` });
+  const cursor = el('span', { class: 'demo-cursor', 'aria-hidden': 'true', hidden: true });
+  cursor.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28"><path d="M5 3l13 8.2-6 1.2-3.2 5.6z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  const carry = el('a', { class: 'demo-carry', href: spriteHref(HERO) }, 'Open it with these changes', el('span', { 'aria-hidden': 'true' }, ' →'));
+  const node = el('div', { class: 'hero-demo' },
+    el('div', { class: 'demo-glow', 'aria-hidden': 'true' }),
+    el('div', { class: 'demo-stage' }, mine.node),
+    el('div', { class: 'demo-panel' }, tools, box),
+    carry, cursor);
+  const sync = () => { carry.href = spriteHref(HERO, mine.changed()); for (const b of box.querySelectorAll('[data-v]')) b.setAttribute('aria-checked', String(String(mine.params[tool]) === b.dataset.v)); const r = box.querySelector('input'); if (r) { r.value = String(mine.params[tool]); r.style.setProperty('--p', `${((mine.params[tool] - r.min) / (r.max - r.min)) * 100}%`); } };
+  const set = (k, v) => { mine.set({ [k]: v }); sync(); };
+  function control(key) {
+    const d = mine.def.params[key];
+    const label = DEMO.find((x) => x[0] === key)[2];
+    if (d.kind === 'range' || d.min != null) {
+      const r = el('input', { type: 'range', min: String(d.min), max: String(d.max), step: String(d.step ?? 0.01), 'aria-label': label });
+      r.addEventListener('input', () => set(key, Number(r.value)));
+      return el('div', { class: 'demo-ctl is-range' }, el('span', { 'aria-hidden': 'true' }, d.lo || 'Low'), r, el('span', { 'aria-hidden': 'true' }, d.hi || 'High'));
+    }
+    if (d.swatches) return el('div', { class: 'demo-ctl swatches', role: 'radiogroup', 'aria-label': label },
+      DEMO.find((x) => x[0] === key)[3].filter((c) => d.swatches.includes(c)).map((c) => el('button', { type: 'button', class: 'swatch', role: 'radio', 'data-v': c, style: `--c:${c}`, 'aria-label': colourWord(c), title: colourWord(c), onclick: () => set(key, c) })));
+    return el('div', { class: 'demo-ctl chips', role: 'radiogroup', 'aria-label': label },
+      (d.options ?? []).filter((o) => o.value !== 'none').map((o) => el('button', { type: 'button', class: 'chip', role: 'radio', 'data-v': o.value, onclick: () => set(key, o.value) }, o.label)));
+  }
+  function choose(key) {
+    tool = key;
+    for (const b of tools.children) b.setAttribute('aria-pressed', String(b.dataset.tool === key));
+    box.replaceChildren(control(key));
+    sync();
+  }
+  // the visitor takes over: the pointer goes away for good
+  const takeOver = () => { if (!auto) return; auto = false; cursor.hidden = true; };
+  node.addEventListener('pointerdown', takeOver, true);
+  node.addEventListener('keydown', takeOver, true);
+  const still = () => { if (reduceMotion.matches) takeOver(); };
+  reduceMotion.addEventListener('change', still);
+  const seen = new IntersectionObserver(([e]) => { inView = e.isIntersecting; });
+  seen.observe(node);
+
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const going = () => alive && auto;
+  const until = async () => { while (alive && auto && (!inView || document.hidden)) await wait(400); return going(); };
+  /** Move the pointer over an element (or a point across it, 0..1), then wait for it to get there. */
+  async function point(target, fx = 0.5, ms = 650) {
+    const a = node.getBoundingClientRect(), b = target.getBoundingClientRect();
+    cursor.style.transitionDuration = `${ms}ms`;
+    cursor.style.transform = `translate(${b.left - a.left + b.width * fx - 4}px, ${b.top - a.top + b.height / 2 - 4}px)`;
+    await wait(ms + 60);
+  }
+  const press = async () => { cursor.classList.add('is-down'); await wait(140); cursor.classList.remove('is-down'); };
+  async function run() {
+    await mine.ready;
+    if (!alive || !mine.def) return;
+    tools.replaceChildren(...DEMO.filter(([k]) => mine.def.params[k]).map(([k, ic, label]) => el('button', { type: 'button', class: 'demo-tool', 'data-tool': k, 'aria-label': label, title: label, onclick: () => choose(k) }, ICON[ic]())));
+    choose(DEMO[0][0]);
+    if (!auto) return;
+    await wait(900);
+    cursor.hidden = false;
+    cursor.style.transitionDuration = '0ms';
+    cursor.style.transform = `translate(${Math.round(node.clientWidth * 0.8)}px, ${Math.round(node.clientHeight * 0.5)}px)`;
+    while (await until()) {
+      for (const [key, , , tries] of DEMO) {
+        if (!(await until()) || !mine.def.params[key]) continue;
+        await point(tools.querySelector(`[data-tool="${key}"]`));
+        if (!going()) return; await press(); choose(key); await wait(250);
+        const d = mine.def.params[key];
+        if (box.querySelector('input')) {
+          const r = box.querySelector('input'), span = d.max - d.min;
+          await point(r, (mine.params[key] - d.min) / span, 450); await press();
+          for (const to of tries) {
+            const from = mine.params[key], steps = 22;
+            for (let i = 1; i <= steps && going(); i++) {
+              const v = from + (to - from) * (i / steps);
+              set(key, Number(v.toFixed(3)));
+              await point(r, (v - d.min) / span, 45);
+            }
+            if (!going()) return;
+            await wait(500);
+          }
+        } else for (const v of tries) {
+          const b = box.querySelector(`[data-v="${CSS.escape(v)}"]`);
+          if (!b) continue;
+          await point(b, 0.5, 500); if (!going()) return;
+          await press(); set(key, v); await wait(900);
+        }
+        await wait(400);
+      }
+    }
+  }
+  run().catch((e) => console.warn('Loadout: the Hero demo stopped.', e));
+  return { node, stop() { alive = false; seen.disconnect(); reduceMotion.removeEventListener('change', still); } };
+}
 
 /** Where a cropped tile (.hv) centres a sprite: over its feet, a little under a third of the frame up. In art pixels. */
 function centred(node, row) {
@@ -100,12 +211,20 @@ export function landingPage(app) {
   const actions = () => el('div', { class: 'hero-actions' },
     el('a', { class: 'btn btn-lg btn-primary', href: '#/browse' }, 'Browse everything'),
     hero ? el('a', { class: 'btn btn-lg btn-secondary', href: `#/sprite/${HERO}` }, `Change the ${hero.name}`) : null);
-  const first = el('section', { class: 'hero' },
-    el('h1', {}, 'Game art, sound and music you can change.'),
-    el('p', { class: 'lede' }, 'Pick a hero, a monster or a tune, change it with a few sliders and choices, and download it ready for your game.'),
-    // true today: nothing costs anything; what a released game may do with it is not decided (every asset records "draft", README "Licences")
-    el('p', { class: 'terms' }, 'Free to try and to download. The terms for using it in a game you release are not set yet.'),
-    actions(), search);
+  const demo = hero ? heroDemo(live, hero) : null;
+  if (demo) stops.push(() => demo.stop());
+  const engine = (name) => el('b', {}, name);
+  const first = el('section', { class: `hero${demo ? ' has-demo' : ''}` },
+    el('div', { class: 'hero-text' },
+      el('h1', {}, 'Game art, sound and music you can ', el('span', { class: 'hero-word' }, 'change'), '.'),
+      el('p', { class: 'lede' }, 'Every sprite, sound and tune here is ', el('b', {}, 'made by code'), ', not a frozen picture. Turn its knobs, keep it in your bag, try it in the playground, then download it ready for your game. ',
+        el('b', {}, 'Free to try and to download.')),
+      actions(),
+      el('p', { class: 'hero-works' }, el('span', {}, 'Ready for'), engine('Unity'), engine('Godot'), engine('GameMaker'), engine('Phaser'), el('span', {}, 'and any engine that reads PNG and WAV')),
+      search,
+      // true today: nothing costs anything; what a released game may do with it is not decided (every asset records "draft", README "Licences")
+      el('p', { class: 'terms' }, 'The terms for using it in a game you release are not set yet.')),
+    demo?.node);
 
   // ---------------------------------------------------------------- the line-up
   const standing = [];
