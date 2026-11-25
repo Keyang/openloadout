@@ -17,7 +17,7 @@
  "pivot": [28,58],
  "grounded": false,
  "preview": "cast",
- "styles": ["pixel"],
+ "styles": ["pixel", "flat"],
  "palette": [
   {"id":"skin","label":"Skin","default":"#f6d3b0","material":"skin","swatches":["#f6d3b0","#e8b088","#c98a5c","#9a6240","#6e4428","#9bd18a","#b9a7e0"]},
   {"id":"beardColor","label":"Hair and beard","default":"#d8d8e0","material":"plant","swatches":["#2b2233","#5a3a22","#a8612a","#e0b040","#d8d8e0","#c9423a","#3f7fd1","#e670b0"]},

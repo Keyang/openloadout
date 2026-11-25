@@ -43,6 +43,7 @@
  ],
  "grounded": false,
  "preview": "frame",
+ "styles": ["pixel", "flat"],
  "styles": [
   "pixel"
  ],

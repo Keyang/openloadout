@@ -160,15 +160,16 @@ test('a sprite with one style shows nothing new: no Style choice, no style in it
   expect('artStyle' in JSON.parse(text(files.find((f) => f.name === 'coin.json').data))).toBe(false);
 });
 
-test('the shipped site knows one style, and says so on window.loadout', async ({ page }) => {
+test('the shipped site knows two styles, and says so on window.loadout', async ({ page }) => {
   await openRoute(page, '/');
   const got = await page.evaluate(async () => {
     const api = await window.loadout.api;
     const render = api.actions.find((a) => a.name === 'render'), add = api.actions.find((a) => a.name === 'bag_add');
     return { styles: api.styles, render: render.inputSchema.properties.options.properties.artStyle, add: add.inputSchema.properties.settings.description, coin: (await window.loadout.assets.get('coin')).asset.styles };
   });
-  expect(got.styles.map((s) => s.id)).toEqual(['pixel']);
+  expect(got.styles.map((s) => s.id)).toEqual(['pixel', 'flat']);
   expect(got.styles[0]).toMatchObject({ label: 'Pixel art', exports: ['sheet'] });
+  expect(got.styles[1]).toMatchObject({ label: 'Flat', exports: ['sheet'] });
   expect(got.render.description).toMatch(/Sprites: the art style/);
   expect(got.add).toMatch(/artStyle/);
   expect(got.coin).toEqual(['pixel']);

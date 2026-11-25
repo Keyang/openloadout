@@ -17,7 +17,7 @@
   "pivot": [16,16],
   "grounded": false,
   "preview": "fly",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"body","label":"Body","default":"#9fe040","material":"water","swatches":["#9fe040","#2fb3a8","#4f9ff0","#5fe0f0","#b04a8a"]},
     {"id":"glow","label":"Shine","default":"#f0ead8","material":"light","swatches":["#f0ead8","#e8ecf2","#f6d3b0","#c2c9d6"]}

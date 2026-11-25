@@ -9,7 +9,7 @@
   "pivot": [16,30],
   "grounded": false,
   "preview": "idle",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"body","label":"Candy","default":"#c9423a","material":"paint","swatches":["#c9423a","#9bd18a","#7a4fc4","#3f8a4f","#7a4f33","#3f9fd1","#f2c230","#a06a3c"]},
     {"id":"accent","label":"Icing","default":"#f0ead8","material":"paint","swatches":["#f0ead8","#4fd8ee","#a4c44a","#3f6fd1","#d8d8e0"]},

@@ -17,7 +17,7 @@
   "pivot": [48,32],
   "grounded": false,
   "preview": "panel",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"face","label":"Paper","default":"#f0ead8","material":"interface","swatches":["#f0ead8","#e6c96a","#f6d3b0","#c2c9d6","#9bd18a"]},
     {"id":"frame","label":"Ink","default":"#3f5068","material":"interface","swatches":["#3f5068","#7a4f33","#434d6d","#8e3a4a"]},

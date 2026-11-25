@@ -1,7 +1,7 @@
 { "format": "loadout-sprite", "version": 2, "id": "giant-mole", "name": "Old Delver",
   "blurb": "A giant mole boss, waist-deep in a mound of rubble, that digs under, bursts out, sweeps a claw and roars. Change its size, build, snout, claws, eyes, crystals and colours.",
   "meta": {"type":"creature","role":"characters/boss","themes":["fantasy","dungeon"],"gameTypes":["top-down-rpg","turn-based-rpg","roguelike-action"],"view":"top-down","words":["boss","mole","burrow","dig","claw","cave","beast","tunnel","rocks","roar","emerge","giant"],"license":"draft"},
-  "size": [96,96], "pivot": [48,88], "grounded": true, "preview": "idle", "styles": ["pixel"],
+  "size": [96,96], "pivot": [48,88], "grounded": true, "preview": "idle", "styles": ["pixel", "flat"],
   "palette": [
     {"id":"body","label":"Fur","default":"#8e3a4a","material":"skin","swatches":["#8e3a4a","#7a4fc4","#357a4c","#9a6a3e","#c9423a"]},
     {"id":"accent","label":"Snout, paws and belly","default":"#e6c96a","material":"skin","swatches":["#e6c96a","#c9a06a","#f0ead8","#a8c8d8"]},

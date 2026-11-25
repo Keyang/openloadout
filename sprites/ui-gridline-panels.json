@@ -2,7 +2,7 @@
   "blurb": "Stretchable dark panels for the screens round a puzzle round: pause with a pause badge, results split into labels and numbers, game over with tumbled corner blocks, and a new-best panel whose corners light up in turn; change the style, corners, border, heading and colours.",
   "meta": { "type": "ui", "role": "interface/panel", "themes": ["neutral", "sci-fi"], "gameTypes": ["puzzle", "arcade"], "view": "none",
             "words": ["pause", "results", "game over", "record", "best", "panel", "popup", "score", "summary", "screen"], "license": "draft" },
-  "size": [96, 64], "pivot": [48, 32], "grounded": false, "preview": "pause", "styles": ["pixel"],
+  "size": [96, 64], "pivot": [48, 32], "grounded": false, "preview": "pause", "styles": ["pixel", "flat"],
   "stylesWhy": "The kit is pixel only until the flat style has been looked at (specification, decision P5); the frame, the corner blocks, the pause bars and the notch are laid pixel by pixel by ui.screen@1.",
   "palette": [
     { "id": "face", "label": "Panel", "default": "#2a3058", "material": "paint", "swatches": ["#2a3058", "#3a4278", "#1e4658", "#6a3a8e"] },

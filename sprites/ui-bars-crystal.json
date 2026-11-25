@@ -17,7 +17,7 @@
   "pivot": [32,8],
   "grounded": false,
   "preview": "frame",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"frame","label":"Crystal","default":"#8fd0f0","material":"interface","swatches":["#8fd0f0","#9bd18a","#5fe0f0","#7fe0a0"]},
     {

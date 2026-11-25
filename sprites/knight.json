@@ -7,6 +7,7 @@
  "size": [64,64],
  "pivot": [28,58],
  "preview": "walk",
+ "styles": ["pixel", "flat"],
  "meta": {
   "type": "character",
   "role": "characters/player",

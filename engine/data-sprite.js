@@ -61,8 +61,8 @@
 // (fps a function of Speed when there is one; an icon set's pictures are one-frame clips), each clip's sounds with
 // their control conditions kept (cueInEffect decides), sockets from the attach points (a rig's and the sprite's), slice
 // and textArea when the definition has them, materials { rest }, materialTable(p) (Contract 7 read from the slots,
-// engine/resolve.js materialTable), versions, `was`, `definition` (the cleaned definition, frozen) and styles ['pixel']
-// (draw-list.js is the pixel renderer; other styles come with their renderer).
+// engine/resolve.js materialTable), versions, `was`, `definition` (the cleaned definition, frozen) and styles (the definition's `styles`, or ['pixel'])
+// (draw-list.js draws every style; a style other than pixel hands it a surface that rewrites the list, engine/flat.js).
 // Choices where the design leaves room (reported with B6):
 //   - A pictures body is outlined only where its list says so (a rig gets one at the end unless its list outlines
 //     everything, as rigs/bones.js does). The white flash is a tint just before the last outline, as for a rig.
@@ -905,7 +905,7 @@ function buildV2(value, opts = {}) {
     size: [...definition.size], pivot: [...definition.pivot], grounded: definition.grounded !== false,
     params, parts: partsV2(definition, params, shapes), clips, sounds: soundsV2(definition, first.clips),
     preview: Object.hasOwn(clips, definition.preview) ? definition.preview : first.preview ?? names[0],
-    styles: ['pixel'],
+    styles: Array.isArray(definition.styles) && definition.styles.length ? [...definition.styles] : ['pixel'],
     ...(definition.versions ? { versions: definition.versions.map((v) => ({ name: v.name, params: { ...v.params } })) } : {}),
     ...(isObj(definition.was) ? { was: JSON.parse(JSON.stringify(definition.was)) } : {}),
     ...(isObj(definition.materials) && typeof definition.materials.rest === 'string' ? { materials: { rest: definition.materials.rest } } : {}),

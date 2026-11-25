@@ -4,13 +4,15 @@
 // registry, so a new pipeline plugs in without touching the sprites that do not use it.
 // Pure JavaScript: runs the same in the browser and in Node.
 //
-//   pixel   the one style on the site today: the pixel grid of surface.js, no finish, a PNG sheet plus JSON.
+//   flat    clean flat shapes: solid colours, smooth edges, drawn at 4x (engine/flat.js); a sprite lists it to offer it
+//   pixel   the first style on the site: the pixel grid of surface.js, no finish, a PNG sheet plus JSON.
 //           A sprite that lists no styles has this one, and draws exactly as it did before styles existed.
 //
 // A sprite opts in with a top-level `styles: ["pixel", "flat"]` in its data (best first); the renderer is told which one is
 // being drawn as `ctx.style` in render(g, ctx). How to add a style is in docs/framework-api.md, "Styles".
 
 import { Surface } from './surface.js';
+import { FlatSurface, smooth, toGrid, FLAT_SCALE } from './flat.js';
 import { renderSheet } from './sprite.js';      // sprite.js imports this file too; neither uses the other until a call
 
 const registry = new Map();
@@ -32,6 +34,8 @@ const list = (ids) => ids.join(', ');
  *            frame, which is what the site previews and what the quality bar looks at;
  *   recolour(surface, apply)   optional, needed when the surface is not a pixel grid: apply a whole-bundle look.
  *            `apply` takes a Uint32Array of packed colours and recolours it in place;
+ *   pictureScale   optional, 1 when left out: how many times bigger than the sprite's grid the style's own picture of a frame is
+ *            (flat: 4). The api's render answers at that size;
  *   exporters: { sheet(sprite, params, options) }   turns a sprite into files. Returns (or resolves to)
  *            { files: [{ name, bytes, type }], data }: the picture files, and the JSON that ships with them
  *            (it must keep `animations`, so sounds can be timed). options: see exportSheet().
@@ -50,6 +54,7 @@ export function defineStyle(style) {
   if (exporters === null || typeof exporters !== 'object' || typeof exporters.sheet !== 'function' || Object.values(exporters).some((f) => typeof f !== 'function')) throw new Error(`${where}: needs exporters: { sheet(sprite, params, options) }, which returns { files, data }`);
   const made = Object.freeze({
     id: s.id, label: s.label, about: s.about,
+    pictureScale: Number.isInteger(s.pictureScale) && s.pictureScale >= 1 ? s.pictureScale : 1,
     makeSurface: s.makeSurface, finish: s.finish ?? null, toPixels: s.toPixels ?? null, recolour: s.recolour ?? null,
     exporters: Object.freeze({ ...exporters }),
   });
@@ -181,4 +186,32 @@ defineStyle({
   makeSurface: (width, height) => new Surface(width, height),
   // no finish: the outline and the shading are drawn by the sprite itself, as they always were
   exporters: { sheet: pngSheet },
+});
+
+/** The flat style's sheet: one PNG at FLAT_SCALE x, a row per clip, with the sheet's JSON (artStyle 'flat'). */
+async function flatSheet(sprite, params, { style = 'flat', clips, recolour = null, encodePng } = {}) {
+  if (typeof encodePng !== 'function') throw new Error('style "flat" exports a PNG sheet, which needs options.encodePng(width, height, rgbaBytes): tools/png.mjs encodePNG in Node, a canvas in the browser');
+  const sheet = renderSheet(sprite, params, clips ? { scale: FLAT_SCALE, clips, style } : { scale: FLAT_SCALE, style });
+  const [fw, fh] = [sheet.meta.frameWidth, sheet.meta.frameHeight];
+  const data = new Uint32Array(sheet.w * sheet.h);
+  sheet.surfaces.forEach((g, n) => {
+    const f = sheet.meta.frames[n];
+    for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) { const v = g.data[y * fw + x]; if (v) data[(f.y + y) * sheet.w + f.x + x] = v; }
+  });
+  if (recolour) recolour(data);
+  const bytes = await encodePng(sheet.w, sheet.h, new Uint8ClampedArray(data.buffer, data.byteOffset, data.byteLength));
+  const image = `${sprite.id}.png`;
+  return { files: [{ name: image, bytes, type: 'image/png' }], data: { ...sheet.meta, image } };
+}
+
+defineStyle({
+  id: 'flat',
+  label: 'Flat',
+  about: 'Clean flat shapes with solid colours, a thin outline and smooth edges, drawn at four times the size.',
+  pictureScale: FLAT_SCALE,
+  makeSurface: (width, height) => new FlatSurface(width, height),
+  finish: (surface) => smooth(surface),
+  toPixels: (surface) => toGrid(surface),
+  recolour: (surface, apply) => { apply(surface.data); if (surface.raw) apply(surface.raw.data); },       // the unsmoothed drawing too: pixelsOf reads whole colours from it
+  exporters: { sheet: flatSheet },
 });

@@ -1101,6 +1101,8 @@ class Painter {
  * Arguments: g (a Surface), list (primitives and operations in frame coordinates, see the header), options { palette ({ slot: '#rrggbb' | { hex, detail } }), glowRim (default true: rim glow with its own darker tone) }.
  */
 export function drawList(g, list, { palette = {}, glowRim = true } = {}) {
+  // a surface of another style (engine/flat.js) rewrites the list for its own drawing: same renderer, other numbers
+  if (typeof g.flatPlan === 'function') ({ list, palette, glowRim } = g.flatPlan(list, palette));
   return paintList(g, list, palette, glowRim, false);
 }
 

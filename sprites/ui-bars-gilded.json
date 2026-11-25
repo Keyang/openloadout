@@ -17,7 +17,7 @@
   "pivot": [32,8],
   "grounded": false,
   "preview": "frame",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"frame","label":"Gold","default":"#f0ead8","material":"interface","swatches":["#f0ead8","#c2c9d6","#f6d3b0","#f4e06a","#e6c96a"]},
     {"id":"accent","label":"Gems","default":"#4fd8ee","material":"interface","swatches":["#4fd8ee","#c9423a","#a4c44a","#3f6fd1","#e08a2c"]},

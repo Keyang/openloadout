@@ -9,7 +9,7 @@
   "pivot": [160,180],
   "grounded": false,
   "preview": "far",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"sky","label":"Space","default":"#434d6d","material":"sky","swatches":["#434d6d","#566182","#6660b6","#6b7896","#a87894"]},
     {"id":"haze","label":"Nebula","default":"#6660b6","material":"sky","swatches":["#6660b6","#b48af8","#6b7896","#9aa6c0","#2fb3a8","#566182"]},

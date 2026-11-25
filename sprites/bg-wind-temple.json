@@ -9,7 +9,7 @@
   "pivot": [160,180],
   "grounded": false,
   "preview": "mid",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "versions": [
     {"name":"Thunder at the gate","params":{}},
     {"name":"Quiet break","params":{"time":"clearing","lightning":false,"sky":"#7e86d6","density":0}},

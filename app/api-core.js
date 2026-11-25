@@ -318,14 +318,15 @@ export function createLoadout(env = {}) {
     const p = S.cleanParams(def, o.params ?? {});
     const T = o.look ? await lib.theme() : null;
     const frames = o.frame === undefined || o.frame === null ? Array.from({ length: count }, (_, f) => f) : [o.frame];
-    const [fw, fh] = def.size, W = frames.length * fw * scale, H = fh * scale;
+    const k = Y.styleById(style)?.pictureScale ?? 1;      // a style that draws each frame bigger than the sprite's grid (flat: 4 times) answers at that size
+    const [fw, fh] = [def.size[0] * k, def.size[1] * k], W = frames.length * fw * scale, H = fh * scale;
     if (W * H > MAX_PICTURE) throw new Problem(`That picture would be ${W} by ${H} pixels. Ask for one frame, or a smaller scale.`);
     const px = new Uint32Array(W * H);
     let opaque = 0, last = performance.now();
     for (let n = 0; n < frames.length; n++) {
       let g;
       // the picture is the style's own pixels, or its pixel picture of a frame it drew on another kind of surface
-      try { g = Y.pixelsOf(T ? T.renderThemedFrame(def, clip, frames[n], p, o.look, { style }) : S.renderFrame(def, clip, frames[n], p, { style }), style); } catch (e) { throw new Problem(`The sprite could not be drawn on clip "${clip}", frame ${frames[n]}${style === 'pixel' ? '' : `, in the style "${style}"`}: ${messageOf(e)}`); }
+      try { const drawn = T ? T.renderThemedFrame(def, clip, frames[n], p, o.look, { style }) : S.renderFrame(def, clip, frames[n], p, { style }); g = k > 1 ? drawn : Y.pixelsOf(drawn, style); } catch (e) { throw new Problem(`The sprite could not be drawn on clip "${clip}", frame ${frames[n]}${style === 'pixel' ? '' : `, in the style "${style}"`}: ${messageOf(e)}`); }
       for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) {
         const v = g.data[y * fw + x];
         if (!v) continue;

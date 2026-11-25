@@ -9,7 +9,7 @@
   "pivot": [16,30],
   "grounded": false,
   "preview": "idle",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"metal","label":"Metal","default":"#f2c230","material":"metal","swatches":["#f2c230","#c2c9d6","#8f97a8","#e6c545","#c98a4a"]},
     {"id":"accent","label":"Jewel","default":"#c9423a","material":"magic","swatches":["#c9423a","#4fd8ee","#a4c44a","#7a4fc4"]},

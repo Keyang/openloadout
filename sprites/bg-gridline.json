@@ -1,7 +1,7 @@
 { "format": "loadout-sprite", "version": 2, "id": "bg-gridline", "name": "Grid backdrop",
   "blurb": "A dark grid, towers of lit cells and floating shapes that pulse, in three layers that repeat sideways: scroll far at 0.1, mid at 0.4, near at 0.7 of the camera's speed, or lay far two by two behind a still screen. Change the colours, the stacks' height and the floating shapes.",
   "meta": {"type": "background", "role": "environment/background", "themes": ["neutral", "sci-fi"], "gameTypes": ["puzzle", "arcade", "shooter"], "view": "none", "words": ["grid", "backdrop", "void", "neon", "shapes", "night", "abstract", "space", "lines", "glow"], "license": "draft"},
-  "size": [320, 180], "pivot": [160, 180], "grounded": false, "preview": "far", "styles": ["pixel"],
+  "size": [320, 180], "pivot": [160, 180], "grounded": false, "preview": "far", "styles": ["pixel", "flat"],
   "stylesWhy": "The kit is pixel only until the flat style has been looked at (specification, decision P5). Detail layer: the 2x2 lights and the lit cells.",
   "palette": [
     {"id": "sky", "label": "Space", "default": "#2a3058", "material": "sky", "swatches": ["#2a3058", "#3a4278", "#1e4658", "#6a3a8e"]},

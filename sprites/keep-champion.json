@@ -9,7 +9,7 @@
  "pivot": [28,58],
  "grounded": false,
  "preview": "idle",
- "styles": ["pixel"],
+ "styles": ["pixel", "flat"],
  "palette": [
   {"id":"skin","label":"Skin","default":"#f6d3b0","material":"skin","swatches":["#f6d3b0","#e8b088","#c98a5c","#9bd18a"]},
   {"id":"metal","label":"Armour","default":"#5d6475","material":"metal","swatches":["#5d6475","#3f5068","#7a4f33","#7a4fc4","#3f8a4f"]},

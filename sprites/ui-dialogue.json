@@ -39,4 +39,4 @@
     "name-tag": {"frames": 1, "fps": 8, "label": "Name tag"},
     "choice": {"frames": 1, "fps": 8},
     "next": {"noText": true, "frames": 8, "fps": 8, "loop": true, "label": "More text"} },
-  "styles": ["pixel"] }
+  "styles": ["pixel", "flat"] }

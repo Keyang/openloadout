@@ -9,7 +9,7 @@
   "pivot": [160,180],
   "grounded": false,
   "preview": "far",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"sky","label":"Sky","default":"#86c8f2","material":"sky","swatches":["#86c8f2","#7e86d6","#f4c9a0","#b9cfe6"]},
     {"id":"land","label":"Islands","default":"#8a8fa6","material":"stone","swatches":["#8a8fa6","#56607e","#3f8f5a","#b8663a"]},

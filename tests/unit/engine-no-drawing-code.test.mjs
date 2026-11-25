@@ -142,7 +142,7 @@ test('KEPT names a frozen copy and a test for each declaration it keeps, and eve
 const ALLOWED = {
   // framework (section 5)
   'sprite': 'framework', 'surface': 'framework', 'color': 'framework', 'motion': 'framework', 'palettes': 'framework', 'materials': 'framework',
-  'theme': 'framework', 'styles': 'framework', 'sheet-info': 'framework', 'versions': 'framework', 'tile-rules': 'framework', 'tiles': 'framework (picker) and what generators draw tiles with',
+  'theme': 'framework', 'styles': 'framework', 'flat': 'framework (the flat style: rewrites a draw list for the renderer)', 'sheet-info': 'framework', 'versions': 'framework', 'tile-rules': 'framework', 'tiles': 'framework (picker) and what generators draw tiles with',
   'data-sprite': 'framework', 'draw-list': 'framework', 'resolve': 'framework', 'pieces': 'framework', 'data-rules': 'framework', 'data-frames': 'framework',
   // used by the app, the tools or the quality bar
   'maptext': 'helper: app/tools', 'fences': 'helper: generators', 'backdrop': 'helper: tools/app', 'fx': 'helper: generators', 'creature': 'helper: generators', 'pixel-font': 'helper: font generators',

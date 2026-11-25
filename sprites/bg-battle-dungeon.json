@@ -9,7 +9,7 @@
   "pivot": [160,180],
   "grounded": false,
   "preview": "far",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"stone","label":"Stone","default":"#5a5f7a","material":"stone","swatches":["#5a5f7a","#8e3a4a","#357a4c","#7a4fc4"]},
     {"id":"floor","label":"Floor","default":"#7e84a0","material":"stone","swatches":["#7e84a0","#a8a4a0","#c9a06a","#e6c96a"]},

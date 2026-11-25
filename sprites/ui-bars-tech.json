@@ -17,7 +17,7 @@
   "pivot": [32,8],
   "grounded": false,
   "preview": "frame",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"frame","label":"Frame","default":"#6b7896","material":"interface","swatches":["#6b7896","#2fb3a8","#5fe0f0","#9aa6c0","#c2c9d6","#f2a030"]},
     {"id":"fill","label":"Health","default":"#5fd47a","material":"interface","swatches":["#5fd47a","#9fe040","#e2473f","#f2a030","#2fb3a8","#f0ead8"]},

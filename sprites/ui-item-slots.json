@@ -8,7 +8,7 @@
   "pivot": [16,16],
   "grounded": false,
   "preview": "slot",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id": "face", "label": "Slot", "default": "#4a609c", "material": "interface", "swatches": ["#4a609c", "#5a5f7a", "#2f8f9d", "#8e3a4a"]},
     {"id": "slot-face", "material": "interface", "derive": {"rule": "choose", "when": {"face": ["#2f8f9d"]}, "then": {"rule": "shadeTo", "of": "face", "under": "shine", "drop": 0.65, "floor": 0}, "else": "face"}},

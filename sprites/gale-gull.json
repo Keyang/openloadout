@@ -9,7 +9,7 @@
  "pivot": [32,24],
  "grounded": false,
  "preview": "fly",
- "styles": ["pixel"],
+ "styles": ["pixel", "flat"],
  "palette": [
   {"id":"body","label":"Wings and back","default":"#56607e","material":"skin","swatches":["#56607e","#4a5a82","#7a4fc4","#b8663a","#3f8f5a"]},
   {"id":"accent","label":"Head and breast","default":"#d8d2c0","material":"skin","swatches":["#d8d2c0","#f0ead8","#b9cfe6","#e8d9a8"]},

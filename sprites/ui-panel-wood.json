@@ -47,6 +47,7 @@
  ],
  "grounded": false,
  "preview": "panel",
+ "styles": ["pixel", "flat"],
  "styles": [
   "pixel"
  ],

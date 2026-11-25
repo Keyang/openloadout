@@ -17,13 +17,11 @@ test('the render and bag_add actions accept a style', () => {
   assert.match(add.inputSchema.properties.settings.description, /Sprite: \{ params, cues, scale, artStyle \}/);
 });
 
-test('api.json describes the registered styles: on the shipped site that is pixel alone', async () => {
+test('api.json describes the registered styles: on the shipped site that is pixel and flat', async () => {
   const api = await buildApi({ root: ROOT });
   assert.ok(Array.isArray(api.styles));
-  assert.deepEqual(api.styles.map((s) => s.id), ['pixel'], 'the test styles are never part of the build');
-  const [pixel] = api.styles;
-  assert.ok(pixel.label && pixel.about);
-  assert.deepEqual(pixel.exports, ['sheet']);
+  assert.deepEqual(api.styles.map((s) => s.id), ['pixel', 'flat'], 'the test styles are never part of the build');
+  for (const style of api.styles) { assert.ok(style.label && style.about, style.id); assert.deepEqual(style.exports, ['sheet'], style.id); }
   assert.ok(api.modules.some((m) => m.name === 'styles' && m.file === 'engine/styles.js'));
   const names = api.modules.find((m) => m.name === 'styles').exports.map((e) => e.name);
   for (const n of ['defineStyle', 'styleById', 'styleIds', 'stylesOf', 'supports']) assert.ok(names.includes(n), n);

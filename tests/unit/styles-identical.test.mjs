@@ -61,10 +61,10 @@ test('the pixel exporter hands back exactly the old sheet: the same PNG bytes, t
   assert.ok(n >= 6, `at least six sprites exported (${n})`);
 });
 
-test('every existing sprite offers one style, pixel, and its catalogue row says so', () => {
-  for (const { id, def } of sprites) assert.deepEqual(stylesOf(def), ['pixel'], id);
+test('every existing sprite draws in pixel first, may also list flat, and its catalogue row says so', () => {
+  for (const { id, def } of sprites) assert.ok([['pixel'], ['pixel', 'flat']].some((own) => JSON.stringify(own) === JSON.stringify(stylesOf(def))), `${id}: ${stylesOf(def)}`);
   const cat = buildCatalog({ sprites: sprites.slice(0, 6).map(({ id, file, def }) => ({ id, file, def })) });
-  for (const row of cat.assets) assert.deepEqual(row.styles, ['pixel'], row.id);
+  for (const row of cat.assets) assert.deepEqual(row.styles, stylesOf(sprites.find((x) => x.id === row.id).def), row.id);
 });
 
 test('the scan covers every sprite file, code and data alike, and names any that did not load', async (t) => t.diagnostic(await libraryCoverage()));

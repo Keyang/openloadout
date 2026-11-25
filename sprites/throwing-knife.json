@@ -9,7 +9,7 @@
   "pivot": [16,16],
   "grounded": false,
   "preview": "fly",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "versions": [
     {"name":"Runner's knife","params":{}},
     {"name":"Four-point star","params":{"style":"star","metal":"#8f97a8","glow":"#4fd8ee"}},

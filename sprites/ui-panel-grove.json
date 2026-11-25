@@ -17,7 +17,7 @@
   "pivot": [48,32],
   "grounded": false,
   "preview": "panel",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"face","label":"Bark","default":"#7a4f33","material":"interface","swatches":["#7a4f33","#3f5068","#8e3a4a","#434d6d"]},
     {"id":"frame","label":"Vine","default":"#9bd18a","material":"interface","swatches":["#9bd18a","#7fe0a0","#e6c96a","#f0ead8"]},

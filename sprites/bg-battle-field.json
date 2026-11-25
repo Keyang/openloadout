@@ -9,7 +9,7 @@
   "pivot": [160,180],
   "grounded": false,
   "preview": "far",
-  "styles": ["pixel"],
+  "styles": ["pixel", "flat"],
   "palette": [
     {"id":"sky","label":"Sky","default":"#9fd8f4","material":"sky","swatches":["#9fd8f4","#a8c8d8","#f0ead8","#e6c96a","#7aa0f4"]},
     {"id":"land","label":"Grass","default":"#7fbf5a","material":"plant","swatches":["#7fbf5a","#4f9d57","#357a4c","#e6c96a"]},

@@ -265,7 +265,7 @@ The framework functions are not tools. An agent uses them by naming the framewor
 
 ## Styles
 
-A style is one way to draw and export a sprite (Contract 12 of `docs/architecture.md`). The site has one, `pixel`, and every sprite has it. The registry is `engine/styles.js`; every renderer and exporter goes through it. No real sprite has a second style yet: what follows was proven with two test styles in `tests/fixtures/styles/styles.js`, which are the worked examples to copy from.
+A style is one way to draw and export a sprite (Contract 12 of `docs/architecture.md`). The site has two: `pixel`, which every sprite has, and `flat` (below), which 67 sprites also list. The registry is `engine/styles.js`; every renderer and exporter goes through it. The two test styles in `tests/fixtures/styles/styles.js` are the worked examples of the surface, finish and exporter parts.
 
 ### What a style is made of
 
@@ -307,6 +307,14 @@ A sprite is a data file (`sprites/<id>.json`; a code sprite with a `render()` fu
 - A generator that draws a detail layer (eyes, highlights, trim) branches on the style inside the framework and keeps the pixel branch as the `else`, so the pixel drawing is never at risk.
 - A control may have the key `style`. The chosen art style never uses that name where a control's key can appear: it is `artStyle` in a bag item, in `loadout.render` and `loadout.bag.add`, in the sheet JSON and the manifest, and `artstyle=` in a page link. Inside a renderer's `render(g, ctx)` the art style is `ctx.style` and a control called `style` is `ctx.p.style`.
 - Asking for a style a sprite does not list is an error everywhere (`renderFrame`, `renderSheet`, `exportSheet`, `loadout.render`, `loadout.bag.add`); nothing falls back to another style.
+
+### The flat style
+
+`flat` (`engine/flat.js`) draws the same draw list with solid colours and smooth edges, at four times the sprite's frame (a 64 px sprite makes a 256 px frame; a sheet is one PNG at that size, its JSON says `artStyle: "flat"`). It is not a second renderer: `engine/draw-list.js drawList` stays the only one, and a flat surface hands it a rewritten list (`flatPlan`): coordinates, radii and widths times 8, shading bands off (a slot paints its base tone), a `dot` becomes a round dot, a `stamp` becomes solid blocks, an `outline` becomes a thin line, `dither` and `text` are left out (`UNSUPPORTED`). The frame is drawn at 8x and averaged down to 4x, which is where the soft edge comes from. `loadout.render(id, { artStyle: 'flat' })` answers at that size (`pictureScale`).
+
+- **Who lists it.** A sprite whose pixel frame is less than a tenth stamp pixels (shapes do the drawing; stamps are small details such as eyes and rivets). Sprites made mostly of stamps (`crawler-bug`, tiles, most props) stay pixel only: a flat frame of them is the same blocks, bigger. The new way to widen it is a stamp's `alt` (a drawn shape for a pixel detail), not built yet.
+- **What the page shows.** The site's previews and the quality bar read `pixelsOf`, the frame-size grid of a flat frame (whole colours, no blending). The smooth picture is what `loadout.render`, a bag download and a package contain. A smooth preview on the sprite page is not built.
+- **Cost.** A flat frame takes about ten times a pixel frame (about 12 ms for a 64 px character), and the quality bar runs it once more, so a character that lists flat takes about a minute to check uncached.
 
 ### What it costs
 
