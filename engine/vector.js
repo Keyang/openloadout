@@ -273,11 +273,12 @@ function patchPolys(cells, W, look) {
   }
   return out;
 }
-/** A stamp or text drawn by the pixel renderer, then traced: [{ polys, hex }], the silhouette first in its main colour. */
-function pixelShapes(p, palette, w, h, look) {
+/** Stamps and text drawn together by the pixel renderer, then traced: [{ polys, hex }], the silhouette first in its main colour. */
+function pixelShapes(prims, palette, w, h, look) {
   // flat art has one colour a material: a stamp's tones of one slot (its pixel shading) become that slot's base colour
-  const key = isObj(p.key) ? Object.fromEntries(Object.entries(p.key).map(([k, ref]) => [k, look.flattenStamps && typeof ref === 'string' && /^[a-z][\w-]*\.(light|dark|deep)$/i.test(ref) ? `${ref.slice(0, ref.lastIndexOf('.'))}.base` : ref])) : p.key;
-  const { g } = renderList(w, h, [{ ...p, ...(key ? { key } : {}), z: 0, group: undefined, glow: false, id: undefined }], { palette });
+  const flatKey = (p) => (isObj(p.key) ? Object.fromEntries(Object.entries(p.key).map(([k, ref]) => [k, look.flattenStamps && typeof ref === 'string' && /^[a-z][\w-]*\.(light|dark|deep)$/i.test(ref) ? `${ref.slice(0, ref.lastIndexOf('.'))}.base` : ref])) : p.key);
+  // the stamps drawn one after another are one picture: a big body laid as tiles (or halves) of stamps is traced whole, so no seam shows where they meet
+  const { g } = renderList(w, h, prims.map((p) => ({ ...p, ...(isObj(p.key) ? { key: flatKey(p) } : {}), z: 0, group: undefined, glow: false, id: undefined })), { palette });
   const byColour = new Map(), all = new Set();
   for (let i = 0; i < g.data.length; i++) {
     const v = g.data[i];
@@ -497,13 +498,15 @@ export function renderVector(list, palette = {}, { width, height, scale = 4, sha
     cv.mark(keys, C);
   };
 
-  const paintPixels = (it) => {
-    for (const { polys, hex } of pixelShapes(it.p, palette, fw, fh, look)) {
+  const paintPixels = (its) => {
+    const keys = [...new Set(its.flatMap((it) => [it.group, it.id]))].filter((k) => k && cv.layers.has(k));
+    for (const { polys, hex } of pixelShapes(its.map((it) => it.p), palette, fw, fh, look)) {
       const C = coverage(polys, scale, W, H);
       cv.over(C, () => rgbOf(hex));
-      cv.mark([it.group, it.id].filter((k) => k && cv.layers.has(k)), C);
+      cv.mark(keys, C);
     }
   };
+
   const paintBands = (it) => {
     const area = isObj(it.p.area) ? shapePolys(it.p.area, { ...look, corner: () => 0 }) : null;
     if (!area) return;
@@ -526,10 +529,16 @@ export function renderVector(list, palette = {}, { width, height, scale = 4, sha
     const keyOf = (it) => (it.group && !['stamp', 'text', 'bands', 'dither'].includes(it.p.kind) ? `${it.z}\u0000${it.group}` : null);
     const bodies = new Map(), done = new Set();
     for (const it of list) { const k = keyOf(it); if (k) { const b = bodies.get(k); if (b) b.push(it); else bodies.set(k, [it]); } }
-    for (const it of list) {
-      const kind = it.p.kind;
+    for (let n = 0; n < list.length; n++) {
+      const it = list[n], kind = it.p.kind;
       if (kind === 'dither') continue;                          // a texture of single pixels: not part of flat art
-      if (kind === 'stamp' || kind === 'text') { paintPixels(it); continue; }
+      if (kind === 'stamp' || kind === 'text') {
+        // with the stamps and text that come straight after it (dither between them is left out anyway)
+        const its = [it];
+        while (n + 1 < list.length && ['stamp', 'text', 'dither'].includes(list[n + 1].p.kind)) { n++; if (list[n].p.kind !== 'dither') its.push(list[n]); }
+        paintPixels(its);
+        continue;
+      }
       if (kind === 'bands') { paintBands(it); continue; }
       const key = keyOf(it);
       if (key && done.has(key)) continue;
