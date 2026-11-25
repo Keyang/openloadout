@@ -139,7 +139,14 @@
 /* the panel for one thing, in place of the list */
 .play-edit-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); padding: var(--s2) var(--s4); border-bottom: 1px solid var(--line); font-size: 13px; }
 .play-back { color: var(--ink); font-weight: 500; }
-.play-side-page { white-space: nowrap; color: var(--ink-2); }
+.play-edit-top .row-icon { width: 28px; height: 28px; margin: -4px -6px -4px 0; }
+/* the panel made big: the same panel in a window over the page, with room for its controls */
+.play-wide { width: min(1080px, calc(100vw - 32px)); max-width: none; height: auto; min-height: min(560px, calc(100dvh - 32px)); max-height: min(900px, calc(100dvh - 32px)); padding: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); box-shadow: 0 24px 64px rgba(0, 0, 0, 0.28); overflow: hidden; }
+.play-wide[open] { display: flex; flex-direction: column; }
+.play-wide::backdrop { background: rgba(20, 18, 16, 0.45); }
+.play-wide > .play-edit-view { flex: 1 1 auto; align-self: stretch; width: 100%; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.play-wide .play-edit-view > .rx-panel { display: grid; --pad: var(--s5); }      /* room for the picture beside the versions, as on an asset's page */
+.play-wide .play-edit-top { position: sticky; top: 0; z-index: 4; background: var(--paper); }
 .play-edit-view > .rx-panel { --pad: var(--s4); display: block; }
 .play-side .pane { overflow: visible; }
 .play-side .tune { grid-template-rows: auto auto; }

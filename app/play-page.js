@@ -30,7 +30,7 @@ import { createInput } from './play/input.js';
 import { createSounds } from './play/sound.js';
 import { displayPlan, fillSpan } from './play/display.js';
 import { itemEditor } from './bag-edit.js';
-import { surpriseButton, duplicateButton, removeButton, surpriseItem } from './row-tools.js';
+import { surpriseButton, duplicateButton, removeButton, surpriseItem, iconBtn } from './row-tools.js';
 import { listFilter, typeOf } from './list-filter.js';
 import { makeMagic } from './magic.js';
 import { themeControls } from './theme-controls.js';
@@ -142,11 +142,30 @@ export async function playPage(app, query = {}) {
     el('p', { class: 'hint play-look-note' }, 'Everything in your bag takes this look, here, in your bag and in the download. A thing with a look of its own keeps it.'));
   let sideEntries = [], restored = false;
   let lookFrom = 'list';             // where "Back to ..." in the look goes
+  // The panel made big: the same panel (the same editor, so nothing is lost or started again) moved into a window over
+  // the page, with room for its controls. Escape, a click outside it or its Make smaller button puts it back in the column.
+  let big = false;
+  const bigBox = el('dialog', { class: 'play-wide', 'aria-label': 'Change it, in a big panel' });
+  bigBox.addEventListener('click', (ev) => { if (ev.target === bigBox) bigBox.close(); });      // the dimmed page around it
+  bigBox.addEventListener('close', () => {
+    if (!big) return;
+    big = false;
+    drawSide();
+    side.querySelector('.play-wide-open')?.focus({ preventScroll: true });
+  });
+  main.append(bigBox);
+  function setBig(on) {
+    big = on;
+    drawSide();
+    if (on) bigBox.querySelector('.play-wide-close')?.focus({ preventScroll: true });
+    else side.querySelector('.play-wide-open')?.focus({ preventScroll: true });
+  }
 
   const entryOf = (key) => sideEntries.find((x) => x.key === key) ?? null;
 
   function closeChosen() {
     if (!chosen) return;
+    big = false;
     chosen.off();
     chosen.editor.close();
     chosen = null;
@@ -219,11 +238,14 @@ export async function playPage(app, query = {}) {
     let body;
     if (showing === 'look') body = lookBox;
     else if (showing === 'item') {
-      const e = entryOf(chosen.key);
+      const name = entryOf(chosen.key)?.row.name ?? 'it';
+      const size = big
+        ? iconBtn('shrink', `Make the panel for ${name} smaller`, { class: 'play-wide-close', title: 'Back to the column (Esc)', onclick: () => setBig(false) })
+        : iconBtn('expand', `Make the panel for ${name} bigger`, { class: 'play-wide-open', title: 'Make it bigger', onclick: () => setBig(true) });
       body = el('div', { class: 'play-edit-view' },
         el('div', { class: 'play-edit-top' },
           el('button', { type: 'button', class: 'link play-back', onclick: backToList }, el('span', { 'aria-hidden': 'true' }, '‹ '), 'All things in your bag'),
-          e ? el('a', { class: 'link play-side-page', href: `#/${e.row.kind}/${e.row.id}?bag=${chosen.key}`, onclick: () => chosen && chosen.editor.edit.flush() }, 'Open its page') : null),
+          size),
         chosen.editor.node);
     } else body = null;
     // the list stays where it is while the panel or the look is shown, so it keeps its place when the creator comes back
@@ -231,8 +253,15 @@ export async function playPage(app, query = {}) {
     if (side.firstElementChild) side.firstElementChild.replaceWith(head); else side.append(head);
     if (listNode && side.children[1] !== listNode) { if (side.children[1]) side.children[1].replaceWith(listNode); else side.append(listNode); }
     while (side.children.length > (listNode ? 2 : 1)) side.lastElementChild.remove();
-    if (body) side.append(body);
-    if (listNode) listNode.hidden = showing !== 'list';
+    // made big, the panel is in the window over the page and the column shows the list behind it
+    const inBig = showing === 'item' && big;
+    if (inBig) { bigBox.replaceChildren(body); if (!bigBox.open) bigBox.showModal(); }
+    else {
+      if (bigBox.open) { big = false; bigBox.close(); }
+      bigBox.replaceChildren();
+      if (body) side.append(body);
+    }
+    if (listNode) listNode.hidden = showing !== 'list' && !inBig;
     side.dataset.showing = showing;
     side.hidden = !sideEntries.length && !scene?.list;
   }
@@ -241,7 +270,7 @@ export async function playPage(app, query = {}) {
     sideEntries = entries.filter((e) => !String(e.key).startsWith('guest-') && bag.get(e.key));
     look.set(bag.theme());
     if (picked && !entries.some((e) => e.key === picked)) picked = null;
-    if (!entries.length) { closeChosen(); mode = 'list'; side.hidden = true; side.replaceChildren(); return; }
+    if (!entries.length) { closeChosen(); mode = 'list'; if (bigBox.open) bigBox.close(); side.hidden = true; side.replaceChildren(); return; }
     if (chosen && sideEntries.some((e) => e.key === chosen.key)) { chosen.editor.panel.sync(); drawSide(); scene.picked(); return; }
     if (chosen) { closeChosen(); if (mode === 'item') mode = 'list'; }
     // opened from a bag row's playground button (#/play?pick=<key>): that thing is picked, and the address is tidied so a
@@ -541,7 +570,7 @@ export async function playPage(app, query = {}) {
       const pad = player ? el('div', { class: 'play-pad' },
         el('div', { class: 'play-pad-group' }, hold('left', 'Left', '◀'), top ? hold('up', 'Up', '▲') : null, top ? hold('down', 'Down', '▼') : null, hold('right', 'Right', '▶')),
         el('div', { class: 'play-pad-group' }, top ? null : hold('jump', 'Jump'), has('block') ? hold('block', 'Block') : null, hold('action', 'Action'))) : el('div', { class: 'play-pad', hidden: true });
-      const input = createInput({ pad, ignore: '.play-side' });      // keys pressed in the right column are its own: they never move the character
+      const input = createInput({ pad, ignore: '.play-side, .play-wide' });      // keys pressed in the right column (or the big panel) are its own: they never move the character
       stops.push(() => input.destroy());
 
       // score and health over the top edge of the scene: what was collected (when there is something to collect) and
@@ -954,7 +983,7 @@ export async function playPage(app, query = {}) {
   const api = {
     ready: false,
     /** The scene as plain data: mode, player, things, collected, paused, muted, the sounds that fired; picked, panel. */
-    state: () => ({ ...(scene ? scene.state() : blankState()), chosen: picked, panel: mode === 'item' && chosen ? chosen.key : null }),
+    state: () => ({ ...(scene ? scene.state() : blankState()), chosen: picked, panel: mode === 'item' && chosen ? chosen.key : null, big: mode === 'item' && !!chosen && big }),
     /** Open the editing panel on a bag item (by its key), as "Change" on its row does. */
     choose: (key) => openPanel(key),
     /** Pick a row (by its key): it is marked in the scene and its moves are shown under it. */

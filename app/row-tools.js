@@ -22,15 +22,18 @@ const ICONS = {
   play: { d: 'M5 3.2v9.6L12.6 8z', fill: true },
   stop: { d: 'M4.5 4.5h7v7h-7z', fill: true },
   busy: 'M8 2.5a5.5 5.5 0 1 1-5.5 5.5',
+  expand: 'M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9',
+  shrink: 'M13 7H9V3M9 7l4.5-4.5M3 9h4v4M7 9l-4.5 4.5',
+  close: 'M4 4l8 8M12 4l-8 8',
 };
-function icon(name) {
+export function icon(name) {
   const def = ICONS[name], d = typeof def === 'string' ? def : def.d, fill = typeof def !== 'string';
   const n = document.createElementNS(NS, 'svg');
   for (const [k, v] of Object.entries({ viewBox: '0 0 16 16', width: 16, height: 16, 'aria-hidden': 'true', class: `row-glyph is-${name}`, fill: fill ? 'currentColor' : 'none', stroke: fill ? 'none' : 'currentColor', 'stroke-width': '1.4', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' })) n.setAttribute(k, v);
   const p = document.createElementNS(NS, 'path'); p.setAttribute('d', d); n.append(p);
   return n;
 }
-const iconBtn = (name, label, attrs = {}) => el('button', { type: 'button', class: `row-icon ${attrs.class ?? ''}`.trim(), 'aria-label': label, title: attrs.title ?? label, onclick: attrs.onclick }, icon(name));
+export const iconBtn = (name, label, attrs = {}) => el('button', { type: 'button', class: `row-icon ${attrs.class ?? ''}`.trim(), 'aria-label': label, title: attrs.title ?? label, onclick: attrs.onclick }, icon(name));
 
 /** Give a bag item a random version of itself (the same as the panel's Surprise me). Returns false when the item is gone. */
 export function surpriseItem(key, asset) {
