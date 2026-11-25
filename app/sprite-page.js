@@ -3,8 +3,8 @@
 // as chips and the frames of the one playing. Right: the editing panel (app/panel.js) with its versions, its controls in
 // tabs, the sounds that play with each animation (Sounds), its looks (Look), and the download.
 // Every change is saved to the bag as it is made (app/editing.js).
-import { defaultParams, cleanParams, clipFps, cueInEffect, renderPixels } from '../engine/sprite.js';
-import { stylesOf, styleById } from '../engine/styles.js';
+import { defaultParams, cleanParams, clipFps, cueInEffect, renderFrame, renderPixels } from '../engine/sprite.js';
+import { stylesOf, styleById, artStyleOf } from '../engine/styles.js';
 import { bag, cleanSettings, lookOf } from './bag.js';     // W6-A: a sprite may offer more than one style (Contract 12)
 import { drawStage, backdropFor, stagesFor, sceneFor, defaultStage, keptStage } from './stage.js';
 import { bagBackdrop } from './bag-scene.js';      // "In your bag": the creator's own scene behind the sprite (the workbench)
@@ -85,7 +85,8 @@ class StyleFrames {
     const key = clip + ':' + f;
     let cv = this.map.get(key);
     if (!cv) {
-      const g = renderPixels(this.sprite, clip, f, this.p, { style: this.style });
+      // the style's own picture of the frame: bigger than the sprite's grid for a style with a pictureScale (flat), else the grid
+      const g = (styleById(this.style)?.pictureScale ?? 1) > 1 ? renderFrame(this.sprite, clip, f, this.p, { style: this.style }) : renderPixels(this.sprite, clip, f, this.p, { style: this.style });
       cv = document.createElement('canvas');
       cv.width = g.w; cv.height = g.h;
       cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
@@ -115,7 +116,7 @@ export function spritePage(app, sprite, query) {
   const choice = styles.length > 1;
   const held = choice && query.bag ? bag.get(query.bag) : null;
   // (the link's key is `artstyle`: `style` may be one of the sprite's own controls)
-  const askedStyle = choice ? query.artstyle ?? (held && held.kind === 'sprite' && held.id === sprite.id ? held.settings.artStyle : undefined) : undefined;
+  const askedStyle = choice ? query.artstyle ?? (held && held.kind === 'sprite' && held.id === sprite.id ? held.settings.artStyle : undefined) ?? artStyleOf(sprite) : undefined;      // none named: the site's art style (the header toggle) when the sprite lists it
   // The edit session (app/editing.js): what the address carries is where it starts; a bag item of this sprite (the one
   // the address names, or the visitor's own when the address carries no settings) is what it edits. From here on the
   // session holds the settings, and every change to them is saved to the bag.
@@ -286,7 +287,8 @@ export function spritePage(app, sprite, query) {
     for (let r = 0; r * cols < n; r++) { rowAt[r] = { marks: rowsWithMarks.has(r) ? line++ : 0, cells: line++ }; }
     strip.classList.toggle('has-marks', names.size > 0);
     stripCells = Array.from({ length: n }, (_, f) => {
-      const c = el('canvas', { width: sprite.size[0], height: sprite.size[1] });
+      const kk = styleById(st.style)?.pictureScale ?? 1;      // a style with a bigger picture of each frame (flat) fills a bigger canvas, shown at the same size
+      const c = el('canvas', { width: sprite.size[0] * kk, height: sprite.size[1] * kk });
       c.getContext('2d').drawImage(pic(st.clip, f), 0, 0);
       // in its cell at a whole-number size, or a whole-number fraction when the frame is larger than the cell
       const z = (cell - 4) / Math.max(sprite.size[0], sprite.size[1]), k = z >= 1 ? Math.floor(z) : 1 / Math.ceil(1 / z);
@@ -402,11 +404,11 @@ export function spritePage(app, sprite, query) {
     // sounds that depend on the settings: refresh the list and anything looping when what applies has changed
     if (cueSig() !== shownSig) { buildCues(); syncLoops(); }
   };
-  let syncStyle = () => {}, urlTimer = 0;
+  let syncStyle = () => {}, urlTimer = 0, refit = () => {};
   function pull() {
     const s = edit.settings();
     st.scale = s.scale;
-    if (styleOf(s) !== st.style) { st.style = styleOf(s); if (choice) frames.setStyle(st.style); repaint(); ahead(); buildStrip(); syncStyle(); look.sync(); }
+    if (styleOf(s) !== st.style) { st.style = styleOf(s); if (choice) frames.setStyle(st.style); refit(); repaint(); ahead(); buildStrip(); syncStyle(); look.sync(); }
     if (JSON.stringify(s.params) !== JSON.stringify(st.p)) { st.p = cleanParams(sprite, s.params); changed(); }
     if (lookOf(s) !== st.look) { st.look = lookOf(s); repaint(); buildStrip(); look.sync(); }
     if (cueKey(s.cues) !== cueKey(st.cues)) { st.cues = s.cues ?? spriteCues(sprite); buildCues(); buildStrip(); syncLoops(); }
@@ -418,7 +420,7 @@ export function spritePage(app, sprite, query) {
   const styleBlock = () => {
     const about = el('p', { class: 'pane-note style-about' }, styleById(st.style).about);
     const row = el('span', { class: 'chips', role: 'group', 'aria-label': 'Style' },
-      styles.map((id) => el('button', { type: 'button', class: 'chip', 'data-style': id, 'aria-pressed': String(id === st.style), onclick: () => edit.set({ artStyle: id === styles[0] ? undefined : id }) }, styleById(id).label)));
+      styles.map((id) => el('button', { type: 'button', class: 'chip', 'data-style': id, 'aria-pressed': String(id === st.style), title: styleById(id).about, onclick: () => edit.set({ artStyle: id === styles[0] ? undefined : id }) }, styleById(id).label)));
     syncStyle = () => {
       for (const b of row.children) b.setAttribute('aria-pressed', String(b.dataset.style === st.style));
       about.textContent = styleById(st.style).about;
@@ -510,6 +512,13 @@ export function spritePage(app, sprite, query) {
   let W = 160, H = 104, gy = 80, raf = 0, last = performance.now();
   // The picture fills its tile at a whole-number size: the canvas is as many sprite pixels as fit, the sprite in the
   // middle of it. (A sprite larger than the tile is shown at a whole-number fraction instead.)
+  // the stage canvas has the sprite's pixel grid; for a style with a bigger picture of each frame (flat) it has that many canvas pixels to a grid pixel, drawn at the same size
+  const sizeStage = () => {
+    const k = styleById(st.style)?.pictureScale ?? 1;
+    stage.width = W * k; stage.height = H * k;
+    ctx.setTransform(k, 0, 0, k, 0, 0);
+    ctx.imageSmoothingEnabled = k === 1;
+  };
   const place = (k) => {
     const cw = stageWrap.clientWidth, ch = stageWrap.clientHeight;
     const left = Math.floor((cw - W * k) / 2), top = Math.floor((ch - H * k) / 2);
@@ -525,7 +534,7 @@ export function spritePage(app, sprite, query) {
       // a background is the whole frame: the canvas is exactly the sprite, at the largest whole size that fits
       [W, H] = sprite.size;
       const z = Math.min(cw / W, ch / H);
-      stage.width = W; stage.height = H;
+      sizeStage();
       place(z >= 1 ? Math.min(6, Math.floor(z)) : 1 / Math.ceil(1 / z));
       return;
     }
@@ -534,7 +543,7 @@ export function spritePage(app, sprite, query) {
     // in your bag: a smaller whole-number size, so the scene shows enough of the bag's world around the sprite
     if (behind && st.stage === 'bag' && k >= 1) k = Math.min(k, Math.max(1, Math.floor(ch / 120)));
     W = Math.ceil(cw / k); H = Math.ceil(ch / k);
-    stage.width = W; stage.height = H;
+    sizeStage();
     // the ground: under the middle of the tile, never so high that the sprite's top is cut, never off the bottom
     const lift = hover(sprite);
     gy = Math.min(H - 8, Math.max(sprite.pivot[1] + lift + 6, Math.round(H / 2 + (sprite.pivot[1] + lift) / 2 + 4)));
@@ -544,6 +553,7 @@ export function spritePage(app, sprite, query) {
   const ro = new ResizeObserver(() => { fit(); if (strip.clientWidth !== stripRoom) buildStrip(); });
   ro.observe(stageWrap);
   fit();
+  refit = fit;
 
   const tick = (now) => {
     if (advanced.isOpen()) { raf = 0; return; }      // Advanced shows the editor's picture instead; leaving starts this again
@@ -574,7 +584,7 @@ export function spritePage(app, sprite, query) {
       py = foot - sprite.pivot[1] - hover(sprite);
       if (st.stage !== 'plain') shadow(ctx, px + sprite.pivot[0], foot, Math.round(sprite.size[0] * 0.17));
     }
-    ctx.drawImage(pic(st.clip, st.frame), px, py);
+    ctx.drawImage(pic(st.clip, st.frame), px, py, sprite.size[0], sprite.size[1]);
     for (let i = 0; i < stripCells.length; i++) stripCells[i].classList.toggle('on', i === st.frame);
     raf = requestAnimationFrame(tick);
   };

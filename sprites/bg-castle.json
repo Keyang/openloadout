@@ -9,7 +9,7 @@
   "pivot": [160,180],
   "grounded": false,
   "preview": "far",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "palette": [
     {"id":"sky","label":"Sky","default":"#8696dc","material":"sky","swatches":["#8696dc","#8fd0f0","#7fb0b8","#f0ead8","#3f9fd1","#e08a2c"]},
     {"id":"land","label":"Stone","default":"#5d6475","material":"stone","swatches":["#5d6475","#8f97a8","#f0ead8","#3f5068","#a4c44a","#6b7280"]},

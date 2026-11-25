@@ -43,9 +43,6 @@
  ],
  "preview": "idle",
  "styles": ["pixel", "flat"],
- "styles": [
-  "pixel"
- ],
  "versions": [
   {
    "name": "Sealed cave",

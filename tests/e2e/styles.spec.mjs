@@ -371,7 +371,7 @@ test('a sprite of single pixels lists two styles: the shape style is never offer
   await page.evaluate(() => window.loadout.go('/sprite/style-sparkle'));
   await waitForDrawn(page);
   await expect(page.locator('.style-choice .chip')).toHaveText(['Pixel art', 'Silhouette']);
-  await expect(page.getByRole('button', { name: 'Outlined shapes' })).toHaveCount(0);
+  await expect(page.locator('.style-choice').getByRole('button', { name: 'Outlined shapes' })).toHaveCount(0);
   // a link that names it opens in the sprite's first style instead
   await page.evaluate(() => window.loadout.go('/sprite/style-sparkle?artstyle=outline-svg'));
   await waitForDrawn(page);

@@ -29,6 +29,9 @@
     .brand { height: 56px; display: inline-flex; align-items: center; font: 600 21px/1 system-ui, sans-serif; color: #000000; text-decoration: none; }
     .top-nav { display: flex; gap: 24px; font-size: 14px; margin-right: auto; }
     .top-nav a { color: #5c5c5c; text-decoration: none; padding: 6px 0; }
+    .style-toggle { display: inline-flex; height: 32px; box-sizing: border-box; padding: 2px; gap: 2px; border: 1px solid #cfcfcb; border-radius: 6px; font-size: 13px; }
+    .style-toggle button { padding: 0 10px; border: 0; border-radius: 4px; background: none; font: inherit; color: #5c5c5c; }
+    .style-toggle button[aria-pressed='true'] { background: #000000; color: #ffffff; font-weight: 500; }
     .bag-link { height: 32px; box-sizing: border-box; padding: 0 6px 0 12px; display: inline-flex; align-items: center; gap: 8px; border: 1px solid #cfcfcb; border-radius: 6px; font-size: 14px; font-weight: 500; color: #000000; text-decoration: none; }
     .bag-count { min-width: 20px; height: 20px; box-sizing: border-box; padding: 0 6px; border-radius: 4px; background: #000000; color: #fff; font-size: 12px; line-height: 20px; text-align: center; }
     .menu-btn { display: none; }
@@ -41,7 +44,7 @@
 <body>
   <!-- The page frame and a loading line, drawn before the style sheets below have arrived (they hold up only what comes
        after them) and before any script has run. app/app.js replaces it; the header matches app/ui.js header(). -->
-  <div id="app"><header class="top"><a class="brand" href="#/">Loadout</a><nav id="main-nav" class="top-nav" aria-label="Main"><a href="#/browse">Library</a> <a href="#/bundles">Kits</a> <a href="#/play">Play</a> <a href="#/studio">Studio</a></nav><a class="bag-link" href="#/bag">Bag <span class="bag-count">0</span></a></header><main class="v2 home"><p class="lede">Loading…</p></main></div>
+  <div id="app"><header class="top"><a class="brand" href="#/">Loadout</a><nav id="main-nav" class="top-nav" aria-label="Main"><a href="#/browse">Library</a> <a href="#/bundles">Kits</a> <a href="#/play">Play</a> <a href="#/studio">Studio</a></nav><div class="style-toggle" role="group" aria-label="Art style"><button type="button" data-style="pixel" aria-pressed="true">Pixel</button><button type="button" data-style="flat" aria-pressed="false">Flat</button></div><a class="bag-link" href="#/bag">Bag <span class="bag-count">0</span></a></header><main class="v2 home"><p class="lede">Loading…</p></main></div>
   <link rel="stylesheet" href="vendor/fonts/fonts.css">
   <!-- The shared look first (tokens, the frame, the components, the editing panel), then one sheet per page, each with
        one owner. -->

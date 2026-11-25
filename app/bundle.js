@@ -4,7 +4,7 @@
 // Which files a sprite becomes is decided by the style it is exported in (engine/styles.js, Contract 12): this
 // file asks that style's exporter, and adds the sounds, the JSON and the guide around what it returns.
 import { cleanParams, cueInEffect } from '../engine/sprite.js';
-import { exportSheet, styleById, stylesOf, supports } from '../engine/styles.js';
+import { exportSheet, styleById, stylesOf, supports, artStyleOf } from '../engine/styles.js';
 import { defaultTheme, normalizeTheme, applyColour, spriteMaterials, spriteLook } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { soundById, soundParams, rendered, renderAsync, wavBytes, isMusic } from './audio.js';
@@ -229,7 +229,7 @@ export async function packageFiles({ items, theme = null, scale = 1, catalog = n
     const sprite = studio ? studio.sprite : item.kind === 'sprite' && kindMatches(item.kind, item.id) ? await loadSprite(item.id).catch(() => null) : null;
     if (item.kind === 'sprite' ? !sprite : !kindMatches(item.kind, item.id)) { missing.push(item.id); continue; }
     if (item.kind === 'sprite') {
-      const style = typeof s.artStyle === 'string' && s.artStyle ? s.artStyle : stylesOf(sprite)[0];
+      const style = typeof s.artStyle === 'string' && s.artStyle ? s.artStyle : artStyleOf(sprite);      // none chosen: the site's art style when the sprite lists it (the header toggle), else its first
       if (!supports(sprite, style) || !styleById(style)) { unsupported.push({ id: item.id, artStyle: style }); continue; }
       const folder = unique(folders, item.id);
       const a = entry(sprite.name, sprite.meta);

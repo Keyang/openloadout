@@ -2,6 +2,7 @@
 // between the home page, the results view, the asset pages, bundles, the bag and the playground.
 // An asset's own file is loaded only by the page that draws or plays it.
 import { el, header } from './ui.js';
+import { startArtStyle } from './art-style.js';
 import { loadCatalog, assetById, loadSprite } from './catalog.js';
 import { loadSounds, soundById, stopAll, isMusic } from './audio.js';
 import { homePage } from './home.js';
@@ -142,6 +143,8 @@ const catalogue = loadCatalog(standIn);      // nothing named: the usual generat
 try {
   await catalogue;
   window.addEventListener('hashchange', route);
+  startArtStyle();      // the site's art style from the last visit, before the first page draws
+  window.addEventListener('loadout:artstyle', () => { const y = window.scrollY; route(); window.scrollTo(0, y); });      // the header toggle: the page draws again in the chosen style
   route();
   setTimeout(() => restoreRuntime(), 0);      // W5-A: after the first page is up, what the bag holds from an earlier visit is checked again (in workers, never here)
   // fetch the sound library in a quiet moment, so the first asset page opens at once; not on a slow or metered

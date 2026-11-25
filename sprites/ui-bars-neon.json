@@ -44,9 +44,6 @@
  "grounded": false,
  "preview": "frame",
  "styles": ["pixel", "flat"],
- "styles": [
-  "pixel"
- ],
  "palette": [
   {
    "id": "frame",

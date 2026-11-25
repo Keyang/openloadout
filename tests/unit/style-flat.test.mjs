@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { styleById, styleIds, exportSheet, pixelsOf } from '../../engine/styles.js';
+import { styleById, styleIds, exportSheet, pixelsOf, preferStyle, preferredStyle, artStyleOf } from '../../engine/styles.js';
 import { dataSprite } from '../../engine/data-sprite.js';
 import { defaultParams, renderFrame, renderSheet } from '../../engine/sprite.js';
 import { drawList } from '../../engine/draw-list.js';
@@ -91,4 +91,17 @@ test('text is listed as unsupported, and a flat sheet exports one PNG at 4x with
   const img = readPNG(Buffer.from(out.files[0].bytes));
   assert.equal(img.w, out.data.frameWidth * Math.max(...Object.values(out.data.animations).map((a) => a.frames)));
   assert.ok(Object.keys(out.data.animations).length > 0, 'animations kept, so sounds can be timed');
+});
+
+test('the site\'s preferred style is a default only: a sprite that lists it shows in it, others keep their first', () => {
+  const coin = load('coin', ['pixel']);
+  try {
+    assert.equal(preferredStyle(), 'pixel');
+    assert.equal(artStyleOf(knight), 'pixel');
+    preferStyle('flat');
+    assert.equal(artStyleOf(knight), 'flat');
+    assert.equal(artStyleOf(knight, 'pixel'), 'pixel', 'a style named on the item wins');
+    assert.equal(artStyleOf(coin), 'pixel', 'a sprite that does not list it stays in its first');
+    assert.equal(preferStyle('nope'), 'pixel', 'an unknown style means pixel');
+  } finally { preferStyle('pixel'); }
 });

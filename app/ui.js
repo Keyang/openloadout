@@ -2,6 +2,7 @@
 import { renderFrame } from '../engine/sprite.js';
 import { bag } from './bag.js';
 import { wayBack } from './back.js';
+import { siteStyle, setSiteStyle, toggleStyles } from './art-style.js';
 
 export const el = (tag, attrs = {}, ...kids) => {
   const n = document.createElement(tag);
@@ -129,6 +130,19 @@ if (typeof document !== 'undefined') {
 const NAV_KEY = { sprites: 'library', sounds: 'library', music: 'library', browse: 'library', library: 'library', kits: 'bundles', bundles: 'bundles', play: 'play', studio: 'studio' };
 
 /**
+ * The art style toggle before the Bag button: one segment for each style of the site, the site's chosen one pressed.
+ * Choosing one is for the whole site (app/art-style.js); sprites that do not list it stay in their first style.
+ * index.html draws a copy of it before any script runs; change both together.
+ */
+function styleToggle() {
+  const now = siteStyle();
+  const short = (t) => (t.id === 'pixel' ? 'Pixel' : t.label);
+  const group = el('div', { class: 'style-toggle', role: 'group', 'aria-label': 'Art style' },
+    ...toggleStyles().map((t) => el('button', { type: 'button', 'data-style': t.id, title: t.about, 'aria-pressed': String(t.id === now), onclick: () => { if (t.id !== siteStyle()) setSiteStyle(t.id); } }, short(t))));
+  return group;
+}
+
+/**
  * The page header (docs/site-design.md, "Frame"): the wordmark, Library, Kits, Play, Studio, and the Bag button with its count.
  * On a phone the four links fold behind "Menu". `current`: home | library | sprites | sounds | music | bundles | kits | play | studio | bag | ''.
  * Under the row, when there is one: the way back to the list the visitor came from, and the warning that the bag is not kept.
@@ -148,6 +162,7 @@ export function header(current) {
       link('#/play', 'Play', 'play'),
       link('#/studio', 'Studio', 'studio')),
     menu,
+    styleToggle(),
     el('a', { class: 'bag-link', href: '#/bag', 'aria-current': current === 'bag' ? 'page' : null }, 'Bag ', el('span', { class: 'bag-count' }, String(bag.count()))),
     back ? el('a', { class: 'back-link', href: back.href }, el('span', { 'aria-hidden': 'true' }, '‹'), back.label) : null);
   top.dataset.page = current || '';

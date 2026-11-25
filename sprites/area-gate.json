@@ -41,10 +41,7 @@
   76
  ],
  "preview": "closed",
- "styles": ["pixel", "flat"],
- "styles": [
-  "pixel"
- ],
+ "styles": ["pixel"],
  "versions": [
   {
    "name": "Keep gate",

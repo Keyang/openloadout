@@ -85,7 +85,24 @@ export function stylesOf(sprite) {
  */
 export function artStyleOf(sprite, id) {
   const own = stylesOf(sprite);
-  return typeof id === 'string' && own.includes(id) && registry.has(id) ? id : own[0];
+  if (typeof id === 'string' && own.includes(id) && registry.has(id)) return id;
+  return own.includes(preferred) ? preferred : own[0];
+}
+
+let preferred = 'pixel';
+/**
+ * The style the site shows things in when nothing says otherwise (the toggle in the page header): artStyleOf falls back to it
+ * for a sprite that lists it, and to the sprite's first style for one that does not. Exports and the api stay explicit
+ * (styleFor never uses it). id: a style id; an unknown one means 'pixel'.
+ */
+export function preferStyle(id) {
+  preferred = registry.has(id) ? id : 'pixel';
+  return preferred;
+}
+
+/** The style set by preferStyle ('pixel' until then). */
+export function preferredStyle() {
+  return preferred;
 }
 
 /** True when the sprite lists this style. sprite: a sprite definition; id: a style id. */

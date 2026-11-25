@@ -107,8 +107,9 @@ canvas.stage { position: absolute; display: block; }
 
 /* ---------- the Look tab: a sprite's art style (when it has a choice), then the whole-set looks on this one sprite ---------- */
 .look-tab { max-width: 760px; }
-.style-choice { margin-bottom: var(--s3); padding-bottom: var(--s2); border-bottom: 1px solid var(--line); }
-.style-choice .pane-note { margin: 0; }
+.style-choice { margin-bottom: 0; padding-bottom: 0; }
+/* the sentence about the chosen style is for screen readers and the chips' tooltips: the header toggle is the usual way to choose, and a busy sprite's Look tab has no room to spare */
+.style-choice .pane-note { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .looks { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: var(--s2); }
 .looks { --vmax: 104px; align-items: start; }
 .looks .vpic { height: var(--vh, 88px); }
