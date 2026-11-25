@@ -11,6 +11,7 @@ import { bag, lookOf, themeFor } from './bag.js';
 import { assetById, loadSprite } from './catalog.js';
 import { cleanParams, clipFps } from '../engine/sprite.js';
 import { spriteLook } from '../engine/theme.js';
+import { drawPicture, showPicture } from './art.js';      // a flat thing smooth, the scene's pixel art crisp
 import { planScene, fitsMode } from './play/roles.js';
 import { makeLevel, levelFeatures, tileIndex, surfaceBelow } from './play/level.js';
 import { createPainter, cameraFor } from './play/draw.js';
@@ -79,8 +80,9 @@ export async function bagModel({ max = 7, skipId = null, mode = null } = {}) {
   const tilesHere = tilesets.filter((k) => drawn[k]);
   const tiles = tileIndex(tilesHere.map((key) => ({ key, names: Object.keys(drawn[key].sprite.clips), size: drawn[key].sprite.size[0], clips: drawn[key].sprite.clips })));
   const level = makeLevel(wrongView ? mode : plan.mode, levelFeatures(tiles, wrongView ? mode : plan.mode));
-  const painter = createPainter({ sprites: drawn, colour: theme.colour, tiles });
   const bg = background && drawn[background] ? background : null;
+  // (the ground and the sky stay the frame-size grid; a thing in a vector style, flat, is its own smooth picture: app/play/draw.js)
+  const painter = createPainter({ sprites: drawn, colour: theme.colour, tiles, scenery: [...tilesHere, ...(bg ? [bg] : [])] });
   return {
     plan: { ...plan, background: bg, tilesets: tilesHere }, level, painter, drawn,
     cast: cast.filter((k) => drawn[k]), rows: byKey,
@@ -89,15 +91,21 @@ export async function bagModel({ max = 7, skipId = null, mode = null } = {}) {
   };
 }
 
-/** One thing standing in the scene: its frame at this time, its foot on (x, y) of the canvas, faced left when flip. */
-function stand(g, m, key, x, y, time, flip = false) {
+const dpr = () => (window.devicePixelRatio > 0 ? window.devicePixelRatio : 1);
+
+/**
+ * One thing standing in the scene: its frame at this time, its foot on (x, y) of the canvas, faced left when flip.
+ * zoom: CSS pixels a scene pixel, the size a smooth picture (flat) is made for; pixel art is its frame, drawn 1:1.
+ */
+function stand(g, m, key, x, y, time, flip = false, zoom = 1) {
   const { sprite, params } = m.drawn[key];
   const clip = restClip(sprite), c = sprite.clips[clip];
   const f = c.frames > 1 && !reduceMotion.matches ? Math.floor(time * clipFps(sprite, clip, params) + key.length) % c.frames : 0;
-  const img = m.painter.frame(key, clip, f);
+  const pic = m.painter.picture ? m.painter.picture(key, clip, f, zoom) : null;
+  const put = (px, py) => (pic ? drawPicture(g, pic, px, py, pic.w, pic.h) : g.drawImage(m.painter.frame(key, clip, f), px, py));
   const top = Math.round(y - sprite.pivot[1] - hover(sprite));
-  if (flip) { g.save(); g.translate(Math.round(x), 0); g.scale(-1, 1); g.drawImage(img, -sprite.pivot[0], top); g.restore(); }
-  else g.drawImage(img, Math.round(x - sprite.pivot[0]), top);
+  if (flip) { g.save(); g.translate(Math.round(x), 0); g.scale(-1, 1); put(-sprite.pivot[0], top); g.restore(); }
+  else put(Math.round(x - sprite.pivot[0]), top);
 }
 
 /** The ground's height under x, near y (a level point); y itself over a pit or past the level. */
@@ -128,8 +136,11 @@ export function bagScene({ max = 7, height = 132 } = {}) {
     raf = 0;
     if (gone || !m) return;
     const w = Math.max(96, node.clientWidth || 288), h = height;
-    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
-    const view = { w, h, zoom: 1 }, time = (now - start) / 1000;
+    // with a thing in a vector style (flat) the canvas has a backing store for the screen: its things smooth, the
+    // ground and the background as crisp as before
+    const z = m.painter.vector ? Math.max(1, Math.ceil(dpr())) : 1;
+    if (canvas.width !== w * z || canvas.height !== h * z) { canvas.width = w * z; canvas.height = h * z; showPicture(canvas, z); }
+    const view = { w, h, zoom: 1, scale: z }, time = (now - start) / 1000;
     const L = m.level;
     // side: the start of the level, a little in from its left edge; top-down: the room around where the player starts
     const cam = L.mode === 'side' ? cameraFor(L, view, { x: L.start.x + w * 0.35, y: L.start.y }) : cameraFor(L, view, L.start);
@@ -138,7 +149,7 @@ export function bagScene({ max = 7, height = 132 } = {}) {
     m.cast.forEach((key, i) => {
       const x = cam.x + shares[i] * w;
       const y = L.mode === 'side' ? groundAt(L, x, L.start.y) : cam.y + h * (0.55 + (i % 2) * 0.18);
-      stand(g, m, key, x - cam.x, y - cam.y, time, m.plan.roles[key] === 'creature' && shares[i] > 0.5);
+      stand(g, m, key, x - cam.x, y - cam.y, time, m.plan.roles[key] === 'creature' && shares[i] > 0.5, 1);
     });
     node.dataset.drawn = 'true';
     if (seen && !reduceMotion.matches) raf = requestAnimationFrame(paint);
@@ -197,14 +208,16 @@ export function bagBackdrop({ id, view = null, onChange = () => {} }) {
 
   function draw(g, W, H, gy, time, fallback) {
     let foot = gy, cam = null;
+    // the page's own scale (canvas pixels a sprite pixel: more than 1 when its canvas has a backing store for the screen)
+    const t = g.getTransform(), z = t.a > 0 ? t.a : 1;
     if (m && m.scene) {
-      const L = m.level, view = { w: W, h: H, zoom: 1 };
+      const L = m.level, view = { w: W, h: H, zoom: z, scale: z };
       const x = L.mode === 'side' ? L.start.x + 40 : L.start.x;
       const y = groundAt(L, x, L.start.y);
       // the sprite's foot on the ground at gy; never below the bottom of the level (nothing is drawn there)
       cam = { x: Math.round(Math.max(0, Math.min(L.width - W, x - W / 2))), y: Math.round(Math.min(y - gy, L.height - H)) };
       paintGround(g, m, view, cam, time);
-      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.setTransform(t);
       foot = y - cam.y;
     } else fallback();
     if (!m || !m.cast.length) return { gy: foot };
@@ -215,7 +228,7 @@ export function bagBackdrop({ id, view = null, onChange = () => {} }) {
       const off = AROUND[i] * W, cx = W / 2 + off;
       let fy = foot;
       if (cam && m.level.mode === 'side') fy = groundAt(m.level, cam.x + cx, foot + cam.y) - cam.y;
-      stand(g, m, key, cx, fy, time, off > 0);
+      stand(g, m, key, cx, fy, time, off > 0, z / dpr());
     });
     g.restore();
     return { gy: foot };

@@ -837,10 +837,10 @@ export function spriteLook(sprite, baseParams, theme, { style, record } = {}) {
  * Render one frame with the theme's controls and colours. Returns what renderFrame returns: a Surface in the pixel style.
  * style: the style to draw in (one the sprite lists; its first when left out). record: as spriteLook.
  */
-export function renderThemedFrame(sprite, clip, frame, baseParams, theme, { style, record } = {}) {
+export function renderThemedFrame(sprite, clip, frame, baseParams, theme, { style, record, scale } = {}) {
   const st = styleFor(sprite, style);
   const look = spriteLook(sprite, baseParams, theme, { style: st.id, record });
-  const g = renderFrame(sprite, clip, frame, look.params, { style: st.id });
+  const g = renderFrame(sprite, clip, frame, look.params, { style: st.id, scale });
   // a surface that is not a pixel grid says how a look recolours it (engine/styles.js, defineStyle)
   if (st.recolour) st.recolour(g, look.recolour);
   else look.recolour(g.data);

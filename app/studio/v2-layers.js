@@ -13,7 +13,8 @@
 //     generator picker), handed in by the editor as listSection.
 // The changes themselves are app/studio/v2-layers-model.js; nothing here is code from a definition.
 import { el, reduceMotion } from '../ui.js';
-import { renderFrame, cleanParams, clipFps } from '../../engine/sprite.js';
+import { cleanParams, clipFps } from '../../engine/sprite.js';
+import { framePicture, drawPicture, pictureScale, shownStyle, sizeScene } from '../art.js';
 import * as LM from './v2-layers-model.js';
 
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
@@ -22,14 +23,6 @@ const mini = (label, onclick, more = {}) => el('button', { type: 'button', class
 
 /** The camera speed slider's range and starting value, in sprite pixels a second. */
 export const CAMERA_SPEED = Object.freeze({ min: 0, max: 240, step: 10, start: 60 });
-
-/** A Surface as a canvas of its own size. */
-function canvasOf(g) {
-  const c = document.createElement('canvas');
-  c.width = g.w; c.height = g.h;
-  c.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
-  return c;
-}
 
 /** The state the editor keeps between redraws of the pane (the object it hands in as `ui`), filled in once. */
 function settle(ui) {
@@ -80,23 +73,31 @@ export function layersEditor({ def, sprite, params = {}, errors = [], stale = fa
     note,
     sprite ? null : el('p', { class: 'pane-note' }, 'It does not draw yet: fix what Check lists.'));
 
-  function frameCanvas(name, f) {
+  /** A layer's frame as a picture in the site's art style (app/art.js), drawn `zoom` CSS pixels a frame pixel; kept per sprite and settings. */
+  function framePic(name, f, zoom) {
     const key = JSON.stringify(tried);
     if (ui.cacheSprite !== sprite || ui.cacheKey !== key) { ui.cache = new Map(); ui.cacheSprite = sprite; ui.cacheKey = key; }
-    const k = `${name}:${f}`;
+    const k = `${name}:${f}:${pictureScale(shownStyle(sprite), zoom, Math.max(...sprite.size))}`;
     if (!ui.cache.has(k)) {
       let c = null;
-      try { c = canvasOf(renderFrame(sprite, name, f, cleanParams(sprite, tried))); } catch { c = null; }
+      try { c = framePicture(sprite, name, f, cleanParams(sprite, tried), { zoom }); } catch { c = null; }
       ui.cache.set(k, c);
     }
     return ui.cache.get(k);
   }
 
+  // the preview is drawn in frame pixels; for a flat picture its canvas is bigger than the frame (app/art.js sizeScene)
+  let sized = '';
   /** Draws the preview at the camera as it is now. */
   function paint() {
     if (!sprite) return;
     const [W, H] = sprite.size;
-    if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; }
+    const style = shownStyle(sprite);
+    // CSS pixels a frame pixel where it is shown (the preview is as wide as the pane), a guess before it is on the page
+    const zoom = cv.clientWidth > 0 ? cv.clientWidth / W : Math.max(1, Math.min(4, 400 / W));
+    const sk = pictureScale(style, zoom, Math.max(W, H));
+    const want = `${W}x${H}:${style}:${sk}`;
+    if (sized !== want || cv.width !== W * sk || cv.height !== H * sk) { sizeScene(cv, W, H, zoom, style); sized = want; }
     const g = cv.getContext('2d');
     g.imageSmoothingEnabled = false;
     g.clearRect(0, 0, W, H);
@@ -109,11 +110,11 @@ export function layersEditor({ def, sprite, params = {}, errors = [], stale = fa
       const n = Math.max(1, c.frames | 0);
       const fps = n > 1 ? clipFps(sprite, r.name, p) || 8 : 0;
       const f = n > 1 ? Math.floor(ui.time * fps) % n : 0;
-      const pic = frameCanvas(r.name, f);
+      const pic = framePic(r.name, f, zoom);
       if (!pic) continue;
       const scroll = live && live.index === r.index ? live.scroll : r.scroll;
       const off = LM.layerOffset(ui.camera, scroll, W);
-      for (const x of LM.copiesFor(off, W, W)) g.drawImage(pic, x, 0);
+      for (const x of LM.copiesFor(off, W, W)) drawPicture(g, pic, x, 0, W, H);
       shown.push(r.name);
       if (r.index === P.index && ui.seam) seams = LM.seamsIn(off, W, W);
     }

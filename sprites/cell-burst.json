@@ -40,7 +40,7 @@
  ],
  "grounded": false,
  "preview": "burst",
- "styles": ["pixel", "flat"],
+ "styles": ["pixel"],
  "versions": [
   {
    "name": "Rose chips",

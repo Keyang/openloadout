@@ -17,7 +17,7 @@
   "pivot": [32,8],
   "grounded": false,
   "preview": "frame",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "palette": [
     {"id":"frame","label":"Sugar","default":"#f0ead8","material":"interface","swatches":["#f0ead8","#f6d3b0","#8fd0f0","#9bd18a"]},
     {"id":"fill","label":"Health","default":"#6aa83e","material":"interface","swatches":["#6aa83e","#3f8a4f","#c9423a","#e08a2c","#4fd8ee","#f2c230"]},

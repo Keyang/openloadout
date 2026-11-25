@@ -8,7 +8,9 @@
 //     in a choice the sprite has, as a look (named).
 // Every change goes back through onCommit(def, note, params): the editor keeps the definition, its undo and its check.
 import { el } from '../ui.js';
-import { renderFrame, cleanParams } from '../../engine/sprite.js';
+import { cleanParams } from '../../engine/sprite.js';
+import { framePicture } from '../art.js';
+import { showFrame } from './bits.js';
 import { sitePieces } from '../../engine/pieces.js';
 import { checkFull, spriteOf, loadPiecesFor } from './v2-check.js';
 import * as PT from './v2-parts.js';
@@ -22,18 +24,25 @@ const pieceWords = (p) => `${p.use}@${p.v ?? '?'}`;
 let indexP = null;
 const piecesIndex = () => (indexP ??= Promise.resolve().then(() => sitePieces().index()).catch(() => ({ pieces: [] })));
 
-/** A frame of a sprite drawn into a canvas, cut to what is drawn with a pixel round it (false when it cannot be drawn). */
-function frameInto(canvas, sprite, clip, params) {
+/**
+ * A frame of a sprite drawn into a canvas, cut to what is drawn with a pixel round it (false when it cannot be drawn).
+ * In the site's art style (app/art.js): a flat one drawn for `room` CSS pixels (the box it is shown in), smooth.
+ */
+function frameInto(canvas, sprite, clip, params, room = 40) {
   try {
     const c = sprite.clips[clip] ? clip : sprite.preview && sprite.clips[sprite.preview] ? sprite.preview : Object.keys(sprite.clips)[0];
-    const g = renderFrame(sprite, c, 0, cleanParams(sprite, params));
-    const px = g.bytes();
-    let x0 = g.w, y0 = g.h, x1 = -1, y1 = -1;
-    for (let y = 0; y < g.h; y++) for (let x = 0; x < g.w; x++) if (px[(y * g.w + x) * 4 + 3]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
-    if (x1 < 0) { x0 = 0; y0 = 0; x1 = g.w - 1; y1 = g.h - 1; }
-    x0 = Math.max(0, x0 - 1); y0 = Math.max(0, y0 - 1); x1 = Math.min(g.w - 1, x1 + 1); y1 = Math.min(g.h - 1, y1 + 1);
+    const pic = framePicture(sprite, c, 0, cleanParams(sprite, params), { zoom: room / Math.max(sprite.size[0], sprite.size[1]) });
+    const { g, k } = pic, w = pic.canvas.width, h = pic.canvas.height;
+    const px = new Uint8ClampedArray(g.data.buffer, g.data.byteOffset, w * h * 4);
+    let x0 = w, y0 = h, x1 = -1, y1 = -1;
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) if (px[(y * w + x) * 4 + 3]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (x1 < 0) { x0 = 0; y0 = 0; x1 = w - 1; y1 = h - 1; }
+    // a frame pixel round it: k picture pixels
+    const m = Math.max(1, Math.round(k));
+    x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(w - 1, x1 + m); y1 = Math.min(h - 1, y1 + m);
     canvas.width = x1 - x0 + 1; canvas.height = y1 - y0 + 1;
-    canvas.getContext('2d').putImageData(new ImageData(px, g.w, g.h), -x0, -y0);
+    canvas.getContext('2d').drawImage(pic.canvas, -x0, -y0);
+    showFrame(canvas, pic);
     return true;
   } catch { return false; }
 }
@@ -140,7 +149,7 @@ function pickForm({ def, sprite, clip, params, ui, c, index, onCommit, redraw })
     const v = checkFull(r.def);
     const m = v.ok ? spriteOf(v.value) : null;
     if (!m?.ok) { caption.textContent = `It does not draw yet: ${(v.errors?.[0] ?? m?.errors?.[0] ?? 'the check failed').slice(0, 160)}`; return; }
-    caption.textContent = frameInto(pic, m.sprite, clip, { ...params, [r.control]: r.option }) ? `${c.name} on ${c.on}.` : 'It could not be drawn.';
+    caption.textContent = frameInto(pic, m.sprite, clip, { ...params, [r.control]: r.option }, 128) ? `${c.name} on ${c.on}.` : 'It could not be drawn.';
   })();
   const add = () => {
     let r;

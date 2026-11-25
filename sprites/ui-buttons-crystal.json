@@ -17,7 +17,7 @@
   "pivot": [48,16],
   "grounded": false,
   "preview": "normal",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "palette": [
     {"id":"face","label":"Stone","default":"#3f5068","material":"interface","swatches":["#3f5068","#7a4f33","#434d6d","#8e3a4a"]},
     {"id":"frame","label":"Crystal","default":"#8fd0f0","material":"interface","swatches":["#8fd0f0","#9bd18a","#5fe0f0","#7fe0a0"]},

@@ -13,6 +13,9 @@ import { buildKind } from './play/kinds.js';
 import { makeLevel, levelFeatures, tileIndex } from './play/level.js';
 import { createWorld, step } from './play/world.js';
 import { createPainter, cameraFor, VIEW_H } from './play/draw.js';
+import { showPicture } from './art.js';      // a flat thing smooth, the scene's pixel art crisp
+
+const dpr = () => (window.devicePixelRatio > 0 ? window.devicePixelRatio : 1);
 
 // how many of each kind of thing a scene shows: enough to say what the kit is, few enough to load at once
 const MOST = { player: 1, creature: 3, npc: 1, pickup: 2, prop: 3, tiles: 4, background: 1 };
@@ -37,7 +40,7 @@ export function kitScene(bundle, { theme = null, label = `A scene made only from
   const node = el('div', { class: 'kit-scene tile' + (fill ? ' is-fill' : ''), 'data-kit': bundle.id }, canvas);
   const ctx = canvas.getContext('2d');
   const view = { w: 320, h: VIEW_H, zoom: 1 };
-  let look = normalizeTheme(theme ?? {}), made = null, raf = 0, gone = false, visible = false, last = 0, drawnOnce = false;
+  let look = normalizeTheme(theme ?? {}), made = null, raf = 0, gone = false, visible = false, last = 0, drawnOnce = false, dense = 1;
 
   const fit = () => {
     const cw = node.clientWidth;
@@ -55,14 +58,20 @@ export function kitScene(bundle, { theme = null, label = `A scene made only from
     }
     view.w = Math.max(96, Math.min(made.level.width, Math.ceil(cw / view.zoom)));
     const w = view.w * view.zoom, h = view.h * view.zoom;
-    if (canvas.width === w && canvas.height === h) return;
-    canvas.width = w; canvas.height = h;
+    // with things in a vector style (flat) the canvas has a backing store for the screen (dense canvas pixels a CSS px),
+    // and the painter makes their pictures for the zoom they are shown at (app/play/draw.js)
+    if (made.painter.setZoom && made.painter.setZoom(view.zoom)) drawnOnce = false;
+    const d = made.painter.vector ? Math.max(1, Math.ceil(dpr())) : 1;
+    if (canvas.width === w * d && canvas.height === h * d && dense === d) return;
+    dense = d;
+    canvas.width = w * d; canvas.height = h * d;
     canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+    showPicture(canvas, d);
     drawnOnce = false;
   };
   const paint = () => {
     const cam = cameraFor(made.level, view, made.world.player ?? made.level.start);
-    made.painter.draw(ctx, { world: made.world, view, cam, plan: made.plan });
+    made.painter.draw(ctx, { world: made.world, view: dense > 1 ? { ...view, scale: view.zoom * dense } : view, cam, plan: made.plan });
     drawnOnce = true;
     node.dataset.drawn = made.lookKey;
   };
@@ -81,7 +90,9 @@ export function kitScene(bundle, { theme = null, label = `A scene made only from
   function dress() {
     const drawn = {};
     for (const e of made.entries) drawn[e.key] = { sprite: e.sprite, params: spriteLook(e.sprite, defaultParams(e.sprite), look).params };
-    made.painter = createPainter({ sprites: drawn, colour: look.colour, tiles: made.tiles });
+    // (the ground and the sky stay the frame-size grid; a thing in a vector style, flat, is its own smooth picture)
+    made.painter = createPainter({ sprites: drawn, colour: look.colour, tiles: made.tiles, scenery: [...made.plan.tilesets, ...(made.plan.background ? [made.plan.background] : [])] });
+    if (made.painter.setZoom) made.painter.setZoom(view.zoom);
     made.lookKey = JSON.stringify(look);
     drawnOnce = false;
   }

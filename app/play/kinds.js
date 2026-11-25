@@ -20,7 +20,7 @@
 //   a tree with wide roots) would need a field such as `footprint: { left, right, depth }` in pixels from the pivot
 //   in the sprite's data, carried to the catalogue's `tech`: proposed, not in the engine.
 // Pure JavaScript: no DOM.
-import { cleanParams, defaultParams, clipFps, renderFrame, frameSockets, cueInEffect } from '../../engine/sprite.js';
+import { cleanParams, defaultParams, clipFps, renderPixels, frameSockets, cueInEffect } from '../../engine/sprite.js';
 import { clipSpeed, restClip, actionOf, STATES } from './clips.js';
 
 /**
@@ -64,7 +64,7 @@ export function isCustom(sprite, settings = {}) {
  * (A frame has empty space round the sprite; touching is judged on the body, not on the frame.)
  */
 export function bodyBox(sprite, clip, params, pivot = sprite.pivot) {
-  const b = renderFrame(sprite, clip, 0, params).bounds();
+  const b = renderPixels(sprite, clip, 0, params).bounds();      // the frame-size grid, whatever style the thing is shown in
   const [px, py] = pivot;
   if (!b) return { l: sprite.size[0] / 4, r: sprite.size[0] / 4, t: sprite.size[1] / 2, b: 0, gap: 0 };
   return { l: Math.max(1, px - b.x0), r: Math.max(1, b.x1 + 1 - px), t: Math.max(1, py - b.y0), b: Math.max(0, b.y1 + 1 - py), gap: Math.max(0, py - (b.y1 + 1)) };
@@ -80,7 +80,7 @@ const BASE_ROWS = 6;
  */
 export function footprintOf(sprite, clip, params, meta = sprite.meta ?? {}, pivot = sprite.pivot) {
   if (meta.type !== 'prop' || !BLOCKING_ROLES.includes(meta.role)) return null;
-  const g = renderFrame(sprite, clip, 0, params), [px, py] = pivot;
+  const g = renderPixels(sprite, clip, 0, params), [px, py] = pivot;      // the frame-size grid, whatever style the thing is shown in
   let x0 = Infinity, x1 = -Infinity;
   for (let y = Math.max(0, py - BASE_ROWS); y < Math.min(g.h, py); y++) for (let x = 0; x < g.w; x++) {
     if (!g.data[y * g.w + x]) continue;

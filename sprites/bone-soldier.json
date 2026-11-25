@@ -17,7 +17,7 @@
  "pivot": [28,58],
  "grounded": false,
  "preview": "walk",
- "styles": ["pixel", "flat"],
+ "styles": ["pixel"],
  "palette": [
   {"id":"body","label":"Bone","default":"#f0ead8","material":"stone","swatches":["#f0ead8","#a8a4a0","#e6c96a","#7fe0a0"]},
   {"id":"glow","label":"Eyes","default":"#4fd8ee","material":"magic","swatches":["#4fd8ee","#e8662c","#7aa0f4","#f4e06a","#7fe0a0","#7a4fc4"]},

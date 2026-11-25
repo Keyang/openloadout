@@ -9,7 +9,7 @@
   "pivot": [16,30],
   "grounded": false,
   "preview": "idle",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "palette": [
     {"id":"body","label":"Heart","default":"#c9423a","material":"magic","swatches":["#c9423a","#e08a2c","#4fd8ee","#7a4fc4","#a4c44a","#3f6fd1"]},
     {"id":"feather","default":"#f0ead8","material":"cloth","detail":true},

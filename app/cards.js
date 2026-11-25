@@ -15,11 +15,18 @@
 //
 // Every card is { node, stop(), tick() }. cardFor(row) picks the right one; cardFor(row, { layout: 'row' }) gives the
 // same card laid out as a list row with more facts (the library's list view, the bag).
+//
+// Pictures follow the site's art style (the header toggle, app/art-style.js). In pixel art a card is exactly as it always
+// was: the build's thumbnail and strip, scaled up with crisp pixels. In a vector style (flat) it shows the build's flat
+// pictures (row.thumbFlat, row.stripFlat: 4x the frame, shown at the same size and smooth), and where the build made none
+// it draws the sprite itself at the size it is shown (app/art.js), never pixels scaled up.
 import { labelFor } from '../catalog/schema.js';
 import { el, reduceMotion } from './ui.js';
 import { assetById, bundlesOf, loadSound, loadSprite } from './catalog.js';
 import { soundById, soundParams, renderAsync, playRendered, playLive, drawWave, whenRendered } from './audio.js';
-import { renderPixels, defaultParams, cleanParams } from '../engine/sprite.js';
+import { renderPixels, renderFrame, defaultParams, cleanParams } from '../engine/sprite.js';
+import { siteStyle } from './art-style.js';
+import { framePicture, drawPicture, showPicture, pictureScale } from './art.js';
 import { bag } from './bag.js';
 import { backdropFor } from './stage.js';
 import { loadVersions, versionsFor } from './versions.js';
@@ -133,6 +140,49 @@ function versionDots(row, show) {
   return { node: box, fill };
 }
 
+// ---- pictures in a vector style (flat) ----------------------------------------------------------------------
+
+/** True when the site's art style is a vector one (flat): pictures are drawn smooth at the size they are shown. */
+export const isVectorSite = () => pictureScale(siteStyle()) > 1;
+
+/** The frame of its preview clip a sprite's thumbnail shows: the one with the most drawn pixels, the first on a tie (as the build picks it, tools/lib/thumbs.mjs). */
+function thumbFrame(def, clip, params) {
+  const n = def.clips[clip]?.frames ?? 1;
+  if (n < 2) return 0;
+  let best = 0, most = -1;
+  for (let f = 0; f < n; f++) {
+    let c = 0;
+    for (const v of renderFrame(def, clip, f, params).data) if (v) c++;
+    if (c > most) { most = c; best = f; }
+  }
+  return best;
+}
+
+/**
+ * A sprite's still picture in a vector style, for any page that shows a sprite's thumbnail: the build's flat thumbnail
+ * (row.thumbFlat) when it made one, otherwise a canvas the sprite draws itself on, at the size it is shown. Either way it
+ * is shown width x height CSS px, smooth. opts: { width, height (CSS px), className, alt, style (more CSS), lazy }.
+ */
+export function flatThumb(row, { width, height, className = '', alt = '', style = '', lazy = true } = {}) {
+  const [fw, fh] = row.tech?.frame ?? [64, 64];
+  const css = `width:${width}px;height:${height}px;${style}`;
+  if (row.thumbFlat) {
+    const img = el('img', { class: `${className} is-vector`.trim(), src: row.thumbFlat, alt, width, height, style: css, loading: lazy ? 'lazy' : null, decoding: 'async', draggable: 'false' });
+    return showPicture(img, 4);
+  }
+  const cv = el('canvas', { class: className || null, width: fw, height: fh, style: css, ...(alt ? { role: 'img', 'aria-label': alt } : { 'aria-hidden': 'true' }) });
+  showPicture(cv, 2);
+  loadSprite(row.id).then((def) => {
+    const clip = row.stripClip && def.clips[row.stripClip] ? row.stripClip : def.preview ?? Object.keys(def.clips)[0];
+    const params = defaultParams(def);
+    const pic = framePicture(def, clip, thumbFrame(def, clip, params), params, { zoom: width / fw });
+    cv.width = pic.canvas.width; cv.height = pic.canvas.height;
+    drawPicture(cv.getContext('2d'), pic, 0, 0, cv.width, cv.height);
+    showPicture(cv, pic.k);
+  }).catch((e) => console.warn(`Loadout: the picture of "${row.id}" could not be drawn.`, e));
+  return cv;
+}
+
 // ---- pieces every card shares -------------------------------------------------------------------------
 
 const draft = (row) => row.runtime && row.ok === false;       // made on this visit and not yet through the quality bar: it cannot go in the bag
@@ -168,8 +218,12 @@ export function spriteCard(asset, { layout = 'card' } = {}) {
   const crop = inRow && !cover ? rowCrop(row) : null;
   const k = cover ? (inRow ? 1 : 2) : crop ? 1 : tileScale(fw, fh, inRow ? 64 : 136);
   const size = `width:${fw * k}px;height:${fh * k}px`;
-  const thumb = row.thumb ? el('img', { class: 'thumb px', src: row.thumb, alt: '', width: fw, height: fh, style: size, loading: 'lazy', decoding: 'async', draggable: 'false' }) : null;
-  const canvas = el('canvas', { class: 'anim px', width: fw, height: fh, style: size, hidden: true, 'aria-hidden': 'true' });
+  // a vector style (flat): the build's flat pictures, or the sprite drawn here at kc canvas px a frame px, shown smooth
+  const vector = isVectorSite(), kc = vector ? pictureScale(siteStyle(), k) : 1;
+  const thumb = !row.thumb ? null : vector ? flatThumb(row, { width: fw * k, height: fh * k, className: 'thumb' })
+    : el('img', { class: 'thumb px', src: row.thumb, alt: '', width: fw, height: fh, style: size, loading: 'lazy', decoding: 'async', draggable: 'false' });
+  const canvas = el('canvas', { class: vector ? 'anim' : 'anim px', width: fw * kc, height: fh * kc, style: size, hidden: true, 'aria-hidden': 'true' });
+  if (vector) showPicture(canvas, kc);
   const pic = el('span', { class: `card-pic${crop ? ' is-crop' : ''}`, style: crop ? `--ox:${crop.x}px;--oy:${crop.y}px` : null }, thumb, canvas);
   const tag = el('span', { 'data-tag': '' }, tagOf(row));
   const link = title(row);
@@ -187,6 +241,9 @@ export function spriteCard(asset, { layout = 'card' } = {}) {
   let strip = null, raf = 0, playing = null, shown = -1, t0 = 0, gone = false;
   // no built picture (made on this visit): the canvas is the picture, drawn from the sprite itself, frame by frame as needed
   const live = !row.thumb && row.runtime === true;
+  // the animation is drawn from the sprite itself (not a strip picture): made on this visit, or a vector style with no flat strip
+  const fromProgram = live || (vector && !row.stripFlat);
+  const stripSrc = vector ? row.stripFlat : row.strip;
   let sprite = null, loading = null;
   const program = () => (loading ??= loadSprite(row.id).then((s) => { sprite = s; return s; }));
   const cells = new Map();          // version name ('' for the sprite as it is) -> its frames, drawn as needed
@@ -198,12 +255,19 @@ export function spriteCard(asset, { layout = 'card' } = {}) {
     if (!list[f]) {
       const params = v ? cleanParams(sprite, { ...defaultParams(sprite), ...(v.params ?? {}) }) : defaultParams(sprite);
       const count = sprite.clips[clipOf()]?.frames ?? 1;
-      list[f] = new ImageData(new Uint8ClampedArray(renderPixels(sprite, clipOf(), f % count, params).data.buffer), fw, fh);
+      if (vector) { const pic = framePicture(sprite, clipOf(), f % count, params, { zoom: k }); list[f] = { canvas: pic.canvas, k: pic.k }; }
+      else list[f] = new ImageData(new Uint8ClampedArray(renderPixels(sprite, clipOf(), f % count, params).data.buffer), fw, fh);
     }
     return list[f];
   };
+  // a frame on the canvas: pixels as they are, or a vector picture drawn smooth at the canvas's size
+  const put = (pic) => {
+    if (pic instanceof ImageData) { g.putImageData(pic, 0, 0); return; }
+    g.clearRect(0, 0, canvas.width, canvas.height);
+    drawPicture(g, pic, 0, 0, canvas.width, canvas.height);
+  };
   const showCanvas = (yes) => { canvas.hidden = !yes; if (thumb) thumb.hidden = yes; };
-  const still = () => { if (sprite) { g.putImageData(frameOf(null, 0), 0, 0); shown = 0; } };
+  const still = () => { if (sprite) { put(frameOf(null, 0)); shown = 0; } };
   if (live) {
     canvas.hidden = false;
     program().then(() => { if (gone) return; still(); if (dots) versionsFor('sprite', sprite, DOTS).then(dots.fill); })
@@ -217,9 +281,16 @@ export function spriteCard(asset, { layout = 'card' } = {}) {
     const f = Math.floor((Math.max(0, now - t0) / 1000) * fps) % frames;      // a frame's clock can read a little before t0
     if (f !== shown) {
       shown = f;
-      if (want.version) g.putImageData(frameOf(want.version, f), 0, 0);
-      else if (live) g.putImageData(frameOf(null, f), 0, 0);
-      else { g.clearRect(0, 0, fw, fh); g.drawImage(strip, f * fw, 0, fw, fh, 0, 0, fw, fh); }
+      if (want.version) put(frameOf(want.version, f));
+      else if (fromProgram) put(frameOf(null, f));
+      else if (vector) {
+        // the flat strip: its frames side by side, each drawn smooth at the canvas's size
+        const sw = strip.naturalWidth / frames, sh = strip.naturalHeight;
+        g.clearRect(0, 0, canvas.width, canvas.height);
+        g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+        g.drawImage(strip, f * sw, 0, sw, sh, 0, 0, canvas.width, canvas.height);
+        g.imageSmoothingEnabled = false;
+      } else { g.clearRect(0, 0, fw, fh); g.drawImage(strip, f * fw, 0, fw, fh, 0, 0, fw, fh); }
     }
     raf = requestAnimationFrame(draw);
   };
@@ -238,10 +309,10 @@ export function spriteCard(asset, { layout = 'card' } = {}) {
     const version = want.version;
     tag.textContent = version ? `${version.name} version` : tagOf(row);
     try {
-      if (version || live) await program();
-      else if (!strip && row.strip && frames > 1 && !reduceMotion.matches) {
+      if (version || fromProgram) await program();
+      else if (!strip && stripSrc && frames > 1 && !reduceMotion.matches) {
         const img = new Image();
-        img.src = row.strip;
+        img.src = stripSrc;
         await img.decode();
         strip = img;
       }
@@ -249,10 +320,10 @@ export function spriteCard(asset, { layout = 'card' } = {}) {
     if (playing !== mode || gone) return;                            // moved on while it loaded
     if (version) {
       // a version is shown at once, and moves like the sprite does unless the visitor asked for less motion
-      g.putImageData(frameOf(version, 0), 0, 0);
+      put(frameOf(version, 0));
       showCanvas(true);
       if (frames < 2 || reduceMotion.matches) return;
-    } else if (live ? frames < 2 || reduceMotion.matches : !strip) { if (live) still(); else showCanvas(false); return; }
+    } else if (fromProgram ? frames < 2 || reduceMotion.matches : !strip) { if (live) still(); else showCanvas(false); return; }
     t0 = performance.now(); shown = -1;
     showCanvas(true);
     draw(t0);
@@ -363,7 +434,8 @@ export function bundleCard(bundle) {
     if (fh > 72 || fw > 96) continue;                        // big pictures (backgrounds, bosses) do not sit in a row of small ones
     width += fw * 2;
     if (width > 384 || pics.length === 4) break;             // what fits the narrowest card
-    pics.push(el('img', { class: 'px', src: row.thumb, alt: '', width: fw * 2, height: fh * 2, loading: 'lazy', decoding: 'async', draggable: 'false' }));
+    pics.push(isVectorSite() ? flatThumb(row, { width: fw * 2, height: fh * 2 })
+      : el('img', { class: 'px', src: row.thumb, alt: '', width: fw * 2, height: fh * 2, loading: 'lazy', decoding: 'async', draggable: 'false' }));
   }
   const first = !pics.length ? [...(bundle.sounds ?? []), ...(bundle.music ?? [])].map(assetById).find(Boolean) : null;
   const n = { sprites: (bundle.sprites ?? []).length, sounds: (bundle.sounds ?? []).length, music: (bundle.music ?? []).length };

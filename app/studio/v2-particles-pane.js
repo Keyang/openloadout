@@ -17,7 +17,8 @@
 //   - The validator's messages about an emitter on its card.
 // Every change goes through the editor (commit / change), so it is saved, undone and checked like any other.
 import { el } from '../ui.js';
-import { renderFrame, cleanParams } from '../../engine/sprite.js';
+import { cleanParams } from '../../engine/sprite.js';
+import { framePicture, drawPicture } from '../art.js';
 import { EASES } from '../../rigs/keypose.js';
 import { getAt } from './v2-model.js';
 import * as P from './v2-particles.js';
@@ -31,14 +32,6 @@ const fmt = (n) => Math.round(n).toLocaleString('en');
 const mini = (label, onclick, more = {}) => el('button', { type: 'button', class: 'btn btn-sm v2-mini', onclick, ...more }, label);
 /** How close (CSS pixels) a press must be to a point or a corner on the stage to take it. */
 const NEAR_POINT = 10, NEAR_CORNER = 9;
-
-/** A Surface as a canvas of its own size. */
-function canvasOf(s) {
-  const c = document.createElement('canvas');
-  c.width = s.w; c.height = s.h;
-  c.getContext('2d').putImageData(new ImageData(s.bytes(), s.w, s.h), 0, 0);
-  return c;
-}
 
 /** A number box committed on Enter or on leaving it. */
 function numberBox({ k, value, min, max, step = 'any', label, onchange }) {
@@ -362,10 +355,11 @@ export function particleEditor(ctx) {
     const [W, H] = sprite.size;
     if (drag?.sprite) {
       try {
-        const pic = canvasOf(renderFrame(drag.sprite, s.clip, Math.min(s.frame, drag.sprite.clips[s.clip].frames - 1), cleanParams(drag.sprite, s.params)));
+        // in the site's art style (app/art.js), at the frame's size and place, as the stage draws it
+        const pic = framePicture(drag.sprite, s.clip, Math.min(s.frame, drag.sprite.clips[s.clip].frames - 1), cleanParams(drag.sprite, s.params), { zoom: z });
         g.clearRect(ox, oy, W * z, H * z);
         g.imageSmoothingEnabled = false;
-        g.drawImage(pic, ox, oy, W * z, H * z);
+        drawPicture(g, pic, ox, oy, W * z, H * z);
       } catch { /* the stage keeps the last picture */ }
     }
     let ems;

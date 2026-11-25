@@ -4,7 +4,9 @@
 // tile pictures drawn by the framework renderer (cached per sprite and settings). Built from app/ui.js el() and the
 // shared components; the look is in app/css/studio.css (the .v2-tiles rules).
 import { el } from '../ui.js';
-import { renderFrame, cleanParams } from '../../engine/sprite.js';
+import { cleanParams } from '../../engine/sprite.js';
+import { framePicture, pictureScale, shownStyle } from '../art.js';
+import { showFrame } from './bits.js';
 import { paintRefs, paintWords } from './v2-model.js';
 import { swatchOf, fieldTree } from './v2-fields.js';
 import { isBound, bindTo, unbind } from './v2-gen.js';
@@ -124,25 +126,29 @@ export function fieldRow({ name, input, about, k }) {
 
 // ---- tile pictures -----------------------------------------------------------------------------------------------
 
-const PICTURES = new WeakMap();   // sprite -> Map('<settings>|<clip>' -> canvas)
+const PICTURES = new WeakMap();   // sprite -> Map('<settings>|<clip>|<style>@<scale>' -> picture)
+/** CSS pixels a frame pixel the tile pictures are drawn for: the test map is shown at most twice its size. */
+const TILE_ZOOM = 2;
 
-/** A tile of the sprite drawn by the framework at its own size (frame 0), cached per sprite and settings; null when it cannot be drawn. Arguments: sprite, params (the settings tried), clip. */
-export function tilePicture(sprite, params, clip) {
+/**
+ * A tile of the sprite drawn by the framework (frame 0) as a picture (app/art.js: { canvas, k }, k canvas pixels a frame
+ * pixel), cached per sprite and settings; null when it cannot be drawn. In the site's art style (a flat one drawn for
+ * the test map's size), or in the one named: { style: 'pixel' } is the pixel grid a click places pixels on.
+ * Arguments: sprite, params (the settings tried), clip, { style }.
+ */
+export function tilePicture(sprite, params, clip, { style } = {}) {
   if (!sprite?.clips?.[clip]) return null;
   if (!PICTURES.has(sprite)) PICTURES.set(sprite, new Map());
   const cache = PICTURES.get(sprite);
   const p = cleanParams(sprite, params ?? {});
-  const key = `${JSON.stringify(p)}|${clip}`;
+  const st = shownStyle(sprite, style);
+  const grid = style === 'pixel';
+  const key = `${JSON.stringify(p)}|${clip}|${st}@${grid ? 1 : pictureScale(st, TILE_ZOOM, Math.max(...sprite.size))}`;
   if (!cache.has(key)) {
-    let cv = null;
-    try {
-      const g = renderFrame(sprite, clip, 0, p);
-      cv = document.createElement('canvas');
-      cv.width = g.w; cv.height = g.h;
-      cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
-    } catch { cv = null; }
+    let pic = null;
+    try { pic = framePicture(sprite, clip, 0, p, { style: st, zoom: TILE_ZOOM, grid }); } catch { pic = null; }
     if (cache.size > 400) cache.clear();
-    cache.set(key, cv);
+    cache.set(key, pic);
   }
   return cache.get(key);
 }
@@ -150,8 +156,8 @@ export function tilePicture(sprite, params, clip) {
 /** A small picture of a tile for a button or a list (its own canvas; a blank one when the tile cannot be drawn). Arguments: sprite, params, clip, size (pixels shown, default 32). */
 export function tileThumb(sprite, params, clip, size = 32) {
   const pic = tilePicture(sprite, params, clip);
-  const w = pic?.width ?? 32, h = pic?.height ?? 32;
+  const w = pic?.canvas.width ?? 32, h = pic?.canvas.height ?? 32;
   const c = el('canvas', { class: 'v2-tilethumb', width: w, height: h, style: `width:${size}px;height:${Math.round((size * h) / w)}px`, 'aria-hidden': 'true' });
-  if (pic) c.getContext('2d').drawImage(pic, 0, 0);
+  if (pic) { c.getContext('2d').drawImage(pic.canvas, 0, 0); showFrame(c, pic); }
   return c;
 }

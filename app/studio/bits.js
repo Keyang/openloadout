@@ -2,6 +2,17 @@
 // a number with buttons either side, a switch, a heading, a menu that opens under its button. Built from app/ui.js el()
 // and the shared components in app/css/base.css; the studio's own layout is in app/css/studio.css.
 import { el } from '../ui.js';
+import { showPicture } from '../art.js';
+import { styleById } from '../../engine/styles.js';
+
+/** Whether a picture from app/art.js framePicture is a vector style's (flat), even one drawn at the frame's own size (k 1: a small thumbnail). */
+export const isVectorPicture = (pic) => !!pic && (pic.k > 1 || (styleById(pic.style)?.pictureScale ?? 1) > 1);
+
+/**
+ * Show such a picture on a canvas the page scales with CSS: smooth for a vector style however small it is drawn (never
+ * pixelated), crisp pixels for pixel art (as before). Arguments: el (the canvas), pic ({ k, style }).
+ */
+export const showFrame = (node, pic) => showPicture(node, isVectorPicture(pic) ? Math.max(2, pic.k) : 1);
 
 let uid = 0;
 /** A fresh id for a label to point at. */

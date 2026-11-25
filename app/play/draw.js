@@ -2,8 +2,14 @@
 // scaled by a whole number with smoothing off, so pixel art stays sharp.
 // The bag's look (its colour settings) is applied to every sprite frame, and to the plain
 // ground and sky the playground draws when the bag has no tiles or background.
+// A thing shown in the flat style (the site's art style, app/art-style.js, or its own) is drawn as its own vector picture,
+// made at the size it is shown (picture: `k` canvas pixels a frame pixel), and drawn smooth with app/art.js drawPicture on
+// a scene canvas whose backing store is that many times bigger (app/art.js sizeScene; view.scale). The ground and the sky
+// (the bag's tiles and background layers, and the plain ones) stay pixel art on the frame-size grid (frame), crisp. In pixel
+// art a picture is the frame itself, so a pixel scene is drawn exactly as it always was.
 import { renderFrame, clipFps } from '../../engine/sprite.js';
-import { artStyleOf, pixelsOf, recolourFrame } from '../../engine/styles.js';
+import { artStyleOf, stylesOf, pixelsOf, recolourFrame } from '../../engine/styles.js';
+import { pictureScale, surfaceCanvas, drawPicture } from '../art.js';
 import { applyColour, spriteMaterials, namedMaterials } from '../../engine/theme.js';
 import { hexToRgb, rgbToHex, pack } from '../../engine/color.js';
 import { hash } from '../../engine/motion.js';
@@ -26,9 +32,12 @@ const PLAIN_OF = namedMaterials(PLAIN);       // looks: what each of these is of
  * sprites: { key: { sprite, params, artStyle?, colour? } } (colour: that sprite's own colour settings, when it wears a look of its own)
  * colour: the bag look's colour settings (theme.colour).
  * tiles: what level.js tileIndex made of the bag's tilesets, or null with none.
+ * scenery: the keys of the ground and the sky (tilesets, the background): drawn in the scene as the frame-size grid.
+ * Returns { frame, picture, setZoom, warm, vector, isVector, allFrames, draw, look, forget, tileAt, mark }.
  */
-export function createPainter({ sprites, colour, tiles: tileSets = null }) {
+export function createPainter({ sprites, colour, tiles: tileSets = null, scenery = [] }) {
   const bagColour = colour;
+  const grids = new Set(scenery);
   const cache = new Map();
   const tinted = new Map();
   /** A plain colour with the bag's look applied. */
@@ -44,24 +53,91 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
   };
   const C = Object.fromEntries(Object.entries(PLAIN).map(([k, hex]) => [k, look(hex)]));
 
-  /** One frame of one sprite as a small canvas, with the look applied. Made once and kept. */
+  /** The art style a bag item is shown in: its own, else the site's when it has it, else its first (engine/styles.js artStyleOf). */
+  const styleOf = (key) => artStyleOf(sprites[key].sprite, sprites[key].artStyle);
+  /** True when the item is shown as a vector picture (flat), not on the pixel grid. */
+  const isVector = (key) => !!sprites[key] && pictureScale(styleOf(key), 1) > 1;
+  /** True when any item is shown as a vector picture: the scene canvas then gets a bigger backing store (play-page.js). */
+  const vector = Object.keys(sprites).some(isVector);
+
+  /**
+   * One frame of one sprite with the look applied, drawn in its style: the finished Surface. A pixel style draws the
+   * frame-size grid; a vector style (flat) draws its own picture, k picture pixels a frame pixel. The look recolours the
+   * picture's own pixels, whatever its size (recolourFrame).
+   */
+  function drawn(key, clip, f, k = 1, style = styleOf(key)) {
+    const { sprite, params } = sprites[key];
+    const colour = sprites[key].colour ?? bagColour;      // a sprite that wears a look of its own has its own colour settings
+    const of = () => spriteMaterials(sprite, params, { style });       // looks: what each colour of this sprite is of, found when a look first needs it
+    if (style === 'pixel') { const g = renderFrame(sprite, clip, f, params); applyColour(g.data, colour, of); return g; }
+    return recolourFrame(renderFrame(sprite, clip, f, params, { style, scale: k }), style, (pixels) => applyColour(pixels, colour, of));
+  }
+
+  /**
+   * One frame of one sprite as a small canvas the size of the frame, with the look applied. Made once and kept. What the
+   * ground and the sky are laid from, and what a page reads pixels from; a vector style gives its pixel grid (pixelsOf).
+   * The ground and the sky (scenery) stay pixel art when the site is flat: a tileset or a background that has the pixel
+   * style and names no style of its own is laid in pixel art, so the scene's ground is the same as in a pixel scene.
+   */
   function frame(key, clip, f) {
-    const id = key + '|' + clip + '|' + f;
+    if (!isVector(key)) return picture(key, clip, f).canvas;      // pixel art: the picture is the frame
+    const id = key + '|' + clip + '|' + f + '|grid';
     let cv = cache.get(id);
     if (!cv) {
-      const { sprite, params, artStyle } = sprites[key];
-      const colour = sprites[key].colour ?? bagColour;      // a sprite that wears a look of its own has its own colour settings
-      const style = artStyleOf(sprite, artStyle);
-      let g;
-      const of = () => spriteMaterials(sprite, params, { style });       // looks: what each colour of this sprite is of, found when a look first needs it
-      if (style === 'pixel') { g = renderFrame(sprite, clip, f, params); applyColour(g.data, colour, of); }
-      else g = pixelsOf(recolourFrame(renderFrame(sprite, clip, f, params, { style }), style, (pixels) => applyColour(pixels, colour, of)), style);
-      cv = document.createElement('canvas');
-      cv.width = g.w; cv.height = g.h;
-      cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
+      const { sprite, artStyle } = sprites[key];
+      if (grids.has(key) && !artStyle && stylesOf(sprite).includes('pixel')) cv = surfaceCanvas(drawn(key, clip, f, 1, 'pixel'));
+      // otherwise the grid of the flat picture at the size it is first made (FLAT_SCALE): the colours and the cover are those of the picture
+      else cv = surfaceCanvas(pixelsOf(drawn(key, clip, f, 4), styleOf(key)));
       cache.set(id, cv);
     }
     return cv;
+  }
+
+  // canvas pixels a frame pixel for a vector picture shown `zoom` CSS pixels a frame pixel (app/art.js pictureScale); one
+  // shown smaller than its frame (a background in a 40 px tile) is made at the frame's own size and drawn smaller
+  let sceneZoom = 1;
+  const scaleFor = (key, zoom) => (zoom < 1 ? 1 : pictureScale(styleOf(key), zoom));
+
+  /**
+   * One frame of one sprite as a picture to draw with app/art.js drawPicture: { canvas, k, w, h } (w x h: the frame's
+   * size; k: canvas pixels a frame pixel). Pixel art: the frame-size canvas, k = 1, as it always was. Flat: its vector
+   * picture, made for `zoom` CSS pixels a frame pixel (the scene's zoom when left out). Made once for each size and kept.
+   */
+  function picture(key, clip, f, zoom = sceneZoom) {
+    const k = isVector(key) ? scaleFor(key, zoom) : 1;
+    const id = key + '|' + clip + '|' + f + '|' + k;
+    let pic = cache.get(id);
+    if (!pic) {
+      const g = drawn(key, clip, f, k), [w, h] = sprites[key].sprite.size;
+      let canvas;
+      if (k === 1 && !isVector(key)) {
+        canvas = document.createElement('canvas');
+        canvas.width = g.w; canvas.height = g.h;
+        canvas.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
+      } else canvas = surfaceCanvas(g);
+      pic = { canvas, k: g.w / w, w, h };
+      cache.set(id, pic);
+    }
+    return pic;
+  }
+
+  /**
+   * The scene's zoom (CSS pixels a scene pixel), so the things in it are made at the size they are shown. Returns true
+   * when their pictures are now made at another size (the ones made before are dropped; make them again ahead of need).
+   */
+  function setZoom(zoom) {
+    if (zoom === sceneZoom) return false;
+    const before = Object.keys(sprites).filter(isVector).map((key) => scaleFor(key, sceneZoom)).join();
+    sceneZoom = zoom;
+    if (Object.keys(sprites).filter(isVector).map((key) => scaleFor(key, sceneZoom)).join() === before) return false;
+    for (const [id, v] of [...cache]) if (v && v.k > 1) cache.delete(id);      // vector pictures at the old size
+    return true;
+  }
+
+  /** Make one frame ahead of need, as the scene will draw it: the grid for the ground and the sky, the picture for a thing. */
+  function warm(key, clip, f) {
+    if (grids.has(key) || !isVector(key)) frame(key, clip, f);
+    else picture(key, clip, f);
   }
 
   /** Every frame the scene can show, so they can be made a few at a time before they are needed. */
@@ -250,25 +326,26 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
       const feet = k.grounded === false || !k.box.gap ? 0 : k.box.gap;       // empty rows under the feet: the shadow goes where they are, not where the pivot is
       shadow(g, x, floor - feet, Math.max(3, Math.round((k.box.l + k.box.r) * (t.lift || floor !== y ? 0.35 : 0.5))));
     }
-    const img = frame(t.kind, t.anim.clip, t.anim.frame);
+    const pic = picture(t.kind, t.anim.clip, t.anim.frame);      // pixel art: the frame itself, drawn 1:1 as before; flat: its picture, smooth
     const top = y - k.pivot[1] - t.lift - bob;
     const faded = t.role === 'player' && t.invuln > 0 && blink && !strict;
     if (faded) g.globalAlpha = 0.55;
     if (t.anim.flip) {
       g.save(); g.translate(x, 0); g.scale(-1, 1);
-      g.drawImage(img, -k.pivot[0], top);
+      drawPicture(g, pic, -k.pivot[0], top, pic.w, pic.h);
       g.restore();
-    } else g.drawImage(img, x - k.pivot[0], top);
+    } else drawPicture(g, pic, x - k.pivot[0], top, pic.w, pic.h);
     if (faded) g.globalAlpha = 1;
   }
 
   /**
-   * Draw one picture of the scene. view: { w, h, zoom } in sprite pixels; cam: { x, y } the top-left corner shown.
-   * plan: { tiles, background } keys in use.
+   * Draw one picture of the scene. view: { w, h, zoom, scale } in sprite pixels (scale: the canvas's pixels a scene
+   * pixel, zoom when left out); cam: { x, y } the top-left corner shown. plan: { tiles, background } keys in use.
    */
   function draw(g, { world, view, cam, plan }) {
     const { level } = world;
-    g.setTransform(view.zoom, 0, 0, view.zoom, 0, 0);
+    const s = view.scale ?? view.zoom;
+    g.setTransform(s, 0, 0, s, 0, 0);
     g.imageSmoothingEnabled = false;
     const cx = Math.round(cam.x), cy = Math.round(cam.y);
     const c = { x: cx, y: cy };
@@ -302,7 +379,8 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
   function mark(g, { world, view, cam, key }) {
     const k = world.kinds[key];
     if (!k) return;
-    g.setTransform(view.zoom, 0, 0, view.zoom, 0, 0);
+    const s = view.scale ?? view.zoom;
+    g.setTransform(s, 0, 0, s, 0, 0);
     const cx = Math.round(cam.x), cy = Math.round(cam.y), n = 4;
     for (const t of world.player ? [...world.things, world.player] : world.things) {
       if (t.kind !== key || t.state === 'gone' || t.passing) continue;
@@ -317,7 +395,7 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     }
   }
 
-  return { frame, allFrames, draw, look, forget, tileAt, mark };
+  return { frame, picture, setZoom, warm, vector, isVector, allFrames, draw, look, forget, tileAt, mark };
 }
 
 /**

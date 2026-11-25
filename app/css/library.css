@@ -19,6 +19,8 @@
 .tile-add.in-bag:hover { background: #2b2b2b; border-color: #2b2b2b; }
 .card-pic > * { max-width: none; flex: none; }
 .card-pic .thumb, .card-pic .anim { image-rendering: pixelated; }
+/* in a vector art style (flat, the header toggle) the pictures are drawn at the size they are shown and stay smooth */
+.card-pic .is-vector, .kitcard-pics .is-vector { image-rendering: auto; }
 .card-tile.is-cover .card-pic { overflow: hidden; }
 /* on a background the dots sit on a small plate of paper, so they can be seen on any sky */
 .card-tile.is-cover .card-dots { background: var(--paper); box-shadow: 0 0 0 1px var(--line-2); }
@@ -53,6 +55,7 @@ a.card.kit { display: block; grid-template-columns: none; border: 0; border-radi
 .kitcard-pics { position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: var(--s6); color: var(--ink); }
 .kitcard-pics svg { align-self: center; margin-top: var(--s6); }
 .kitcard-pics img { flex: none; image-rendering: pixelated; }
+.kitcard-pics canvas { flex: none; }
 .card.kit .card-meta { display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; }
 .card.kit .card-title { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
 .card.kit:hover .card-title { text-decoration: underline; text-underline-offset: 3px; }

@@ -8,7 +8,8 @@ import crypto from 'node:crypto';
 import { encodePNG } from '../png.mjs';
 import { renderFrame, defaultParams, clipFps } from '../../engine/sprite.js';
 import { renderPatch, defaultParams as soundDefaults } from '../../sound/sfx-engine.js';
-import { thumbPath, stripPath, WAVE_INK } from './catalog.mjs';
+import { thumbPath, stripPath, thumbFlatPath, stripFlatPath, WAVE_INK } from './catalog.mjs';
+import { stylesOf } from '../../engine/styles.js';
 
 export const THUMB_SCALE = 2;
 export const WAVE_W = 64;
@@ -18,6 +19,8 @@ export const WAVE_H = 40;
 export const INK = [1, 3, 5].map((i) => parseInt(WAVE_INK.slice(i, i + 2), 16));   // #231b33
 /** Bump when the pictures change for reasons other than the asset files. */
 export const THUMBS_VERSION = 1;
+/** Picture pixels a frame pixel in the flat style's thumbnails and strips (smaller for a big frame: at most 512 px a side). */
+export const flatScale = (def) => Math.max(1, Math.min(4, Math.floor(512 / Math.max(...def.size))));
 
 const previewFrames = (def) => {
   const p = defaultParams(def);
@@ -54,6 +57,17 @@ export function spriteStrip(def) {
     }
   });
   return { png: encodePNG(w, h, out), w, h, frames: frames.length, fps: clipFps(def, clip, p) };
+}
+
+/** The flat style's thumbnail (the same frame as spriteThumb) and strip (every frame of the preview clip in a row), at flatScale. */
+export function spriteFlat(def, frame) {
+  const p = defaultParams(def), clip = def.preview, n = def.clips[clip].frames, k = flatScale(def), [fw, fh] = def.size;
+  const frames = Array.from({ length: n }, (_, f) => renderFrame(def, clip, f, p, { style: 'flat', scale: k }));
+  const W = fw * k, H = fh * k, bytes = (g) => new Uint8ClampedArray(g.data.buffer, g.data.byteOffset, g.w * g.h * 4);
+  const strip = new Uint8ClampedArray(W * n * H * 4);
+  frames.forEach((g, f) => { const src = bytes(g); for (let y = 0; y < H; y++) strip.set(src.subarray(y * W * 4, (y + 1) * W * 4), (y * W * n + f * W) * 4); });
+  const one = frames[Math.min(frame ?? 0, n - 1)];
+  return { thumb: encodePNG(W, H, bytes(one)), strip: encodePNG(W * n, H, strip), scale: k };
 }
 
 /** Largest absolute sample in each of n equal slices (as app/audio.js peaks). */
@@ -111,19 +125,28 @@ export function writeImages({ root, sprites = [], sounds = [], force = false }) 
   const spriteCode = sha(String(THUMBS_VERSION), dirHash(root, 'engine'), dirHash(root, 'rigs'));
   const soundCode = sha(String(THUMBS_VERSION), dirHash(root, 'sound'));
   const thumbsDir = path.join(root, 'generated', 'thumbs'), stripsDir = path.join(root, 'generated', 'strips');
-  fs.mkdirSync(thumbsDir, { recursive: true });
-  fs.mkdirSync(stripsDir, { recursive: true });
+  const flatDirs = [path.join(root, 'generated', 'thumbs-flat'), path.join(root, 'generated', 'strips-flat')];
+  for (const d of [thumbsDir, stripsDir, ...flatDirs]) fs.mkdirSync(d, { recursive: true });
   const made = [], skipped = [], keep = new Set();
   const fresh = (id, hash, files) => !force && old[id] === hash && files.every((f) => fs.existsSync(path.join(root, f)));
 
   for (const { id, file, def } of sprites) {
-    const files = [thumbPath(id), stripPath(id)];
+    const flat = stylesOf(def).includes('flat');
+    const files = [thumbPath(id), stripPath(id), ...(flat ? [thumbFlatPath(id), stripFlatPath(id)] : [])];
     files.forEach((f) => keep.add(f));
     const hash = sha(spriteCode, fs.readFileSync(path.join(root, file)));
     images[id] = hash;
     if (fresh(id, hash, files)) { skipped.push(id); continue; }
-    fs.writeFileSync(path.join(root, files[0]), spriteThumb(def).png);
+    const thumb = spriteThumb(def);
+    fs.writeFileSync(path.join(root, files[0]), thumb.png);
     fs.writeFileSync(path.join(root, files[1]), spriteStrip(def).png);
+    if (flat) {
+      try {
+        const f = spriteFlat(def, thumb.frame);
+        fs.writeFileSync(path.join(root, files[2]), f.thumb);
+        fs.writeFileSync(path.join(root, files[3]), f.strip);
+      } catch (e) { console.warn(`flat pictures of ${id}: ${e.message}`); }
+    }
     made.push(id);
   }
   for (const { id, file, patch, isMusic } of sounds) {
@@ -138,7 +161,7 @@ export function writeImages({ root, sprites = [], sounds = [], force = false }) 
   }
 
   const removed = [];
-  for (const [dir, rel] of [[thumbsDir, 'generated/thumbs'], [stripsDir, 'generated/strips']]) {
+  for (const [dir, rel] of [[thumbsDir, 'generated/thumbs'], [stripsDir, 'generated/strips'], [flatDirs[0], 'generated/thumbs-flat'], [flatDirs[1], 'generated/strips-flat']]) {
     for (const f of fs.readdirSync(dir)) {
       if (f.endsWith('.png') && !keep.has(`${rel}/${f}`)) { fs.rmSync(path.join(dir, f)); removed.push(`${rel}/${f}`); }
     }

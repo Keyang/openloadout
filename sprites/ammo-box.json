@@ -9,7 +9,7 @@
   "pivot": [16,30],
   "grounded": false,
   "preview": "idle",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "palette": [
     {"id":"body","label":"Box","default":"#3f8a4f","material":"paint","swatches":["#3f8a4f","#9bd18a","#7a4fc4","#c9423a","#7a4f33","#3f9fd1","#5d6475","#6b7896"]},
     {"id":"metal","label":"Brass","default":"#f2c230","material":"metal","swatches":["#f2c230","#c2c9d6","#8f97a8","#e6c545","#c98a4a"]},

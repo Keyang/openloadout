@@ -13,7 +13,7 @@
   58
  ],
  "preview": "idle",
- "styles": ["pixel", "flat"],
+ "styles": ["pixel"],
  "meta": {
   "type": "character",
   "role": "characters/player",

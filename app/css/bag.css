@@ -49,6 +49,7 @@
 .bag-item[aria-current] .bag-pic, .bag-item[aria-current] canvas.tile { background: var(--paper); }
 .bag-pic { position: relative; width: 80px; height: 72px; border-radius: var(--r); overflow: hidden; background: var(--shelf); flex: none; }
 .bag-pic canvas.tile { display: block; width: 80px; height: 72px; border-radius: 0; }
+.bag-pic canvas.tile.is-vector { image-rendering: auto; }      /* a flat picture (the header's art style): smooth */
 .bag-pic.pending::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, var(--shelf-2), transparent); }
 .bag-text { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: baseline; gap: 0 var(--s2); text-align: left; min-width: 0; padding: var(--s2) 0; border-radius: var(--r); }
 .bag-open, .bag-item.opens { cursor: pointer; }

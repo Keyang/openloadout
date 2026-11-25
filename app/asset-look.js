@@ -6,7 +6,7 @@
 // words as the Look tab beside the bag's list and the playground's scene (app/bag-edit.js).
 import { THEME_PRESETS, spriteLook } from '../engine/theme.js';
 import { el } from './ui.js';
-import { spritePicture, trimPictures } from './panel.js';
+import { spritePicture, trimPictures, pictureK, keepK } from './panel.js';
 import { bag } from './bag.js';
 
 /** The looks, the first being "Original" (nothing changed). */
@@ -16,7 +16,8 @@ export const lookById = (id) => (id && id !== 'original' ? THEME_PRESETS.find((p
 
 /**
  * Something that recolours pictures of one sprite at one set of settings in one look: (canvas) => a new canvas.
- * What each colour is of is found once, at the first picture.
+ * What each colour is of is found once, at the first picture. A canvas of any size (a flat picture is bigger than its
+ * frame): the new one is the same size and is shown the same way.
  */
 export function lookPainter(sprite, params, style, look) {
   const made = spriteLook(sprite, params, look.theme, { style });
@@ -27,7 +28,7 @@ export function lookPainter(sprite, params, style, look) {
     const img = g.getImageData(0, 0, cv.width, cv.height);
     made.recolour(img.data);
     g.putImageData(img, 0, 0);
-    return out;
+    return keepK(out, pictureK(cv));
   };
 }
 
@@ -66,9 +67,10 @@ export function lookTab({ sprite, now, pick, say = () => {}, before = null }) {
     // (the tallest a tile may be comes from the style sheet, --vmax; the tiles then take the height the pictures need, --vh)
     const w = first.pic.clientWidth - 8, h = (parseFloat(getComputedStyle(grid).getPropertyValue('--vmax')) || 88) - 8;
     if (w <= 0 || h <= 0) return;
-    const z = Math.min(w / first.cv.width, h / first.cv.height), k = z >= 1 ? Math.min(4, Math.floor(z)) : 1 / Math.ceil(1 / z);
-    grid.style.setProperty('--vh', `${Math.max(56, Math.ceil(first.cv.height * k) + 8)}px`);
-    for (const t of tiles) if (t.cv) { t.cv.style.width = `${t.cv.width * k}px`; t.cv.style.height = `${t.cv.height * k}px`; }
+    const q = pictureK(first.cv), fw = first.cv.width / q, fh = first.cv.height / q;      // (its size in frame pixels)
+    const z = Math.min(w / fw, h / fh), k = z >= 1 ? Math.min(4, Math.floor(z)) : 1 / Math.ceil(1 / z);
+    grid.style.setProperty('--vh', `${Math.max(56, Math.ceil(fh * k) + 8)}px`);
+    for (const t of tiles) if (t.cv) { const p = pictureK(t.cv); t.cv.style.width = `${(t.cv.width / p) * k}px`; t.cv.style.height = `${(t.cv.height / p) * k}px`; }
   };
   const watch = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(fit);
   if (watch) watch.observe(grid);
@@ -102,4 +104,4 @@ export function lookTab({ sprite, now, pick, say = () => {}, before = null }) {
     close() { clearTimeout(timer); if (watch) watch.disconnect(); },
   };
 }
-const copyOf = (cv) => { const out = el('canvas', { width: cv.width, height: cv.height }); out.getContext('2d').drawImage(cv, 0, 0); return out; };
+const copyOf = (cv) => { const out = el('canvas', { width: cv.width, height: cv.height }); out.getContext('2d').drawImage(cv, 0, 0); return keepK(out, pictureK(cv)); };

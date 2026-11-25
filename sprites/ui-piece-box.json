@@ -9,7 +9,7 @@
   "pivot": [48,32],
   "grounded": false,
   "preview": "hold",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "stylesWhy": "The kit is pixel only until the flat style has been looked at (specification, decision P5); ui.gridbox@2 lays its bands ring by ring in whole pixels.",
   "palette": [{"id":"face","label":"Box","default":"#2a3058","material":"paint","swatches":["#2a3058","#3a4278","#1e4658","#6a3a8e"]},{"id":"frame","label":"Frame","default":"#c2c9d6","material":"paint","swatches":["#c2c9d6","#5fe0f0","#f2dc4c","#e6e8f6"]},{"id":"accent","label":"Corner blocks","default":"#f2609e","material":"paint","swatches":["#f2609e","#46d8a8","#a6dc46","#f2c230","#f5875a"]},{"id":"spent","default":"#8f8f99","material":"interface","detail":true},{"id":"shine","default":"#ffffff","material":"light","detail":true}],
   "controls": [{"key":"style","kind":"choice","label":"Style","options":[{"value":"blocks","label":"Blocks"},{"value":"plate","label":"Plate"},{"value":"tube","label":"Tube"}],"default":"blocks","group":"Look"},{"key":"corner","kind":"range","label":"Corner","lo":"Square","hi":"Round","default":0.5,"group":"Look","when":{"style":["tube","plate"]}},{"key":"border","kind":"range","label":"Border","lo":"Thin","hi":"Thick","default":0.5,"group":"Look"},{"key":"tab","kind":"toggle","label":"Title tab","default":true,"group":"Look"},{"key":"face","kind":"colour","label":"Box","group":"Colors"},{"key":"frame","kind":"colour","label":"Frame","group":"Colors"},{"key":"accent","kind":"colour","label":"Corner blocks","group":"Colors","when":{"style":["blocks"]}}],

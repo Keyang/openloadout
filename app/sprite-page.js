@@ -5,6 +5,7 @@
 // Every change is saved to the bag as it is made (app/editing.js).
 import { defaultParams, cleanParams, clipFps, cueInEffect, renderFrame, renderPixels } from '../engine/sprite.js';
 import { stylesOf, styleById, artStyleOf } from '../engine/styles.js';
+import { framePicture, pictureScale } from './art.js';      // a frame in the chosen art style, at the size it is shown
 import { bag, cleanSettings, lookOf } from './bag.js';     // W6-A: a sprite may offer more than one style (Contract 12)
 import { drawStage, backdropFor, stagesFor, sceneFor, defaultStage, keptStage } from './stage.js';
 import { bagBackdrop } from './bag-scene.js';      // "In your bag": the creator's own scene behind the sprite (the workbench)
@@ -78,18 +79,17 @@ const cueKey = (cues) => JSON.stringify(cleanSettings('sprite', { cues }).cues);
  * offers a choice of style. A style that does not draw on the pixel grid is shown by its pixel picture.
  */
 class StyleFrames {
-  constructor(sprite, p, style) { this.sprite = sprite; this.p = p; this.style = style; this.map = new Map(); }
+  constructor(sprite, p, style) { this.sprite = sprite; this.p = p; this.style = style; this.zoom = 4; this.map = new Map(); }
   set(p) { this.p = p; this.map.clear(); }
   setStyle(style) { this.style = style; this.map.clear(); }
+  /** The stage's CSS px a frame px: a vector picture is drawn at that size, so its edges stay smooth. */
+  setZoom(zoom) { if (pictureScale(this.style, zoom, Math.max(...this.sprite.size)) !== pictureScale(this.style, this.zoom, Math.max(...this.sprite.size))) this.map.clear(); this.zoom = zoom; }
   get(clip, f) {
     const key = clip + ':' + f;
     let cv = this.map.get(key);
     if (!cv) {
-      // the style's own picture of the frame: bigger than the sprite's grid for a style with a pictureScale (flat), else the grid
-      const g = (styleById(this.style)?.pictureScale ?? 1) > 1 ? renderFrame(this.sprite, clip, f, this.p, { style: this.style }) : renderPixels(this.sprite, clip, f, this.p, { style: this.style });
-      cv = document.createElement('canvas');
-      cv.width = g.w; cv.height = g.h;
-      cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
+      // the style's own picture of the frame (app/art.js): a vector picture at the stage's size for flat, else the grid
+      cv = framePicture(this.sprite, clip, f, this.p, { style: this.style, zoom: this.zoom }).canvas;
       this.map.set(key, cv);
     }
     return cv;
@@ -287,9 +287,10 @@ export function spritePage(app, sprite, query) {
     for (let r = 0; r * cols < n; r++) { rowAt[r] = { marks: rowsWithMarks.has(r) ? line++ : 0, cells: line++ }; }
     strip.classList.toggle('has-marks', names.size > 0);
     stripCells = Array.from({ length: n }, (_, f) => {
-      const kk = styleById(st.style)?.pictureScale ?? 1;      // a style with a bigger picture of each frame (flat) fills a bigger canvas, shown at the same size
-      const c = el('canvas', { width: sprite.size[0] * kk, height: sprite.size[1] * kk });
-      c.getContext('2d').drawImage(pic(st.clip, f), 0, 0);
+      const src = pic(st.clip, f), vector = src.width > sprite.size[0];      // a vector picture (flat) fills a bigger canvas, shown at the same size
+      const c = el('canvas', { width: src.width, height: src.height });
+      c.getContext('2d').drawImage(src, 0, 0);
+      if (vector) c.style.imageRendering = 'auto';
       // in its cell at a whole-number size, or a whole-number fraction when the frame is larger than the cell
       const z = (cell - 4) / Math.max(sprite.size[0], sprite.size[1]), k = z >= 1 ? Math.floor(z) : 1 / Math.ceil(1 / z);
       c.style.width = `${sprite.size[0] * k}px`; c.style.height = `${sprite.size[1] * k}px`;
@@ -513,8 +514,12 @@ export function spritePage(app, sprite, query) {
   // The picture fills its tile at a whole-number size: the canvas is as many sprite pixels as fit, the sprite in the
   // middle of it. (A sprite larger than the tile is shown at a whole-number fraction instead.)
   // the stage canvas has the sprite's pixel grid; for a style with a bigger picture of each frame (flat) it has that many canvas pixels to a grid pixel, drawn at the same size
-  const sizeStage = () => {
-    const k = styleById(st.style)?.pictureScale ?? 1;
+  let zoomNow = 4;
+  const sizeStage = (zoom = zoomNow) => {
+    zoomNow = zoom;
+    if (frames.setZoom) frames.setZoom(zoom);
+    const k = pictureScale(st.style, zoom, Math.max(W, H));
+    stage.style.imageRendering = k > 1 ? 'auto' : '';
     stage.width = W * k; stage.height = H * k;
     ctx.setTransform(k, 0, 0, k, 0, 0);
     ctx.imageSmoothingEnabled = k === 1;
@@ -533,9 +538,9 @@ export function spritePage(app, sprite, query) {
     if (backdrop === 'fill') {
       // a background is the whole frame: the canvas is exactly the sprite, at the largest whole size that fits
       [W, H] = sprite.size;
-      const z = Math.min(cw / W, ch / H);
-      sizeStage();
-      place(z >= 1 ? Math.min(6, Math.floor(z)) : 1 / Math.ceil(1 / z));
+      const z = Math.min(cw / W, ch / H), kz = z >= 1 ? Math.min(6, Math.floor(z)) : 1 / Math.ceil(1 / z);
+      sizeStage(kz);
+      place(kz);
       return;
     }
     const z = Math.min(cw / (sw + 24), ch / (sh + (backdrop === 'panel' ? 16 : 36)));
@@ -543,7 +548,7 @@ export function spritePage(app, sprite, query) {
     // in your bag: a smaller whole-number size, so the scene shows enough of the bag's world around the sprite
     if (behind && st.stage === 'bag' && k >= 1) k = Math.min(k, Math.max(1, Math.floor(ch / 120)));
     W = Math.ceil(cw / k); H = Math.ceil(ch / k);
-    sizeStage();
+    sizeStage(k);
     // the ground: under the middle of the tile, never so high that the sprite's top is cut, never off the bottom
     const lift = hover(sprite);
     gy = Math.min(H - 8, Math.max(sprite.pivot[1] + lift + 6, Math.round(H / 2 + (sprite.pivot[1] + lift) / 2 + 4)));

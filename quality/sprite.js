@@ -22,7 +22,7 @@ import { brightness, hexToRgb, rgbToHsl } from '../engine/color.js';
 import { blockJoins, classifyTiles } from '../engine/tiles.js';
 import { THEME_PRESETS, applyColour, themedParams, spriteMaterials, lookColours, randomTheme, toneNeed } from '../engine/theme.js';
 import { outsideMaterial, colourGap, materialById, unsaidMaterial, MATERIAL_IDS } from '../engine/materials.js';
-import { stylesOf, styleById, styleIds } from '../engine/styles.js';
+import { ownStyles, styleById, styleIds } from '../engine/styles.js';
 import { cleanVersions } from '../engine/versions.js';
 import { dataChecks } from './data-checks.js';
 
@@ -361,7 +361,7 @@ export function lookFaults(table, looks = checkedLooks(), recolour = lookColours
  */
 export function checkSprite(def, options = {}) {
   const t0 = now();
-  const ids = stylesOf(def);
+  const ids = ownStyles(def);      // a derived style (flat) is drawn from the same list and is not checked on its own
   const known = ids.filter((id) => styleById(id));
   const errors = [], warnings = [];
   for (const id of ids) if (!styleById(id)) errors.push(`styles: "${id}" is not a style (the styles are: ${styleIds().join(', ')})`);

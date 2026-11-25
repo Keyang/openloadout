@@ -9,7 +9,7 @@
   "pivot": [16,30],
   "grounded": false,
   "preview": "idle",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "versions": [
     {"name":"Guard's sword","params":{}},
     {"name":"Old woodcutter's axe","params":{"shape":"axe","wear":1,"metal":"#8f97a8","wood":"#7a4f33","accent":"#a4c44a"}},

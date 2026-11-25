@@ -1,18 +1,24 @@
 // Live sprites for the landing page: a sprite drawn by the real engine, frame by frame, on a canvas of its own size.
 // One clock runs every live sprite on the page. A sprite that is off screen is not drawn, and with "reduce motion"
 // each one shows a single frame. Nothing here is kept between visits: stop() ends everything a page started.
+// In the site's art style (the header toggle, app/art-style.js): pixel art is drawn on a canvas of the frame's size and
+// scaled up with crisp pixels, as it always was; a vector style (flat) is drawn at the size it is shown (app/art.js), so
+// its edges stay smooth however big the page shows it.
 import { renderFrame, defaultParams, cleanParams, randomParams, clipFps } from '../engine/sprite.js';
 import { renderThemedFrame } from '../engine/theme.js';
 import { el, reduceMotion } from './ui.js';
 import { loadSprite } from './catalog.js';
+import { framePicture, drawPicture, showPicture, shownStyle, pictureScale } from './art.js';
 
 /**
- * A group of live sprites with one clock. Returns { sprite(row, opts), still(def, clip, theme, params), stop() }.
- *   sprite(row, { clip, params, scale, flip, layers, paused, frame, theme }) ->
+ * A group of live sprites with one clock. Returns { sprite(row, opts), still(def, clip, theme, params, zoom), stop() }.
+ *   sprite(row, { clip, params, scale, flip, layers, paused, frame, theme, zoom }) ->
  *     { node (canvas), ready (promise of the sprite's program, or null when it could not be loaded), def, params,
  *       set(part), setParams(all), surprise(), reset(), setTheme(theme | null), changed() }
  *   row: the catalogue row (the canvas takes its size from it at once, before the sprite's program arrives)
  *   layers: a background, every layer stacked into one picture, not animated
+ *   zoom: CSS px a frame px where it is shown, for a vector style; left out, it is measured on the page when the sprite is
+ *     first drawn (scale, or 4, when it cannot be)
  */
 export function liveGroup() {
   const all = new Set();
@@ -39,7 +45,7 @@ export function liveGroup() {
   const onMotion = () => { for (const s of all) s.dirty = true; wake(); };
   reduceMotion.addEventListener('change', onMotion);
 
-  function sprite(row, { clip = null, params = {}, scale = 2, flip = false, layers = false, paused = false, frame = 0, theme = null } = {}) {
+  function sprite(row, { clip = null, params = {}, scale = 2, flip = false, layers = false, paused = false, frame = 0, theme = null, zoom = null } = {}) {
     const [fw, fh] = row.tech?.frame ?? [64, 64];
     const node = el('canvas', { class: 'live', width: fw, height: fh, 'aria-hidden': 'true' });
     if (scale) { node.style.width = `${fw * scale}px`; node.style.height = `${fh * scale}px`; }      // scale 0: the page's own sheet sizes it
@@ -47,13 +53,28 @@ export function liveGroup() {
     const g = node.getContext('2d');
     const frames = new Map();
     let tmp = null;
+    // the picture's size, decided when it is first drawn: k canvas px a frame px (1: pixel art, drawn as it always was),
+    // z the CSS px a frame px it is shown at (what a vector picture is drawn for)
+    let k = 0, z = 0;
+    const measure = () => {
+      const shown = node.getBoundingClientRect().width / fw;
+      z = shown > 0 ? shown : zoom || scale || 4;
+      k = pictureScale(shownStyle(s.def), z);
+      if (k > 1) { node.width = fw * k; node.height = fh * k; }
+      showPicture(node, k);
+    };
     const s = {
       node, def: null, params: {}, clip, layers, paused, visible: false, dirty: true, t0: performance.now(), shown: -1,
       image(name, f) {
         const key = `${name}:${f}`;
         if (!frames.has(key)) {
-          const p = theme ? renderThemedFrame(s.def, name, f, s.params, theme) : renderFrame(s.def, name, f, s.params);
-          frames.set(key, new ImageData(p.bytes(), p.w, p.h));
+          if (k > 1) {
+            const pic = framePicture(s.def, name, f, s.params, { zoom: z, theme });
+            frames.set(key, { canvas: pic.canvas, k: pic.k });
+          } else {
+            const p = theme ? renderThemedFrame(s.def, name, f, s.params, theme) : renderFrame(s.def, name, f, s.params);
+            frames.set(key, new ImageData(p.bytes(), p.w, p.h));
+          }
         }
         return frames.get(key);
       },
@@ -68,7 +89,12 @@ export function liveGroup() {
         if (f === s.shown && !s.dirty) return;
         s.shown = f; s.dirty = false;
         try {
-          if (layers) {
+          if (!k) measure();
+          if (k > 1) {
+            // a vector picture, drawn at the canvas's own size (every layer of a background on top of the one before)
+            g.clearRect(0, 0, node.width, node.height);
+            for (const name of layers ? Object.keys(s.def.clips) : [s.clip]) drawPicture(g, s.image(name, layers ? 0 : f), 0, 0, node.width, node.height);
+          } else if (layers) {
             tmp ??= el('canvas', { width: fw, height: fh });
             const tg = tmp.getContext('2d');
             g.clearRect(0, 0, fw, fh);
@@ -98,12 +124,20 @@ export function liveGroup() {
     return s;
   }
 
-  /** One frame of a loaded sprite as a picture address (ground tiles are laid as a repeating background). */
-  function still(def, clip, theme = null, params = defaultParams(def)) {
+  /**
+   * One frame of a loaded sprite as a picture address (ground tiles are laid as a repeating background): { url, k }, k the
+   * picture's pixels a frame pixel (1 for pixel art; then show it with crisp pixels, else smooth: showPicture(node, k)).
+   * zoom: CSS px a frame px where it is shown, for a vector style.
+   */
+  function still(def, clip, theme = null, params = defaultParams(def), zoom = 2) {
+    if (pictureScale(shownStyle(def), zoom) > 1) {
+      const pic = framePicture(def, clip, 0, params, { zoom, theme });
+      return { url: pic.canvas.toDataURL(), k: pic.k };
+    }
     const p = theme ? renderThemedFrame(def, clip, 0, params, theme) : renderFrame(def, clip, 0, params);
     const cv = el('canvas', { width: p.w, height: p.h });
     cv.getContext('2d').putImageData(new ImageData(p.bytes(), p.w, p.h), 0, 0);
-    return cv.toDataURL();
+    return { url: cv.toDataURL(), k: 1 };
   }
 
   return {

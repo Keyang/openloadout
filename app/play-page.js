@@ -30,6 +30,7 @@ import { createInput } from './play/input.js';
 import { createSounds } from './play/sound.js';
 import { displayPlan, fillSpan } from './play/display.js';
 import { itemEditor } from './bag-edit.js';
+import { sizeScene, drawPicture } from './art.js';
 import { surpriseButton, duplicateButton, removeButton, surpriseItem, iconBtn } from './row-tools.js';
 import { listFilter, typeOf } from './list-filter.js';
 import { makeMagic } from './magic.js';
@@ -324,7 +325,10 @@ export async function playPage(app, query = {}) {
     }
     syncMute();
 
-    const painter = createPainter({ sprites: drawn, colour: theme.colour, tiles: plan.soundsOnly ? null : tileIndex(plan.tilesets.map((key) => ({ key, names: Object.keys(drawn[key].sprite.clips), size: drawn[key].sprite.size[0], clips: drawn[key].sprite.clips }))) });
+    // the ground and the sky (the tilesets, the background) are drawn in the scene as the frame-size grid, as before; in the
+    // flat style every other thing is drawn as its own smooth picture (app/play/draw.js)
+    const painter = createPainter({ sprites: drawn, colour: theme.colour, tiles: plan.soundsOnly ? null : tileIndex(plan.tilesets.map((key) => ({ key, names: Object.keys(drawn[key].sprite.clips), size: drawn[key].sprite.size[0], clips: drawn[key].sprite.clips }))),
+      scenery: plan.soundsOnly ? [] : [...plan.tilesets, ...plan.backgrounds] });
     const hasPlayer = !!plan.player;
     // each track's settings as it plays them (its own look's, when it wears one), by its key
     const trackState = () => Object.fromEntries(plan.music.map((key, i) => [key, tracks[i] ? { ...tracks[i].params } : null]));
@@ -342,10 +346,15 @@ export async function playPage(app, query = {}) {
 
     const rows = {};                    // key -> { li, pick, acts, draw }
     let ids = 0;
-    /** A live picture of a sprite, at a whole-number scale (or a whole-number share of it, for a big one). */
+    /**
+     * A live picture of a sprite, at a whole-number scale (or a whole-number share of it, for a big one). In the flat style
+     * the canvas has a backing store for the screen (app/art.js sizeScene) and the sprite is its smooth picture.
+     */
     function livePicture(e) {
       const cv = el('canvas', { class: 'play-pic-live', width: PIC, height: PIC, 'aria-hidden': 'true' });
       const g = cv.getContext('2d');
+      const vec = painter.isVector(e.key), K = vec ? sizeScene(cv, PIC, PIC, 1, 'flat') : 1;
+      if (vec) cv.classList.add('is-vector');      // smooth wherever CSS shows it at another size (the 26 px ground and sky choices)
       const sprite = e.sprite, role = plan.roles[e.key];
       const clipNow = () => {
         const shown = world?.show?.[e.key];
@@ -367,11 +376,14 @@ export async function playPage(app, query = {}) {
         last = id;
         const [w, h] = sprite.size, big = Math.max(w, h);
         const s = big <= PIC ? Math.max(1, Math.floor(PIC / big)) : 1 / Math.ceil(big / PIC);
-        g.setTransform(1, 0, 0, 1, 0, 0);
+        g.setTransform(K, 0, 0, K, 0, 0);
         g.clearRect(0, 0, PIC, PIC);
         g.imageSmoothingEnabled = false;
         const dw = Math.round(w * s), dh = Math.round(h * s);
-        for (const [clip, f] of frames) g.drawImage(painter.frame(e.key, clip, f), Math.floor((PIC - dw) / 2), Math.floor((PIC - dh) / 2), dw, dh);
+        for (const [clip, f] of frames) {
+          if (vec) drawPicture(g, painter.picture(e.key, clip, f, s), Math.floor((PIC - dw) / 2), Math.floor((PIC - dh) / 2), dw, dh);
+          else g.drawImage(painter.frame(e.key, clip, f), Math.floor((PIC - dw) / 2), Math.floor((PIC - dh) / 2), dw, dh);
+        }
       };
       return { node: el('span', { class: 'play-pic-tile tile' }, cv), draw, forget: () => { last = ''; } };
     }
@@ -521,6 +533,7 @@ export async function playPage(app, query = {}) {
       const wrap = el('div', { class: 'play-stage-wrap' }, stage);
       const ctx = stage.getContext('2d');
       const view = { w: 320, h: 180, zoom: 2 };
+      const jobs = painter.allFrames(Object.keys(drawn));      // frames to make ahead of need, a few each picture (the loop)
       let made = '';                      // the size the level was made for: zoom, columns, rows
       let cam = { x: 0, y: 0 };
 
@@ -554,8 +567,16 @@ export async function playPage(app, query = {}) {
         }
         if (!choice) return;
         Object.assign(view, { w: choice.vw, h: choice.vh, zoom: choice.z });
-        stage.width = view.w * view.zoom; stage.height = view.h * view.zoom;
-        stage.style.width = stage.width + 'px'; stage.style.height = stage.height + 'px';
+        if (painter.vector) {
+          // a flat thing in the scene: the backing store is made for the screen (zoom x devicePixelRatio canvas pixels a
+          // scene pixel), so its picture is drawn smooth and 1:1; the ground and the sky are scaled up crisp, as before
+          view.scale = sizeScene(stage, view.w, view.h, view.zoom, 'flat');
+          stage.style.width = view.w * view.zoom + 'px'; stage.style.height = view.h * view.zoom + 'px';
+          if (painter.setZoom(view.zoom)) { jobs.length = 0; jobs.push(...painter.allFrames(Object.keys(drawn))); }      // the things' pictures, at their new size
+        } else {
+          stage.width = view.w * view.zoom; stage.height = view.h * view.zoom;
+          stage.style.width = stage.width + 'px'; stage.style.height = stage.height + 'px';
+        }
         if (choice.id !== made || !world) { made = choice.id; makeScene(choice.lv); }
         // the level fills the picture: a side view rests on its ground, a room is in the middle
         cam = { x: Math.round((level.width - view.w) / 2), y: plan.mode === 'side' ? level.height - view.h : Math.round((level.height - view.h) / 2) };
@@ -729,7 +750,6 @@ export async function playPage(app, query = {}) {
       drawEnv();
 
       // ---- the loop
-      const jobs = painter.allFrames(Object.keys(drawn));
       let raf = 0, last = performance.now(), shown = -1, shownHp = -1, picsAt = 0;
       const onEvent = (e) => {
         if (e.type !== 'sound') return;
@@ -748,7 +768,7 @@ export async function playPage(app, query = {}) {
         }
         sounds.syncLoops(keep.paused || !soundState.on ? [] : activeLoops(world));
         // make a few frames ahead of need, so nothing stutters the first time a clip plays
-        for (const t0 = performance.now(); jobs.length && performance.now() - t0 < 3;) painter.frame(...jobs.pop());
+        for (const t0 = performance.now(); jobs.length && performance.now() - t0 < 3;) painter.warm(...jobs.pop());
         painter.draw(ctx, { world, view, cam, plan });
         if (picked && world.kinds[picked]) painter.mark(ctx, { world, view, cam, key: picked });      // what the visitor picked is marked in the scene
         if (world.collected !== shown) { shown = world.collected; countText.textContent = String(shown); }
@@ -1024,13 +1044,29 @@ export async function playPage(app, query = {}) {
 
 // ---- small pictures for the on-screen display ----------------------------------------------------------
 
-/** One still frame of a sprite, at a whole-number size. */
+/** One still frame of a sprite, at a whole-number size (in the flat style, its smooth picture at that size). */
 function picture(painter, key, sprite, clip) {
   const scale = sprite.size[1] <= 20 ? 2 : 1;
   const cv = el('canvas', { class: 'play-pic', width: sprite.size[0] * scale, height: sprite.size[1] * scale, 'aria-hidden': 'true' });
   const g = cv.getContext('2d');
+  if (painter.isVector(key)) {
+    vectorCanvas(cv, sprite.size[0], sprite.size[1], scale);
+    drawPicture(g, painter.picture(key, clip, 0, scale), 0, 0, sprite.size[0], sprite.size[1]);
+    return cv;
+  }
   g.imageSmoothingEnabled = false;
   g.drawImage(painter.frame(key, clip, 0), 0, 0, cv.width, cv.height);
+  return cv;
+}
+
+/**
+ * Make a small canvas ready for a flat picture shown `zoom` CSS pixels a frame pixel: its backing store is made for the
+ * screen and its context drawn in frame pixels (app/art.js sizeScene), and it keeps its size on the page (w x zoom).
+ */
+function vectorCanvas(cv, w, h, zoom) {
+  sizeScene(cv, w, h, zoom, 'flat');
+  cv.classList.add('is-vector');
+  cv.style.width = `${w * zoom}px`; cv.style.height = `${h * zoom}px`;
   return cv;
 }
 
@@ -1047,17 +1083,26 @@ function displayPiece(painter, key, name, sprite, params, health) {
   const plan = displayPlan(sprite.clips);
   const s = pieceScale(sprite), [w, h] = sprite.size;
   const node = el('span', { class: 'play-piece', role: 'img', 'aria-label': name, title: name });
-  const cell = () => { const cv = el('canvas', { class: 'play-pic', width: w * s, height: h * s }); node.append(cv); return cv.getContext('2d'); };
+  const vec = painter.isVector(key);      // the flat style: each cell is drawn in frame pixels on a backing store made for the screen
+  const cell = () => { const cv = el('canvas', { class: 'play-pic', width: w * s, height: h * s }); if (vec) vectorCanvas(cv, w, h, s); node.append(cv); return cv.getContext('2d'); };
   const frameOf = (clip, time) => {
     const c = sprite.clips[clip], fps = clipFps(sprite, clip, params);
     return c.frames > 1 ? (c.loop ? Math.floor(time * fps) % c.frames : Math.min(c.frames - 1, Math.floor(time * fps) % (c.frames + fps))) : 0;
   };
   // draw columns x .. x + cw of one frame (the whole frame when not given)
   const paint = (g, clip, f, x = 0, cw = w) => {
+    if (vec) {
+      if (cw <= 0) return;
+      // only columns x .. x + cw of the picture: it is clipped there, so a smooth edge is cut cleanly at the fill's end
+      g.save(); g.beginPath(); g.rect(x, 0, cw, h); g.clip();
+      drawPicture(g, painter.picture(key, clip, f, s), 0, 0, w, h);
+      g.restore();
+      return;
+    }
     g.imageSmoothingEnabled = false;
     if (cw > 0) g.drawImage(painter.frame(key, clip, f), x, 0, cw, h, x * s, 0, cw * s, h * s);
   };
-  const wipe = (g) => g.clearRect(0, 0, w * s, h * s);
+  const wipe = (g) => (vec ? g.clearRect(0, 0, w, h) : g.clearRect(0, 0, w * s, h * s));
   let shown = null;
   const changed = (id) => { if (id === shown) return false; shown = id; return true; };
 

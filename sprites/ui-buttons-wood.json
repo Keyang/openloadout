@@ -14,7 +14,7 @@
  ],
  "grounded": false,
  "preview": "normal",
- "styles": ["pixel", "flat"],
+ "styles": ["pixel"],
  "meta": {
   "type": "ui",
   "role": "interface/button",

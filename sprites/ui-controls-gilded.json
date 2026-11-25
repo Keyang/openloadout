@@ -47,7 +47,7 @@
  ],
  "grounded": false,
  "preview": "check-on",
- "styles": ["pixel", "flat"],
+ "styles": ["pixel"],
  "palette": [
   {
    "id": "face",

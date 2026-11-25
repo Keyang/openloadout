@@ -19,12 +19,14 @@
 .tray-list { margin: 0; padding: 0; list-style: none; min-height: 0; }
 .tray-pic { position: relative; display: grid; place-items: center; overflow: hidden; flex: none; color: var(--ink-2); }
 .tray-pic img, .tray-pic canvas { max-width: 100%; max-height: 100%; object-fit: contain; image-rendering: pixelated; }
+.tray-pic .is-vector { image-rendering: auto; }      /* a flat picture (the header's art style): smooth, never blocky */
 .tray-row:hover .tray-pic { background: var(--shelf-2); }
 .tray-more { font-size: 12px; color: var(--ink-2); text-align: center; }
 
 /* the small live scene of the bag: a picture the width of the panel, opening the playground */
 .tray-scene { display: block; position: relative; height: 132px; overflow: hidden; flex: none; }
 .tray-scene canvas { display: block; width: 100%; height: 132px; image-rendering: pixelated; }
+.tray-scene canvas.is-vector { image-rendering: auto; }      /* flat things: a backing store for the screen, drawn smooth */
 .tray-scene:hover { box-shadow: inset 0 0 0 1px var(--ink); }
 .tray-scene:hover canvas { opacity: 0.92; }
 .tray-scene:focus-visible { outline-offset: 2px; }

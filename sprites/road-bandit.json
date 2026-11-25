@@ -17,7 +17,7 @@
  "pivot": [28,58],
  "grounded": true,
  "preview": "walk",
- "styles": ["pixel", "flat"],
+ "styles": ["pixel"],
  "palette": [
   {"id":"skin","label":"Skin","default":"#f6d3b0","material":"skin","swatches":["#f6d3b0","#e8b088","#c98a5c","#9a6240","#6e4428","#9bd18a","#b9a7e0"]},
   {"id":"outfit","label":"Coat","default":"#8e3a4a","material":"cloth","swatches":["#8e3a4a","#3f6fd1","#7a4fc4","#2f8f9d","#c9423a","#4f9d57"]},

@@ -113,6 +113,8 @@ canvas.stage { position: absolute; display: block; }
 .looks { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: var(--s2); }
 .looks { --vmax: 104px; align-items: start; }
 .looks .vpic { height: var(--vh, 88px); }
+/* a flat picture (the header's art style) on a version or look tile, or the bag's picture of an item: smooth, never blocky */
+.vpic canvas.is-vector, .rx-preview-tile canvas.is-vector { image-rendering: auto; }
 .looks .vbtn .name { white-space: normal; line-height: 1.25; }
 .look-acts { margin-top: var(--s3); }
 /* a sound's and a track's looks: no picture, so each is a bordered button with its name and what is heard */

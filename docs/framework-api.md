@@ -265,7 +265,7 @@ The framework functions are not tools. An agent uses them by naming the framewor
 
 ## Styles
 
-A style is one way to draw and export a sprite (Contract 12 of `docs/architecture.md`). The site has two: `pixel`, which every sprite has, and `flat` (below), which 67 sprites also list. The registry is `engine/styles.js`; every renderer and exporter goes through it. The two test styles in `tests/fixtures/styles/styles.js` are the worked examples of the surface, finish and exporter parts.
+A style is one way to draw and export a sprite (Contract 12 of `docs/architecture.md`). The site has two: `pixel`, which every sprite has, and `flat` (below), which every data sprite has too. The registry is `engine/styles.js`; every renderer and exporter goes through it. The two test styles in `tests/fixtures/styles/styles.js` are the worked examples of the surface, finish and exporter parts.
 
 ### What a style is made of
 
@@ -310,11 +310,21 @@ A sprite is a data file (`sprites/<id>.json`; a code sprite with a `render()` fu
 
 ### The flat style
 
-`flat` (`engine/flat.js`) draws the same draw list with solid colours and smooth edges, at four times the sprite's frame (a 64 px sprite makes a 256 px frame; a sheet is one PNG at that size, its JSON says `artStyle: "flat"`). It is not a second renderer: `engine/draw-list.js drawList` stays the only one, and a flat surface hands it a rewritten list (`flatPlan`): coordinates, radii and widths times 8, shading bands off (a slot paints its base tone), a `dot` becomes a round dot, a `stamp` becomes solid blocks, an `outline` becomes a thin line, `dither` and `text` are left out (`UNSUPPORTED`). The frame is drawn at 8x and averaged down to 4x, which is where the soft edge comes from. `loadout.render(id, { artStyle: 'flat' })` answers at that size (`pictureScale`).
+`flat` draws a data sprite's draw list as true vector shapes (`engine/vector.js`), not as enlarged pixels. It follows the flat and semi-flat game-art conventions (research brief: Unity's art-style guide, Kenney's vector-art notes, Kopf and Lischinski on depixelizing, outline and cel-shadow techniques):
 
-- **Who lists it.** A sprite whose pixel frame is less than a tenth stamp pixels (shapes do the drawing; stamps are small details such as eyes and rivets). Sprites made mostly of stamps (`crawler-bug`, tiles, most props) stay pixel only: a flat frame of them is the same blocks, bigger. The new way to widen it is a stamp's `alt` (a drawn shape for a pixel detail), not built yet.
-- **What the page shows.** The site's previews and the quality bar read `pixelsOf`, the frame-size grid of a flat frame (whole colours, no blending). The smooth picture is what `loadout.render`, a bag download and a package contain. A smooth preview on the sprite page is not built.
-- **Cost.** A flat frame takes about ten times a pixel frame (about 12 ms for a 64 px character), and the quality bar runs it once more, so a character that lists flat takes about a minute to check uncached.
+| Rule | How the renderer does it |
+|---|---|
+| Exact shapes, no pixel grid | every primitive becomes polygons in float frame coordinates (an ellipse a smooth ellipse, a limb a round-capped stroke, a rect a rounded rectangle); each body is filled once with anti-aliased coverage at the size it is shown |
+| One shadow tone, one light | a body is its base colour with one hard cel shadow: the body minus itself moved toward the light (a crescent on the side away from it, 14% of its smaller side); an optional highlight the same way; bodies under 5 px wide stay one colour |
+| An even, round outline | the `outline` operation is a distance field round the silhouette (round corners), about 1.4% of the frame, drawn behind the fills; `outline only` a group draws over its neighbours, thinner |
+| Few colours a material | a pixel stamp's light, dark and deep tones of a slot are drawn in the slot's base colour; the stamp is traced into shapes and smoothed (Chaikin); a speck of 4 pixels or fewer is a round dot (eyes, rivets) |
+| No pixel textures | `dither` is left out; `bands` keep their colours with smooth outer edges; pixel-font text is traced like a stamp |
+
+- **Every data sprite has it.** `flat` is a *derived* style (`derived: true` in `defineStyle`): `stylesOf` gives it after a data sprite's own styles without the sprite listing it, so the header toggle reaches the whole library. A code fixture (a sprite that draws on a pixel surface itself) does not get it.
+- **The quality bar checks the styles a sprite lists** (`ownStyles`), not derived ones: a flat frame is drawn from the same list the pixel checks already cover. The flat pictures the build writes (`generated/thumbs-flat/`, `generated/strips-flat/`, rows `thumbFlat`, `stripFlat`) are the visible check.
+- **Size.** `renderFrame(sprite, clip, frame, params, { style: 'flat', scale })` draws `scale` picture pixels a frame pixel (4 when left out). Pages draw it at the size it is shown (`app/art.js pictureScale`: CSS zoom times device pixel ratio, at most 2,048 px a side), so edges are smooth at any zoom. `loadout.render` and sheets use 4.
+- **The site's choice.** The header toggle (`app/art-style.js`) sets `preferStyle`; `artStyleOf` falls back to it. A page draws a frame with `app/art.js framePicture` and puts it on screen with `drawPicture` / `showPicture` / `sizeScene`.
+- **Limits.** Sprites drawn mostly with stamps (pixel bitmaps) come out as smoothed blobs of flat colour: readable, but they are not designed shapes. Redrawing them with shapes is what makes them truly flat. There is no SVG export yet (the polygons are there to write one).
 
 ### What it costs
 

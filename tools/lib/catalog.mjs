@@ -6,6 +6,9 @@ import { createVoice } from '../../sound/sfx-engine.js';
 
 export const CATALOG_VERSION = 1;
 export const thumbPath = (id) => `generated/thumbs/${id}.png`;
+/** The flat style's pictures of a sprite (every data sprite has the style): the thumbnail and the strip, drawn as vector shapes. */
+export const thumbFlatPath = (id) => `generated/thumbs-flat/${id}.png`;
+export const stripFlatPath = (id) => `generated/strips-flat/${id}.png`;
 /**
  * Colour of a sound effect's waveform thumbnail, drawn on a transparent background.
  * It is dark, so the site must place it on a light tile (it vanishes on a dark page).
@@ -94,6 +97,7 @@ export function buildCatalog({ sprites = [], sounds = [], bundles = [] }) {
       stripClip: preview.name,
       stripFrames: preview.frames,
       stripFps: preview.fps,
+      ...(stylesOf(def).includes('flat') ? { thumbFlat: thumbFlatPath(id), stripFlat: stripFlatPath(id) } : {}),
     });
   }
   for (const { id, file, patch, isMusic } of sounds) {

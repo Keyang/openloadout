@@ -20,7 +20,7 @@
   "pivot": [16,16],
   "grounded": false,
   "preview": "fly",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "palette": [
     {"id":"metal","label":"Metal","default":"#c2c9d6","material":"metal","swatches":["#c2c9d6","#9aa6c0","#6b7896","#f2c230","#8f97a8","#e6c545","#c98a4a","#5d6475"]},
     {"id":"glow","label":"Edge","default":"#5fe0f0","material":"light","swatches":["#5fe0f0","#e2473f","#9fe040","#f2a030","#b48af8","#4f9ff0","#5fd47a"]},

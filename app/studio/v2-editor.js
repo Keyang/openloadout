@@ -19,10 +19,11 @@
 // its errors are shown, and the picture, the bag and the file wait until it passes; Undo and Redo step through changes.
 import { el, header, saveBlob, reduceMotion } from '../ui.js';
 import * as bagModule from '../bag.js';
-import { renderSheet, defaultParams, renderFrame, cleanParams, clipFps } from '../../engine/sprite.js';
+import { renderSheet, defaultParams, cleanParams, clipFps } from '../../engine/sprite.js';
+import { framePicture, drawPicture } from '../art.js';
 import { createSaver } from './drafts.js';
 import { bagTakes, followBag } from './keep.js';
-import { menuButton } from './bits.js';
+import { menuButton, showFrame, isVectorPicture } from './bits.js';
 import * as M from './v2-model.js';
 import { generatorsFor, newCall } from './v2-gen.js';
 import { newStamp } from './v2-stamp.js';
@@ -76,13 +77,10 @@ function undoStack(first) {
   };
 }
 
-/** A Surface as a canvas of its own size. */
-function canvasOf(g) {
-  const c = document.createElement('canvas');
-  c.width = g.w; c.height = g.h;
-  c.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
-  return c;
-}
+/** The most stage pictures kept for one sprite at one set of settings (a clip's frames at a zoom or two). */
+const STAGE_PICS = 96;
+/** The timeline's frame buttons show a frame at most this big (app/css/studio.css `.timeline .frame canvas`). */
+const THUMB_W = 40, THUMB_H = 36;
 
 /**
  * Draws the version 2 editor for one draft into `app` and returns its teardown. Arguments: app, { id (the draft), entry
@@ -195,6 +193,20 @@ export function v2EditorPage(app, { id, entry, drafts, kept, query = {}, studio 
     card, tools, under, stageNote);
 
   let layout = null;          // where the frame was drawn: { ox, oy, z }
+  // the stage's pictures in the site's art style (app/art.js), kept for one sprite at one set of settings: a flat one is
+  // drawn at the size it is shown, so Play and a frame picked again do not draw it again
+  let stagePics = { sprite: null, params: null, map: new Map() };
+  function stagePicture(sprite, clip, frame, z) {
+    if (stagePics.sprite !== sprite || stagePics.params !== S.params) stagePics = { sprite, params: S.params, map: new Map() };
+    const key = `${clip}:${frame}:${z}`;
+    let pic = stagePics.map.get(key);
+    if (!pic) {
+      pic = framePicture(sprite, clip, frame, cleanParams(sprite, S.params), { zoom: z });
+      if (stagePics.map.size >= STAGE_PICS) stagePics.map.clear();
+      stagePics.map.set(key, pic);
+    }
+    return pic;
+  }
   const fitZoom = (cw, ch, w, h) => Math.max(1, Math.floor(Math.min((cw - 8) / w, (ch - 8) / h)));
   function drawStage() {
     const box = card.getBoundingClientRect();
@@ -214,11 +226,12 @@ export function v2EditorPage(app, { id, entry, drafts, kept, query = {}, studio 
     const ox = Math.floor((cw - W * z) / 2), oy = Math.floor((ch - H * z) / 2);
     layout = { ox, oy, z };
     let pic;
-    try { pic = canvasOf(renderFrame(sprite, S.clip, Math.min(S.frame, sprite.clips[S.clip].frames - 1), cleanParams(sprite, S.params))); } catch (e) { stageNote.textContent = `This frame could not be drawn: ${String(e?.message ?? e).slice(0, 200)}`; return; }
+    try { pic = stagePicture(sprite, S.clip, Math.min(S.frame, sprite.clips[S.clip].frames - 1), z); } catch (e) { stageNote.textContent = `This frame could not be drawn: ${String(e?.message ?? e).slice(0, 200)}`; return; }
     g.imageSmoothingEnabled = false;
     g.strokeStyle = 'rgba(0,0,0,0.12)';
     g.strokeRect(ox - 0.5, oy - 0.5, W * z + 1, H * z + 1);
-    g.drawImage(pic, ox, oy, W * z, H * z);
+    // at the frame's size and place whatever the style, so the handles and points drawn over it in frame pixels line up
+    drawPicture(g, pic, ox, oy, W * z, H * z);
     if (S.stale) { g.fillStyle = 'rgba(255,255,255,0.55)'; g.fillRect(ox, oy, W * z, H * z); }
     particles.drawOver(g, layout, sprite);
     handles.drawOver(g, layout, sprite);
@@ -268,13 +281,19 @@ export function v2EditorPage(app, { id, entry, drafts, kept, query = {}, studio 
   canvas.addEventListener('pointerup', endDrag);
   canvas.addEventListener('pointercancel', endDrag);
 
-  // the frames of the clip in hand, small, under the picture
+  // the frames of the clip in hand, small, under the picture (a flat one drawn at the size it is shown, and sized so)
   let thumbs = new Map();
   function thumbOf(f) {
     const k = `${S.clip}:${f}`;
     if (!thumbs.has(k)) {
       let c;
-      try { c = canvasOf(renderFrame(S.sprite, S.clip, f, cleanParams(S.sprite, S.params))); } catch { c = document.createElement('canvas'); }
+      try {
+        const [W, H] = S.sprite.size;
+        const s = Math.min(1, THUMB_W / W, THUMB_H / H);
+        const pic = framePicture(S.sprite, S.clip, f, cleanParams(S.sprite, S.params), { zoom: s });
+        c = pic.canvas;
+        if (isVectorPicture(pic)) { c.style.width = `${W * s}px`; c.style.height = `${H * s}px`; showFrame(c, pic); }
+      } catch { c = document.createElement('canvas'); }
       thumbs.set(k, c);
     }
     return thumbs.get(k);

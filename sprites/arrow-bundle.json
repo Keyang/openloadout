@@ -9,7 +9,7 @@
   "pivot": [16,30],
   "grounded": false,
   "preview": "idle",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "palette": [
     {"id":"body","label":"Leather","default":"#7a4f33","material":"cloth","swatches":["#7a4f33","#5a3a22","#a8612a","#3f8a4f"]},
     {"id":"wood","label":"Shafts","default":"#a06a3c","material":"wood","swatches":["#a06a3c","#c98a4a","#f0ead8","#e6c96a"]},

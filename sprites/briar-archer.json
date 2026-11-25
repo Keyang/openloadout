@@ -9,7 +9,7 @@
  "pivot": [28,58],
  "grounded": false,
  "preview": "idle",
- "styles": ["pixel", "flat"],
+ "styles": ["pixel"],
  "palette": [
   {"id":"skin","label":"Skin","default":"#9bd18a","material":"skin","swatches":["#9bd18a","#7fb0b8","#f6d3b0","#8696dc"]},
   {"id":"outfit","label":"Mantle and tunic","default":"#3f8a4f","material":"cloth","swatches":["#3f8a4f","#7a4f33","#5d6475","#7a4fc4","#c9423a"]},

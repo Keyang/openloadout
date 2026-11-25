@@ -29,6 +29,8 @@
 .play-count { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 var(--s2); border-radius: var(--r); background: rgba(255, 255, 255, 0.88); color: var(--ink-2); white-space: nowrap; }
 .play-count strong { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
 .play-pic { display: block; flex: none; image-rendering: pixelated; }
+/* a sprite shown in the flat style (app/art.js): a smooth vector picture, never scaled with square pixels */
+.play-page canvas.is-vector, .play-wide canvas.is-vector { image-rendering: auto; }
 .play-pieces { display: flex; align-items: center; gap: var(--s2); overflow-x: auto; min-width: 0; flex: 1 1 160px; padding: 2px; scrollbar-width: thin; }
 .play-pieces.open { flex-wrap: wrap; overflow: visible; flex-basis: 100%; padding: var(--s2); border-radius: var(--r); background: rgba(255, 255, 255, 0.88); }
 .play-piece { display: inline-flex; gap: 2px; flex: none; }

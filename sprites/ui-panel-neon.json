@@ -17,7 +17,7 @@
   "pivot": [48,32],
   "grounded": false,
   "preview": "panel",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "palette": [
     {"id":"face","label":"Wall","default":"#3f5068","material":"interface","swatches":["#3f5068","#7a4f33","#434d6d","#8e3a4a"]},
     {"id":"frame","label":"Tube","default":"#8fd0f0","material":"interface","swatches":["#8fd0f0","#9bd18a","#c2c9d6","#5fe0f0","#7fe0a0"]},

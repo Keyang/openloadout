@@ -16,6 +16,8 @@
 :is(.kits-page, .bundle-page) .kit-scene canvas { display: block; flex: none; }
 :is(.kits-page, .bundle-page) .kit-lineup { display: flex; align-items: flex-end; justify-content: center; gap: var(--s2); padding: var(--s5); min-height: 180px; }
 :is(.kits-page, .bundle-page) .kit-lineup img { flex: none; image-rendering: pixelated; }
+/* a flat picture (the header's art style), a scene with flat things in it: smooth, never blocky */
+:is(.kits-page, .bundle-page) :is(.kit-lineup, .kit-scene, .bundle-pic) .is-vector { flex: none; image-rendering: auto; }
 :is(.kits-page, .bundle-page) .kit-body { padding: var(--s6) var(--s7); display: flex; flex-direction: column; min-width: 0; }
 :is(.kits-page, .bundle-page) .kit-kind { font-size: 14px; color: var(--ink-2); }
 :is(.kits-page, .bundle-page) .kit-body h1, :is(.kits-page, .bundle-page) .kit-body h3 { margin-top: var(--s1); }

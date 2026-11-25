@@ -9,7 +9,7 @@
   "pivot": [16,30],
   "grounded": false,
   "preview": "idle",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "palette": [
     {"id":"body","label":"Fruit","default":"#c9423a","material":"plant","swatches":["#c9423a","#9bd18a","#7a4fc4","#7a4f33","#3f9fd1","#a4c44a","#f2c230"]},
     {"id":"accent","label":"Leaves","default":"#3f8a4f","material":"plant","swatches":["#3f8a4f","#6aa83e","#e08a2c","#4f9d57"]},

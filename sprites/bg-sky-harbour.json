@@ -9,7 +9,7 @@
   "pivot": [160,180],
   "grounded": false,
   "preview": "far",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "versions": [
     {"name":"Evening harbour","params":{}},
     {"name":"Bright noon quay","params":{"time":"day","sky":"#86c8f2","accent":"#f2c230","windows":0}},

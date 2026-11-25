@@ -5,6 +5,8 @@
 
 .landing { max-width: calc(var(--page) + 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--gutter); }
 .landing .live { display: block; image-rendering: pixelated; flex: none; }
+/* in a vector art style (flat, the header toggle) a picture is drawn at the size it is shown and stays smooth (app/art.js showPicture) */
+.landing .live.is-vector, .landing .demo-hero.is-vector, .landing .scene-ground.is-vector, .landing .pick .is-vector { image-rendering: auto; }
 
 /* ---------- the first screen: big words on the left, the Hero changing on the right ---------- */
 .landing .hero { padding: var(--s8) 0 var(--s7); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s6); align-items: center; }
@@ -81,7 +83,7 @@
 .landing .pick { display: grid; grid-template-columns: repeat(3, 80px); gap: var(--s2); }
 .landing .pick a { width: 80px; height: 80px; border-radius: var(--r); background: var(--paper); position: relative; }
 .landing .pick i { position: absolute; inset: 0; overflow: hidden; border-radius: var(--r); }
-.landing .pick img { max-width: none; position: absolute; left: 50%; top: 50%; translate: calc(-50% + var(--dx, 0px)) calc(-50% + var(--dy, 0px)); }
+.landing .pick :is(img, canvas) { max-width: none; position: absolute; left: 50%; top: 50%; translate: calc(-50% + var(--dx, 0px)) calc(-50% + var(--dy, 0px)); }
 .landing .pick a:hover { box-shadow: 0 0 0 1px var(--line-2); }
 .landing .pick .on, .landing .pick .on:hover { box-shadow: 0 0 0 1.5px var(--ink); }
 .landing .pick .on::after { content: ''; position: absolute; right: -7px; top: -7px; width: 18px; height: 18px; border-radius: 50%; background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23fff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 8.5l2.6 2.6L12 5.2'/%3E%3C/svg%3E") center / 12px no-repeat; }

@@ -7,7 +7,8 @@ import { makeMagic } from './magic.js';
 import { el, header, footer, reduceMotion, sourceLink } from './ui.js';
 import { currentCatalog, loadSprite, loadSound } from './catalog.js';
 import { soundById, soundParams, renderAsync, playRendered, playLive } from './audio.js';
-import { cardFor } from './cards.js';
+import { cardFor, isVectorSite, flatThumb } from './cards.js';
+import { showPicture } from './art.js';
 import { versionsFor } from './versions.js';
 import { colourWord } from './panel.js';
 import { Q_MAX, stateFromQuery, hashFromState } from './browse.js';
@@ -252,7 +253,10 @@ export function landingPage(app) {
     const a = spriteRow(id);
     if (!a || !a.thumb) return null;
     const [w, h] = a.tech.frame;
-    return el('a', { class: i === 0 ? 'on' : null, href: `#/sprite/${a.id}`, title: a.name }, el('i', {}, el('img', { class: 'px', src: a.thumb, width: w * 2, height: h * 2, alt: a.name, decoding: 'async', draggable: 'false', style: `--dx:${dx}px;--dy:${dy}px` })));
+    // in a vector style (flat) the build's flat picture, or one drawn here, at the same size and smooth
+    const pic = isVectorSite() ? flatThumb(a, { width: w * 2, height: h * 2, alt: a.name, style: `--dx:${dx}px;--dy:${dy}px`, lazy: false })
+      : el('img', { class: 'px', src: a.thumb, width: w * 2, height: h * 2, alt: a.name, decoding: 'async', draggable: 'false', style: `--dx:${dx}px;--dy:${dy}px` });
+    return el('a', { class: i === 0 ? 'on' : null, href: `#/sprite/${a.id}`, title: a.name }, el('i', {}, pic));
   }));
 
   let tryNode = null, sheetNode = null, carryOn = null;
@@ -322,7 +326,13 @@ export function landingPage(app) {
   // ---------------------------------------------------------------- the kits, each a small living scene
   let look = 'original';
   const themeOf = (id) => (id === 'original' ? null : THEME_PRESETS.find((p) => p.id === id)?.theme ?? null);
-  const scenes = [];           // { node, spec, parts: live sprites, grounds: [{ node, def, clip }], built }
+  const scenes = [];           // { node, spec, parts: live sprites, grounds: [{ node, def, clip, zoom }], built }
+  // a ground tile laid as the repeating background of its strip: crisp pixels for pixel art, smooth for a vector style
+  const layGround = (ground, theme) => {
+    const pic = live.still(ground.def, ground.clip, theme, undefined, ground.zoom);
+    ground.node.style.backgroundImage = `url(${pic.url})`;
+    showPicture(ground.node, pic.k);
+  };
   async function buildScene(sc) {
     sc.built = true;
     const { spec, node } = sc, theme = themeOf(look);
@@ -332,9 +342,14 @@ export function landingPage(app) {
       if (!spriteRow(g.sprite)) continue;
       const d = el('div', { class: 'scene-ground', style: `--top:${g.top};--h:${g.height};--tw:${spriteRow(g.sprite).tech.frame[0]}` });
       node.append(d);
-      const ground = { node: d, def: null, clip: g.clip };
+      const ground = { node: d, def: null, clip: g.clip, zoom: 2 };
       sc.grounds.push(ground);
-      loadSprite(g.sprite).then((def) => { if (!alive) return; ground.def = def; d.style.backgroundImage = `url(${live.still(def, g.clip, themeOf(look))})`; }).catch((e) => console.warn(`Loadout: the ground "${g.sprite}" could not be drawn.`, e));
+      loadSprite(g.sprite).then((def) => {
+        if (!alive) return;
+        ground.def = def;
+        ground.zoom = d.getBoundingClientRect().height / g.height || 2;       // CSS px a tile pixel: the scene's own zoom
+        layGround(ground, themeOf(look));
+      }).catch((e) => console.warn(`Loadout: the ground "${g.sprite}" could not be drawn.`, e));
     }
     for (const [id, x, y, o = {}] of spec.actors) {
       const a = spriteRow(id);
@@ -383,7 +398,7 @@ export function landingPage(app) {
     for (const sc of scenes) {
       sc.node.dataset.look = id;
       for (const s of sc.parts) s.setTheme(theme);
-      for (const g of sc.grounds) if (g.def) g.node.style.backgroundImage = `url(${live.still(g.def, g.clip, theme)})`;
+      for (const g of sc.grounds) if (g.def) layGround(g, theme);
     }
     for (const a of kitLinks) a.href = kitHref(a.dataset.kit);
   }

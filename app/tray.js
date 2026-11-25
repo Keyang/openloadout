@@ -16,8 +16,10 @@ import { assetById, spriteNow, loadSprite, loadSound } from './catalog.js';
 import { soundById } from './audio.js';
 import { labelFor } from '../catalog/schema.js';
 import { cleanParams } from '../engine/sprite.js';
-import { renderThemedFrame, defaultTheme } from '../engine/theme.js';
-import { artStyleOf, stylesOf, pixelsOf } from '../engine/styles.js';
+import { defaultTheme } from '../engine/theme.js';
+import { artStyleOf, styleById } from '../engine/styles.js';
+import { framePicture, showPicture } from './art.js';      // pixel art crisp, a flat picture smooth (the header's art style)
+import { siteStyle } from './art-style.js';
 import { changesOf } from './bag-edit.js';
 import { packageFiles } from './bundle.js';
 import { zip } from './zip.js';
@@ -44,18 +46,22 @@ function drawnOwnWay(item, plainBag) {
   return !plainBag || !!lookOf(s) || !!s.artStyle || Object.keys(s.params ?? {}).length > 0;
 }
 
-/** A sprite as the bag shows it: the first frame of its preview, in its settings and look. */
+/** A sprite as the bag shows it: the first frame of its preview, in its settings and look (a flat one smooth, at twice its size). */
 function spriteStill(sprite, settings, theme) {
   const s = settings ?? {}, p = cleanParams(sprite, s.params ?? {});
-  const style = artStyleOf(sprite, s.artStyle), first = stylesOf(sprite)[0];
   const record = lookOf(s) ? undefined : s.lookParams;
   const look = lookOf(s) ? null : theme;
-  const g = style === first && style === 'pixel' ? renderThemedFrame(sprite, sprite.preview, 0, p, look ?? theme, { record }) : pixelsOf(renderThemedFrame(sprite, sprite.preview, 0, p, look ?? theme, { style, record }), style);
-  const cv = document.createElement('canvas');
-  cv.width = g.w; cv.height = g.h;
-  cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
-  return cv;
+  const pic = framePicture(sprite, sprite.preview, 0, p, { style: s.artStyle, theme: look ?? theme, record, zoom: 2 });
+  if (pic.k > 1) pic.canvas.style.width = `${sprite.size[0] * 2}px`;      // (its height follows; the tile's max-width still caps it)
+  return showPicture(pic.canvas, pic.k);
 }
+
+/** The style a catalogue row is shown in before its program is here: engine/styles.js artStyleOf, read from the row's `styles`. */
+function rowStyle(row, named) {
+  const own = row?.styles?.length ? row.styles : ['pixel'], site = siteStyle();
+  return own.includes(named) ? named : own.includes(site) ? site : own[0];
+}
+const isVector = (style) => (styleById(style)?.pictureScale ?? 1) > 1;
 
 /**
  * size: 'full' (the library) or 'slim' (an asset page). current: { kind, id, key? }, the thing on the page (marked).
@@ -115,12 +121,18 @@ export function bagTray({ size = 'full', current = null } = {}) {
       box.append(icon(item.kind === 'music' ? ICON.note : ICON.speaker, { size: full ? 18 : 20 }));
       return box;
     }
-    const sprite = spriteNow(item.id);
-    if (sprite && drawnOwnWay(item, plainBag)) {
+    const sprite = spriteNow(item.id), named = item.settings?.artStyle;
+    // in a vector style (flat) the picture is smooth: the build's flat thumbnail, else drawn here once the program is
+    const vector = isVector(sprite ? artStyleOf(sprite, named) : rowStyle(row, named));
+    const own = drawnOwnWay(item, plainBag) || (vector && !row?.thumbFlat);
+    if (sprite && own) {
       try { box.append(spriteStill(sprite, item.settings, theme)); return box; } catch (e) { console.warn('tray picture:', e); }
     }
-    if (row?.thumb) box.append(el('img', { src: row.thumb, alt: '', loading: 'lazy', decoding: 'async' }));
-    if (!sprite && drawnOwnWay(item, plainBag)) bring(item.id);
+    const [fw] = row?.tech?.frame ?? [];
+    // (the flat thumbnail is drawn at 4x: shown at the size of the pixel one, 2x, its height following its width)
+    if (vector && row?.thumbFlat) box.append(showPicture(el('img', { src: row.thumbFlat, alt: '', loading: 'lazy', decoding: 'async', style: fw ? `width:${fw * 2}px` : null }), 4));
+    else if (!vector && row?.thumb) box.append(el('img', { src: row.thumb, alt: '', loading: 'lazy', decoding: 'async' }));
+    if (!sprite && own) bring(item.id);
     return box;
   }
   function bring(id) {

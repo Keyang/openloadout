@@ -4,7 +4,9 @@
 // id of its own, or with the library's id to make a new version of the library file. A version 2 draft's picture in the
 // list of drafts is drawn once the pieces it names are loaded.
 import { el } from '../ui.js';
-import { renderFrame, defaultParams } from '../../engine/sprite.js';
+import { defaultParams } from '../../engine/sprite.js';
+import { framePicture } from '../art.js';
+import { showFrame } from './bits.js';
 import { parseSpriteJson } from '../../catalog/sprite-schema.js';
 import { loadCatalog, allAssets } from '../catalog.js';
 import { draftIdFor } from './drafts.js';
@@ -14,17 +16,22 @@ import { spriteOf, loadPiecesFor, checkDraft } from './v2-check.js';
 
 const LIST_MOST = 40;
 
-/** A sprite's first frame on a canvas shown at a whole-number size that fits `room` pixels; empty when it cannot be drawn. */
+/**
+ * A sprite's first frame on a canvas shown at a whole-number size that fits `room` pixels; empty when it cannot be drawn.
+ * In the site's art style (app/art.js): a flat one is drawn at the size it is shown, smooth.
+ */
 function canvasFor(sprite, room) {
-  const c = el('canvas', { 'aria-hidden': 'true' });
+  let c = el('canvas', { 'aria-hidden': 'true' });
   try {
     const clip = sprite.clips[sprite.preview] ? sprite.preview : Object.keys(sprite.clips)[0];
-    const g = renderFrame(sprite, clip, 0, defaultParams(sprite));
-    c.width = g.w; c.height = g.h;
-    c.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
-    const k = Math.max(1, Math.floor(room / Math.max(g.w, g.h)));
-    c.style.width = `${g.w * Math.min(k, 8)}px`;
-    if (g.w > room) c.style.width = `${room}px`;
+    const [w, h] = sprite.size;
+    const k = Math.max(1, Math.floor(room / Math.max(w, h)));
+    const shown = w > room ? room : w * Math.min(k, 8);
+    const pic = framePicture(sprite, clip, 0, defaultParams(sprite), { zoom: shown / w });
+    c = pic.canvas;
+    c.setAttribute('aria-hidden', 'true');
+    c.style.width = `${shown}px`;
+    showFrame(c, pic);
   } catch { /* an empty picture: the draft's own page says what is wrong */ }
   return c;
 }

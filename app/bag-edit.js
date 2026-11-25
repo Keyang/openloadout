@@ -10,8 +10,8 @@ import { soundParams, rendered, renderAsync, playRendered, playLive } from './au
 import { defaultCues, activeTheme } from './bundle.js';
 import { createEdit, countChanges } from './editing.js';
 import { bag, cleanSettings, lookOf, themeFor } from './bag.js';
-import { renderThemedFrame } from '../engine/theme.js';
-import { artStyleOf, stylesOf, pixelsOf } from '../engine/styles.js';
+import { artStyleOf, styleById } from '../engine/styles.js';
+import { framePicture, showPicture } from './art.js';      // pixel art crisp, a flat picture smooth (the header's art style)
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { el, reduceMotion } from './ui.js';
 import { editPanel } from './panel.js';
@@ -51,58 +51,66 @@ function icon(d, size) {
 
 /**
  * A sprite as it is set, moving, in its look: one canvas the size of what is ever drawn over its animation, shown at a
- * whole-number scale with crisp pixels. read() -> { params, artStyle, theme, record }: what to draw, asked again whenever
- * the item changes (redraw()). Still while the visitor asked for less motion.
+ * whole-number scale with crisp pixels (a vector style, flat, smooth: drawn for the size it is shown at, app/art.js).
+ * read() -> { params, artStyle, theme, record }: what to draw, asked again whenever the item changes (redraw()). Still
+ * while the visitor asked for less motion.
  */
 function spriteStage(sprite, read) {
   const cv = el('canvas', { width: 1, height: 1, role: 'img', 'aria-label': `${sprite.name}, as it is set here` });
   const tile = el('div', { class: 'rx-preview-tile' }, cv);
   const clip = sprite.preview, c = sprite.clips[clip];
-  let sig = '', frames = new Map(), box = null, now = null, fps = 8, last = -1, start = performance.now(), raf = 0, k = 1;
-  const frame = (f) => {
-    let out = frames.get(f);
-    if (!out) {
-      const first = stylesOf(sprite)[0], style = artStyleOf(sprite, now.artStyle);
-      const g = style === first && style === 'pixel'
-        ? renderThemedFrame(sprite, clip, f, now.params, now.theme, { record: now.record })
-        : pixelsOf(renderThemedFrame(sprite, clip, f, now.params, now.theme, { style, record: now.record }), style);
-      out = document.createElement('canvas');
-      out.width = g.w; out.height = g.h;
-      out.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
-      frames.set(f, out);
+  let sig = '', frames = new Map(), box = null, now = null, fps = 8, last = -1, start = performance.now(), raf = 0, k = 1, vector = false;
+  // grid: the frame-size grid, which says where a vector frame draws; the picture itself is drawn for the scale shown (k)
+  const frame = (f, grid = false) => {
+    const id = `${f}|${grid}`;
+    let pic = frames.get(id);
+    if (!pic) {
+      pic = framePicture(sprite, clip, f, now.params, { style: now.artStyle, theme: now.theme, record: now.record, grid, zoom: Math.max(2, k) });
+      frames.set(id, pic);
     }
-    return out;
+    return pic;
   };
-  // the smallest box that holds every drawn pixel of every frame, so the picture does not jump while it moves
+  // the smallest box that holds every drawn pixel of every frame (in frame pixels), so the picture does not jump while it moves
   function drawnBox() {
     let x0 = Infinity, y0 = Infinity, x1 = -1, y1 = -1;
     for (let f = 0; f < c.frames; f++) {
-      const f0 = frame(f), d = f0.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, f0.width, f0.height).data;
+      const f0 = frame(f, vector).canvas, d = f0.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, f0.width, f0.height).data;
       for (let y = 0; y < f0.height; y++) for (let x = 0; x < f0.width; x++) if (d[(y * f0.width + x) * 4 + 3]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
     }
-    const f0 = frame(0);
-    return x1 < 0 ? { x: 0, y: 0, w: f0.width, h: f0.height } : { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+    const [fw, fh] = sprite.size;
+    if (x1 < 0) return { x: 0, y: 0, w: fw, h: fh };
+    // (a vector picture's soft edge reaches a little past the grid's pixels)
+    if (vector) { x0 = Math.max(0, x0 - 1); y0 = Math.max(0, y0 - 1); x1 = Math.min(fw - 1, x1 + 1); y1 = Math.min(fh - 1, y1 + 1); }
+    return { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
   }
   function fit() {
     if (!box) return;
     const w = tile.clientWidth - 8, h = tile.clientHeight - 8;
     if (w <= 0 || h <= 0) return;
+    const was = k;
     k = wholeScale(box.w, box.h, w, h);
     cv.style.width = `${box.w * k}px`; cv.style.height = `${box.h * k}px`;
+    // a vector picture shown larger or smaller is drawn again for its new size
+    if (vector && k !== was && now) { for (const id of [...frames.keys()]) if (id.endsWith('|false')) frames.delete(id); if (last >= 0) { const f = last; last = -1; draw(f); last = f; } }
   }
   function draw(f) {
+    const pic = frame(f), q = pic.k;
+    const w = Math.round(box.w * q), h = Math.round(box.h * q);
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; showPicture(cv, q); }
     const g = cv.getContext('2d');
     g.clearRect(0, 0, cv.width, cv.height);
-    g.drawImage(frame(f), box.x, box.y, box.w, box.h, 0, 0, box.w, box.h);
+    g.imageSmoothingEnabled = q > 1;
+    if (q > 1) g.imageSmoothingQuality = 'high';
+    g.drawImage(pic.canvas, box.x * q, box.y * q, w, h, 0, 0, w, h);
   }
   function redraw() {
     const next = read(), s = JSON.stringify(next);
     if (s === sig) return;
     sig = s; now = next; frames = new Map(); last = -1;
     try {
+      vector = (styleById(artStyleOf(sprite, now.artStyle))?.pictureScale ?? 1) > 1;
       fps = clipFps(sprite, clip, cleanParams(sprite, now.params));
       box = drawnBox();
-      if (cv.width !== box.w || cv.height !== box.h) { cv.width = box.w; cv.height = box.h; }
       fit();
       draw(still());
     } catch (e) { console.error(`picture of ${sprite.id}:`, e); }

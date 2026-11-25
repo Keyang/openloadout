@@ -17,7 +17,9 @@
 //     the palette so a text area of your own keeps it.
 // Every change goes back through onChange(path, value) or onCommit(def, note): the editor keeps the definition.
 import { el } from '../ui.js';
-import { renderFrame, cleanParams } from '../../engine/sprite.js';
+import { cleanParams } from '../../engine/sprite.js';
+import { framePicture, drawPicture } from '../art.js';
+import { showFrame } from './bits.js';
 import { sitePieces } from '../../engine/pieces.js';
 import { paintRefs, paintWords } from './v2-model.js';
 import { genEditor, fieldTree, swatchOf } from './v2-fields.js';
@@ -45,15 +47,12 @@ function exportFor(sprite, clip, p) {
 let indexP = null;
 const piecesIndex = () => (indexP ??= Promise.resolve().then(() => sitePieces().index()).catch(() => ({ pieces: [] })));
 
-/** A frame of the sprite as a canvas of its own size, or null. */
-function frameCanvas(sprite, clip, frame, p) {
-  try {
-    const g = renderFrame(sprite, clip, frame, p);
-    const c = document.createElement('canvas');
-    c.width = g.w; c.height = g.h;
-    c.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
-    return c;
-  } catch { return null; }
+/**
+ * A frame of the sprite as a picture in the site's art style (app/art.js: { canvas, k }, k canvas pixels a frame pixel),
+ * drawn for `zoom` pixels a frame pixel, or null.
+ */
+function framePic(sprite, clip, frame, p, zoom) {
+  try { return framePicture(sprite, clip, frame, p, { zoom }); } catch { return null; }
 }
 
 /** A number box committed on Enter or on leaving it. */
@@ -127,14 +126,16 @@ export function slicePane({ def, sprite, stale = false, clip, frame = 0, params 
   // ---- the zoomed picture, with the lines and boxes over it ----
   const z = SL.zoomFor(size);
   const pic = el('canvas', { class: 'v2-slice-pic', width: Math.round(W * z), height: Math.round(H * z), 'data-w': W, 'data-h': H, 'data-zoom': z, role: 'img', 'aria-label': `The ${state} state, ${z} times, with its slice lines and text area` });
-  const src = sprite && sprite.clips[state] ? frameCanvas(sprite, state, Math.min(frame, sprite.clips[state].frames - 1), p) : null;
+  const src = sprite && sprite.clips[state] ? framePic(sprite, state, Math.min(frame, sprite.clips[state].frames - 1), p, z) : null;
+  // a flat picture is smooth when the page scales the canvas; the lines and boxes are drawn in frame pixels either way
+  showFrame(pic, src);
   let live = { lines, area };
   let hot = null;
   function drawPic() {
     const g = pic.getContext('2d');
     g.imageSmoothingEnabled = false;
     checker(g, pic.width, pic.height, Math.max(4, z * 2));
-    if (src) g.drawImage(src, 0, 0, W * z, H * z);
+    if (src) drawPicture(g, src, 0, 0, W * z, H * z);
     if (isObj(exp?.tile)) { g.fillStyle = 'rgba(5,150,105,0.18)'; g.fillRect(exp.tile.x * z, 0, exp.tile.w * z, H * z); }
     if (isObj(exp?.opening)) box(g, z, exp.opening, OPEN, [2, 2], 2);
     if (isObj(exp?.rect)) box(g, z, exp.rect, RECT, [], 1);
@@ -285,8 +286,13 @@ export function slicePane({ def, sprite, stale = false, clip, frame = 0, params 
       const plan = SL.stretchPlan(e, size, t);
       const c = el('canvas', { width: plan.w * pz, height: plan.h * pz, role: 'img', 'aria-label': `Stretched to ${plan.w} by ${plan.h}`, style: `width:${plan.w * pz}px` });
       const g = c.getContext('2d');
+      // the parts are cut in frame pixels: k picture pixels each (a flat picture is smoothed as it stretches)
+      const k = src.k;
+      g.imageSmoothingEnabled = k > 1;
+      if (k > 1) g.imageSmoothingQuality = 'high';
+      for (const q of plan.parts) g.drawImage(src.canvas, q.sx * k, q.sy * k, q.sw * k, q.sh * k, q.dx * pz, q.dy * pz, q.dw * pz, q.dh * pz);
       g.imageSmoothingEnabled = false;
-      for (const q of plan.parts) g.drawImage(src, q.sx, q.sy, q.sw, q.sh, q.dx * pz, q.dy * pz, q.dw * pz, q.dh * pz);
+      showFrame(c, src);
       const ta = SL.areasOf(e)[0];
       const b = ta && SL.stretchBox(e, size, t, ta);
       if (b) box(g, pz, b, AREA, [4, 3], 1);

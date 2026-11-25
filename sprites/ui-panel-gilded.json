@@ -17,7 +17,7 @@
   "pivot": [48,32],
   "grounded": false,
   "preview": "panel",
-  "styles": ["pixel", "flat"],
+  "styles": ["pixel"],
   "palette": [
     {"id":"face","label":"Stone","default":"#3f5068","material":"interface","swatches":["#3f5068","#7a4f33","#434d6d","#8e3a4a"]},
     {"id":"frame","label":"Gold","default":"#f0ead8","material":"interface","swatches":["#f0ead8","#c2c9d6","#f6d3b0","#f4e06a","#e6c96a"]},

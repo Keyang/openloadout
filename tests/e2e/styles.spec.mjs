@@ -137,23 +137,21 @@ test('existing sprites export exactly what the renderer made before the style se
   expect(got.differ).toEqual([]);
 });
 
-test('a sprite with one style shows nothing new: no Style choice, no style in its link, its bag item or its files', async ({ page }) => {
+test('a library sprite in its first style (the site is pixel) stores no style; flat is on offer and draws at 4x', async ({ page }) => {
   await openRoute(page, '/sprite/coin');
-  await expect(page.locator('.style-choice')).toHaveCount(0);
-  await expect(lookTab(page)).toHaveCount(1);      // the Look tab holds the whole-set looks; a sprite with one style has no Style choice in it
+  await expect(page.locator('.style-choice .chip')).toHaveText(['Pixel art', 'Flat']);      // every data sprite can be drawn flat
   await expect(lookTab(page).locator('.dot')).toBeHidden();
   await page.getByRole('button', { name: 'Add to my bag' }).click();
   await inBag(page);
   const item = await page.evaluate(async () => (await window.loadout.bag.items()).items[0]);
   expect(Object.keys(item.settings)).toEqual(['params', 'cues', 'scale']);
   expect(page.url()).not.toContain('artstyle=');
-  // asking for its one style by name is fine; any other is refused
-  const got = await page.evaluate(async () => [await window.loadout.render('coin', { artStyle: 'pixel' }), await window.loadout.render('coin'), await window.loadout.render('coin', { artStyle: 'flat' })]);
+  // its first style by name is the default; flat is drawn as vector shapes at 4 times the frame
+  const got = await page.evaluate(async () => [await window.loadout.render('coin', { artStyle: 'pixel' }), await window.loadout.render('coin'), await window.loadout.render('coin', { artStyle: 'flat', frame: 0 })]);
   expect(got[0].ok).toBe(true);
   expect(got[0].png).toBe(got[1].png);
   expect(got[1].artStyle).toBe('pixel');
-  expect(got[2]).toMatchObject({ ok: false });
-  expect(got[2].errors[0]).toMatch(/"coin" cannot be drawn in the style "flat".*pixel/);
+  expect(got[2]).toMatchObject({ ok: true, artStyle: 'flat', width: 128 });
   const file = await downloadFrom(page, () => page.locator('.rx-panel [data-act="download"]').click());
   const files = readZip(file.bytes);
   expect(files.map((f) => f.name)).toEqual(expect.arrayContaining(['coin.png', 'coin.json', 'how-to-use.txt']));
@@ -172,7 +170,7 @@ test('the shipped site knows two styles, and says so on window.loadout', async (
   expect(got.styles[1]).toMatchObject({ label: 'Flat', exports: ['sheet'] });
   expect(got.render.description).toMatch(/Sprites: the art style/);
   expect(got.add).toMatch(/artStyle/);
-  expect(got.coin).toEqual(['pixel']);
+  expect(got.coin).toEqual(['pixel', 'flat']);
 });
 
 test('a sprite with three styles: the Style choice has a tab of its own, in plain words, and the pictures follow it', async ({ page }) => {
@@ -420,15 +418,15 @@ test('a library data sprite lists the pixel style only: another style, or an unk
       viaCall: await L.call('render', { id: 'coin', options: { artStyle: 'outline-svg', frame: 0 } }),
     };
   });
-  expect(got.styles).toEqual(['pixel']);
+  expect(got.styles).toEqual(['pixel', 'flat']);
   expect(got.outline.ok).toBe(false);
-  expect(got.outline.errors[0]).toMatch(/"coin" cannot be drawn in the style "outline-svg"\. Its styles are: pixel\./);
+  expect(got.outline.errors[0]).toMatch(/"coin" cannot be drawn in the style "outline-svg"\. Its styles are: pixel, flat\./);
   expect(got.flat.ok).toBe(false);
-  expect(got.flat.errors[0]).toMatch(/"coin" cannot be drawn in the style "silhouette"\. Its styles are: pixel\./);
+  expect(got.flat.errors[0]).toMatch(/"coin" cannot be drawn in the style "silhouette"\. Its styles are: pixel, flat\./);
   expect(got.unknown.ok).toBe(false);
-  expect(got.unknown.errors[0]).toMatch(/"coin" cannot be drawn in the style "watercolour"\. Its styles are: pixel\./);
+  expect(got.unknown.errors[0]).toMatch(/"coin" cannot be drawn in the style "watercolour"\. Its styles are: pixel, flat\./);
   expect(got.notText.ok).toBe(false);
-  expect(got.notText.errors[0]).toMatch(/"coin" cannot be drawn in the style the number 7\. Its styles are: pixel\./);
+  expect(got.notText.errors[0]).toMatch(/"coin" cannot be drawn in the style the number 7\. Its styles are: pixel, flat\./);
   expect(got.pixel).toMatchObject({ ok: true, artStyle: 'pixel' });
   expect(got.pixel.png).toBe(got.plain.png);
   expect(got.viaCall.ok).toBe(false);
@@ -507,11 +505,11 @@ test('a sprite made on the page as data goes through the style seam in its one s
   expect(made.listed.ok).toBe(false);
   expect(made.listed.errors.join('\n')).toMatch(/styles: "silhouette" is not an art style/);
   expect(made.ok).toMatchObject({ ok: true, kept: true });
-  expect(made.styles).toEqual(['pixel']);
+  expect(made.styles).toEqual(['pixel', 'flat']);
   expect(made.pixel).toMatchObject({ ok: true, artStyle: 'pixel' });
   expect(made.pixel.png).toBe(made.plain.png);
   expect(made.flat.ok).toBe(false);
-  expect(made.flat.errors[0]).toMatch(/"style-made" cannot be drawn in the style "silhouette"\. Its styles are: pixel\./);
+  expect(made.flat.errors[0]).toMatch(/"style-made" cannot be drawn in the style "silhouette"\. Its styles are: pixel, flat\./);
   expect(made.add.map((a) => a.ok)).toEqual([true, false, true]);
   expect(Object.keys(made.add[0].item.settings)).toEqual(['params', 'cues', 'scale']);      // no style stored for its one style
   expect(made.add[1].errors[0]).toMatch(/cannot be drawn in the style "silhouette"/);
@@ -524,10 +522,10 @@ test('a sprite made on the page as data goes through the style seam in its one s
   expect(blob).toMatchObject({ id: 'style-blob', artStyle: 'silhouette' });
   expect(files.map((f) => f.name)).toEqual(expect.arrayContaining(['sprites/style-made/style-made.png', 'sprites/style-made/style-made.json', 'sprites/style-made/style-made.sprite.json']));
   expect('artStyle' in JSON.parse(text(files.find((f) => f.name === 'sprites/style-made/style-made.json').data))).toBe(false);
-  // its page: no Style choice, no style in the address; the link of the bag carries no style for it
+  // its page: its own style and flat (every data sprite has it), no style in the address; the link of the bag carries no style for it
   await page.evaluate(() => window.loadout.go('/sprite/style-made'));
   await waitForDrawn(page);
-  await expect(page.locator('.style-choice')).toHaveCount(0);
+  await expect(page.locator('.style-choice .chip')).toHaveText(['Pixel art', 'Flat']);
   expect(page.url()).not.toContain('artstyle=');
   const link = await page.evaluate(async () => {
     const { bag, createBag, memoryStorage } = await import('/app/bag.js');

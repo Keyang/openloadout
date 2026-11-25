@@ -638,3 +638,7 @@ button.adv-btn:hover .adv-go { color: var(--ink); }
   .v2-partpreview { width: 96px; height: 96px; }
   .v2-partthumb { width: 32px; height: 32px; }
 }
+/* the site's art style is Flat: a picture of the sprite drawn as vector shapes (app/art.js showPicture marks it
+   .is-vector) is smooth wherever the studio scales it; the pixel-grid editors (stamp grid, decal placing) stay pixelated */
+.studio canvas.is-vector, .studio-v2 canvas.is-vector, .v2-pic canvas.is-vector, .v2-starts canvas.is-vector,
+.timeline .frame canvas.is-vector, .v2-slice-preview canvas.is-vector, .v2-partthumb.is-vector, .v2-partpreview.is-vector { image-rendering: auto; }

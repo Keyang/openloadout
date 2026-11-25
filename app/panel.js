@@ -35,7 +35,7 @@
 //                   panel beside something else. It sits at the top left, beside the versions, which then shrink to one
 //                   row of small tiles, so the picture and the control being changed are in view together
 //   head            a node for the panel's title row (its name, a way to its page, Close), beside the preview
-import { renderPixels } from '../engine/sprite.js';
+import { framePicture, showPicture } from './art.js';      // pixel art crisp, a flat picture smooth (the header's art style)
 import { colorName } from '../engine/color.js';
 import { el } from './ui.js';
 import { makeMagic } from './magic.js';
@@ -62,15 +62,24 @@ const svg = (d, size = 16) => {
 };
 const ICON = { more: 'M3.5 8h.01M8 8h.01M12.5 8h.01', note: 'M6 12V3.5l6-1.5v8.5M6 12a1.8 1.8 0 1 1-3.6 0A1.8 1.8 0 0 1 6 12Zm6-1.5a1.8 1.8 0 1 1-3.6 0 1.8 1.8 0 0 1 3.6 0Z' };
 
-/** One sprite frame as a canvas of its own size: the first frame of a looping clip, the middle of a one-shot. */
+/**
+ * One sprite frame as a canvas: the first frame of a looping clip, the middle of a one-shot, in the style named (else
+ * the site's art style when the sprite has it, else its first). Pixel art: a canvas of the frame's own size. A vector
+ * style (flat): a smooth picture `pictureK(cv)` canvas pixels a frame pixel, drawn for up to 4 CSS px a frame pixel.
+ */
 export function spritePicture(sprite, params, style) {
   const clip = sprite.clips[sprite.preview], frame = clip.loop === false ? Math.floor(clip.frames / 2) : 0;
-  const g = renderPixels(sprite, sprite.preview, frame, params, style ? { style } : {});
-  const cv = el('canvas', { width: g.w, height: g.h });
-  cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
+  const pic = framePicture(sprite, sprite.preview, frame, params, { style, zoom: 4 });
+  return keepK(pic.canvas, pic.k);
+}
+/** Canvas pixels a frame pixel of a picture made here: 1 for pixel art, more for a vector (flat) one. */
+export const pictureK = (cv) => (cv && cv.dataset ? Number(cv.dataset.k) || 1 : 1);
+/** Mark a canvas as holding a picture k canvas pixels a frame pixel (and show it smooth when k > 1). Returns it. */
+export function keepK(cv, k) {
+  if (k > 1) { cv.dataset.k = String(k); showPicture(cv, k); }
   return cv;
 }
-/** Where a picture has something drawn: { x, y, w, h } of its pixels that are not see-through, or null when it has none. */
+/** Where a picture has something drawn: { x, y, w, h } of its pixels that are not see-through (canvas pixels), or null when it has none. */
 export function drawnBox(cv) {
   const { data } = cv.getContext('2d', { willReadFrequently: true }).getImageData(0, 0, cv.width, cv.height);
   let x0 = cv.width, y0 = cv.height, x1 = -1, y1 = -1;
@@ -86,26 +95,34 @@ export function drawnBox(cv) {
  * then shown larger in its tile. Pictures with nothing drawn are left as they are.
  */
 export function trimPictures(list) {
-  const boxes = list.map((cv) => (cv ? drawnBox(cv) : null)).filter(Boolean);
+  // (the box in frame pixels, so a vector picture, bigger than its frame, is cut at the same place as a pixel one)
+  const boxes = list.map((cv) => {
+    const b = cv ? drawnBox(cv) : null, k = pictureK(cv);
+    if (!b) return null;
+    const x = Math.floor(b.x / k), y = Math.floor(b.y / k);
+    return { x, y, w: Math.ceil((b.x + b.w) / k) - x, h: Math.ceil((b.y + b.h) / k) - y };
+  }).filter(Boolean);
   if (!boxes.length) return list;
   const x0 = Math.max(0, Math.min(...boxes.map((b) => b.x)) - 1), y0 = Math.max(0, Math.min(...boxes.map((b) => b.y)) - 1);
   const x1 = Math.max(...boxes.map((b) => b.x + b.w)) + 1, y1 = Math.max(...boxes.map((b) => b.y + b.h)) + 1;
   return list.map((cv) => {
     if (!cv) return cv;
-    const w = Math.min(cv.width, x1) - x0, h = Math.min(cv.height, y1) - y0;
-    if (w >= cv.width && h >= cv.height) return cv;
-    const out = el('canvas', { width: w, height: h });
-    out.getContext('2d').drawImage(cv, -x0, -y0);
-    return out;
+    const k = pictureK(cv), fw = cv.width / k, fh = cv.height / k;
+    const w = Math.min(fw, x1) - x0, h = Math.min(fh, y1) - y0;
+    if (w >= fw && h >= fh) return cv;
+    const out = el('canvas', { width: w * k, height: h * k });
+    out.getContext('2d').drawImage(cv, -x0 * k, -y0 * k);
+    return keepK(out, k);
   });
 }
 /** Size a pixel picture inside its tile at a whole-number scale (or a whole-number fraction when it is larger than the tile). */
 export function fitPicture(cv, box) {
   const w = box.clientWidth - 8, h = box.clientHeight - 8;
   if (w <= 0 || h <= 0) return;
-  const up = Math.floor(Math.min(w / cv.width, h / cv.height));
-  const k = up >= 1 ? Math.min(up, 4) : 1 / Math.ceil(Math.max(cv.width / w, cv.height / h));
-  cv.style.width = `${cv.width * k}px`; cv.style.height = `${cv.height * k}px`;
+  const q = pictureK(cv), cw = cv.width / q, ch = cv.height / q;      // (its size in frame pixels)
+  const up = Math.floor(Math.min(w / cw, h / ch));
+  const k = up >= 1 ? Math.min(up, 4) : 1 / Math.ceil(Math.max(cw / w, ch / h));
+  cv.style.width = `${cw * k}px`; cv.style.height = `${ch * k}px`;
 }
 
 export function editPanel({
@@ -132,10 +149,11 @@ export function editPanel({
     const first = versionTiles.find((t) => t.cv);
     if (first && kind === 'sprite') {
       const w = first.pic.clientWidth - 8, most = (parseFloat(getComputedStyle(strip).getPropertyValue('--vmax')) || 96) - 8;
+      const q = pictureK(first.cv), fw = first.cv.width / q, fh = first.cv.height / q;      // (its size in frame pixels)
       if (w > 0) {
-        const z = Math.min(w / first.cv.width, most / first.cv.height), k = z >= 1 ? Math.min(4, Math.floor(z)) : 1 / Math.ceil(1 / z);
-        strip.style.setProperty('--vh', `${Math.max(56, Math.ceil(first.cv.height * k) + 8)}px`);
-        for (const { cv } of versionTiles) if (cv) { cv.style.width = `${cv.width * k}px`; cv.style.height = `${cv.height * k}px`; }
+        const z = Math.min(w / fw, most / fh), k = z >= 1 ? Math.min(4, Math.floor(z)) : 1 / Math.ceil(1 / z);
+        strip.style.setProperty('--vh', `${Math.max(56, Math.ceil(fh * k) + 8)}px`);
+        for (const { cv } of versionTiles) if (cv) { const p = pictureK(cv); cv.style.width = `${(cv.width / p) * k}px`; cv.style.height = `${(cv.height / p) * k}px`; }
       }
     } else for (const { pic, cv } of versionTiles) if (cv) fitPicture(cv, pic);
     syncNav();

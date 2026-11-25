@@ -4,7 +4,7 @@
 // registry, so a new pipeline plugs in without touching the sprites that do not use it.
 // Pure JavaScript: runs the same in the browser and in Node.
 //
-//   flat    clean flat shapes: solid colours, smooth edges, drawn at 4x (engine/flat.js); a sprite lists it to offer it
+//   flat    clean vector shapes (engine/vector.js): solid fills, one cel shadow, a round outline; a sprite lists it to offer it
 //   pixel   the first style on the site: the pixel grid of surface.js, no finish, a PNG sheet plus JSON.
 //           A sprite that lists no styles has this one, and draws exactly as it did before styles existed.
 //
@@ -12,7 +12,7 @@
 // being drawn as `ctx.style` in render(g, ctx). How to add a style is in docs/framework-api.md, "Styles".
 
 import { Surface } from './surface.js';
-import { FlatSurface, smooth, toGrid, FLAT_SCALE } from './flat.js';
+import { flatSurface, finishFlat, toGrid, FLAT_SCALE } from './flat.js';
 import { renderSheet } from './sprite.js';      // sprite.js imports this file too; neither uses the other until a call
 
 const registry = new Map();
@@ -34,6 +34,8 @@ const list = (ids) => ids.join(', ');
  *            frame, which is what the site previews and what the quality bar looks at;
  *   recolour(surface, apply)   optional, needed when the surface is not a pixel grid: apply a whole-bundle look.
  *            `apply` takes a Uint32Array of packed colours and recolours it in place;
+ *   derived  optional: true for a style drawn from any data sprite's draw list (flat): every data sprite has it after
+ *            its own styles, without listing it, and the quality bar checks only the styles a sprite lists;
  *   pictureScale   optional, 1 when left out: how many times bigger than the sprite's grid the style's own picture of a frame is
  *            (flat: 4). The api's render answers at that size;
  *   exporters: { sheet(sprite, params, options) }   turns a sprite into files. Returns (or resolves to)
@@ -54,6 +56,7 @@ export function defineStyle(style) {
   if (exporters === null || typeof exporters !== 'object' || typeof exporters.sheet !== 'function' || Object.values(exporters).some((f) => typeof f !== 'function')) throw new Error(`${where}: needs exporters: { sheet(sprite, params, options) }, which returns { files, data }`);
   const made = Object.freeze({
     id: s.id, label: s.label, about: s.about,
+    derived: s.derived === true,
     pictureScale: Number.isInteger(s.pictureScale) && s.pictureScale >= 1 ? s.pictureScale : 1,
     makeSurface: s.makeSurface, finish: s.finish ?? null, toPixels: s.toPixels ?? null, recolour: s.recolour ?? null,
     exporters: Object.freeze({ ...exporters }),
@@ -74,6 +77,14 @@ export function styleIds() {
 
 /** The styles a sprite can be drawn in, best first: its `styles` list, or ['pixel'] when it has none. sprite: a sprite definition. */
 export function stylesOf(sprite) {
+  const own = ownStyles(sprite);
+  // a style made from any data sprite's draw list (flat) is every data sprite's, after its own
+  if (sprite && sprite.definition) for (const s of registry.values()) if (s.derived && !own.includes(s.id)) own.push(s.id);
+  return own;
+}
+
+/** The styles a sprite lists itself (['pixel'] when it lists none), without the derived ones: what the quality bar checks. */
+export function ownStyles(sprite) {
   const own = sprite && sprite.styles;
   return Array.isArray(own) && own.length ? [...own] : ['pixel'];
 }
@@ -121,7 +132,7 @@ export function styleFor(sprite, id) {
   const asked = id !== undefined && id !== null;
   const chosen = asked ? id : has ? own[0] : 'pixel';
   const style = registry.get(chosen);
-  if (style && (!asked || (has ? own.includes(chosen) : chosen === 'pixel'))) return style;
+  if (style && (!asked || (has ? own.includes(chosen) : chosen === 'pixel') || (style.derived && sprite && sprite.definition))) return style;
   const name = sprite && sprite.id ? `sprite ${sprite.id}` : 'this sprite';
   const what = typeof chosen === 'string' ? `"${chosen}"` : String(chosen);
   throw new Error(`${name} cannot be drawn in the style ${what}${style ? '' : ' (there is no style with that name)'}. Its styles are: ${list(stylesOf(sprite))}`);
@@ -224,11 +235,12 @@ async function flatSheet(sprite, params, { style = 'flat', clips, recolour = nul
 defineStyle({
   id: 'flat',
   label: 'Flat',
-  about: 'Clean flat shapes with solid colours, a thin outline and smooth edges, drawn at four times the size.',
+  derived: true,
+  about: 'Clean vector shapes: solid colours, one soft-edged shadow, a round outline and smooth edges at any size.',
   pictureScale: FLAT_SCALE,
-  makeSurface: (width, height) => new FlatSurface(width, height),
-  finish: (surface) => smooth(surface),
+  makeSurface: (width, height) => flatSurface(width, height),
+  finish: (surface, context) => finishFlat(surface, context),
   toPixels: (surface) => toGrid(surface),
-  recolour: (surface, apply) => { apply(surface.data); if (surface.raw) apply(surface.raw.data); },       // the unsmoothed drawing too: pixelsOf reads whole colours from it
+  recolour: (surface, apply) => apply(surface.data),
   exporters: { sheet: flatSheet },
 });

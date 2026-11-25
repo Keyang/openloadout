@@ -402,12 +402,14 @@ const phase = (c, frame) => (c.loop ? frame / c.frames : c.frames > 1 ? frame / 
 /**
  * Render one frame of one clip to a new surface and return it: a pixel Surface in the pixel style.
  * style: the style to draw in (one the sprite lists; its first when left out). It throws for a style the sprite does not list.
+ * scale: for a style that makes its own picture (flat), how many picture pixels a frame pixel (its pictureScale when left out).
  */
-export function renderFrame(sprite, clip, frame, p, { style } = {}) {
+export function renderFrame(sprite, clip, frame, p, { style, scale } = {}) {
   const c = sprite.clips[clip];
   if (!c) throw new Error(`sprite ${sprite.id}: no clip "${clip}"`);
   const st = styleFor(sprite, style);
   const ctx = { clip, t: phase(c, frame), frame, frames: c.frames, loop: c.loop, p, style: st.id };
+  if (Number.isInteger(scale) && scale >= 1 && scale <= 16) ctx.scale = scale;      // a style that draws its own picture (flat) draws it this many times the frame
   const g = st.makeSurface(sprite.size[0], sprite.size[1], ctx);
   sprite.render(g, ctx);
   return st.finish ? st.finish(g, { sprite, ...ctx }) ?? g : g;

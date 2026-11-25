@@ -4,8 +4,9 @@
 // another page. One Download for everything; the bag's look; its link; the warning when the browser will not keep it.
 import { assetById, spriteNow, loadSprites, onCatalogChange } from './catalog.js';   // W2-G: which sprites exist comes from the catalogue; their programs are loaded when the bag needs them
 import { defaultParams, cleanParams, clipFps } from '../engine/sprite.js';
-import { artStyleOf, stylesOf, styleById, pixelsOf } from '../engine/styles.js';   // W6-A: an item is shown in its art style (Contract 12)
-import { renderThemedFrame, spriteLook } from '../engine/theme.js';
+import { artStyleOf, stylesOf, styleById } from '../engine/styles.js';   // W6-A: an item is shown in its art style (Contract 12)
+import { spriteLook } from '../engine/theme.js';
+import { framePicture, sizeScene } from './art.js';      // pixel art crisp, a flat picture smooth (the header's art style)
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { el, header, saveBlob, reduceMotion } from './ui.js';
 import { itemEditor, changesOf } from './bag-edit.js';
@@ -52,7 +53,7 @@ export function changeLink(item) {
       if (s.cues && !same(s.cues, plainCues(defaultCues(sprite)))) q.set('sfx', packCues(s.cues));
     }
     if (s.scale && s.scale !== 1) q.set('scale', String(s.scale));
-    if (sprite && artStyleOf(sprite, s.artStyle) !== stylesOf(sprite)[0]) q.set('artstyle', s.artStyle);
+    if (sprite && s.artStyle && artStyleOf(sprite, s.artStyle) !== stylesOf(sprite)[0]) q.set('artstyle', s.artStyle);      // (one that follows the site's art style names none)
   } else {
     const patch = soundById[item.id];
     if (patch) {
@@ -74,37 +75,42 @@ const plainCues = (cues) => Object.fromEntries(Object.entries(cues).map(([k, l])
 function spritePicture(sprite, settings, theme) {
   const tile = el('canvas', { class: 'tile', width: 80, height: 72, role: 'img', 'aria-label': `${sprite.name}, as you set it up` });
   const p = cleanParams(sprite, settings.params ?? {});
-  const clip = sprite.preview, frames = new Map(), start = performance.now();
-  // in the item's art style; one that is not the sprite's first may draw on another kind of surface, shown by its pixel picture
-  const first = stylesOf(sprite)[0], style = artStyleOf(sprite, settings.artStyle);
+  const clip = sprite.preview, pictures = new Map(), start = performance.now();
+  // in the item's art style (the site's when it names none): pixel art on the frame's grid, crisp; a vector style (flat)
+  // drawn at the size it is shown, smooth, on a tile with a backing store for the screen (app/art.js)
+  const style = artStyleOf(sprite, settings.artStyle), vector = (styleById(style)?.pictureScale ?? 1) > 1;
+  if (vector) sizeScene(tile, 80, 72, 1, style);
   const record = lookOf(settings) ? undefined : settings.lookParams;      // the bag's record of its look is not this item's when it has a look of its own
-  const frame = (f) => {
-    let cv = frames.get(f);
-    if (!cv) {
-      // looks: drawn from what the bag recorded its look made of the sprite (Contract 7, "The record")
-      const g = style === first && style === 'pixel' ? renderThemedFrame(sprite, clip, f, p, theme, { record }) : pixelsOf(renderThemedFrame(sprite, clip, f, p, theme, { style, record }), style);
-      cv = document.createElement('canvas');
-      cv.width = g.w; cv.height = g.h;
-      cv.getContext('2d').putImageData(new ImageData(g.bytes(), g.w, g.h), 0, 0);
-      frames.set(f, cv);
+  let zoom = 4;       // CSS px a frame px the frames are drawn for (a vector picture's size; known once what is drawn is)
+  // looks: drawn from what the bag recorded its look made of the sprite (Contract 7, "The record")
+  // grid: the frame-size grid, which says where a vector frame draws
+  const picture = (f, grid = false) => {
+    const id = `${f}|${grid}`;
+    let pic = pictures.get(id);
+    if (!pic) {
+      pic = framePicture(sprite, clip, f, p, { style, theme, record, grid, zoom: Math.max(2, zoom) });
+      pictures.set(id, pic);
     }
-    return cv;
+    return pic;
   };
   const g = tile.getContext('2d');
   const c = sprite.clips[clip], fps = clipFps(sprite, clip, p);
   let last = -1, box = null;
-  /** The smallest box that holds every drawn pixel of every frame of the clip: { x, y, w, h }. */
+  /** The smallest box that holds every drawn pixel of every frame of the clip, in frame pixels: { x, y, w, h }. */
   function drawnBox() {
     let x0 = Infinity, y0 = Infinity, x1 = -1, y1 = -1;
     for (let f = 0; f < c.frames; f++) {
-      const cv = frame(f), d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
+      const cv = picture(f, vector).canvas, d = cv.getContext('2d').getImageData(0, 0, cv.width, cv.height).data;
       for (let y = 0; y < cv.height; y++) for (let x = 0; x < cv.width; x++) if (d[(y * cv.width + x) * 4 + 3]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
     }
-    const cv = frame(0);
-    return x1 < 0 ? { x: 0, y: 0, w: cv.width, h: cv.height } : { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+    const [fw, fh] = sprite.size;
+    if (x1 < 0) return { x: 0, y: 0, w: fw, h: fh };
+    // (a vector picture's soft edge reaches a little past the grid's pixels)
+    if (vector) { x0 = Math.max(0, x0 - 1); y0 = Math.max(0, y0 - 1); x1 = Math.min(fw - 1, x1 + 1); y1 = Math.min(fh - 1, y1 + 1); }
+    return { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
   }
   // W5-B: a sprite made on a visit is drawn in a worker and its frames arrive later: what was drawn meanwhile is dropped then
-  const offFrames = typeof sprite.onFrames === 'function' ? sprite.onFrames(() => { frames.clear(); last = -1; box = null; }) : null;
+  const offFrames = typeof sprite.onFrames === 'function' ? sprite.onFrames(() => { pictures.clear(); last = -1; box = null; }) : null;
   return {
     node: tile,
     stop() { if (offFrames) offFrames(); },
@@ -116,14 +122,18 @@ function spritePicture(sprite, settings, theme) {
       }
       if (f === last) return;
       last = f;
-      // on the shelf, at the largest whole-number size that fits (a big one is cut to the tile, never squeezed)
+      // on the shelf, at the largest whole-number size that fits (a big one is cut to the tile, never squeezed; a vector
+      // one is fitted to it, smooth at any size)
       // only the part of the frame that is ever drawn on (over the whole animation, so it does not jump), so a small
       // thing in a big frame is shown large
-      const cv = frame(f), b = (box ??= drawnBox());
-      const k = Math.max(1, Math.min(4, Math.floor(Math.min(76 / b.w, 68 / b.h))));
+      const b = (box ??= drawnBox());
+      const k = vector ? Math.min(4, 76 / b.w, 68 / b.h) : Math.max(1, Math.min(4, Math.floor(Math.min(76 / b.w, 68 / b.h))));
+      zoom = k;
+      const pic = picture(f), q = pic.k;
       g.fillStyle = SHELF; g.fillRect(0, 0, 80, 72);
-      g.imageSmoothingEnabled = false;
-      g.drawImage(cv, b.x, b.y, b.w, b.h, Math.round((80 - b.w * k) / 2), Math.round((72 - b.h * k) / 2), b.w * k, b.h * k);
+      g.imageSmoothingEnabled = q > 1;
+      if (q > 1) g.imageSmoothingQuality = 'high';
+      g.drawImage(pic.canvas, b.x * q, b.y * q, b.w * q, b.h * q, Math.round((80 - b.w * k) / 2), Math.round((72 - b.h * k) / 2), b.w * k, b.h * k);
     },
   };
 }
@@ -236,7 +246,7 @@ function describe(item, theme = null) {
     if (sprite) changes = spriteChanges(sprite, used ? used.params : s.params ?? {});
     const style = sprite ? artStyleOf(sprite, s.artStyle) : null;
     // (what it is as it comes is left unsaid: "look" means a colour look such as Night, and only a change is named)
-    parts = [changes.length ? inWords(changes) : null, used && used.changed.length ? 'shapes changed by the bag\'s look' : null, style && style !== stylesOf(sprite)[0] ? `${styleById(style).label} style` : null, s.scale > 1 ? `pixel size ${s.scale}×` : null];
+    parts = [changes.length ? inWords(changes) : null, used && used.changed.length ? 'shapes changed by the bag\'s look' : null, s.artStyle && style !== stylesOf(sprite)[0] ? `${styleById(style).label} style` : null, s.scale > 1 ? `pixel size ${s.scale}×` : null];
   } else {
     const patch = soundById[item.id];
     if (patch) changes = soundChanges(patch, s.style, soundParams(patch, s.style, s.params));
@@ -653,7 +663,8 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
       const cv = pic.node.matches('canvas.tile') ? pic.node : pic.node.querySelector('canvas.tile');
       const old = shown.get(cv?.closest('.bag-item')?.dataset.key);
       if (!cv || !old || old === cv || old.width !== cv.width || old.height !== cv.height) continue;
-      cv.getContext('2d').drawImage(old, 0, 0);
+      const g = cv.getContext('2d');
+      g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(old, 0, 0); g.restore();      // (a flat tile's context is scaled to its backing store)
       if (pic.hold) pic.hold();
     }
     find.setItems(items.map(infoOf));

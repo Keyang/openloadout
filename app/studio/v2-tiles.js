@@ -20,6 +20,7 @@ import { tileClips, TILE_DECAL_ORDERS } from '../../engine/gen/tiles-clips.js';
 import { fieldTree, stampPainter } from './v2-fields.js';
 import { materialEditor } from './v2-tiles-material.js';
 import { mini, numberIn, textIn, selectIn, flagIn, fieldRow, tilePicture, tileThumb } from './v2-tiles-inputs.js';
+import { drawPicture, shownStyle, sizeScene } from '../art.js';
 
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const GP = (gi) => ['body', 'tiles', 'groups', gi];
@@ -88,6 +89,9 @@ function mapSection(ctx) {
   const TS = tileSize(sprite);
   const canvas = el('canvas', { class: 'v2-tilemap-canvas', tabindex: '0', role: 'img', width: ui.map.cols * TS, height: ui.map.rows * TS, 'data-cols': String(ui.map.cols), 'data-rows': String(ui.map.rows),
     style: `max-width:${ui.map.cols * TS * 2}px`, 'aria-label': `Test map, ${ui.map.cols} by ${ui.map.rows} tiles (${view === 'side' ? 'side view' : 'top-down'}): click or drag to paint with the brush; arrows and Enter paint from the keyboard` });
+  // drawn in frame pixels: for a flat tileset the canvas is bigger than the map and its tiles smooth (app/art.js)
+  const MW = ui.map.cols * TS, MH = ui.map.rows * TS;
+  sizeScene(canvas, MW, MH, 2, shownStyle(sprite));
   const g = canvas.getContext('2d');
   const sayLine = el('p', { class: 'v2-tilemap-say', role: 'status', 'aria-live': 'polite' }, ui.said ?? 'Pick a brush, then paint cells. The map carries on past its edges as its edge cells.');
   const notesBox = el('ul', { class: 'v2-tilemap-notes v2-notes' });
@@ -96,12 +100,12 @@ function mapSection(ctx) {
   function draw() {
     laid = T.layMap(ui.map, brushes, view);
     g.fillStyle = BG[view];
-    g.fillRect(0, 0, canvas.width, canvas.height);
-    for (const t of laid.tiles) { const pic = tilePicture(sprite, ctx.params, t.clip); if (pic) g.drawImage(pic, t.col * TS, t.row * TS); }
+    g.fillRect(0, 0, MW, MH);
+    for (const t of laid.tiles) { const pic = tilePicture(sprite, ctx.params, t.clip); if (pic) drawPicture(g, pic, t.col * TS, t.row * TS, pic.canvas.width / pic.k, pic.canvas.height / pic.k); }
     if (ui.grid) {
       g.strokeStyle = 'rgba(0,0,0,0.28)'; g.lineWidth = 1;
-      for (let c = 1; c < ui.map.cols; c++) { g.beginPath(); g.moveTo(c * TS + 0.5, 0); g.lineTo(c * TS + 0.5, canvas.height); g.stroke(); }
-      for (let r = 1; r < ui.map.rows; r++) { g.beginPath(); g.moveTo(0, r * TS + 0.5); g.lineTo(canvas.width, r * TS + 0.5); g.stroke(); }
+      for (let c = 1; c < ui.map.cols; c++) { g.beginPath(); g.moveTo(c * TS + 0.5, 0); g.lineTo(c * TS + 0.5, MH); g.stroke(); }
+      for (let r = 1; r < ui.map.rows; r++) { g.beginPath(); g.moveTo(0, r * TS + 0.5); g.lineTo(MW, r * TS + 0.5); g.stroke(); }
     }
     if (document.activeElement === canvas) { g.strokeStyle = '#fff'; g.lineWidth = 2; g.strokeRect(ui.cursor[0] * TS + 1, ui.cursor[1] * TS + 1, TS - 2, TS - 2); g.strokeStyle = '#000'; g.lineWidth = 1; g.strokeRect(ui.cursor[0] * TS + 2.5, ui.cursor[1] * TS + 2.5, TS - 5, TS - 5); }
     canvas.dataset.map = T.mapText(ui.map, brushes);
@@ -332,10 +336,11 @@ function decalCard(ctx, g, gi, d, di, decalStamp) {
     const cg = cv.getContext('2d');
     cg.fillStyle = BG[viewOf(def)];
     cg.fillRect(0, 0, cv.width, cv.height);
-    const hp = host && tilePicture(sprite, ctx.params, host);
-    if (hp) cg.drawImage(hp, h.at[0] * TS, h.at[1] * TS);
-    const dpPic = tilePicture(sprite, ctx.params, `${g.name}-deco-${d.name}`);
-    if (dpPic) cg.drawImage(dpPic, h.decal[0] * TS, h.decal[1] * TS);
+    // a click places a pixel: the pixel grid, whatever the site's art style
+    const hp = host && tilePicture(sprite, ctx.params, host, { style: 'pixel' });
+    if (hp) cg.drawImage(hp.canvas, h.at[0] * TS, h.at[1] * TS);
+    const dpPic = tilePicture(sprite, ctx.params, `${g.name}-deco-${d.name}`, { style: 'pixel' });
+    if (dpPic) cg.drawImage(dpPic.canvas, h.decal[0] * TS, h.decal[1] * TS);
     let which = placeable.includes(ui.decalItem) ? ui.decalItem : placeable[0];
     cv.addEventListener('click', (e) => {
       if (which === undefined) { ctx.say('Nothing in this decal has a place to move (an outline, or a place set by a control).'); return; }

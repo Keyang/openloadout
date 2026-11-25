@@ -5,11 +5,33 @@
 import { BUNDLE_LEVELS, labelFor } from '../catalog/schema.js';
 import { THEME_PRESETS, normalizeTheme } from '../engine/theme.js';
 import { el, header } from './ui.js';
-import { currentCatalog, assetById } from './catalog.js';
+import { currentCatalog, assetById, loadSprite } from './catalog.js';
 import { kitScene } from './kit-scene.js';
+import { styleById } from '../engine/styles.js';
+import { siteStyle } from './art-style.js';
+import { framePicture, showPicture } from './art.js';      // a flat picture smooth (the header's art style)
 
 const GAME_WORDS = { any: 'For any game', platformer: 'Platformer', 'turn-based-rpg': 'Turn-based role-playing game', 'roguelike-action': 'Roguelike action game' };
 const LOOKS = ['original', 'sunset', 'frost', 'night', 'candy', 'handheld'];
+
+/**
+ * A sprite's picture at twice its size, in the site's art style: the build's thumbnail (pixel art, crisp), or in a vector
+ * style (flat) the build's flat thumbnail, smooth, else one drawn here from its program.
+ */
+function thumbOf(row, fw, fh) {
+  const site = siteStyle(), vector = (styleById(site)?.pictureScale ?? 1) > 1 && (row.styles ?? []).includes(site);
+  if (!vector) return el('img', { class: 'px', src: row.thumb, alt: '', width: fw * 2, height: fh * 2, loading: 'lazy', decoding: 'async', draggable: 'false' });
+  if (row.thumbFlat) return showPicture(el('img', { src: row.thumbFlat, alt: '', width: fw * 2, height: fh * 2, loading: 'lazy', decoding: 'async', draggable: 'false' }), 4);
+  const box = el('canvas', { width: fw * 2, height: fh * 2, 'aria-hidden': 'true', style: `width:${fw * 2}px;height:${fh * 2}px` });
+  loadSprite(row.id).then((sprite) => {
+    const clip = sprite.clips[sprite.preview], f = clip.loop === false ? Math.floor(clip.frames / 2) : 0;
+    const pic = framePicture(sprite, sprite.preview, f, {}, { style: site, zoom: 2 });
+    box.width = pic.canvas.width; box.height = pic.canvas.height;
+    box.getContext('2d').drawImage(pic.canvas, 0, 0);
+    showPicture(box, pic.k);
+  }).catch((e) => console.warn(`kit picture ${row.id}:`, e));
+  return box;
+}
 
 /** A few of a kit's pictures side by side: what stands in for a scene when the kit has nothing to put in one. */
 function lineUp(bundle) {
@@ -22,7 +44,7 @@ function lineUp(bundle) {
     if (fh > 96) continue;
     width += fw * 2 + 8;
     if (width > 300) break;
-    pics.push(el('img', { class: 'px', src: row.thumb, alt: '', width: fw * 2, height: fh * 2, loading: 'lazy', decoding: 'async', draggable: 'false' }));
+    pics.push(thumbOf(row, fw, fh));
   }
   return el('div', { class: 'kit-lineup' }, pics.length ? pics : el('span', { class: 'quiet' }, 'Sounds only'));
 }

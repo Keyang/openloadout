@@ -11,6 +11,8 @@
 // sprite's own program draws the frames it needs.
 import { loadCatalog, bundleById, assetsOfBundle, loadSprite, loadSound } from './catalog.js';
 import { normalizeTheme, renderThemedFrame, spriteMaterials, THEME_PRESETS } from '../engine/theme.js';
+import { artStyleOf, styleById } from '../engine/styles.js';
+import { framePicture, showPicture } from './art.js';      // a sprite in a vector style (flat) drawn smooth, at the size it is shown
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { el, header, saveBlob, reduceMotion, cap } from './ui.js';
 import { kitScene } from './kit-scene.js';
@@ -86,9 +88,9 @@ function spriteTile(row, page) {
       el('a', { class: 'card-title bundle-name', href: linkTo(row) }, row.name),
       el('span', { class: 'card-tag bundle-kind' }, labelFor('type', row.type) || cap(row.type ?? 'sprite'))));
 
-  let indexed = null, sprite = null, loading = null, visible = false;
+  let indexed = null, sprite = null, loading = null, visible = false, vector = false;
   let look = null, lookKey = null, painted = null, last = -1;
-  const shaped = new Map();   // frame -> canvas, for "Also change shapes"
+  const shaped = new Map();   // frame -> canvas, for "Also change shapes" (a vector one: frame -> picture, in the look)
 
   function frameAt(now) {
     if (reduceMotion.matches) return 0;
@@ -106,7 +108,25 @@ function spriteTile(row, page) {
     }
     return c;
   }
+  // a sprite shown in a vector style (the site's art style, flat): every frame drawn by its program in the look, smooth
+  function vectorFrame(f) {
+    let pic = shaped.get(f);
+    if (!pic) {
+      pic = framePicture(sprite, sprite.clips[clipName] ? clipName : sprite.preview, f, {}, { theme: look, zoom: Math.max(2, k) });
+      shaped.set(f, pic);
+    }
+    return pic;
+  }
   function draw(f) {
+    if (vector) {
+      const pic = vectorFrame(f);
+      if (cv.width !== pic.canvas.width || cv.height !== pic.canvas.height) { cv.width = pic.canvas.width; cv.height = pic.canvas.height; showPicture(cv, pic.k); }
+      g.clearRect(0, 0, cv.width, cv.height);
+      g.drawImage(pic.canvas, 0, 0);
+      last = f;
+      if (cv.dataset.look !== lookKey) cv.dataset.look = lookKey;
+      return;
+    }
     g.clearRect(0, 0, fw, fh);
     if (look.shapes && sprite) g.drawImage(shapedFrame(f), 0, 0);
     else g.drawImage(sheet, f * fw, 0, fw, fh, 0, 0, fw, fh);
@@ -115,15 +135,17 @@ function spriteTile(row, page) {
   }
   /** Make the picture match the current look now (only when it is on screen and loaded). */
   function paint(now) {
-    if (!visible || !indexed || !look || painted === lookKey) return;
+    if (!visible || !(indexed || vector) || !look || painted === lookKey) return;
     shaped.clear();
-    if (!look.shapes || !sprite) sg.putImageData(new ImageData(recolourIndexed(indexed, look.colour, sprite ? () => spriteMaterials(sprite, {}) : null), fw * frames, fh), 0, 0);   // looks: with what each colour is of (Contract 7)
+    if (!vector && (!look.shapes || !sprite)) sg.putImageData(new ImageData(recolourIndexed(indexed, look.colour, sprite ? () => spriteMaterials(sprite, {}) : null), fw * frames, fh), 0, 0);   // looks: with what each colour is of (Contract 7)
     painted = lookKey;
     draw(frameAt(now));
   }
   function load() {
     loading = loading ?? (async () => {
       sprite = await loadSprite(row.id).catch(() => null);
+      vector = !!sprite && (styleById(artStyleOf(sprite))?.pictureScale ?? 1) > 1;
+      if (vector) { paint(performance.now()); return; }      // drawn by its program in each look (the strips are pixel art)
       let bytes = null;
       if (row.strip) bytes = await stripPixels(row.strip).catch(() => null);
       if (!bytes && sprite) bytes = programStrip(sprite);
@@ -138,7 +160,7 @@ function spriteTile(row, page) {
   }
   return {
     node, watch: cv,
-    setVisible(on) { visible = on; if (on) { if (!indexed) load(); else paint(performance.now()); } },
+    setVisible(on) { visible = on; if (on) { if (!indexed && !vector) load(); else paint(performance.now()); } },
     restyle(t, key, now) { look = t; lookKey = key; paint(now); },
     tick(now) {
       if (!visible || painted !== lookKey) return;
