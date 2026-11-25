@@ -4,7 +4,7 @@
 import { labelFor } from '../catalog/schema.js';
 import { THEME_PRESETS } from '../engine/theme.js';
 import { makeMagic } from './magic.js';
-import { el, header, footer, reduceMotion } from './ui.js';
+import { el, header, footer, reduceMotion, sourceLink } from './ui.js';
 import { currentCatalog, loadSprite, loadSound } from './catalog.js';
 import { soundById, soundParams, renderAsync, playRendered, playLive } from './audio.js';
 import { cardFor } from './cards.js';
@@ -222,8 +222,8 @@ export function landingPage(app) {
       actions(),
       el('p', { class: 'hero-works' }, el('span', {}, 'Ready for'), engine('Unity'), engine('Godot'), engine('GameMaker'), engine('Phaser'), el('span', {}, 'and any engine that reads PNG and WAV')),
       search,
-      // true today: nothing costs anything; what a released game may do with it is not decided (every asset records "draft", README "Licences")
-      el('p', { class: 'terms' }, 'The terms for using it in a game you release are not set yet.')),
+      // the code and the assets are MIT licensed (LICENSE); the source is on GitHub
+      el('p', { class: 'terms' }, el('b', {}, 'Open source'), ' under the MIT licence: use it in any game, free or paid. ', sourceLink('See the code on GitHub'))),
     demo?.node);
 
   // ---------------------------------------------------------------- the line-up

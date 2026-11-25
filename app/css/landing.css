@@ -24,6 +24,9 @@
 .landing .hero-works b + b::before { content: ''; display: inline-block; width: 1px; height: 14px; background: var(--line-2); margin: 0 14px 0 -8px; vertical-align: -2px; }
 .landing .hero .search { max-width: 440px; margin-top: var(--s5); }
 .landing .hero .terms { margin-top: var(--s3); font-size: 13px; color: var(--ink-2); }
+.landing .hero .terms b { color: var(--ink); font-weight: 600; }
+.source-link { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+.source-link:hover { color: #5b3df5; }
 
 /* the Hero, big, with three real controls; a pointer turns them until the visitor does */
 .landing .hero-demo { position: relative; display: grid; justify-items: center; padding: var(--s5) 0 var(--s4); }

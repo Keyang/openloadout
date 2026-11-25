@@ -160,10 +160,16 @@ export function header(current) {
   return top;
 }
 
-/** The footer (the landing page only): the wordmark's line and the ways into the site. */
+/** Where Loadout's source lives (open source, MIT licence): the landing page and the footer link to it. */
+export const SOURCE_URL = 'https://github.com/Keyang/openloadout';
+
+/** A link to the source on GitHub, opened in a new tab. Arguments: text (the link's words). */
+export const sourceLink = (text) => el('a', { class: 'source-link', href: SOURCE_URL, target: '_blank', rel: 'noopener' }, text);
+
+/** The footer (the landing page only): the wordmark's line, the link to the source, and the ways into the site. */
 export function footer() {
   return el('footer', { class: 'foot' },
-    el('span', {}, 'Loadout. Game art, sounds and music made by code, yours to change.'),
+    el('span', {}, 'Loadout. Game art, sounds and music made by code, yours to change. Open source: ', sourceLink('see it on GitHub'), '.'),
     el('nav', { 'aria-label': 'Footer' },
       el('a', { href: '#/browse' }, 'Library'),
       el('a', { href: '#/bundles' }, 'Kits'),
