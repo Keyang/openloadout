@@ -105,3 +105,9 @@
   .bag-side .rx-panel.has-preview > .rx-preview { position: sticky; top: 56px; z-index: 2; border-bottom: 1px solid var(--line); }
   .bag-export .btn { flex: 1 1 auto; }
 }
+
+/* the list's search and quick filters (app/list-filter.js), between the download box and the list */
+.bag-page .list-find { margin-top: var(--s5); }
+.bag-page .list-find:not([hidden]) + .bag-list { margin-top: var(--s3); }
+.bag-page .list-find-types { flex-wrap: wrap; }
+.bag-page .list-find-box { max-width: 420px; }

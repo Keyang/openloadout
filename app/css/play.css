@@ -212,3 +212,7 @@
   .play-side .rx-panel.has-preview > .rx-preview { position: static; }
   .play-side-links { width: 100%; justify-content: space-between; }
 }
+
+/* the list's search and quick filters (app/list-filter.js), at its top */
+.play-find { padding: var(--s3) var(--s4) 0; }
+.play-find:has(> .list-find[hidden]) { display: none; }

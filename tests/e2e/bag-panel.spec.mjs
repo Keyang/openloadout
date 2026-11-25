@@ -127,7 +127,7 @@ test('a sound and a track are changed in the panel too, and can be heard there',
 test('"Open its page" leads to the asset\'s own page with the item\'s settings and its key', async ({ page }) => {
   await openBag(page, [AXE]);
   const [item] = await bagItems(page);
-  await expect(items(page).nth(0).locator('.bag-actions a')).toHaveAttribute('href', new RegExp(`^#/sprite/knight\\?.*weapon=axe.*bag=${item.key}`));
+  await expect(items(page).nth(0).locator('.bag-actions a.bag-act')).toHaveAttribute('href', new RegExp(`^#/sprite/knight\\?.*weapon=axe.*bag=${item.key}`));
 });
 
 for (const size of [{ width: 1440, height: 900 }, { width: 1024, height: 768 }, { width: 900, height: 700 }, { width: 390, height: 844 }]) {

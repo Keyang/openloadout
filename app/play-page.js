@@ -31,6 +31,7 @@ import { createSounds } from './play/sound.js';
 import { displayPlan, fillSpan } from './play/display.js';
 import { itemEditor } from './bag-edit.js';
 import { surpriseButton, duplicateButton, removeButton, surpriseItem } from './row-tools.js';
+import { listFilter, typeOf } from './list-filter.js';
 import { makeMagic } from './magic.js';
 import { themeControls } from './theme-controls.js';
 import { howTo, roleNote, roleShort, keysLine, keysShort, viewName, leftOutNote, viewReason } from './play/words.js';
@@ -56,6 +57,26 @@ export async function playPage(app, query = {}) {
   topWatch.observe(top);
 
   const guests = [];                 // assets handed over directly instead of through the bag (see addAssets)
+  // search and quick filters at the top of the list (app/list-filter.js). Made once, so what was typed and the chip
+  // picked stay when the scene is built again; they hide rows (and a section left empty), never take anything out.
+  const find = listFilter({ onChange: () => filterRows() });
+  let listNow = null;
+  const infoOf = (item) => ({ name: assetById(item.id)?.name ?? item.id, type: typeOf(item), id: item.id });
+  function filterRows() {
+    if (!listNow) return;
+    let shown = 0;
+    for (const li of listNow.querySelectorAll('.play-row[data-key]')) {
+      const item = bag.get(li.dataset.key);
+      if (!item) continue;
+      li.hidden = !find.test(infoOf(item));
+      if (!li.hidden) shown++;
+    }
+    for (const sec of listNow.querySelectorAll(':scope > section:not(.play-notes)')) {
+      const lis = [...sec.querySelectorAll('.play-row[data-key]')];
+      if (lis.length) sec.hidden = lis.every((li) => li.hidden);
+    }
+    find.result(shown);
+  }
   // The visitor's choices: the view, and for each view its own player and background, so that switching the view
   // and back brings back exactly what was there (a pick made in one view is never used in the other).
   const picks = { mode: null, side: {}, top: {} };
@@ -432,7 +453,10 @@ export async function playPage(app, query = {}) {
     }
     if (missing) notes.push(el('p', { class: 'hint' }, `${missing} thing${missing === 1 ? '' : 's'} in your bag could not be found, so ${missing === 1 ? 'it is' : 'they are'} not here.`));
     if (notes.length) groups.push(el('section', { class: 'play-notes' }, notes));
-    const list = el('div', { class: 'play-list', role: 'region', 'aria-label': 'Everything in your bag', tabindex: '-1' }, groups);
+    const list = el('div', { class: 'play-list', role: 'region', 'aria-label': 'Everything in your bag', tabindex: '-1' }, el('div', { class: 'play-find' }, find.node), groups);
+    listNow = list;
+    find.setItems(entries.map((e) => bag.get(e.key)).filter(Boolean).map(infoOf));
+    filterRows();
 
     // ---- the scene (the left column) -------------------------------------------------------------------------
 

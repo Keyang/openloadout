@@ -10,6 +10,7 @@ import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.
 import { el, header, saveBlob, reduceMotion } from './ui.js';
 import { itemEditor, changesOf } from './bag-edit.js';
 import { surpriseButton, duplicateButton, removeButton, pageLink, playLink, playButton, setPlaying } from './row-tools.js';
+import { listFilter, typeOf } from './list-filter.js';
 import { soundById, soundParams, rendered, renderAsync, playRendered, playLive, drawWave } from './audio.js';
 import { bag, LINK_LIMIT, NOT_KEPT, lookOf, themeFor, linkProblem } from './bag.js';
 import { THEME_PRESETS } from '../engine/theme.js';
@@ -590,6 +591,20 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
     return rows;
   }
 
+  // ---- search and quick filters above the list (app/list-filter.js): they hide rows, never take anything out
+  const find = listFilter({ onChange: () => filterRows() });
+  const infoOf = (item) => ({ name: spriteNow(item.id)?.name ?? soundById[item.id]?.name ?? assetById(item.id)?.name ?? item.id, type: typeOf(item), id: item.id });
+  function filterRows() {
+    let shown = 0;
+    for (const li of list.querySelectorAll('.bag-item[data-key]')) {
+      const item = bag.get(li.dataset.key);
+      if (!item) continue;
+      li.hidden = !find.test(infoOf(item));
+      if (!li.hidden) shown++;
+    }
+    find.result(shown);
+  }
+
   function stopPictures() { for (const p of pictures) if (p.stop) p.stop(); pictures = []; }
 
   function build() {
@@ -628,6 +643,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
       items.length
         ? [
           exportBox,
+          find.node,
           el('ul', { class: 'bag-list' }, listRows(items, theme)),
           lookBox,   // W2-D2
         ]
@@ -640,6 +656,8 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
       cv.getContext('2d').drawImage(old, 0, 0);
       if (pic.hold) pic.hold();
     }
+    find.setItems(items.map(infoOf));
+    filterRows();
     if (heldOpen) list.querySelector(`.bag-item[data-key="${held}"] .bag-open`)?.focus({ preventScroll: true });
     syncDownload();
   }

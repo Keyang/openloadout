@@ -25,6 +25,7 @@ import { packageWords } from './changes.js';
 import { icon, ICON } from './asset-shell.js';
 import { bagScene } from './bag-scene.js';
 import { surpriseButton, duplicateButton, removeButton, playLink } from './row-tools.js';
+import { listFilter, typeOf } from './list-filter.js';
 
 const DOWN = 'M8 2.5v8M4.5 7.5 8 11l3.5-3.5M3 13.5h10';
 export const EMPTY = 'Press + on anything and it lands here.';
@@ -70,6 +71,8 @@ export function bagTray({ size = 'full', current = null } = {}) {
   const empty = el('p', { class: 'tray-empty' }, full ? EMPTY : 'Empty');
   const more = el('p', { class: 'tray-more', hidden: true });
   const scene = full ? bagScene({ max: 7 }) : null;
+  // search and quick filters, above the list (a bag of a few things shows none: app/list-filter.js)
+  const find = full ? listFilter({ onChange: () => filterRows() }) : null;
   const node = el('aside', { class: `tray tray-${size}`, 'aria-label': 'Your bag' },
     el('div', { class: 'tray-head' },
       el('h2', { class: full ? 'tray-title' : 'tray-title sr' }, 'Your bag'),
@@ -77,6 +80,7 @@ export function bagTray({ size = 'full', current = null } = {}) {
       dl),
     status,
     scene ? scene.node : null,
+    find ? find.node : null,
     list, empty, more);
 
   // ---- Download: the bag's own package, as the bag page makes it
@@ -214,7 +218,20 @@ export function bagTray({ size = 'full', current = null } = {}) {
     for (const child of [...list.children]) if (!at.has(child)) child.remove();
     lis.forEach((li, i) => { if (list.children[i] !== li) list.insertBefore(li, list.children[i] ?? null); });
     empty.hidden = n > 0;
+    if (find) { find.setItems(items.map(info)); filterRows(); }
     mark();
+  }
+  const info = (item) => ({ name: assetById(item.id)?.name ?? item.id, type: typeOf(item), id: item.id });
+  /** Show only the rows the search and the chips let through. */
+  function filterRows() {
+    let shown = 0;
+    for (const item of bag.items()) {
+      const li = rows.get(item.key)?.li;
+      if (!li) continue;
+      li.hidden = !find.test(info(item));
+      if (!li.hidden) shown++;
+    }
+    find.result(shown);
   }
 
   // ---- full: the panel starts under the header and stays while the page scrolls (the header scrolls away above it)
