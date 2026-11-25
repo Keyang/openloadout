@@ -100,6 +100,15 @@ canvas, .px, lo-sprite { image-rendering: pixelated; }
 .icon-btn { width: 32px; height: 32px; display: inline-grid; place-items: center; border-radius: var(--r); border: 1px solid var(--line-2); background: var(--paper); flex: none; }
 .icon-btn:hover, .icon-btn[aria-expanded='true'] { border-color: var(--ink); }
 
+/* ---------- a list row's buttons: icons with no words, named for a screen reader, with a tooltip (app/row-tools.js) ---------- */
+.row-icon { width: 32px; height: 32px; flex: none; display: inline-grid; place-items: center; padding: 0; border: 1px solid transparent; border-radius: var(--r); background: transparent; color: var(--ink-2); transition: background-color .12s, color .12s, border-color .12s; }
+.row-icon:hover { color: var(--ink); background: var(--shelf); border-color: var(--line); text-decoration: none; }
+.row-icon.play { color: var(--ink); background: var(--paper); border-color: var(--line-2); }
+.row-icon.play:hover { border-color: var(--ink); }
+.row-icon.play.is-on { color: var(--paper); background: var(--ink); border-color: var(--ink); }
+.row-icon .is-busy { animation: row-spin .8s linear infinite; }
+@keyframes row-spin { to { transform: rotate(360deg); } }
+
 /* ---------- chip: a toggle; pressed = ink border ---------- */
 .chip { height: 32px; padding: 0 var(--s3); display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-2); border-radius: var(--r); font-size: 13px; font-weight: 400; color: var(--ink-2); background: var(--paper); white-space: nowrap; }
 .chip:hover { color: var(--ink); border-color: var(--ink); }
@@ -398,6 +407,8 @@ input[type='range']:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 2px var(
 .btn-magic .magic-star { flex: none; filter: drop-shadow(0 0 3px rgba(255, 240, 160, .9)); animation: magic-twinkle 2.4s ease-in-out infinite; transform-origin: 42% 42%; }
 .btn-magic:hover .magic-star { animation-duration: .9s; }
 .btn-magic.is-casting { animation: magic-cast .45s ease-out; }
+.btn-magic.is-icon { width: 32px; height: 32px; padding: 0; justify-content: center; flex: none; }
+.btn-magic.is-icon .magic-star { width: 18px; height: 18px; }
 .btn-magic.is-casting .magic-star { animation: magic-spin .5s ease-out; }
 @keyframes magic-drift { to { background-position: 100% 50%; } }
 @keyframes magic-twinkle { 0%, 100% { transform: scale(1) rotate(0); opacity: 1; } 50% { transform: scale(.8) rotate(12deg); opacity: .8; } }

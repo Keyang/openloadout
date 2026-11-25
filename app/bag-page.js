@@ -9,6 +9,7 @@ import { renderThemedFrame, spriteLook } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { el, header, saveBlob, reduceMotion } from './ui.js';
 import { itemEditor, changesOf } from './bag-edit.js';
+import { surpriseButton, duplicateButton, removeButton, pageLink, playButton, setPlaying } from './row-tools.js';
 import { soundById, soundParams, rendered, renderAsync, playRendered, playLive, drawWave } from './audio.js';
 import { bag, LINK_LIMIT, NOT_KEPT, lookOf, themeFor, linkProblem } from './bag.js';
 import { THEME_PRESETS } from '../engine/theme.js';
@@ -140,8 +141,8 @@ function soundPicture(patch, settings, theme) {
     return r;
   };
   const timer = setTimeout(() => { try { make(); dirty = true; } catch (e) { held = false; console.error(`sound ${patch.id}:`, e); } }, 0);
-  const btn = el('button', { type: 'button', class: 'btn btn-sm btn-secondary play', 'aria-label': `Play ${patch.name}` }, 'Play');
-  const sync = () => { btn.textContent = handle ? 'Stop' : 'Play'; btn.setAttribute('aria-label', `${handle ? 'Stop' : 'Play'} ${patch.name}`); };
+  const btn = playButton(patch.name);
+  const sync = () => setPlaying(btn, handle ? 'stop' : 'play', patch.name);
   btn.addEventListener('click', () => {
     if (handle) { handle.stop(); handle = null; sync(); dirty = true; return; }
     handle = playRendered(make(), { force: true, loop: !!patch.loop, onended: () => { handle = null; sync(); dirty = true; } });
@@ -171,12 +172,12 @@ function musicPicture(patch, settings, theme) {
   const tile = el('canvas', { class: 'tile', width: 80, height: 72, 'aria-hidden': 'true' });
   const params = themedSoundParams(patch, soundParams(patch, settings.style, settings.params), theme);
   let voice = null, starting = false, gone = false, dirty = true;
-  const btn = el('button', { type: 'button', class: 'btn btn-sm btn-secondary play', 'aria-label': `Play ${patch.name}` }, 'Play');
+  const btn = playButton(patch.name);
   // ==== W2-D2: music under a look that changes brightness ====
   // Live play can follow speed, key and intensity but not brightness, so then the rendered loop is
   // played with the look applied (applySound): what is heard is what the download holds.
   const rendersFirst = soundSettingsFor(patch, theme).brightness !== 0;
-  const sync = () => { const w = voice || starting ? 'Stop' : 'Play'; btn.textContent = starting ? (rendersFirst ? 'Getting the track ready…' : 'Starting…') : w; btn.setAttribute('aria-label', `${w} ${patch.name}`); dirty = true; };
+  const sync = () => { setPlaying(btn, starting ? 'busy' : voice ? 'stop' : 'play', patch.name); dirty = true; };
   const playLoop = async () => {
     const r = await renderAsync(patch, { ...params });
     if (!gone && starting) { const h = playRendered(rendersFirst ? applySound(r, soundSettingsFor(patch, theme)) : r, { force: true, loop: true }); voice = h && { stop: () => h.stop() }; }
@@ -417,10 +418,10 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
       el('button', { type: 'button', class: 'btn btn-sm btn-secondary', onclick: () => take('replace') }, 'Replace my bag'), ignore);
   }
 
-  const removeBtn = (item, name) => el('button', { type: 'button', class: 'bag-act', 'aria-label': name ? `Remove ${name}` : 'Remove', onclick: () => {
+  const removeBtn = (item, name) => removeButton(name ? `Remove ${name}` : 'Remove', () => {
     if (name) flash = { at: bag.items().findIndex((i) => i.key === item.key), text: `Removed ${name}.` };
     bag.remove(item.key);
-  } }, 'Remove');
+  });
 
   // the whole row opens the panel (its picture, its words, the space between); the row's button is what the keyboard and
   // a screen reader use. Its own buttons and links (Play, Open its page, Remove) do what they say instead.
@@ -486,13 +487,10 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
       flash && flash.key === item.key ? el('span', { class: 'row-note', role: 'status' }, flash.text) : null,
       el('div', { class: 'bag-actions' },
         playBtn,      // a sound's or a track's Play: beside its picture, never on it
-        gone ? null : el('a', { class: 'bag-act', href: changeLink(item), 'aria-label': `Open the page of ${name}` }, 'Open its page'),
-        gone ? null : el('button', { type: 'button', class: 'bag-act', onclick: () => {
-          // copies go at the end of the bag; the note goes on the new row
-          flash = { key: null, text: `Added another copy of ${name}.` };
-          flash.key = bag.add({ kind: item.kind, id: item.id, settings: item.settings, definition: item.definition });
-          build();
-        } }, 'Add another copy'),
+        gone ? null : surpriseButton(item, sprite ?? patch, name),      // a random version of it, at once (the bag's change rebuilds the row)
+        gone ? null : pageLink(changeLink(item), name),
+        // the copy goes right after the original; the note goes on the new row
+        gone ? null : duplicateButton(item, name, { onDone: (key) => { flash = { key, text: `Duplicated ${name}.` }; build(); } }),
         removeBtn(item, name)));
     return gone ? li : opensRow(li, item.key);
   }

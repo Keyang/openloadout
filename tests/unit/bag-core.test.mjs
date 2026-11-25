@@ -281,3 +281,17 @@ test('peekLink says what a link holds without changing the bag', () => {
   assert.equal(two.peekLink('rubbish'), null);
   assert.equal(two.count(), 1);
 });
+
+test('duplicate puts a copy of an item right after it, with the same settings and a key of its own', () => {
+  const bag = createBag(memoryStorage());
+  const a = bag.add(sprite()), b = bag.add(sound());
+  const copy = bag.duplicate(a);
+  assert.ok(copy && copy !== a && copy !== b);
+  assert.deepEqual(bag.items().map((i) => i.key), [a, copy, b], 'the copy sits next to its original');
+  assert.deepEqual(bag.get(copy).settings, bag.get(a).settings);
+  assert.equal(bag.get(copy).id, 'knight');
+  // changing the copy leaves the original alone
+  bag.update(copy, { ...bag.get(copy).settings, params: { armor: 0.9 } });
+  assert.equal(bag.get(a).settings.params.armor, 0.5);
+  assert.equal(bag.duplicate('nope'), null);
+});

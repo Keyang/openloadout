@@ -48,7 +48,8 @@ export function makeMagic(button) {
   button.classList.remove('btn-secondary', 'btn-sm');
   button.classList.add('btn-magic');
   button.prepend(star());
-  button.addEventListener('click', () => burst(button));
+  // (in the capture phase, so the burst takes its place from the button before whatever the press does redraws the page)
+  button.addEventListener('click', () => burst(button), true);
   button.addEventListener('animationend', (e) => { if (e.animationName === 'magic-cast') button.classList.remove('is-casting'); });
   return button;
 }

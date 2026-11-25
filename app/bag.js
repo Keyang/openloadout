@@ -483,6 +483,16 @@ export function createBag(storage, { now = () => Date.now(), standard = null, ke
       changed();
       return key;
     },
+    /** A copy of an item, put right after it (the Duplicate button). Returns the copy's key, or null when the key is not in the bag. */
+    duplicate(key) {
+      const i = state.items.findIndex((x) => x.key === key);
+      if (i < 0) return null;
+      const it = state.items[i];
+      const k = put({ kind: it.kind, id: it.id, settings: clone(it.settings), definition: it.definition ? clone(it.definition) : undefined }, now());
+      state.items.splice(i + 1, 0, state.items.pop());
+      changed();
+      return k;
+    },
     items: () => state.items.map(copy),
     get(key) { const it = state.items.find((i) => i.key === key); return it ? copy(it) : null; },
     has: (key) => state.items.some((i) => i.key === key),

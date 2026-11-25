@@ -31,3 +31,13 @@ test('with less motion asked for, Surprise me still works but throws no sparkles
   await expect.poll(() => page.evaluate(() => location.hash)).not.toBe(before);
   await expect(page.locator('.magic-burst')).toHaveCount(0);
 });
+
+test('a bag row\'s Surprise me is the magic button too, and sparkles on a press', async ({ page }) => {
+  await openRoute(page, '/sprite/knight');
+  await page.evaluate(async () => { const { bag } = await import('/app/bag.js'); bag.clear(); bag.add({ kind: 'sprite', id: 'knight', settings: { params: {}, cues: null, scale: 1 } }); });
+  await openRoute(page, '/bag');
+  const btn = page.locator('.bag-item').first().getByRole('button', { name: /^Surprise me: / });
+  await expect(btn).toHaveClass(/btn-magic/);
+  await btn.click();
+  await expect(page.locator('.magic-burst > span')).toHaveCount(12);
+});

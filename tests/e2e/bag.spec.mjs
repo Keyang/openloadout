@@ -37,7 +37,13 @@ test('a changed sound and a music track: the bag lists them and keeps them; clic
   await expect(items(page).nth(0)).toContainText('Sound');
   await expect(items(page).nth(1)).toContainText(MUSIC.name);
   await expect(items(page).nth(1)).toContainText('Music');
-  for (let i = 0; i < 2; i++) await expect(items(page).nth(i).getByRole('button', { name: /^Play/ })).toHaveText('Play');
+  // each row's buttons are icons with no words (app/row-tools.js): named for a screen reader, with a tooltip
+  for (let i = 0; i < 2; i++) {
+    const play = items(page).nth(i).getByRole('button', { name: /^Play/ });
+    await expect(play).toHaveAttribute('title', 'Play');
+    expect((await play.textContent()).trim()).toBe('');
+  }
+  expect(await items(page).first().locator('.bag-actions').evaluate((box) => [...box.querySelectorAll('a, button')].map((b) => b.textContent.trim()).join(''))).toBe('');
 
   await page.reload();
   await expect(items(page)).toHaveCount(2);
@@ -72,12 +78,15 @@ test('a changed sound and a music track: the bag lists them and keeps them; clic
   // "Open its page" still leads to the track's own page, carrying the item
   await expect(items(page).nth(1).getByRole('link', { name: /^Open the page of/ })).toHaveAttribute('href', new RegExp(`#/music/${MUSIC.id}\\?.*bag=`));
 
-  // Add another copy, then Remove; each says what it did next to the row
+  // Duplicate (an icon, no words), then Remove; each says what it did next to the row
   await openRoute(page, '/bag');
-  await items(page).nth(1).getByRole('button', { name: 'Add another copy' }).click();
+  const dup = items(page).nth(1).getByRole('button', { name: `Duplicate ${MUSIC.name}` });
+  expect((await dup.textContent()).trim(), 'the duplicate button is an icon only').toBe('');
+  await expect(dup.locator('svg')).toHaveCount(1);
+  await dup.click();
   await expect(items(page)).toHaveCount(3);
   await expect(count(page)).toHaveText('3');
-  await expect(items(page).nth(2).locator('.row-note')).toHaveText(`Added another copy of ${MUSIC.name}.`);
+  await expect(items(page).nth(2).locator('.row-note')).toHaveText(`Duplicated ${MUSIC.name}.`);
   await items(page).nth(2).getByRole('button', { name: 'Remove' }).click();
   await expect(page.locator('.bag-list > li').nth(2)).toContainText(`Removed ${MUSIC.name}.`);
   await items(page).nth(1).getByRole('button', { name: 'Remove' }).click();
@@ -389,4 +398,29 @@ test('the Play button sits beside the picture, not on it', async ({ page }) => {
     const overlap = !(btn.x >= tile.x + tile.width || btn.x + btn.width <= tile.x || btn.y >= tile.y + tile.height || btn.y + btn.height <= tile.y);
     expect(overlap, `row ${i + 1}`).toBe(false);
   }
+});
+
+test('each row has its own Surprise me and Duplicate: Surprise me changes that item at once, Duplicate puts a copy right after it', async ({ page }) => {
+  await openRoute(page, '/');
+  const soundKey = SOUND.params[0].id;
+  await addInPage(page, { kind: 'sound', id: SOUND.id, settings: { params: { [soundKey]: SOUND.params[0].max }, style: null, seed: 1 } });
+  await addInPage(page, { kind: 'music', id: MUSIC.id, settings: { params: {}, style: null } });
+  await openRoute(page, '/bag');
+  await expect(items(page)).toHaveCount(2);
+  const before = await bagItems(page);
+  const magic = items(page).first().getByRole('button', { name: `Surprise me: ${SOUND.name}` });
+  await expect(magic).toHaveClass(/btn-magic/);
+  await expect(magic.locator('svg.magic-star')).toHaveCount(1);
+  await magic.click();                                                   // no panel is opened: the row's item just changes
+  await expect.poll(async () => JSON.stringify((await bagItems(page))[0].settings.params)).not.toBe(JSON.stringify(before[0].settings.params));
+  const after = await bagItems(page);
+  expect(after[0].key).toBe(before[0].key);
+  expect(JSON.stringify(after[1].settings)).toBe(JSON.stringify(before[1].settings));      // the other row is left alone
+  await expect(page.locator('.bag-side')).toBeHidden();
+  await items(page).first().getByRole('button', { name: `Duplicate ${SOUND.name}` }).click();
+  await expect(items(page)).toHaveCount(3);
+  const now = await bagItems(page);
+  expect(now.map((i) => i.id)).toEqual([SOUND.id, SOUND.id, MUSIC.id]);       // the copy sits right after the original
+  expect(now[1].key).not.toBe(now[0].key);
+  expect(JSON.stringify(now[1].settings)).toBe(JSON.stringify(now[0].settings));
 });
