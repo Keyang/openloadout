@@ -325,6 +325,60 @@ export function indexEntry(piece) {
   };
 }
 
+/** A piece's `pose` arg that draws it for a death frame (anything but the standing or resting pose): not a use to copy. */
+const posedUse = (args) => isObj(args) && typeof args.pose === 'string' && args.pose !== 'stand' && args.pose !== 'rest';
+
+/**
+ * Where the library's sprites wear their parts and held things (build item B20): pieces say which body they fit only in
+ * words, so the studio learns it from use. For definitions (plain data, sprites/*.json) gives a Map from a part or held
+ * piece id to its usedOn list, one row per base the sprites extend: { base, sprites (how many), on: [{ node, at?, n }]
+ * (the nodes it hangs on, most used first; at: the base's node or bone a sprite's own node hangs from), z? (the most used),
+ * socket? (the parts group's attach point), example: { sprite, v, on, z?, args?, paint? } }, rows by sprites then base.
+ * Uses on a sprite with no base, and a part drawn for a death frame (its `pose` arg), are left out. Arguments: definitions.
+ */
+export function pieceUsage(definitions) {
+  const acc = new Map();
+  for (const def of Array.isArray(definitions) ? definitions : []) {
+    const rig = isObj(def?.body) && isObj(def.body.rig) ? def.body.rig : null;
+    const base = rig && isObj(rig.extends) && typeof rig.extends.use === 'string' ? rig.extends.use : null;
+    if (!base || typeof def.id !== 'string') continue;
+    // the sprite's own nodes and bones, and what each hangs from, to say which base node an own node sits on
+    const parent = new Map();
+    for (const l of [rig.bones, rig.nodes]) for (const n of Array.isArray(l) ? l : []) if (isObj(n) && typeof n.id === 'string') parent.set(n.id, typeof n.parent === 'string' ? n.parent : null);
+    const anchor = (id) => { let at = id; for (let i = 0; i < 16 && parent.has(at); i++) at = parent.get(at); return at && !parent.has(at) ? at : null; };
+    const socketOf = new Map();
+    if (isObj(def.parts)) for (const p of Object.values(def.parts)) if (isObj(p) && typeof p.socket === 'string' && Array.isArray(p.shapes)) for (const s of p.shapes) socketOf.set(s, p.socket);
+    for (const u of usesOf(rig.shapes, 'shapes')) {
+      if (!u.ref || (u.kind !== 'part' && u.kind !== 'held') || !isObj(u.node) || u.node.kind !== 'use' || typeof u.node.on !== 'string') continue;
+      if (posedUse(u.args)) continue;
+      if (!acc.has(u.id)) acc.set(u.id, new Map());
+      const by = acc.get(u.id);
+      if (!by.has(base)) by.set(base, { base, sprites: new Set(), on: new Map(), z: new Map(), socket: new Map(), example: null });
+      const r = by.get(base);
+      r.sprites.add(def.id);
+      const on = u.node.on;
+      if (!r.on.has(on)) r.on.set(on, { node: on, ...(parent.has(on) && anchor(on) ? { at: anchor(on) } : {}), n: 0 });
+      r.on.get(on).n++;
+      if (Number.isFinite(u.node.z)) r.z.set(u.node.z, (r.z.get(u.node.z) || 0) + 1);
+      const sock = typeof u.node.id === 'string' ? socketOf.get(u.node.id) : undefined;
+      if (sock) r.socket.set(sock, (r.socket.get(sock) || 0) + 1);
+      if (!r.example) r.example = { sprite: def.id, v: u.v, on, ...(Number.isFinite(u.node.z) && { z: u.node.z }), ...(u.args !== undefined && { args: u.args }), ...(u.paint !== undefined && { paint: u.paint }) };
+    }
+  }
+  const most = (m) => [...m.entries()].sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))[0]?.[0];
+  const out = new Map();
+  for (const [id, by] of acc) {
+    const rows = [];
+    for (const r of by.values()) {
+      rows.push({ base: r.base, sprites: r.sprites.size, on: [...r.on.values()].sort((a, b) => b.n - a.n || (a.node < b.node ? -1 : 1)),
+        ...(r.z.size && { z: most(r.z) }), ...(r.socket.size && { socket: most(r.socket) }), example: r.example });
+    }
+    rows.sort((a, b) => b.sprites - a.sprites || (a.base < b.base ? -1 : 1));
+    if (rows.length) out.set(id, rows);
+  }
+  return out;
+}
+
 /**
  * The pieces as the v2 schema reads them: { piece(id, v) -> summary or null, pieces() -> every summary }, from a
  * store (its loaded pieces, looked up when asked), the pieces index, or a list of index rows. Arguments: source.

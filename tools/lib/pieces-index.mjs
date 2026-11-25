@@ -3,8 +3,11 @@
 // says what a piece is). There is no list of pieces: every file in pieces/ named <kind>-<name>.v<v>.json is one.
 //
 //   generated/pieces.json   { format: "loadout-pieces", version: 1, pieces: [{ ref, id, kind, v, file, name, about,
-//                           slots, args, uses, latest, bytes, hash }] } sorted by id, then version. The site reads it
-//                           to list pieces (studio, context.mjs pieces); the v2 schema checks `use` against it
+//                           slots, args, uses, latest, bytes, hash, usedOn? }] } sorted by id, then version. The site
+//                           reads it to list pieces (studio, context.mjs pieces); the v2 schema checks `use` against it.
+//                           usedOn (written by --write and the build; build item B20): on the latest row of a part or
+//                           held piece, where the library's sprites/ wear it, per base they extend (engine/pieces.js
+//                           pieceUsage), so the studio offers the parts that fit a sprite's base
 //   pieces/_pins.json       { about, pins: { "<kind>:<name>@<v>": "<hash>" } }: the released versions. A pinned
 //                           version whose content changes fails tests/unit/pieces-index.test.mjs, so a released
 //                           version never changes (Contract 15 rule 5). A pin outlives its file, so a deleted
@@ -22,7 +25,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { validatePiece, indexEntry, refOfFile, usesOf, parsePieceRef, checkPieceUses, createPieceStore, sitePieces } from '../../engine/pieces.js';
+import { validatePiece, indexEntry, refOfFile, usesOf, parsePieceRef, checkPieceUses, createPieceStore, sitePieces, pieceUsage } from '../../engine/pieces.js';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const INDEX_FILE = 'generated/pieces.json';
@@ -44,14 +47,29 @@ export function pieceHash(value) {
   return crypto.createHash('sha256').update(canonicalJson(value)).digest('hex').slice(0, 16);
 }
 
+/** The library's sprite definitions in <root>/sprites (the ones that parse), for where parts are worn. Arguments: root. */
+function librarySprites(root) {
+  const dir = path.join(root, 'sprites');
+  if (!fs.existsSync(dir)) return [];
+  const out = [];
+  for (const f of fs.readdirSync(dir).sort()) {
+    if (!f.endsWith('.json')) continue;
+    const text = fs.readFileSync(path.join(dir, f), 'utf8');
+    if (!text.includes('"part:') && !text.includes('"held:')) continue;   // most sprites wear no piece: not parsed
+    try { out.push(JSON.parse(text)); } catch { /* a broken file is the build's error, not this one's */ }
+  }
+  return out;
+}
+
 /**
  * Scans <root>/pieces, checks every piece file (engine/pieces.js validatePiece, with the body hook `check` when
  * given; a material piece's body is always held to the material rules, engine/pieces.js KIND_CHECKS, so the index never
  * lists one a tileset would refuse, and its row says how many fill versions it has: build item B15b) and what each uses
  * against the rest. Returns { index, errors, warnings }: the index holds the valid pieces
- * only; errors start with the file they are about. Arguments: { root, check }.
+ * only; errors start with the file they are about. With usage, the latest row of each part or held piece that
+ * <root>/sprites wears gets usedOn (engine/pieces.js pieceUsage; build item B20). Arguments: { root, check, usage }.
  */
-export function buildPiecesIndex({ root = ROOT, check = null } = {}) {
+export function buildPiecesIndex({ root = ROOT, check = null, usage = false } = {}) {
   const dir = path.join(root, 'pieces');
   const errors = [], warnings = [];
   const rows = [], bodies = new Map();
@@ -73,6 +91,10 @@ export function buildPiecesIndex({ root = ROOT, check = null } = {}) {
   const top = new Map();
   for (const r of rows) top.set(r.id, Math.max(top.get(r.id) || 0, r.v));
   for (const r of rows) r.latest = top.get(r.id) === r.v;
+  if (usage) {
+    const worn = pieceUsage(librarySprites(root));
+    for (const r of rows) if (r.latest && worn.has(r.id)) r.usedOn = worn.get(r.id);
+  }
   const index = { format: 'loadout-pieces', version: 1, pieces: rows };
   // what each piece uses must exist, fit, and make no loop; a piece that fails this stays listed (its file is fine) and the error stops the build
   for (const r of rows) {
@@ -83,9 +105,9 @@ export function buildPiecesIndex({ root = ROOT, check = null } = {}) {
   return { index, errors, warnings };
 }
 
-/** Writes generated/pieces.json when every piece is valid. Returns { count, errors, warnings, file } (file null when not written). Arguments: { root, check }. */
+/** Writes generated/pieces.json when every piece is valid, with where the library wears each part (usedOn). Returns { count, errors, warnings, file } (file null when not written). Arguments: { root, check }. */
 export function writePiecesIndex({ root = ROOT, check = null } = {}) {
-  const { index, errors, warnings } = buildPiecesIndex({ root, check });
+  const { index, errors, warnings } = buildPiecesIndex({ root, check, usage: true });
   if (errors.length) return { count: index.pieces.length, errors, warnings, file: null };
   const out = path.join(root, INDEX_FILE);
   fs.mkdirSync(path.dirname(out), { recursive: true });

@@ -9,7 +9,8 @@
 //                 and everything else in the body as a tree of typed inputs (the dedicated tile, layer, 9-slice and
 //                 particle editors are build item B19; an emitter list gets the particle editor, app/studio/v2-particles*.js, B19a)
 //     Clips       each clip's frames, speed, looping, keys, frame edits and sounds (a tree), clips added and removed
-//     Look & name name, words, palette slots (label, colour), the controls people get, parts, and a try-out of them
+//     Look & name name, words, palette slots (label, colour), the controls people get, parts (for a character that
+//                 extends a base, picked from the library: app/studio/v2-parts-pane.js, B20), and a try-out of them
 //     Check       the validator's errors and warnings (also shown beside the rows they are about) and the quality bar's
 //                 findings, worked out in a background worker (advice only: Contract 14 rule 7)
 //     All fields  the whole definition as one tree
@@ -29,6 +30,8 @@ import { checkFull, spriteOf, loadPiecesFor } from './v2-check.js';
 import { fieldTree, genEditor, stampPainter, itemList, swatchOf } from './v2-fields.js';
 import { layersEditor } from './v2-layers.js';
 import { slicePane } from './v2-slice-pane.js';
+import { partsPane } from './v2-parts-pane.js';
+import { baseOf } from './v2-parts.js';
 import { particleEditor } from './v2-particles-pane.js';
 import { tilesPane } from './v2-tiles.js';
 import { handlesUi } from './v2-handles-ui.js';
@@ -548,8 +551,18 @@ export function v2EditorPage(app, { id, entry, drafts, kept, query = {}, studio 
           el('span', { class: 'v2-acts' }, mini('×', () => change(['controls', i], undefined, 'Control removed.'), { 'aria-label': `Remove the control ${c.key}` }))), tree(c, ['controls', i], { open: 1 })),
         errorBox(errs)));
     });
-    out.push(el('div', { class: 'st-head' }, el('h3', {}, 'Parts that can be switched off')), tree(isObj(d.parts) ? d.parts : {}, ['parts'], { open: 1 }));
-    if (!isObj(d.parts)) out.push(mini('Give it parts', () => change(['parts'], {}), {}));
+    // the parts: for a character that extends a base, picked from the library (B20, app/studio/v2-parts-pane.js), the
+    // fields under its More; for any other body, the fields
+    const partsFields = () => [tree(isObj(d.parts) ? d.parts : {}, ['parts'], { open: 1 }), isObj(d.parts) ? null : mini('Give it parts', () => change(['parts'], {}), {})];
+    if (M.bodyKind(d) === 'rig' && baseOf(d)) {
+      out.push(partsPane({ def: d, sprite: S.sprite, clip: S.clip, params: S.params, ui: (S.partsUi ??= {}), more: el('div', { class: 'v2-partfields-raw' }, ...partsFields().filter(Boolean)),
+        onCommit: (next, note, p) => { if (p) { S.params = p; thumbs = new Map(); } commit(next, note); },
+        onParams: (p) => { S.params = p; thumbs = new Map(); drawStage(); drawUnder(); drawPane(); }, redraw: () => drawPane() }));
+    } else {
+      const [fields, give] = partsFields();
+      out.push(el('div', { class: 'st-head' }, el('h3', {}, 'Parts that can be switched off')), fields);
+      if (give) out.push(give);
+    }
     out.push(el('details', { class: 'v2-sub' }, el('summary', {}, 'What it is, and words to find it (meta)'), isObj(d.meta) ? tree(d.meta, ['meta'], { open: 1 }) : null));
     // trying the controls on the picture
     if (S.sprite) {

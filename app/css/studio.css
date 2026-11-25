@@ -602,3 +602,39 @@ button.adv-btn:hover .adv-go { color: var(--ink); }
   .v2-handlebar .btn { height: 22px; min-height: 0; padding: 0 8px; line-height: 20px; }
   .v2-handlebar .v2-hbones { font-size: 0.8rem; }
 }
+
+/* v2 editor: library parts on Look & name, for a character that extends a base (app/studio/v2-parts-pane.js, B20) */
+.v2-parts { display: grid; gap: var(--s2); min-width: 0; }
+.v2-parts .st-head { margin-bottom: 0; }
+.v2-partgroup { min-width: 0; }
+.v2-parthead { margin: var(--s2) 0 2px; font-size: 14px; }
+.v2-partopt { flex-wrap: nowrap; }
+.v2-partthumb { flex: 0 0 auto; width: 40px; height: 40px; object-fit: contain; image-rendering: pixelated; background: var(--shelf); border-radius: 4px; }
+.v2-partthumb.is-empty { display: inline-block; }
+.v2-partname { display: grid; flex: 1 1 auto; min-width: 0; font-size: 14px; }
+.v2-partwhat { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.v2-partopt .v2-acts { flex: 0 0 auto; flex-wrap: nowrap; }
+.v2-partpick { display: grid; gap: var(--s2); padding: var(--s2) var(--s3) var(--s3); background: var(--shelf); border-radius: var(--r); min-width: 0; }
+.v2-partfindbox { display: flex; align-items: center; gap: 6px; }
+.v2-partfind { flex: 1 1 auto; min-width: 0; max-width: 320px; }
+.v2-partlist { display: grid; gap: 2px; max-height: 260px; overflow-y: auto; min-width: 0; padding-right: 2px; }
+.v2-partrow { display: grid; gap: 1px; width: 100%; min-width: 0; padding: 6px 8px; border: 1px solid transparent; border-radius: 4px; background: var(--paper); text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.v2-partrow:hover { border-color: var(--line-2); }
+.v2-partrow.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.v2-partrow[hidden] { display: none; }
+.v2-partrowhead { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 6px; min-width: 0; font-size: 14px; }
+.v2-partabout { line-height: 1.35; overflow-wrap: anywhere; }
+.v2-partbadge { padding: 0 6px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--ink-2); }
+.v2-partform { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--s3); min-width: 0; }
+.v2-partform:empty { display: none; }
+.v2-partfig { margin: 0; display: grid; gap: 4px; justify-items: center; flex: 0 0 auto; }
+.v2-partpreview { width: 128px; height: 128px; object-fit: contain; image-rendering: pixelated; background: var(--paper); border-radius: var(--r); }
+.v2-partfields { display: grid; gap: 6px; flex: 1 1 240px; min-width: 0; }
+.v2-partfields .st-lbl { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.v2-partfields .st-select, .v2-partfields .st-text { flex: 1 1 160px; min-width: 0; max-width: 100%; }
+.v2-parterr:empty { display: none; }
+.v2-partmore { margin-top: var(--s2); }
+@media (max-width: 720px) {
+  .v2-partpreview { width: 96px; height: 96px; }
+  .v2-partthumb { width: 32px; height: 32px; }
+}
