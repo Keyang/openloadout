@@ -2,7 +2,7 @@
 
 Written 2026-11-19 for the asset plan (`docs/asset-plan.md`, section 2: core libraries, the lines "Menu sound sets in 5 house styles, 8 sounds each" and "Weather and place loops"). These sounds belong to no single kit: any bundle may use them. 42 sounds in 8 batches (S01 to S08): four menu sound sets of eight (32) and ten place loops.
 
-New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is at the workspace root) and `docs/style-guide.md` sections 11 and 13. Where this page and the style guide disagree, this page wins; where this page is silent, the style guide and the skill decide. The format and the general rules of `bundles/specs/core-sounds-1.md` ("What is different about core sounds") apply here too, except where this page says otherwise.
+New sounds follow `.claude/skills/sprite-forge/SOUND.md` and `docs/style-guide.md` sections 11 and 13. Where this page and the style guide disagree, this page wins; where this page is silent, the style guide and the skill decide. The format and the general rules of `bundles/specs/core-sounds-1.md` ("What is different about core sounds") apply here too, except where this page says otherwise.
 
 ## Rules for every sound on this page
 

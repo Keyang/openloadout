@@ -1,6 +1,6 @@
 # Gridline falling-block puzzle kit: specification (`kit-puzzle-gridline`)
 
-Written 2026-11-19 by the art director for the asset plan (`docs/asset-plan.md` in `lab/sprite-forge/`, section 7, wave 1, row 48: "Gridline: falling-block puzzle", fixed screen). It goes with `kit-puzzle-gridline.plan.json`; the two always agree. **Nothing in it is built yet.** **Read `docs/style-guide.md` first**: it fixes clip names, frame counts, cue frames, control keys and labels, metadata and originality. This file says what each asset is, and where it departs from the guide it says so and why. Where this page and the style guide disagree, this page wins for that asset; where this page is silent, the style guide and the skill (`../../skills/sprite-forge/SKILL.md`, `SOUND.md`) decide.
+Written 2026-11-19 by the art director for the asset plan (`docs/asset-plan.md` in `lab/sprite-forge/`, section 7, wave 1, row 48: "Gridline: falling-block puzzle", fixed screen). It goes with `kit-puzzle-gridline.plan.json`; the two always agree. **Nothing in it is built yet.** **Read `docs/style-guide.md` first**: it fixes clip names, frame counts, cue frames, control keys and labels, metadata and originality. This file says what each asset is, and where it departs from the guide it says so and why. Where this page and the style guide disagree, this page wins for that asset; where this page is silent, the style guide and the skill (`.claude/skills/sprite-forge/SKILL.md`, `SOUND.md`) decide.
 
 | | |
 |---|---|
@@ -424,7 +424,7 @@ All four: type `effect`, view `none`, `grounded: false`, themes `neutral`, `sci-
 
 ## Sound effects
 
-Exactly 24: 16 new and the 8 reused above. New sounds follow `SOUND.md` (the skill is at the workspace root) and the style guide, section 11, with this kit's house sound (top of the page). Style names are fixed: sprites and games cue them by name. Every new sound has `meta.themes` `["neutral"]`, `meta.gameTypes` `["puzzle", "arcade"]`, `license: "draft"`, and 6 to 14 words. **Identical every time** unless the row says it varies (moves, locks, clears and rewards are interface-like and tuned; the slam, the junk rise and the collapse vary). Phone speakers: 40% of the energy above 300 Hz at the default and in every style. **A difference of style that is a different shape (another note count, a reversed glide, an extra layer) has its own control**, named in the row.
+Exactly 24: 16 new and the 8 reused above. New sounds follow `SOUND.md` and the style guide, section 11, with this kit's house sound (top of the page). Style names are fixed: sprites and games cue them by name. Every new sound has `meta.themes` `["neutral"]`, `meta.gameTypes` `["puzzle", "arcade"]`, `license: "draft"`, and 6 to 14 words. **Identical every time** unless the row says it varies (moves, locks, clears and rewards are interface-like and tuned; the slam, the junk rise and the collapse vary). Phone speakers: 40% of the energy above 300 Hz at the default and in every style. **A difference of style that is a different shape (another note count, a reversed glide, an extra layer) has its own control**, named in the row.
 
 | # | id | Name | type | role | Batch | Pairs with |
 |---|---|---|---|---|---|---|

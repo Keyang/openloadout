@@ -2,7 +2,7 @@
 
 Written 2026-11-19 for the asset plan (`docs/asset-plan.md`, section 2: core libraries, the lines "Menu sound sets in 5 house styles, 8 sounds each", "Weather and place loops", "General hits, whooshes, pickups, alerts and short reward tunes" and "Menu and credits themes, two in each of 12 music styles"). These assets belong to no single kit: any bundle may use them. 34 sounds and 6 music tracks in 13 batches (T01 to T13): the fifth menu sound set (8), ten more place loops, sixteen general sounds, and the credits themes of the six music styles that have none yet.
 
-New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is at the workspace root) and `docs/style-guide.md` sections 11, 12 and 13. Where this page and the style guide disagree, this page wins; where this page is silent, the style guide and the skill decide. The format and the general rules of `bundles/specs/core-sounds-1.md` ("What is different about core sounds") and `bundles/specs/core-sounds-2.md` ("Rules for every sound on this page", "What a set is", the rules for all loops) apply here too, except where this page says otherwise.
+New sounds follow `.claude/skills/sprite-forge/SOUND.md` and `docs/style-guide.md` sections 11, 12 and 13. Where this page and the style guide disagree, this page wins; where this page is silent, the style guide and the skill decide. The format and the general rules of `bundles/specs/core-sounds-1.md` ("What is different about core sounds") and `bundles/specs/core-sounds-2.md` ("Rules for every sound on this page", "What a set is", the rules for all loops) apply here too, except where this page says otherwise.
 
 ## Rules for every asset on this page
 

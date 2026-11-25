@@ -1,6 +1,6 @@
 # Core sprites, part 1: specification (`core-sprites-1`)
 
-Written 2026-11-19 by the art director for the asset plan (`docs/asset-plan.md`, section 2: core libraries, the lines "Common pickups", "Common effects" and "Weather and light overlays"). These sprites belong to no single kit: any bundle may list them. **32 sprites in 9 batches (K01 to K09)**: 11 pickups, 13 effects, 8 weather and light loops. Nothing here is built yet. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, control keys and labels, palettes and metadata. This file says what each sprite is. Where this page and the style guide disagree, this page wins for that sprite; where this page is silent, the style guide and the skill (`../../skills/sprite-forge/SKILL.md`) decide.
+Written 2026-11-19 by the art director for the asset plan (`docs/asset-plan.md`, section 2: core libraries, the lines "Common pickups", "Common effects" and "Weather and light overlays"). These sprites belong to no single kit: any bundle may list them. **32 sprites in 9 batches (K01 to K09)**: 11 pickups, 13 effects, 8 weather and light loops. Nothing here is built yet. **Read `docs/style-guide.md` first**: it fixes frame sizes, clip names, frame counts, cue frames, control keys and labels, palettes and metadata. This file says what each sprite is. Where this page and the style guide disagree, this page wins for that sprite; where this page is silent, the style guide and the skill (`.claude/skills/sprite-forge/SKILL.md`) decide.
 
 | | |
 |---|---|

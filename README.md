@@ -66,6 +66,10 @@ npm run serve          # static server on http://localhost:5178
 
 How long a full build takes is not recorded in `docs/progress.md` and has not been measured for this README. Do not run two builds at once in the same folder.
 
+## Contributing
+
+To improve the platform (engine, build, website, checks) read [docs/contributing-platform.md](docs/contributing-platform.md). To add sprites, sounds, music or kits read [docs/contributing-assets.md](docs/contributing-assets.md). The ground rules are in [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## How to use the site
 
 Pages are addresses after `#/`. Every page keeps its settings in the address, so a copied link reproduces what you see.
@@ -84,7 +88,7 @@ Loadout has two layers. The **framework** is the code every asset is written wit
 
 The rule: code that any other asset could use goes into the framework, not into the asset file. A maker who finds something missing adds a new function or module, with a one-line comment and a test, and does not change what existing functions do (`docs/architecture.md`, Contract 11; `docs/framework-api.md`).
 
-Agents make assets with the skill at `../../skills/sprite-forge/` (`SKILL.md` for sprites, `SOUND.md` for sounds and music). They check them with:
+Anyone can add assets: see [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/contributing-assets.md](docs/contributing-assets.md). The maintainer's AI agents make them with the skill in `.claude/skills/sprite-forge/` (`SKILL.md` for sprites, `SOUND.md` for sounds and music) and the `loadout-maker` agent in `.claude/agents/`. Assets are checked with:
 
 ```bash
 node tools/check.mjs [<id> ...]                  # sprites; no id checks every sprite
@@ -159,13 +163,13 @@ The last full runs are in the counts table above. Neither suite was run for this
 - **Nobody has listened to any sound or track.** They were tuned and judged by measurement and spectrograms.
 - **Nobody has judged the art by eye** except the orchestrating agent looking at renders, plus second agents working from renders.
 - **Firefox and Safari are untested.** Only Chromium is installed. The safety rules for made assets must be checked there before any public release (`docs/framework-api.md`, "Before a public release").
-- **No hosting.** The site runs from a local server. Nothing has been pushed.
+- **No hosting.** The site runs from a local server. The source is at https://github.com/Keyang/openloadout; nothing is deployed yet.
 - **Unity package export is not built.** The zip is engine-neutral with written Unity steps; it has never been imported into Unity.
 - **The MCP server is not built.** `window.loadout` and its description exist.
 - **A second art style is not built.** The framework seam exists and is tested with test-only styles (`docs/architecture.md`, Contract 12).
 - **Sprites as data are partly built** (option B, Contract 15): 3 of 229 sprites are data; effects have 7 of about 27 behaviours, 10 of 13 tilesets are still being ported, and the side-view person is still being baked; the migration has not started.
 - **Open decisions for Keyang** are listed in `docs/features.md`: whether the MCP server is next, the "flat Hero" style test, installing Firefox and Safari, a `footprint` field on sprites, and the search-by-meaning default.
 - **Engine steps in the download are untried.** The text for each kind of asset (tilesets, interface pieces, backgrounds) gives Unity and Godot steps written from knowledge of the engines; nothing has been imported into either.
-- **Licences:** every asset records `draft`, and the download's licence file says the terms are not set yet. Choosing terms is Keyang's decision.
+- **Licences:** the code and the assets are MIT (`LICENSE`); third-party files are listed in `THIRD_PARTY_NOTICES.md`. Every asset still records `draft` in `meta.license`, and the download's `licence.txt` still says the terms are not decided; both need updating to match.
 
 The sound engine in `sound/` began as a copy of `experiment/procedural-sfx/` and has since diverged, so do not re-copy it over; merge by hand.

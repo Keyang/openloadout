@@ -49,7 +49,7 @@ export function codeSpriteRefusal(rel) {
   const what = files.length === 1 ? 'a code sprite' : 'code sprites';
   const target = files.length === 1 ? `one file sprites/${ids[0]}.json` : `one file sprites/<id>.json for each (${ids.map((i) => `sprites/${i}.json`).join(', ')})`;
   return `${rel}: ${what}. Loadout takes sprites as data only: ${target} (format "loadout-sprite", version 2) that names shapes, pixel stamps and framework generators, with no drawing code and nothing to run. `
-    + `Make it with the /sprite-forge skill (skills/sprite-forge/SKILL.md; to redo an old sprite, redraw it as data under the same id)`
+    + `Make it with the /sprite-forge skill (.claude/skills/sprite-forge/SKILL.md; to redo an old sprite, redraw it as data under the same id)`
     + (files.every((f) => /(^|[\\/])sprites[\\/][^\\/]+$/.test(f)) ? `, then take ${files.length === 1 ? 'this file' : 'these files'} out of sprites/.` : `; ${files.length === 1 ? 'this file is' : 'these files are'} not a sprite of the library, so it stays outside sprites/.`);
 }
 
@@ -153,7 +153,7 @@ async function readDataSprite(root, file, { soundIds } = {}) {
   const value = parsed.value;
   // the library takes one form: format "loadout-sprite", version 2 (R4a); a version 1 definition is the studio's, never a library file
   if (value?.format !== 'loadout-sprite' || value?.version !== 2) {
-    throw new Error(`${rel}: not a data sprite of format "loadout-sprite", version 2 (found format ${JSON.stringify(value?.format)}, version ${JSON.stringify(value?.version)}). Make it as data with the /sprite-forge skill (skills/sprite-forge/SKILL.md).`);
+    throw new Error(`${rel}: not a data sprite of format "loadout-sprite", version 2 (found format ${JSON.stringify(value?.format)}, version ${JSON.stringify(value?.version)}). Make it as data with the /sprite-forge skill (.claude/skills/sprite-forge/SKILL.md).`);
   }
   const got = await store.loadFor(value);
   if (!got.ok) throw new Error(`${rel}: a piece it uses could not be loaded: ${got.errors.slice(0, 6).join('; ')}`);

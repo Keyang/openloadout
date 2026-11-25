@@ -2,7 +2,7 @@
 
 This is a teaching document for makers and reviewers of Loadout sound effects, ambience loops and jingles. Music tracks have their own guide (`docs/craft/music.md`).
 
-The other documents are rules to pass: `skills/sprite-forge/SOUND.md` (how to write a patch), `docs/style-guide.md` section 11 (house sound, controls, pairing), `docs/quality-bar.md` sections 2 to 4 (checker and rubric), `docs/review-protocol.md` section 3 (judging without hearing). This one explains **why** a sound works in a game, and how to get there with a Loadout patch. Where this document and a rule disagree, the rule wins, and the disagreement is listed in section 9 for the owner.
+The other documents are rules to pass: `.claude/skills/sprite-forge/SOUND.md` (how to write a patch), `docs/style-guide.md` section 11 (house sound, controls, pairing), `docs/quality-bar.md` sections 2 to 4 (checker and rubric), `docs/review-protocol.md` section 3 (judging without hearing). This one explains **why** a sound works in a game, and how to get there with a Loadout patch. Where this document and a rule disagree, the rule wins, and the disagreement is listed in section 9 for the owner.
 
 Three things to know before reading:
 

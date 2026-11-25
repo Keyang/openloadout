@@ -7,7 +7,7 @@ in a generator and check in the note data.
 
 The other music docs are rules: `docs/style-guide.md` §12 (controls, lengths, instruments),
 `docs/music-styles.md` (the twelve bands), `docs/quality-bar.md` §2 to §4 (checks and the rubric),
-`skills/sprite-forge/SOUND.md` "Music" (the steps). This guide is craft. **Where craft and a rule disagree,
+`.claude/skills/sprite-forge/SOUND.md` "Music" (the steps). This guide is craft. **Where craft and a rule disagree,
 the rule wins**, and the disagreement is listed in section 16 for the owner.
 
 How to read it: sections 1 to 9 are principles, each ending in "In Loadout". Section 10 is one page per game
@@ -1015,7 +1015,7 @@ are paraphrased and should be checked before being quoted; secondary reports of 
 
 **Loadout (primary for every "In Loadout" paragraph)**
 
-- `docs/style-guide.md` §12; `docs/music-styles.md`; `docs/quality-bar.md` §2 to §4; `docs/review-protocol.md` §3 to §5; `skills/sprite-forge/SOUND.md` "Music" and "Lessons".
+- `docs/style-guide.md` §12; `docs/music-styles.md`; `docs/quality-bar.md` §2 to §4; `docs/review-protocol.md` §3 to §5; `.claude/skills/sprite-forge/SOUND.md` "Music" and "Lessons".
 - `sound/compose.js` (header, `chords`, `arrangement`, `melody`, `instruments`, `tuneFit`, `lint`, measure functions); `sound/bands.js`; `tools/compose/kit.mjs`; `tools/compose/verify_music.mjs`.
 - `tools/compose/thornwood_keep.mjs`, `menu_folk.mjs`, and the `CHORDS` and tempo lines of all 40 generators; `tests/unit/compose-library.test.mjs`.
 

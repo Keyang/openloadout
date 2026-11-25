@@ -1,0 +1,44 @@
+{ "format": "loadout-sprite", "version": 2, "id": "small-gem", "name": "Small gem",
+  "blurb": "A small cut gem that floats and sparkles until it is picked up. Change its cut, size, cut lines, sparkle and colour.",
+  "meta": { "type": "pickup", "role": "items/pickup", "themes": ["fantasy", "neutral"], "gameTypes": ["platformer", "arcade", "puzzle"], "view": "front",
+            "words": ["gem", "jewel", "diamond", "crystal", "ruby", "emerald", "treasure", "loot", "collect", "pickup", "shiny", "score"], "license": "draft" },
+  "size": [32, 32], "pivot": [16, 30], "grounded": false, "preview": "idle", "styles": ["pixel"],
+  "palette": [
+    { "id": "body", "label": "Gem", "default": "#e0457a", "material": "magic", "swatches": ["#e0457a", "#3f86e0", "#3fbf6b", "#a45ee0", "#f2c230", "#5fd0e0"] },
+    { "id": "spark", "material": "light", "derive": { "rule": "mix", "of": { "rule": "ramp", "of": "body", "tone": "light" }, "with": "shine", "amount": 0.6 } },
+    { "id": "shine", "default": "#ffffff", "material": "light", "detail": true } ],
+  "controls": [
+    { "key": "size", "kind": "range", "label": "Size", "lo": "Small", "hi": "Big", "default": 0.5 },
+    { "key": "shape", "kind": "choice", "label": "Cut", "options": ["diamond", "emerald", "round", "shard", "heart"], "default": "diamond" },
+    { "key": "facets", "kind": "toggle", "label": "Cut lines", "default": true },
+    { "key": "sparkle", "kind": "toggle", "label": "Sparkle", "default": true },
+    { "key": "body", "kind": "colour", "label": "Gem" },
+    { "key": "bob", "kind": "range", "label": "Float", "lo": "Still", "hi": "Floaty", "default": 0.5, "group": "Motion" },
+    { "key": "pop", "kind": "range", "label": "Pop height", "lo": "Low", "hi": "High", "default": 0.5, "group": "Motion" },
+    { "key": "speed", "standard": "speed" } ],
+  "body": { "pictures": {
+    "nodes": [ { "id": "gem", "parent": null, "at": [16, 17] } ],
+    "draw": [
+      { "id": "stone", "gen": "gem.cut", "v": 2, "on": "gem", "at": [0, 0],
+        "r": [ { "from": "size", "map": [[0, 5], [1, 10]], "round": "px" }, { "from": "size", "map": [[0, 4], [1, 9]], "round": "px" } ],
+        "cut": { "from": "shape", "pick": { "diamond": "diamond", "emerald": "emerald", "round": "round", "shard": "shard", "heart": "heart" } },
+        "facets": { "from": "facets", "pick": { "true": true, "false": false } },
+        "paint": "body", "shine": "shine" },
+      { "kind": "outline", "paint": "ink" },
+      { "id": "sparkle", "gen": "gleam", "v": 1, "on": "gem", "clip": ["idle"], "when": { "sparkle": [true] },
+        "at": [ { "from": "size", "map": [[0, 5], [1, 10]], "round": "px" }, { "from": "size", "map": [[0, -4], [1, -10]], "round": "px" } ],
+        "peak": 0.75, "paint": "spark", "core": "shine" } ],
+    "motion": [
+      { "gen": "pickup.bob", "v": 1, "clip": ["idle"], "height": { "from": "bob", "map": [[0, 0], [1, 2]] } },
+      { "gen": "pickup.collect", "v": 1, "node": "gem", "clip": ["collect"],
+        "pop": { "from": "pop", "map": [[0, 0], [1, 1]] }, "room": { "from": "size", "map": [[0, 8], [1, 5]] } } ],
+    "emitters": [
+      { "id": "burst", "gen": "pickup.burst", "v": 1, "on": "gem", "at": [0, 0], "reach": { "from": "size", "map": [[0, 8], [1, 12]] },
+        "sparkle": { "from": "sparkle", "pick": { "true": true, "false": false } }, "paint": "body", "bright": "spark", "core": "shine" } ] } },
+  "clips": {
+    "idle": { "frames": 8, "fps": 10 },
+    "collect": { "frames": 8, "fps": 14, "loop": false, "frameEdits": { "4": { "flash": true } },
+      "keys": [ { "t": 0, "ease": "hold", "emit": { "burst": { "amount": 0 } } },
+                { "t": 0.71, "ease": "linear", "hide": ["stone"], "emit": { "burst": { "amount": 0.1111 } } },
+                { "t": 1, "emit": { "burst": { "amount": 1 } } } ],
+      "sounds": [ { "sound": "gem-pickup", "preset": "Gem", "frame": 1, "volume": 0.7 } ] } } }

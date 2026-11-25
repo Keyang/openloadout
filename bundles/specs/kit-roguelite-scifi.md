@@ -576,7 +576,7 @@ How to read a row. **Clips:** name, frame count, "loop" if it loops; fps and wha
 
 ## Sound effects
 
-Exactly 20. New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is at the workspace root) and the style guide, section 11. The style names are fixed: sprites cue them by name. Every new sound also has `meta.themes` and `meta.gameTypes` chosen by the style guide, section 13.
+Exactly 20. New sounds follow `.claude/skills/sprite-forge/SOUND.md` and the style guide, section 11. The style names are fixed: sprites cue them by name. Every new sound also has `meta.themes` and `meta.gameTypes` chosen by the style guide, section 13.
 
 | # | id | Name | type | role | Batch | Pairs with |
 |---|---|---|---|---|---|---|

@@ -2,7 +2,7 @@
 
 Written 2026-11-19 for the asset plan (`docs/asset-plan.md`, section 2: core libraries). These sounds belong to no single kit: any bundle may use them. 43 sounds in 8 batches (C01 to C08).
 
-New sounds follow `../../skills/sprite-forge/SOUND.md` (the skill is at the workspace root) and `docs/style-guide.md` sections 11 and 13. Where this page and the style guide disagree, this page wins; where this page is silent, the style guide and the skill decide.
+New sounds follow `.claude/skills/sprite-forge/SOUND.md` and `docs/style-guide.md` sections 11 and 13. Where this page and the style guide disagree, this page wins; where this page is silent, the style guide and the skill decide.
 
 ## What is different about core sounds
 

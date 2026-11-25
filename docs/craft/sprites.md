@@ -2,7 +2,7 @@
 
 Written 2026-11-25. For makers (the `loadout-maker` agent) and reviewers.
 
-**What this is.** The other documents are rules to pass: `docs/style-guide.md` (sizes, outline, colours, clips), `docs/quality-bar.md` (the checker and the rubric) and the skill (`../../skills/sprite-forge/SKILL.md`, how to write the file). This one teaches what makes a sprite *good*, and how to get it out of a Loadout data file. It adds no rule. Where it and a rule document disagree, the rule document wins; section 15 lists every place where common advice from outside and Loadout's rules pull apart.
+**What this is.** The other documents are rules to pass: `docs/style-guide.md` (sizes, outline, colours, clips), `docs/quality-bar.md` (the checker and the rubric) and the skill (`.claude/skills/sprite-forge/SKILL.md`, how to write the file). This one teaches what makes a sprite *good*, and how to get it out of a Loadout data file. It adds no rule. Where it and a rule document disagree, the rule document wins; section 15 lists every place where common advice from outside and Loadout's rules pull apart.
 
 **Why it exists.** Most assets pass review at 11 of 15: four criteria at 2 and one at 3. A 2 means "nothing wrong". A 3 means "someone chose this on purpose". The rubric's own words for a 3 are *a character of its own*, *deliberate clusters*, *weight and personality*, *reads in silhouette alone*, *a level built from it looks finished*. Those are craft, and no checker can measure them. This guide is about those words.
 
@@ -98,7 +98,7 @@ Appeal is not "cute". It is a design that is clear and that someone would look a
 
 Derek Yu's tutorial says to remove the saturation and see whether the shading still reads. A Game Developer article on visual confusion gives the same test for a whole screen: desaturate it, and check that you can still tell characters, enemies and ground apart.
 
-Loadout has this test built in: the Mono and Handheld looks. Run `node ../../skills/sprite-forge/sheets.mjs looks <id>` and look at the Mono row. If the sprite turns into one grey blob there, it was held together by hue alone. The checker's S-survives-looks warning measures the same thing.
+Loadout has this test built in: the Mono and Handheld looks. Run `node .claude/skills/sprite-forge/sheets.mjs looks <id>` and look at the Mono row. If the sprite turns into one grey blob there, it was held together by hue alone. The checker's S-survives-looks warning measures the same thing.
 
 ### 3.2 A value plan for one sprite
 
@@ -874,7 +874,7 @@ These are already rules (style guide section 2, Contract 12); here is why they m
 
 For makers before review, and for reviewers when scoring. Grouped by the rubric's five criteria (`docs/quality-bar.md` section 4). The left column is what earns a **2**; the right column is what earns a **3**.
 
-Run first: `node tools/check.mjs <id> --no-cache` (zero errors), then `node tools/render.mjs <id> --scale 1`, the default sheet, each action clip with `--clip`, and `node ../../skills/sprite-forge/sheets.mjs looks <id>`. Tilesets: `tools/tilemap.mjs`. Sets: `tools/scene.mjs`.
+Run first: `node tools/check.mjs <id> --no-cache` (zero errors), then `node tools/render.mjs <id> --scale 1`, the default sheet, each action clip with `--clip`, and `node .claude/skills/sprite-forge/sheets.mjs looks <id>`. Tilesets: `tools/tilemap.mjs`. Sets: `tools/scene.mjs`.
 
 ### Criterion 1: Reads as what it is (`reads`)
 
