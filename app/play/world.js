@@ -274,9 +274,10 @@ export function step(world, input = {}, dt = 1 / 60) {
   world.time += dt;
   const edge = {};
   for (const key of ['jump', 'action', 'block', 'dodge']) { edge[key] = !!input[key] && !world.prev[key]; world.prev[key] = !!input[key]; }
-  if (world.player) stepPlayer(world, world.player, input, edge, dt, ev);
+  if (world.player) { if (world.player.held) tick(world, world.player, dt, ev); else stepPlayer(world, world.player, input, edge, dt, ev); }
   for (const t of [...world.things]) {
     if (t.flash > 0) t.flash = Math.max(0, t.flash - dt);
+    if (t.held) { tick(world, t, dt, ev); continue; }       // in the visitor's hand (liftThing)
     const shown = world.show?.[t.kind];
     if (shown && !t.passing && t.state !== 'gone' && t.state !== 'collected' && t.state !== 'dying') { stepShown(world, t, shown, dt, ev); continue; }
     if (t.passing === 'burst') { tick(world, t, dt, ev); if (played(world, t)) t.dead = true; }
@@ -729,4 +730,34 @@ export function snapshot(world) {
     player: p ? { ...view(world, p), onGround: p.onGround, vy: round(p.vy), hp: p.hp, maxHp: world.kinds[p.kind].hp, wading: !!p.wading } : null,
     things: world.things.map((t) => view(world, t)),
   };
+}
+
+// ---- picking a thing up and putting it down (the visitor drags it in the scene) -----------------------------
+
+/** Pick a thing up: it keeps its picture but stops what it does until dropThing. */
+export function liftThing(world, t) { t.held = true; t.vx = 0; t.vy = 0; t.from = { x: t.x, y: t.y }; }
+
+/** Carry a held thing to (x, y), a point of the scene, kept inside the level. */
+export function carryThing(world, t, x, y) {
+  const { level } = world;
+  t.x = clamp(Math.round(x), 8, level.width - 8);
+  t.y = clamp(Math.round(y), 8, level.height);
+}
+
+/**
+ * Put a held thing down. In a side view it comes to rest on the ground or ledge below it (the player falls there, a
+ * thing that hovers keeps its height); seen from above it stays where it is, unless that is inside a wall, and then it
+ * goes back to where it was lifted from. Returns true when it was put where the visitor let go.
+ */
+export function dropThing(world, t) {
+  const { level } = world, k = world.kinds[t.kind];
+  t.held = false;
+  const was = t.from; t.from = null;
+  if (level.mode === 'top') {
+    if (hitsWall(level, t.x - k.box.l, t.y - Math.min(k.box.t, 16), t.x + k.box.r, t.y)) { if (was) { t.x = was.x; t.y = was.y; } return false; }
+    return true;
+  }
+  if (t === world.player) { t.onGround = false; t.vy = 0; return true; }
+  if (!t.lift) t.y = surfaceBelow(level, t.x, t.y - 4).y;
+  return true;
 }

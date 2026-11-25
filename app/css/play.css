@@ -35,14 +35,39 @@
 .play-pieces.open .play-piece { flex-wrap: wrap; flex-shrink: 1; }
 .play-pieces-more { height: 28px; }
 
-/* the moves of the picked thing: one line of chips under the scene, scrolling sideways when there are many */
-.play-anims { flex: none; height: 40px; display: flex; align-items: center; gap: var(--s3); overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; font-size: 13px; }
-.play-anims .chips { flex-wrap: nowrap; }
+/* the picked thing: a card under the scene with its name, what can be done to it, and its animations to try */
+.play-anims { flex: none; display: flex; flex-direction: column; justify-content: center; gap: var(--s2); font-size: 13px; }
+/* always the same height, picked or not: the scene is sized to the room it has, and a card that grew when a thing is picked would resize it (and start it over) */
+.play-inspector { height: 120px; padding: var(--s2) var(--s3); border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); overflow-y: auto; box-sizing: border-box; }
+.play-insp-top { display: flex; align-items: center; gap: var(--s3); min-width: 0; }
+.play-insp-top .play-pic-tile { flex: none; }
+.play-insp-who { display: grid; min-width: 0; flex: 1 1 auto; line-height: 1.3; }
+.play-insp-who .quiet { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.play-insp-acts { display: flex; align-items: center; gap: var(--s2); flex: none; }
+.play-insp-moves { display: flex; align-items: center; gap: var(--s2) var(--s3); flex-wrap: wrap; min-width: 0; }
+.play-insp-label { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-2); white-space: nowrap; }
+.play-anims .chips { flex-wrap: wrap; }
 .play-anims .chip { height: 30px; }
 .play-anims-name { font-weight: 600; white-space: nowrap; }
-.play-anims-hint { white-space: nowrap; }
-.play-anims-note, .play-howto-line { color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.play-anims-hint { flex: 1 1 100%; }
+.play-anims-note, .play-howto-line { color: var(--ink-2); margin: 0; }
 .play-anims-note strong, .play-howto { color: var(--ink); font-weight: 500; }
+.play-anims > .play-howto-line, .play-anims > .play-anims-note { overflow: hidden; }
+
+/* the setting: ground and sky to choose from, when the bag has several */
+.play-env { flex: none; display: flex; flex-wrap: wrap; gap: var(--s2) var(--s5); align-items: center; font-size: 13px; }
+.play-env[hidden] { display: none; }
+.play-env-group { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; min-width: 0; }
+.play-env-opt { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 var(--s2) 0 4px; border: 1px solid var(--line-2); border-radius: var(--r); background: var(--paper); color: var(--ink); font: inherit; cursor: pointer; }
+.play-env-opt:hover { border-color: var(--ink); }
+.play-env-opt[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); font-weight: 600; }
+.play-env-opt:not(:has(canvas)) { padding-left: var(--s2); }
+.play-env-opt .play-pic-tile, .play-insp-top .play-pic-tile { display: grid; place-items: center; flex: none; padding: 0; border: 0; background: var(--shelf); border-radius: 4px; overflow: hidden; }
+.play-env-opt .play-pic-tile { width: 26px; height: 26px; }
+.play-insp-top .play-pic-tile { width: 40px; height: 40px; }
+.play-env-opt canvas, .play-insp-top canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; }
+.play-stage { touch-action: none; }
+.play-stage.is-dragging { cursor: grabbing; }
 
 /* the bar: Pause, Mute, Reset, the view; the keys; More */
 .play-bar { flex: none; display: flex; align-items: center; gap: var(--s2) var(--s3); padding-top: var(--s2); border-top: 1px solid var(--line); min-width: 0; }
@@ -95,9 +120,7 @@
 .play-does { font-size: 12px; color: var(--ink-2); }
 .play-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 400; color: var(--ink-2); white-space: nowrap; }
 .play-more { display: inline-flex; align-items: center; gap: 2px; }
-.play-step { width: 28px; height: 28px; border: 1px solid var(--line-2); border-radius: var(--r); font-size: 16px; line-height: 1; background: var(--paper); }
-.play-step:hover { border-color: var(--ink); }
-.play-n { min-width: 22px; text-align: center; font-size: 13px; font-variant-numeric: tabular-nums; }
+.play-row-tools { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 0 0 var(--s2) 52px; }
 .play-row-acts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2); padding: 2px 0 var(--s2) 52px; }
 .play-row-acts[hidden] { display: none; }
 .play-row-acts .hint { font-size: 12px; color: var(--ink-2); }

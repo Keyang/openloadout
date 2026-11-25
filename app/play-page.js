@@ -24,12 +24,14 @@ import { rowFromSprite, rowFromPatch, planScene, SCENE_ROLES, MODES } from './pl
 import { buildKind, soundIdsOf, isCustom, harmfulLiquid } from './play/kinds.js';
 import { lookupClip } from './play/clips.js';
 import { makeLevel, levelFeatures, tileIndex, levelText, UNIT } from './play/level.js';
-import { createWorld, resetWorld, step, spawn, removeOne, countOf, snapshot, activeLoops, startCount, showClip, rectOf } from './play/world.js';
+import { createWorld, resetWorld, step, snapshot, activeLoops, startCount, showClip, rectOf, liftThing, carryThing, dropThing } from './play/world.js';
 import { createPainter } from './play/draw.js';
 import { createInput } from './play/input.js';
 import { createSounds } from './play/sound.js';
 import { displayPlan, fillSpan } from './play/display.js';
 import { itemEditor } from './bag-edit.js';
+import { surpriseButton, duplicateButton, removeButton, surpriseItem } from './row-tools.js';
+import { makeMagic } from './magic.js';
 import { themeControls } from './theme-controls.js';
 import { howTo, roleNote, roleShort, keysLine, keysShort, viewName, leftOutNote, viewReason } from './play/words.js';
 
@@ -278,8 +280,7 @@ export async function playPage(app) {
     let onPicked = () => {};
     // what a change made in the panel does to the running scene, by the key of the bag item it changed
     const softSprite = {}, softSound = {};
-    const counters = [], tags = {};
-    const syncCounts = () => { for (const [key, node] of counters) node.textContent = world ? String(countOf(world, key)) : '0'; };
+    const tags = {};
     let pendingPlay = null;             // a clip of the player's, to play once (its chip)
 
     // ---- the list of what is in the bag (the right column) ---------------------------------------------------
@@ -332,14 +333,12 @@ export async function playPage(app) {
       const pickBtn = el('button', { type: 'button', class: 'play-row-pick', 'aria-label': name, 'aria-describedby': noteId, 'aria-pressed': 'false', disabled: out, onclick: () => pick(e.key) },
         pic.node, el('span', { class: 'play-row-text' }, el('span', { class: 'play-name' }, name, tagBox), el('span', { class: 'play-does', id: noteId }, does)));
       const li = el('li', { class: `play-row${out ? ' is-out' : ''}`, 'data-key': e.key }, pickBtn);
-      if (!out && SCENE_ROLES.includes(role)) {
-        const n = el('span', { class: 'play-n', 'aria-label': `${name} in the scene` });
-        counters.push([e.key, n]);
-        li.append(el('span', { class: 'play-more' },
-          el('button', { type: 'button', class: 'play-step', 'aria-label': `Remove one ${name}`, title: 'Remove one', onclick: () => { if (world) removeOne(world, e.key); syncCounts(); } }, '−'),
-          n,
-          el('button', { type: 'button', class: 'play-step', 'aria-label': `Add one ${name}`, title: 'Add one', onclick: () => { if (world) spawn(world, e.key); syncCounts(); } }, '+')));
-      }
+      // the same things the bag's list lets you do to a row (app/row-tools.js): a random version at once, a copy, take it out
+      const item = out ? null : bag.get(e.key);
+      if (item) li.append(el('div', { class: 'play-row-tools' },
+        surpriseButton(item, e.sprite, name),
+        duplicateButton(item, name),
+        removeButton(`Remove ${name}`, () => bag.remove(item.key))));
       const acts = el('div', { class: 'play-row-acts', hidden: true });
       li.append(acts);
       rows[e.key] = { li, pick: pickBtn, acts, draw: pic.draw, forget: pic.forget, name, role };
@@ -432,7 +431,10 @@ export async function playPage(app) {
 
     // ---- the scene (the left column) -------------------------------------------------------------------------
 
-    const anims = el('div', { class: 'play-anims', 'aria-live': 'polite' });
+    const anims = el('div', { class: 'play-anims play-inspector', 'aria-live': 'polite' });
+    const env = el('div', { class: 'play-env', hidden: true });         // the ground and the sky to choose from, when the bag has several
+    const envDraws = [];                // redraws the little pictures in env and in the inspector
+    let inspDraw = null;
     let bar, stick = null, hud = null, syncPieces = () => {};
     let canvasStage = null;
     let sceneStart = null;              // lays the picture out for the room it has, once the page is in place
@@ -456,7 +458,7 @@ export async function playPage(app) {
       // the background lies round a top-down room: the room is whole tiles, and the room to spare round it is background
       const roomInset = plan.mode === 'top' && !!plan.background;
 
-      const stage = el('canvas', { class: 'play-stage', tabindex: '0', role: 'img', 'aria-label': 'The playground scene. Click a thing in it to pick it.' });
+      const stage = el('canvas', { class: 'play-stage', tabindex: '0', role: 'img', 'aria-label': 'The playground scene. Click a thing in it to pick it; drag it to move it.' });
       canvasStage = stage;
       const wrap = el('div', { class: 'play-stage-wrap' }, stage);
       const ctx = stage.getContext('2d');
@@ -477,7 +479,6 @@ export async function playPage(app) {
         const shownBefore = world ? { ...world.show } : {};
         world = createWorld({ mode: plan.mode, level, kinds, player: plan.player, start: startWith });
         for (const [key, clip] of Object.entries(shownBefore)) showClip(world, key, clip);
-        syncCounts();
       }
       /** Fit the picture to the room: the largest whole-number zoom at which a level that fills it holds everything. */
       const fit = () => {
@@ -571,7 +572,7 @@ export async function playPage(app) {
       const keysFull = keysLine({ mode: plan.mode, player: !!player, block: has('block'), dodge: has('dodge') });
       bar = el('div', { class: 'play-bar' },
         el('div', { class: 'play-tools' }, pauseBtn, muteBtn,
-          el('button', { type: 'button', class: 'btn btn-sm btn-secondary', 'aria-label': 'Reset the scene', title: 'Put everything back where it started', onclick: () => { if (world) { resetWorld(world); syncCounts(); } } }, 'Reset'),
+          el('button', { type: 'button', class: 'btn btn-sm btn-secondary', 'aria-label': 'Reset the scene', title: 'Put everything back where it started', onclick: () => { if (world) resetWorld(world); } }, 'Reset'),
           viewPick),
         el('p', { class: 'play-keys', title: keysFull }, keysShort({ mode: plan.mode, player: !!player, block: has('block'), dodge: has('dodge') }) || 'Pick a thing on the right to see its moves.'),
         el('div', { class: 'menu-wrap play-more-wrap' }, moreBtn, moreMenu));
@@ -626,16 +627,53 @@ export async function playPage(app) {
             drawChips();
           } }, (e.sprite.clips[clip].label ?? clip).replace(/\s*\(.*\)$/, ''));
         const own = isPlayer ? null : el('button', { type: 'button', class: 'chip play-own', 'aria-pressed': String(!shown), onclick: () => { showClip(world, picked, null); drawChips(); } }, 'As in the game');
-        anims.replaceChildren(el('span', { class: 'play-anims-name' }, name),
-          el('span', { class: 'chips', role: 'group', 'aria-label': `Moves of ${name}` }, own, Object.keys(e.sprite.clips).map(chip)),
-          el('span', { class: 'quiet play-anims-hint' }, isPlayer ? 'A move plays once.' : ''));
+        // the card for the picked thing: who it is, what can be done to it (a random version, the panel), and its animations to try
+        const pic = livePicture(e);
+        inspDraw = pic.draw; pic.draw(world.time);
+        const item = bag.get(picked);
+        const acts = item ? el('div', { class: 'play-insp-acts' },
+          makeMagic(el('button', { type: 'button', class: 'btn btn-sm btn-secondary play-surprise', 'aria-label': `Surprise me, picked in the scene: ${name}`, onclick: () => surpriseItem(picked, e.sprite) }, 'Surprise me')),
+          el('button', { type: 'button', class: 'btn btn-sm btn-secondary play-customise', 'aria-label': `Customise ${name}`, 'aria-pressed': String(!!chosen && chosen.key === picked), onclick: () => openPanel(picked) }, 'Customise')) : null;
+        anims.replaceChildren(
+          el('div', { class: 'play-insp-top' }, pic.node,
+            el('div', { class: 'play-insp-who' }, el('strong', { class: 'play-anims-name' }, name), el('span', { class: 'quiet' }, roleShort(plan.roles[picked], { player: hasPlayer }))),
+            acts),
+          el('div', { class: 'play-insp-moves' }, el('span', { class: 'play-insp-label' }, 'Animations'),
+            el('span', { class: 'chips', role: 'group', 'aria-label': `Moves of ${name}` }, own, Object.keys(e.sprite.clips).map(chip)),
+            el('span', { class: 'quiet play-anims-hint' }, `${isPlayer ? 'A move plays once. ' : 'Click one to watch it. '}Drag ${isPlayer ? 'it' : 'the thing'} in the scene to move it.`)));
       }
+
+      // ---- the setting: the ground and the sky, when the bag has more than one of either to choose from
+      function drawEnv() {
+        envDraws.length = 0;
+        const group = (label, options, isOn, choose) => {
+          const opts = options.map(({ key, name, entry }) => {
+            const pic = entry ? livePicture(entry) : null;
+            if (pic) { envDraws.push(pic.draw); pic.draw(world?.time ?? 0); }
+            return el('button', { type: 'button', class: 'play-env-opt', 'aria-pressed': String(isOn(key)), onclick: () => choose(key) }, pic ? pic.node : null, el('span', {}, name));
+          });
+          return el('div', { class: 'play-env-group', role: 'group', 'aria-label': label }, el('span', { class: 'play-insp-label' }, label), opts);
+        };
+        const parts = [];
+        if (plan.allTilesets.length > 1) {
+          const whole = plan.tilesets.length === plan.allTilesets.length;
+          parts.push(group('Ground', [{ key: null, name: 'All together' }, ...plan.allTilesets.map((k) => ({ key: k, name: byKey[k].row.name, entry: byKey[k] }))],
+            (k) => (k === null ? whole : plan.tilesets.length === 1 && plan.tilesets[0] === k),
+            (k) => { picks[plan.mode].tiles = k ?? undefined; build(); }));
+        }
+        if (plan.backgrounds.length > 1) {
+          parts.push(group('Sky and background', plan.backgrounds.map((k) => ({ key: k, name: byKey[k].row.name, entry: byKey[k] })), (k) => k === plan.background,
+            (k) => { picks[plan.mode].background = k; build(); }));
+        }
+        env.hidden = !parts.length;
+        env.replaceChildren(...parts);
+      }
+      drawEnv();
 
       // ---- the loop
       const jobs = painter.allFrames(Object.keys(drawn));
       let raf = 0, last = performance.now(), shown = -1, shownHp = -1, picsAt = 0;
       const onEvent = (e) => {
-        if (e.type === 'collect' || e.type === 'die') syncCounts();
         if (e.type !== 'sound') return;
         sounds.cue(e.cue);
         hear({ sound: e.sound, by: world.kinds[e.kind].id, clip: e.clip });
@@ -648,9 +686,7 @@ export async function playPage(app) {
         const inp = input.state(plan.mode);
         if (!keep.paused) {
           if (pendingPlay) { inp.play = pendingPlay; pendingPlay = null; }
-          const before = world.things.length;
           for (const e of step(world, inp, dt)) onEvent(e);
-          if (world.things.length !== before) syncCounts();
         }
         sounds.syncLoops(keep.paused || !soundState.on ? [] : activeLoops(world));
         // make a few frames ahead of need, so nothing stutters the first time a clip plays
@@ -660,7 +696,7 @@ export async function playPage(app) {
         if (world.collected !== shown) { shown = world.collected; countText.textContent = String(shown); }
         if (world.player && world.player.hp !== shownHp) { shownHp = world.player.hp; healthText.textContent = `${Math.max(0, shownHp)} of ${player.hp}`; }
         for (const p of pieces) p.tick(world.time);
-        if (now - picsAt > 90) { picsAt = now; for (const r of Object.values(rows)) if (r.draw) r.draw(world.time); }
+        if (now - picsAt > 90) { picsAt = now; for (const r of Object.values(rows)) if (r.draw) r.draw(world.time); for (const d of envDraws) d(world.time); if (inspDraw) inspDraw(world.time); }
       };
       const ro = new ResizeObserver(() => { fit(); syncPieces(); });
       stops.push(() => { cancelAnimationFrame(raf); ro.disconnect(); });
@@ -674,26 +710,56 @@ export async function playPage(app) {
         plan: { mode: plan.mode, modes: plan.modes, why: plan.why, leftOut: plan.leftOut, player: plan.player, tilesets: plan.tilesets, background: plan.background, scene: plan.scene, display: plan.display, board: plan.board, music: plan.music },
       });
       // ---- a thing in the scene is clicked: it is picked (or, with the panel open, put in the panel)
-      const thingAt = (wx, wy) => {
+      const thingHit = (wx, wy) => {
         let best = null;
         for (const t of world.player ? [...world.things, world.player] : world.things) {
           if (t.state === 'gone' || t.passing) continue;
           const k = world.kinds[t.kind], x0 = t.x - k.pivot[0], y0 = t.y - k.pivot[1] - t.lift;
           if (wx < x0 - 2 || wx > x0 + k.size[0] + 2 || wy < y0 - 2 || wy > y0 + k.size[1] + 2) continue;
           const d = Math.hypot(wx - (x0 + k.size[0] / 2), wy - (y0 + k.size[1] / 2));
-          if (!best || d < best.d) best = { key: t.kind, d };
+          if (!best || d < best.d) best = { t, d };
         }
-        return best ? best.key : null;
+        return best ? best.t : null;
       };
+      const thingAt = (wx, wy) => thingHit(wx, wy)?.kind ?? null;
+      const sceneAt = (ev) => { const box = stage.getBoundingClientRect(); return { wx: cam.x + (ev.clientX - box.left) / view.zoom, wy: cam.y + (ev.clientY - box.top) / view.zoom }; };
+      // a thing is dragged: pressed on, moved a few pixels, it is lifted and follows the pointer; let go, it is put down
+      // (on the ground below it in a side view; app/play/world.js, dropThing). A press that does not move is a click: it picks.
+      let drag = null;
       stage.addEventListener('pointerdown', (ev) => {
         stage.focus({ preventScroll: true });      // the keyboard comes to the scene
         if (!world) return;
-        const box = stage.getBoundingClientRect();
-        const wx = cam.x + (ev.clientX - box.left) / view.zoom, wy = cam.y + (ev.clientY - box.top) / view.zoom;
+        const { wx, wy } = sceneAt(ev);
+        const hit = thingHit(wx, wy);
         // a thing first; else the ground, wall or platform laid there; else what is behind the scene
-        const key = thingAt(wx, wy) ?? painter.tileAt(wx, wy) ?? plan.background ?? null;
+        const key = hit?.kind ?? painter.tileAt(wx, wy) ?? plan.background ?? null;
         if (key !== null && rows[key]) pick(key, { reveal: true });
+        if (hit && ev.button === 0) {
+          drag = { t: hit, id: ev.pointerId, dx: hit.x - wx, dy: hit.y - wy, x0: ev.clientX, y0: ev.clientY, moved: false };
+          try { stage.setPointerCapture(ev.pointerId); } catch { /* a pointer that has gone */ }
+        }
       });
+      stage.addEventListener('pointermove', (ev) => {
+        if (!world) return;
+        if (!drag) { if (ev.pointerType === 'mouse') { const { wx, wy } = sceneAt(ev); stage.style.cursor = thingHit(wx, wy) ? 'grab' : ''; } return; }
+        if (ev.pointerId !== drag.id) return;
+        if (drag.t !== world.player && !world.things.includes(drag.t)) { drag = null; stage.classList.remove('is-dragging'); stage.style.cursor = ''; return; }      // the scene was laid out again: the thing held is gone
+        if (!drag.moved) {
+          if (Math.hypot(ev.clientX - drag.x0, ev.clientY - drag.y0) < 4) return;
+          drag.moved = true; liftThing(world, drag.t); stage.style.cursor = 'grabbing'; stage.classList.add('is-dragging');
+        }
+        const { wx, wy } = sceneAt(ev);
+        carryThing(world, drag.t, wx + drag.dx, wy + drag.dy);
+      });
+      const letGo = (ev) => {
+        if (!drag || ev.pointerId !== drag.id) return;
+        const d = drag; drag = null;
+        stage.classList.remove('is-dragging'); stage.style.cursor = '';
+        try { stage.releasePointerCapture(ev.pointerId); } catch { /* already released */ }
+        if (d.moved && world) dropThing(world, d.t);
+      };
+      stage.addEventListener('pointerup', letGo);
+      stage.addEventListener('pointercancel', letGo);
       // where things are on the page now (for the browser tests): the middle of a kind's first one, or every one's box
       const boxOf = (t, box) => {
         const k = world.kinds[t.kind], x0 = box.left + (t.x - k.pivot[0] - cam.x) * view.zoom, y0 = box.top + (t.y - k.pivot[1] - t.lift - cam.y) * view.zoom;
@@ -778,7 +844,7 @@ export async function playPage(app) {
     col.replaceChildren(
       el('div', { class: 'play-head' }, el('h1', { class: 'h3' }, 'Playground'),
         el('p', { class: 'lede' }, plan.soundsOnly ? 'Your bag has sounds but nothing to draw yet, so here they are to listen to. Add a character or a creature to see a scene.' : 'Everything in your bag, together. Pick a thing on the right to see its moves.')),
-      ...(stick ? [stick, anims] : []),
+      ...(stick ? [stick, env, anims] : []),
       bar);
     main.classList.add('has-scene');
     main.classList.toggle('sounds-only', !!plan.soundsOnly);

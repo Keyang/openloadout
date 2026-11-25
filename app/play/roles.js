@@ -135,14 +135,15 @@ export function chooseMode(things, wanted = null) {
 /**
  * Sort a bag into a scene.
  * entries: [{ key, row, soundIds }] in bag order; soundIds = the sounds that sprite plays on its clips.
- * picks: what the visitor chose: { mode, side: { player, background }, top: { player, background } }. Each view keeps
+ * picks: what the visitor chose: { mode, side: { player, background, tiles }, top: { player, background, tiles } }. Each view keeps
  * its own picks, so switching the view and back changes nothing else; a pick that is not there (or not in this
  * view) falls back to the first of its kind.
  * Returns {
  *   mode: 'side' | 'top',            // chooseMode: from the bag's ground tiles, else from what most of it was drawn for
  *   modes, why,                       // the views the bag has things for (two: the page offers a switch); why this one
  *   player, players,                  // the key in use and every playable character drawn for this view
- *   tilesets, otherTiles,             // the tilesets made for this scene's view (used together); those made for the other view
+ *   tilesets, allTilesets, otherTiles, // the tilesets used for the ground (all of this view's together, or the one picked); every one made
+ *                                     // for this view; those made for the other view
  *   background, backgrounds,          // those that fit this view
  *   scene,                            // keys of the things that stand or move in the scene, in bag order
  *   projectile,                       // the key the player's action fires, or null
@@ -164,7 +165,7 @@ export function planScene(entries, picks = {}) {
   const out = new Set(placed.filter((e) => !fitsMode(e.row.view, mode)).map((e) => e.key));
   const by = (role) => entries.filter((e) => roles[e.key] === role && !out.has(e.key)).map((e) => e.key);
   const mine = picks[mode] ?? {};
-  const players = by('player'), backgrounds = by('background');
+  const players = by('player'), backgrounds = by('background'), allTilesets = by('tiles');
   const player = pick(players, mine.player);
   for (const k of players) if (k !== player) roles[k] = 'npc';
 
@@ -173,7 +174,8 @@ export function planScene(entries, picks = {}) {
   const sprites = entries.filter((e) => e.row.kind === 'sprite');
   return {
     mode, modes, why, player, players,
-    tilesets: by('tiles'), otherTiles: entries.filter((e) => roles[e.key] === 'tiles' && out.has(e.key)).map((e) => e.key),
+    // the ground: every tileset of the view together, or the one the visitor chose when the bag has several
+    tilesets: allTilesets.includes(mine.tiles) ? [mine.tiles] : allTilesets, allTilesets, otherTiles: entries.filter((e) => roles[e.key] === 'tiles' && out.has(e.key)).map((e) => e.key),
     background: pick(backgrounds, mine.background), backgrounds,
     scene: entries.filter((e) => SCENE_ROLES.includes(roles[e.key]) && !out.has(e.key)).map((e) => e.key),
     projectile: by('projectile')[0] ?? null,

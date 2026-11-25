@@ -123,7 +123,6 @@ test('an enemy hit enough times plays its end and is removed from the scene', as
   }
   await page.keyboard.up('Shift');
   expect((await state(page)).things.filter((t) => t.id === 'slime').length).toBe(0);
-  await expect(page.locator('.play-things li', { hasText: 'Slime' }).locator('.play-n')).toHaveText('0');
   await expect(page.locator('.play-health')).toContainText(/of 3/);
 });
 
@@ -166,16 +165,20 @@ test('the look of the bag changes the pixels of the scene', async ({ page }) => 
   expect(looked.colours.length, 'colours on screen with the look on').toBeLessThanOrEqual(plain.colours.length);
 });
 
-test('add one, remove one, reset and mute', async ({ page }) => {
+test('the list is the bag\'s list (no add-one and remove-one); Duplicate puts another one in the scene; reset and mute', async ({ page }) => {
   await openPlay(page, [HERO, SLIME, COIN]);
   const slimes = async () => (await state(page)).things.filter((t) => t.id === 'slime').length;
   expect(await slimes()).toBe(1);
+  await expect(page.locator('.play-step, .play-n')).toHaveCount(0);
   const row = page.locator('.play-things li', { hasText: 'Slime' });
-  await row.getByRole('button', { name: /Add one/ }).click();
-  expect(await slimes()).toBe(2);
-  await row.getByRole('button', { name: /Remove one/ }).click();
-  await row.getByRole('button', { name: /Remove one/ }).click();
-  expect(await slimes()).toBe(0);
+  await expect(row.getByRole('button', { name: 'Surprise me: Slime' })).toHaveClass(/btn-magic/);
+  const dup = row.getByRole('button', { name: 'Duplicate Slime' });
+  expect((await dup.textContent()).trim(), 'icon only').toBe('');
+  await dup.click();
+  await expect.poll(slimes).toBe(2);
+  await expect(page.locator('.play-things li', { hasText: 'Slime' })).toHaveCount(2);
+  await page.locator('.play-things li', { hasText: 'Slime' }).nth(1).getByRole('button', { name: 'Remove Slime' }).click();
+  await expect.poll(slimes).toBe(1);
   await page.keyboard.down('ArrowRight');
   await expect.poll(async () => (await state(page)).player.x).toBeGreaterThan(50);
   await page.keyboard.up('ArrowRight');
