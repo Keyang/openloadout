@@ -5,7 +5,7 @@
 //
 //   surpriseButton(item, asset, name, { onDone })   the magic button; changes the item in the bag
 //   duplicateButton(item, name, { onDone })         puts a copy after the item. onDone(newKey)
-//   removeButton(label, onclick)  pageLink(href, name)  playButton(name)  setPlaying(btn, 'play' | 'stop' | 'busy', name)
+//   removeButton(label, onclick)  pageLink(href, name)  playLink(item, name)  playButton(name)  setPlaying(btn, ...)
 import { bag } from './bag.js';
 import { spriteModel, soundModel } from './panel-model.js';
 import { standardOf } from './bag-edit.js';
@@ -16,6 +16,7 @@ const NS = 'http://www.w3.org/2000/svg';
 // 16-unit pictures, drawn with a line (filled ones say so)
 const ICONS = {
   copy: 'M5.5 5.5h7v7h-7zM3.5 10.5v-7h7',
+  game: 'M5 5h6a3 3 0 0 1 2.9 3.8l-.7 2.6a1.4 1.4 0 0 1-2.4.6L9.5 10.5h-3l-1.3 1.5a1.4 1.4 0 0 1-2.4-.6l-.7-2.6A3 3 0 0 1 5 5ZM5.5 7v2.5M4.25 8.25h2.5M10.5 7.6v.01M11.8 9v.01',
   open: 'M9 3h4v4M13 3 7.5 8.5M11.5 10v3h-9V4.5h3',
   remove: 'M2.5 4.5h11M6 4.5V2.8h4v1.7M4 4.5l.7 8.7h6.6l.7-8.7M6.7 7v3.8M9.3 7v3.8',
   play: { d: 'M5 3.2v9.6L12.6 8z', fill: true },
@@ -59,6 +60,9 @@ export function duplicateButton(item, name, { onDone = () => {} } = {}) {
 }
 
 export const removeButton = (label, onclick) => iconBtn('remove', label, { class: 'row-remove', title: 'Remove', onclick });
+
+/** The playground, opened with this item picked (marked in the scene, its card shown). */
+export const playLink = (item, name) => el('a', { class: 'row-icon row-play', href: `#/play?pick=${encodeURIComponent(item.key)}`, 'aria-label': `Try ${name} in the playground`, title: 'Open in the playground' }, icon('game'));
 
 /** The way to the item's own page (a link: it carries the item's settings). */
 export const pageLink = (href, name, attrs = {}) => el('a', { class: 'bag-act row-icon', href, 'aria-label': `Open the page of ${name}`, title: 'Open its page', ...attrs }, icon('open'));

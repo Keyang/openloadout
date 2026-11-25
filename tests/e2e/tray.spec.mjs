@@ -115,6 +115,21 @@ for (const [w, h] of [[1440, 900], [1024, 768]]) {
       expect(await hasHorizontalScroll(page)).toBe(false);
     });
 
+    test('a row\'s playground icon opens the playground with that thing picked', async ({ page }) => {
+      await openRoute(page, '/');
+      const keys = await page.evaluate(async () => { const { bag } = await import('/app/bag.js'); bag.clear();
+        return ['knight', 'slime', 'coin'].map((id) => bag.add({ kind: 'sprite', id, settings: { params: {}, cues: null, scale: 1 } })); });
+      await openLibrary(page);
+      const go = rows(page).nth(1).getByRole('link', { name: `Try ${C.byId.slime.name} in the playground` });
+      await expect(go).toHaveAttribute('title', 'Open in the playground');
+      expect((await go.textContent()).trim()).toBe('');
+      await go.click();
+      await page.waitForFunction(() => window.__loadoutPlay && window.__loadoutPlay.ready, null, { timeout: 30_000 });
+      await expect(page.locator(`.play-things li[data-key="${keys[1]}"]`)).toHaveClass(/is-picked/);
+      await expect(page.locator('.play-inspector')).toContainText(C.byId.slime.name);
+      await expect(page).toHaveURL(/#\/play$/);                      // the address is tidied: a reload does not pick it again
+    });
+
     test('Download in the tray saves the whole bag as one package', async ({ page }) => {
       await addKit(page, KIT);
       await openLibrary(page);

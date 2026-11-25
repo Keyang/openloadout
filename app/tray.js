@@ -2,7 +2,7 @@
 // the creator adds things. Two sizes:
 //   'full'  the library (1024 px and wider): "Your bag", the count, Download; a short live scene of the bag that opens
 //           the playground (app/bag-scene.js); then the list: picture, name, type, change dot, and the bag list's icon
-//           buttons (Surprise me, Duplicate, Remove: app/row-tools.js). A row
+//           buttons (Surprise me, Open in the playground, Duplicate, Remove: app/row-tools.js). A row
 //           opens that thing's page with its bag item. An empty bag says what to do in one sentence.
 //   'slim'  the asset pages (1280 px and wider): the count, Download, then the pictures with their change dots; the
 //           thing on the page is marked; "+N more" when they do not fit.
@@ -24,7 +24,7 @@ import { zip } from './zip.js';
 import { packageWords } from './changes.js';
 import { icon, ICON } from './asset-shell.js';
 import { bagScene } from './bag-scene.js';
-import { surpriseButton, duplicateButton, removeButton } from './row-tools.js';
+import { surpriseButton, duplicateButton, removeButton, playLink } from './row-tools.js';
 
 const DOWN = 'M8 2.5v8M4.5 7.5 8 11l3.5-3.5M3 13.5h10';
 export const EMPTY = 'Press + on anything and it lands here.';
@@ -153,7 +153,7 @@ export function bagTray({ size = 'full', current = null } = {}) {
     const out = full ? removeButton(`Take ${name} out of your bag`, () => takeOut(item.key)) : null;
     if (out) out.classList.add('tray-x');
     const li = el('li', { 'data-key': item.key, 'data-id': item.id, 'data-kind': item.kind }, link,
-      full ? el('span', { class: 'tray-acts' }, surpriseButton(item, assetFor, name), duplicateButton(item, name), out) : null);
+      full ? el('span', { class: 'tray-acts' }, surpriseButton(item, assetFor, name), playLink(item, name), duplicateButton(item, name), out) : null);
     rows.set(item.key, { li, sig });
     return li;
   }

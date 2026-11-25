@@ -41,7 +41,7 @@ const ZOOMS = [3, 2, 1];                  // the picture is drawn at the largest
 const MANY = 6;                           // with more sorts of thing than this, the scene starts with one of each pickup
 const PIC = 40;                           // the live pictures in the list are this many pixels square
 
-export async function playPage(app) {
+export async function playPage(app, query = {}) {
   document.title = 'Playground · Loadout';
   // col: the scene and what is under it, made again with every build. side: the list, or the editing panel; it stays.
   const col = el('div', { class: 'play-main' }, el('p', { class: 'lede' }, 'Loading the playground…'));
@@ -223,8 +223,13 @@ export async function playPage(app) {
     if (!entries.length) { closeChosen(); mode = 'list'; side.hidden = true; side.replaceChildren(); return; }
     if (chosen && sideEntries.some((e) => e.key === chosen.key)) { chosen.editor.panel.sync(); drawSide(); scene.picked(); return; }
     if (chosen) { closeChosen(); if (mode === 'item') mode = 'list'; }
-    const before = !restored ? store.get('play-chosen') : null;
+    // opened from a bag row's playground button (#/play?pick=<key>): that thing is picked, and the address is tidied so a
+    // reload does not pick it again
+    const asked = !restored && query.pick && sideEntries.some((e) => e.key === query.pick) ? query.pick : null;
+    if (!restored && query.pick) history.replaceState(history.state, '', '#/play');
+    const before = !restored && !asked ? store.get('play-chosen') : null;
     restored = true;
+    if (asked) { if (chosen) closeChosen(); mode = 'list'; store.set('play-chosen', ''); drawSide(); pick(asked, { reveal: true }); return; }
     if (before && sideEntries.some((e) => e.key === before) && openPanel(before)) return;
     drawSide();
     scene.picked();

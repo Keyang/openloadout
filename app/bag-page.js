@@ -9,7 +9,7 @@ import { renderThemedFrame, spriteLook } from '../engine/theme.js';
 import { applySound, themedSoundParams, soundSettingsFor } from '../sound/theme.js';
 import { el, header, saveBlob, reduceMotion } from './ui.js';
 import { itemEditor, changesOf } from './bag-edit.js';
-import { surpriseButton, duplicateButton, removeButton, pageLink, playButton, setPlaying } from './row-tools.js';
+import { surpriseButton, duplicateButton, removeButton, pageLink, playLink, playButton, setPlaying } from './row-tools.js';
 import { soundById, soundParams, rendered, renderAsync, playRendered, playLive, drawWave } from './audio.js';
 import { bag, LINK_LIMIT, NOT_KEPT, lookOf, themeFor, linkProblem } from './bag.js';
 import { THEME_PRESETS } from '../engine/theme.js';
@@ -489,6 +489,7 @@ export function bagPage(app, query = {}, isCurrent = () => true) {
         playBtn,      // a sound's or a track's Play: beside its picture, never on it
         gone ? null : surpriseButton(item, sprite ?? patch, name),      // a random version of it, at once (the bag's change rebuilds the row)
         gone ? null : pageLink(changeLink(item), name),
+        gone ? null : playLink(item, name),
         // the copy goes right after the original; the note goes on the new row
         gone ? null : duplicateButton(item, name, { onDone: (key) => { flash = { key, text: `Duplicated ${name}.` }; build(); } }),
         removeBtn(item, name)));

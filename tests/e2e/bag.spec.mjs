@@ -424,3 +424,15 @@ test('each row has its own Surprise me and Duplicate: Surprise me changes that i
   expect(now[1].key).not.toBe(now[0].key);
   expect(JSON.stringify(now[1].settings)).toBe(JSON.stringify(now[0].settings));
 });
+
+test('a row on the bag page has the playground icon too, opening the playground on that thing', async ({ page }) => {
+  await openRoute(page, '/');
+  await addInPage(page, { kind: 'sprite', id: 'knight', settings: { params: {}, cues: null, scale: 1 } });
+  const key = await addInPage(page, { kind: 'sprite', id: 'slime', settings: { params: {}, cues: null, scale: 1 } });
+  await openRoute(page, '/bag');
+  const go = items(page).nth(1).getByRole('link', { name: /^Try .* in the playground$/ });
+  await expect(go).toHaveAttribute('href', `#/play?pick=${key}`);
+  await go.click();
+  await page.waitForFunction(() => window.__loadoutPlay && window.__loadoutPlay.ready, null, { timeout: 30_000 });
+  await expect(page.locator(`.play-things li[data-key="${key}"]`)).toHaveClass(/is-picked/);
+});
