@@ -63,16 +63,16 @@ const ICON = {
   stop: () => icon('M4.5 4.5h7v7h-7z', { fill: true }),
   sound: () => icon('M2.5 6.2v3.6h2.3L8 12.5v-9L4.8 6.2H2.5ZM10.6 5.8a3 3 0 0 1 0 4.4M12.4 4a5.5 5.5 0 0 1 0 8'),
   note: () => icon('M6 12V3.5l6-1.5v8.5M6 12a1.8 1.8 0 1 1-3.6 0A1.8 1.8 0 0 1 6 12Zm6-1.5a1.8 1.8 0 1 1-3.6 0 1.8 1.8 0 0 1 3.6 0Z'),
-  height: () => icon('M8 2v12M5.2 4.8 8 2l2.8 2.8M5.2 11.2 8 14l2.8-2.8'),
+  cape: () => icon('M5.5 2.5h5L13 13.5c-1.6.8-3.2-.6-5 0s-3.4.8-5 0Z'),
   colour: () => icon('M8 2a6 6 0 1 0 0 12c1 0 1.4-.7 1.1-1.4-.3-.9.3-1.6 1.2-1.6H12a2.3 2.3 0 0 0 2-2.4A6.3 6.3 0 0 0 8 2ZM5 7.2v.01M7.2 4.8v.01M10.4 5.4v.01'),
   weapon: () => icon('M13.5 2.5 6.8 9.2M13.5 2.5H11M13.5 2.5V5M4.6 8.4l3 3M5.8 10.2 2.5 13.5'),
 };
 
 // The first screen's Hero: big, with three of his real controls beside him. Until the visitor touches them, a pointer
-// turns them by itself (taller, shorter; another outfit; another weapon), so the first thing seen is a sprite changing.
+// turns them by itself (a longer cape, a shorter one; another outfit; another weapon), so the first thing seen is a sprite changing.
 // With "reduce motion" nothing moves by itself. demo: [control key, its icon, the tool's name, the values the pointer tries]
 const DEMO = [
-  ['height', 'height', 'How tall', [0.92, 0.12, 0.5]],
+  ['capeLength', 'cape', 'Cape length', [1.8, 0.3, 1]],
   ['outfit', 'colour', 'Clothes colour', ['#c9423a', '#4f9d57', '#7a4fc4', '#3f6fd1']],
   ['weapon', 'weapon', 'Weapon', ['axe', 'spear', 'sword']],
 ];

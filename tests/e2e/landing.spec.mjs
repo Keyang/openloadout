@@ -311,11 +311,11 @@ test('the first screen\'s Hero changes by itself until the visitor takes the con
   await drawn(hero);
   const tools = demo.getByRole('toolbar', { name: 'Change the Hero' });
   await expect(tools.getByRole('button')).toHaveCount(3);
-  // the pointer turns the height by itself: the Hero is drawn another way, and the link carries the change
+  // the pointer turns the cape length by itself: the Hero is drawn another way, and the link carries the change
   const cursor = demo.locator('.demo-cursor');
   await expect(cursor).toBeVisible({ timeout: 5_000 });
   const carry = demo.getByRole('link', { name: /^Open it with these changes/ });
-  await expect(carry).toHaveAttribute('href', /^#\/sprite\/knight\?.*height=/, { timeout: 8_000 });
+  await expect(carry).toHaveAttribute('href', /^#\/sprite\/knight\?.*capeLength=/, { timeout: 8_000 });
   // the visitor takes over: the pointer goes, and a weapon picked is the weapon kept
   await tools.getByRole('button', { name: 'Weapon' }).click();
   await expect(cursor).toBeHidden();
@@ -337,6 +337,6 @@ test('with reduced motion the first screen\'s Hero waits for the visitor', async
   await page.waitForTimeout(2500);
   await expect(demo.locator('.demo-cursor')).toBeHidden();
   await expect(demo.getByRole('link', { name: /^Open it with these changes/ })).toHaveAttribute('href', '#/sprite/knight');
-  await demo.getByRole('slider', { name: 'How tall' }).fill('1');
-  await expect(demo.getByRole('link', { name: /^Open it with these changes/ })).toHaveAttribute('href', /height=/);
+  await demo.getByRole('slider', { name: 'Cape length' }).fill('1.8');
+  await expect(demo.getByRole('link', { name: /^Open it with these changes/ })).toHaveAttribute('href', /capeLength=1\.8/);
 });
