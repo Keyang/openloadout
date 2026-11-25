@@ -247,7 +247,8 @@ export function createPainter({ sprites, colour, tiles: tileSets = null }) {
     if (!t.passing && t.role !== 'effect' && t.state !== 'dying') {
       // the shadow lies on whatever is underneath, so it stays down while the player is in the air
       const floor = world.level.mode === 'side' && t.role === 'player' && !t.onGround ? Math.round(surfaceBelow(world.level, t.x, t.y).y - cam.y) : y;
-      shadow(g, x, floor, Math.max(3, Math.round((k.box.l + k.box.r) * (t.lift || floor !== y ? 0.35 : 0.5))));
+      const feet = k.grounded === false || !k.box.gap ? 0 : k.box.gap;       // empty rows under the feet: the shadow goes where they are, not where the pivot is
+      shadow(g, x, floor - feet, Math.max(3, Math.round((k.box.l + k.box.r) * (t.lift || floor !== y ? 0.35 : 0.5))));
     }
     const img = frame(t.kind, t.anim.clip, t.anim.frame);
     const top = y - k.pivot[1] - t.lift - bob;

@@ -66,8 +66,8 @@ export function isCustom(sprite, settings = {}) {
 export function bodyBox(sprite, clip, params, pivot = sprite.pivot) {
   const b = renderFrame(sprite, clip, 0, params).bounds();
   const [px, py] = pivot;
-  if (!b) return { l: sprite.size[0] / 4, r: sprite.size[0] / 4, t: sprite.size[1] / 2, b: 0 };
-  return { l: Math.max(1, px - b.x0), r: Math.max(1, b.x1 + 1 - px), t: Math.max(1, py - b.y0), b: Math.max(0, b.y1 + 1 - py) };
+  if (!b) return { l: sprite.size[0] / 4, r: sprite.size[0] / 4, t: sprite.size[1] / 2, b: 0, gap: 0 };
+  return { l: Math.max(1, px - b.x0), r: Math.max(1, b.x1 + 1 - px), t: Math.max(1, py - b.y0), b: Math.max(0, b.y1 + 1 - py), gap: Math.max(0, py - (b.y1 + 1)) };
 }
 
 const BLOCKING_ROLES = ['world/prop', 'world/building'];
