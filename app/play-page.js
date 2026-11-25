@@ -324,16 +324,16 @@ export async function playPage(app) {
     function spriteRow(e, { out = false } = {}) {
       const role = plan.roles[e.key], name = e.row.name, noteId = `play-does-${++ids}`;
       const pic = livePicture(e);
-      // a sprite the visitor changed says so, so it is clear this is their version and not the one in the catalogue
+      // a sprite the visitor changed says so, as the bag's list does: the change dot before its buttons ("your version" for a screen reader)
       const tagBox = el('span', { class: 'play-tag-box' });
-      const tag = () => tagBox.replaceChildren(...(isCustom(e.sprite, e.settings) ? [el('span', { class: 'play-tag', title: 'You changed this one' }, el('span', { class: 'dot', 'aria-hidden': 'true' }), 'your version')] : []));
+      const tag = () => tagBox.replaceChildren(...(isCustom(e.sprite, e.settings) ? [el('span', { class: 'play-tag', title: 'Your version: you changed this one' }, el('span', { class: 'dot', 'aria-hidden': 'true' }), el('span', { class: 'sr' }, 'your version'))] : []));
       tag();
       tags[e.key] = tag;
       const does = out ? 'Drawn for the other view' : roleShort(role, { player: hasPlayer });
       const pickBtn = el('button', { type: 'button', class: 'play-row-pick', 'aria-label': name, 'aria-describedby': noteId, 'aria-pressed': 'false', disabled: out, onclick: () => pick(e.key) },
-        pic.node, el('span', { class: 'play-row-text' }, el('span', { class: 'play-name' }, name, tagBox), el('span', { class: 'play-does', id: noteId }, does)));
-      const li = el('li', { class: `play-row${out ? ' is-out' : ''}`, 'data-key': e.key }, pickBtn);
-      // the same things the bag's list lets you do to a row (app/row-tools.js): a random version at once, a copy, take it out
+        pic.node, el('span', { class: 'play-row-text' }, el('span', { class: 'play-name' }, name), el('span', { class: 'play-does', id: noteId }, does)));
+      const li = el('li', { class: `play-row${out ? ' is-out' : ''}`, 'data-key': e.key }, pickBtn, tagBox);
+      // one line, as in the bag's list: picture, name and what it does, the change dot, then the same things the bag's list lets you do to a row (app/row-tools.js): a random version at once, a copy, take it out
       const item = out ? null : bag.get(e.key);
       if (item) li.append(el('div', { class: 'play-row-tools' },
         surpriseButton(item, e.sprite, name),
