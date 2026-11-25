@@ -1,0 +1,45 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "rune-hum",
+  "name": "Rune hum",
+  "category": "ambience",
+  "description": "A steady magical hum that swells and sinks, with faint glints over it, as a loop for something enchanted that is waiting. Change its pitch, how fast it swells, the brightness and how much it sparkles.",
+  "meta": {
+    "type": "ambience",
+    "role": "environment/ambience",
+    "themes": ["fantasy", "dungeon"],
+    "gameTypes": ["roguelike-action", "platformer"],
+    "words": ["hum", "rune", "magic", "glow", "aura", "seal", "enchanted", "drone", "shimmer", "sparkle", "gate", "altar", "chiptune", "waiting"],
+    "license": "draft"
+  },
+  "loop": true,
+  "wrap": true,
+  "duration": 4,
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 110, "max": 440, "default": 196, "scale": "log", "hint": "How low or high the hum is." },
+    { "id": "speed", "label": "Speed", "min": 0, "max": 2, "default": 1, "options": ["Slow", "Steady", "Quick"], "hint": "How often the hum swells in one loop. The loop stays the same length." },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.5 },
+    { "id": "sparkle", "label": "Sparkle", "min": 0, "max": 1, "default": 0.3, "hint": "How strong the faint glints over the hum are." }
+  ],
+  "nodes": [
+    { "id": "f", "type": "expr", "expr": "round(pitch * 2) / 2" },
+    { "id": "swell", "type": "expr", "expr": "0.3 + 0.7 * (0.5 - 0.5 * cos(tau * t * pow(2, speed) / 4))" },
+    { "id": "low", "type": "osc", "wave": "tri", "freq": "f" },
+    { "id": "fifth", "type": "osc", "wave": "pulse", "width": 0.5, "freq": "f * 1.5" },
+    { "id": "pair", "type": "expr", "expr": "low + fifth * (0.2 + 0.27 * bright)" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "pair", "freq": "1000 + bright * 5000" },
+    { "id": "lift", "type": "filter", "mode": "hp", "in": "tone", "freq": 420 },
+    { "id": "hum", "type": "expr", "expr": "(tone * 0.5 + lift * 1.5) * swell" },
+    { "id": "specks", "type": "dust", "density": 16, "spread": 0.6 },
+    { "id": "glints", "type": "filter", "mode": "bp", "in": "specks", "freq": 4000, "q": 80 },
+    { "id": "sum", "type": "expr", "expr": "hum + glints * sparkle * 0.8" },
+    { "id": "room", "type": "reverb", "in": "sum", "size": 0.3, "damp": 0.5, "mix": 0.05 },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "room", "freq": 30 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Lectern glow": {},
+    "Sealed gate": { "pitch": 147, "speed": 0, "bright": 0.35, "sparkle": 0.1 },
+    "Elite aura": { "pitch": 262, "speed": 2, "bright": 0.7, "sparkle": 0.6 }
+  }
+}

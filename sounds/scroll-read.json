@@ -1,0 +1,48 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "scroll-read",
+  "name": "Scroll read",
+  "category": "pickup",
+  "description": "Two quick rustles of paper, then a short climbing run of bright, toy-like notes, the last one ringing longest, for a scroll that is read and its power taken. Change its pitch, speed, brightness, how much paper is heard and how many notes climb. The same every time.",
+  "meta": {
+    "type": "sfx",
+    "role": "items/consume",
+    "themes": ["fantasy", "neutral"],
+    "gameTypes": ["roguelike-action", "platformer"],
+    "words": ["scroll", "read", "paper", "rustle", "boon", "upgrade", "power", "blessing", "spell", "learn", "reward", "unroll", "chiptune", "page"],
+    "license": "draft"
+  },
+  "duration": "0.1 + (notes - 1) / speed + 1.4 / speed + 0.02",
+  "params": [
+    { "id": "pitch", "label": "Pitch", "unit": "Hz", "min": 300, "max": 1200, "default": 520, "scale": "log" },
+    { "id": "speed", "label": "Speed", "unit": "notes/s", "min": 8, "max": 20, "default": 14 },
+    { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "rustle", "label": "Paper", "min": 0, "max": 1, "default": 0.6 },
+    { "id": "notes", "label": "Notes", "min": 2, "max": 4, "default": 3, "step": 1 }
+  ],
+  "nodes": [
+    { "id": "hiss", "type": "noise", "seed": 4107 },
+    { "id": "paperClk", "type": "clock", "rate": "1 / 0.06", "count": 2 },
+    { "id": "paperAmp", "type": "ad", "attack": 0.002, "hold": 0.006, "decay": 0.032, "curve": 1.6, "trig": "paperClk" },
+    { "id": "paper", "type": "filter", "mode": "bp", "in": "hiss", "freq": "2500 * (t < 0.06 ? 1 : 1.18)", "q": 1.4 },
+    { "id": "clk", "type": "clock", "rate": "speed", "count": "notes", "delay": 0.1 },
+    { "id": "note", "type": "seq", "steps": ["pitch", "pitch * semi(5)", "pitch * semi(7)", "pitch * semi(12)"], "trig": "clk" },
+    { "id": "lastClk", "type": "clock", "rate": 1, "count": 1, "delay": "0.1 + (notes - 1) / speed" },
+    { "id": "ampShort", "type": "ad", "attack": 0.003, "hold": "0.3 / speed", "decay": "0.4 / speed - 0.003", "curve": 1.4, "trig": "clk" },
+    { "id": "ampLast", "type": "ad", "attack": 0.003, "hold": "0.4 / speed", "decay": "1.0 / speed - 0.003", "curve": 1.8, "trig": "lastClk" },
+    { "id": "isLast", "type": "expr", "expr": "t >= 0.1 + (notes - 1) / speed - 0.0005 ? 1 : 0" },
+    { "id": "amp", "type": "expr", "expr": "isLast ? ampLast : ampShort * 0.85" },
+    { "id": "pl", "type": "osc", "wave": "pulse", "width": 0.25, "freq": "note" },
+    { "id": "tr", "type": "osc", "wave": "tri", "freq": "note * 0.5" },
+    { "id": "tone", "type": "filter", "mode": "lp", "in": "pl", "freq": "1400 + bright * 9000", "q": 0.7 },
+    { "id": "power", "type": "expr", "expr": "(tone * (0.3 + bright * 0.5) + tr * 0.45) * amp" },
+    { "id": "sum", "type": "expr", "expr": "paper * paperAmp * (0.06 + rustle * 0.94) * 2 + power" },
+    { "id": "clean", "type": "filter", "mode": "hp", "in": "sum", "freq": 120, "q": 0.7 }
+  ],
+  "out": "clean",
+  "presets": {
+    "Read scroll": { "rustle": 1, "notes": 2, "speed": 10, "pitch": 440 },
+    "Power taken": { "rustle": 0.2, "notes": 4, "pitch": 660, "bright": 0.75 },
+    "Small boon": { "notes": 2, "pitch": 780, "rustle": 0.3, "speed": 18 }
+  }
+}

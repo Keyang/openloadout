@@ -1,0 +1,1006 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "scroll-surge",
+ "name": "Scroll surge",
+ "blurb": "The light of a boon taken from a scroll: a flash at the chest, sparks winding in, a ring along the floor and a thin column that lifts away, or a quiet lasting shimmer. Change its size, the sparks, its style, how wild it is and its colours.",
+ "meta": {
+  "type": "effect",
+  "role": "effects/magic",
+  "themes": [
+   "fantasy",
+   "neutral"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "turn-based-rpg",
+   "platformer"
+  ],
+  "view": "none",
+  "words": [
+   "upgrade",
+   "boon",
+   "power",
+   "surge",
+   "scroll",
+   "buff",
+   "level",
+   "light",
+   "swirl",
+   "blessing",
+   "gain",
+   "magic"
+  ],
+  "license": "draft"
+ },
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  32,
+  62
+ ],
+ "grounded": false,
+ "preview": "burst",
+ "styles": [
+  "pixel"
+ ],
+ "versions": [
+  {
+   "name": "Boon taken",
+   "params": {}
+  },
+  {
+   "name": "Golden pillar",
+   "params": {
+    "style": "column",
+    "core": "#f2c230",
+    "edge": "#e08a2c"
+   }
+  },
+  {
+   "name": "Forest blessing",
+   "params": {
+    "style": "leaves",
+    "edge": "#6aa83e",
+    "core": "#a4c44a",
+    "pieces": 12
+   }
+  },
+  {
+   "name": "Small dusk shimmer",
+   "params": {
+    "size": 0,
+    "pieces": 4,
+    "edge": "#8696dc",
+    "core": "#8fd0f0"
+   }
+  }
+ ],
+ "palette": [
+  {
+   "id": "core",
+   "label": "Core",
+   "default": "#f0ead8",
+   "material": "light",
+   "swatches": [
+    "#f0ead8",
+    "#f2c230",
+    "#a4c44a",
+    "#8fd0f0"
+   ]
+  },
+  {
+   "id": "edge",
+   "label": "Edge",
+   "default": "#4fd8ee",
+   "material": "magic",
+   "swatches": [
+    "#4fd8ee",
+    "#e08a2c",
+    "#6aa83e",
+    "#8696dc"
+   ]
+  },
+  {
+   "id": "mid",
+   "material": "magic",
+   "derive": {
+    "rule": "mix",
+    "of": "core",
+    "with": "edge",
+    "amount": 0.5
+   }
+  },
+  {
+   "id": "rim",
+   "material": "magic",
+   "derive": {
+    "rule": "ramp",
+    "of": "edge",
+    "tone": "dark"
+   }
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "controls": [
+  {
+   "key": "size",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5
+  },
+  {
+   "key": "pieces",
+   "kind": "range",
+   "label": "Sparks",
+   "lo": "Few",
+   "hi": "Many",
+   "min": 4,
+   "max": 12,
+   "step": 1,
+   "default": 8
+  },
+  {
+   "key": "style",
+   "kind": "choice",
+   "label": "Style",
+   "options": [
+    "spiral",
+    "column",
+    "leaves"
+   ],
+   "default": "spiral"
+  },
+  {
+   "key": "core",
+   "kind": "colour",
+   "label": "Core"
+  },
+  {
+   "key": "edge",
+   "kind": "colour",
+   "label": "Edge"
+  },
+  {
+   "key": "flicker",
+   "kind": "range",
+   "label": "Flicker",
+   "lo": "Steady",
+   "hi": "Wild",
+   "default": 0.5,
+   "group": "Motion",
+   "when": {
+    "style": [
+     "spiral",
+     "leaves"
+    ]
+   }
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "body": {
+  "nodes": [
+   {
+    "id": "floor",
+    "parent": null,
+    "at": [
+     32,
+     58
+    ]
+   },
+   {
+    "id": "glintA",
+    "parent": null,
+    "at": [
+     20,
+     30
+    ]
+   },
+   {
+    "id": "glintB",
+    "parent": null,
+    "at": [
+     44,
+     22
+    ]
+   }
+  ],
+  "draw": [],
+  "emitters": [
+   {
+    "id": "core",
+    "gen": "glow",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "at": [
+     32,
+     36
+    ],
+    "r": 9,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "halo",
+    "gen": "ring",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "at": [
+     32,
+     36
+    ],
+    "r0": 15,
+    "r1": 20,
+    "thick": 3,
+    "seed": 3,
+    "begin": 0,
+    "end": 0.45,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 63
+    }
+   },
+   {
+    "id": "floor",
+    "gen": "ring",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "on": "floor",
+    "at": [
+     0,
+     0
+    ],
+    "r0": 4,
+    "r1": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       17
+      ],
+      [
+       1,
+       23
+      ]
+     ]
+    },
+    "thick": 3,
+    "squash": 0.17,
+    "seed": 5,
+    "begin": 0.1,
+    "end": 0.5,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 63
+    }
+   },
+   {
+    "id": "column",
+    "gen": "beam.lift",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "on": "floor",
+    "at": [
+     0,
+     1
+    ],
+    "width": 6,
+    "height": 54,
+    "dash": 3,
+    "gap": 2,
+    "solid": 0.5,
+    "seed": 2,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "swirl",
+    "gen": "swirl",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "when": {
+     "style": [
+      "spiral"
+     ]
+    },
+    "at": [
+     32,
+     36
+    ],
+    "count": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       12,
+       12
+      ]
+     ],
+     "round": "px"
+    },
+    "r0": {
+     "from": "size",
+     "map": [
+      [
+       0,
+       20
+      ],
+      [
+       1,
+       26
+      ]
+     ]
+    },
+    "r1": 1,
+    "turns": {
+     "from": "flicker",
+     "map": [
+      [
+       0,
+       0.5
+      ],
+      [
+       0.5,
+       1
+      ],
+      [
+       1,
+       1.7
+      ]
+     ]
+    },
+    "size": 2,
+    "tail": 3,
+    "stagger": 0.25,
+    "seed": 7,
+    "begin": 0.08,
+    "end": 0.5,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 63
+    }
+   },
+   {
+    "id": "pillar",
+    "gen": "beam",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "when": {
+     "style": [
+      "column"
+     ]
+    },
+    "on": "floor",
+    "at": [
+     0,
+     1
+    ],
+    "width": 8,
+    "height": 52,
+    "dash": 3,
+    "gap": 2,
+    "solid": 0.55,
+    "seed": 4,
+    "paints": [
+     "shine",
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ]
+   },
+   {
+    "id": "leaves",
+    "gen": "leaves",
+    "v": 1,
+    "clip": [
+     "burst"
+    ],
+    "when": {
+     "style": [
+      "leaves"
+     ]
+    },
+    "on": "floor",
+    "at": [
+     0,
+     -2
+    ],
+    "count": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       4
+      ],
+      [
+       12,
+       12
+      ]
+     ],
+     "round": "px"
+    },
+    "size": 3,
+    "dist": {
+     "from": "flicker",
+     "map": [
+      [
+       0,
+       9
+      ],
+      [
+       0.5,
+       17
+      ],
+      [
+       1,
+       26
+      ]
+     ]
+    },
+    "gravity": -14,
+    "seed": 6,
+    "begin": 0.08,
+    "end": 0.6,
+    "paints": [
+     "edge",
+     "mid"
+    ],
+    "rim": "rim",
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 63
+    }
+   },
+   {
+    "id": "motes",
+    "gen": "motes",
+    "v": 1,
+    "clip": [
+     "loop"
+    ],
+    "on": "floor",
+    "at": [
+     0,
+     0
+    ],
+    "count": {
+     "from": "pieces",
+     "map": [
+      [
+       4,
+       3
+      ],
+      [
+       12,
+       5
+      ]
+     ],
+     "round": "px"
+    },
+    "rise": 42,
+    "width": 22,
+    "size": 5,
+    "shape": "plus",
+    "sway": {
+     "from": "flicker",
+     "map": [
+      [
+       0,
+       0.4
+      ],
+      [
+       0.5,
+       1.6
+      ],
+      [
+       1,
+       3.2
+      ]
+     ]
+    },
+    "seed": 13,
+    "loop": true,
+    "paints": [
+     "core",
+     "mid",
+     "edge",
+     "rim"
+    ],
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 63
+    }
+   },
+   {
+    "id": "glintA",
+    "gen": "twinkle",
+    "v": 2,
+    "clip": [
+     "loop"
+    ],
+    "on": "glintA",
+    "at": [
+     0,
+     0
+    ],
+    "size": 2,
+    "paint": "edge",
+    "core": "shine",
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 63
+    }
+   },
+   {
+    "id": "glintB",
+    "gen": "twinkle",
+    "v": 2,
+    "clip": [
+     "loop"
+    ],
+    "on": "glintB",
+    "at": [
+     0,
+     0
+    ],
+    "size": 2,
+    "paint": "edge",
+    "core": "shine",
+    "area": {
+     "x0": 1,
+     "y0": 1,
+     "x1": 63,
+     "y1": 63
+    }
+   }
+  ]
+ },
+ "clips": {
+  "burst": {
+   "frames": 10,
+   "fps": 16,
+   "loop": false,
+   "keys": [
+    {
+     "t": 0,
+     "ease": "linear",
+     "emit": {
+      "core": {
+       "amount": 1,
+       "scale": 1,
+       "cool": 0,
+       "at": [
+        32,
+        36
+       ]
+      },
+      "halo": {
+       "amount": 1
+      },
+      "floor": {
+       "amount": 0
+      },
+      "column": {
+       "amount": 0
+      },
+      "swirl": {
+       "amount": 0
+      },
+      "pillar": {
+       "amount": 0
+      },
+      "leaves": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.1111111111111111,
+     "ease": "linear",
+     "emit": {
+      "core": {
+       "amount": 1,
+       "scale": 0.8,
+       "cool": 0
+      },
+      "halo": {
+       "amount": 1
+      },
+      "floor": {
+       "amount": 1
+      },
+      "swirl": {
+       "amount": 1
+      },
+      "pillar": {
+       "amount": 1,
+       "height": 34
+      },
+      "leaves": {
+       "amount": 1
+      }
+     }
+    },
+    {
+     "t": 0.2222222222222222,
+     "ease": "linear",
+     "emit": {
+      "core": {
+       "amount": 1,
+       "scale": 0.6,
+       "cool": 1
+      },
+      "halo": {
+       "amount": 1
+      },
+      "floor": {
+       "amount": 1
+      },
+      "swirl": {
+       "amount": 1
+      },
+      "pillar": {
+       "amount": 1,
+       "height": 52,
+       "phase": 1
+      },
+      "leaves": {
+       "amount": 1
+      }
+     }
+    },
+    {
+     "t": 0.3333333333333333,
+     "ease": "linear",
+     "emit": {
+      "core": {
+       "amount": 1,
+       "scale": 0.55,
+       "cool": 1
+      },
+      "halo": {
+       "amount": 1
+      },
+      "floor": {
+       "amount": 1
+      },
+      "swirl": {
+       "amount": 1
+      },
+      "pillar": {
+       "amount": 1,
+       "height": 52,
+       "phase": 2
+      },
+      "leaves": {
+       "amount": 1
+      }
+     }
+    },
+    {
+     "t": 0.4444444444444444,
+     "ease": "linear",
+     "emit": {
+      "core": {
+       "amount": 1,
+       "scale": 0.9,
+       "cool": 0,
+       "at": [
+        32,
+        36
+       ]
+      },
+      "halo": {
+       "amount": 0
+      },
+      "floor": {
+       "amount": 1
+      },
+      "column": {
+       "amount": 0
+      },
+      "swirl": {
+       "amount": 1
+      },
+      "pillar": {
+       "amount": 1,
+       "height": 46,
+       "phase": 3
+      },
+      "leaves": {
+       "amount": 1
+      }
+     }
+    },
+    {
+     "t": 0.5555555555555556,
+     "ease": "linear",
+     "emit": {
+      "core": {
+       "amount": 1,
+       "scale": 0.6,
+       "cool": 0,
+       "at": [
+        32,
+        31
+       ]
+      },
+      "floor": {
+       "amount": 1
+      },
+      "column": {
+       "amount": 1,
+       "scale": 0.7,
+       "across": 1,
+       "lift": 0,
+       "solid": 0.5,
+       "phase": 0
+      },
+      "swirl": {
+       "amount": 0
+      },
+      "pillar": {
+       "amount": 0
+      },
+      "leaves": {
+       "amount": 1
+      }
+     }
+    },
+    {
+     "t": 0.6666666666666666,
+     "ease": "linear",
+     "emit": {
+      "core": {
+       "amount": 1,
+       "scale": 0.45,
+       "cool": 1,
+       "at": [
+        32,
+        26
+       ]
+      },
+      "floor": {
+       "amount": 0
+      },
+      "column": {
+       "amount": 1,
+       "scale": 0.9,
+       "across": 1,
+       "lift": 0.12,
+       "solid": 0.45,
+       "phase": 1
+      },
+      "leaves": {
+       "amount": 0
+      }
+     }
+    },
+    {
+     "t": 0.7777777777777778,
+     "ease": "linear",
+     "emit": {
+      "core": {
+       "amount": 0
+      },
+      "column": {
+       "amount": 1,
+       "scale": 1,
+       "across": 1,
+       "lift": 0.3,
+       "solid": 0.35,
+       "phase": 2
+      }
+     }
+    },
+    {
+     "t": 0.8888888888888888,
+     "ease": "linear",
+     "emit": {
+      "column": {
+       "amount": 1,
+       "scale": 1,
+       "across": 0.67,
+       "lift": 0.6,
+       "solid": 0.05,
+       "phase": 3
+      }
+     }
+    },
+    {
+     "t": 1,
+     "ease": "linear",
+     "emit": {
+      "column": {
+       "amount": 1,
+       "scale": 1,
+       "across": 0.17,
+       "lift": 0.86,
+       "solid": 0,
+       "phase": 4
+      }
+     }
+    }
+   ],
+   "sounds": [
+    {
+     "sound": "scroll-read",
+     "preset": "Power taken",
+     "frame": 0,
+     "volume": 0.8
+    }
+   ]
+  },
+  "loop": {
+   "label": "Empowered",
+   "frames": 8,
+   "fps": 10,
+   "keys": [
+    {
+     "t": 0,
+     "ease": "linear",
+     "emit": {
+      "glintA": {
+       "size": 2
+      },
+      "glintB": {
+       "size": 0
+      }
+     }
+    },
+    {
+     "t": 0.125,
+     "ease": "linear",
+     "emit": {
+      "glintA": {
+       "size": 1
+      },
+      "glintB": {
+       "size": 0
+      }
+     }
+    },
+    {
+     "t": 0.25,
+     "ease": "linear",
+     "emit": {
+      "glintA": {
+       "size": 0
+      },
+      "glintB": {
+       "size": 1
+      }
+     }
+    },
+    {
+     "t": 0.375,
+     "ease": "linear",
+     "emit": {
+      "glintA": {
+       "size": 0
+      },
+      "glintB": {
+       "size": 2
+      }
+     }
+    },
+    {
+     "t": 0.5,
+     "ease": "linear",
+     "emit": {
+      "glintA": {
+       "size": 1
+      },
+      "glintB": {
+       "size": 1
+      }
+     }
+    },
+    {
+     "t": 0.625,
+     "ease": "linear",
+     "emit": {
+      "glintA": {
+       "size": 2
+      },
+      "glintB": {
+       "size": 0
+      }
+     }
+    },
+    {
+     "t": 0.75,
+     "ease": "linear",
+     "emit": {
+      "glintA": {
+       "size": 1
+      },
+      "glintB": {
+       "size": 1
+      }
+     }
+    },
+    {
+     "t": 0.875,
+     "ease": "linear",
+     "emit": {
+      "glintA": {
+       "size": 0
+      },
+      "glintB": {
+       "size": 2
+      }
+     }
+    }
+   ]
+  }
+ }
+}

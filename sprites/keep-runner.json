@@ -1,0 +1,6224 @@
+{
+ "format": "loadout-sprite",
+ "version": 2,
+ "id": "keep-runner",
+ "name": "Keep runner",
+ "blurb": "A runner who strikes, shoots and dodges without changing what is in the hands. Change the build, the hand weapon, the bow, the headgear, the hair and the colours.",
+ "size": [
+  64,
+  64
+ ],
+ "pivot": [
+  28,
+  58
+ ],
+ "preview": "idle",
+ "styles": [
+  "pixel"
+ ],
+ "meta": {
+  "type": "character",
+  "role": "characters/player",
+  "view": "side",
+  "themes": [
+   "fantasy",
+   "dungeon"
+  ],
+  "gameTypes": [
+   "roguelike-action",
+   "platformer"
+  ],
+  "words": [
+   "runner",
+   "hero",
+   "player",
+   "fighter",
+   "scout",
+   "sword",
+   "bow",
+   "archer",
+   "dodge",
+   "dash",
+   "slash",
+   "shoot",
+   "headband",
+   "adventurer"
+  ],
+  "license": "draft"
+ },
+ "palette": [
+  {
+   "id": "skin",
+   "label": "Skin",
+   "default": "#f6d3b0",
+   "material": "skin",
+   "swatches": [
+    "#f6d3b0",
+    "#e8b088",
+    "#c98a5c",
+    "#9a6240",
+    "#6e4428",
+    "#9bd18a",
+    "#b9a7e0"
+   ]
+  },
+  {
+   "id": "hair",
+   "label": "Hair",
+   "default": "#5a3a22",
+   "material": "plant",
+   "swatches": [
+    "#5a3a22",
+    "#a8612a",
+    "#e0b040",
+    "#d8d8e0"
+   ]
+  },
+  {
+   "id": "outfit",
+   "label": "Jacket",
+   "default": "#3f6fd1",
+   "material": "cloth",
+   "swatches": [
+    "#3f6fd1",
+    "#3f8a4f",
+    "#7a4fc4",
+    "#5d6475",
+    "#a06a3c"
+   ]
+  },
+  {
+   "id": "trousers",
+   "derive": {
+    "rule": "tone",
+    "of": "outfit",
+    "by": -0.6
+   },
+   "material": "cloth"
+  },
+  {
+   "id": "trim",
+   "label": "Headband and belt",
+   "default": "#a4c44a",
+   "material": "cloth",
+   "swatches": [
+    "#a4c44a",
+    "#e08a2c",
+    "#f2c230",
+    "#f0ead8",
+    "#9bd18a"
+   ]
+  },
+  {
+   "id": "metal",
+   "label": "Metal",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "swatches": [
+    "#c2c9d6",
+    "#8f97a8",
+    "#f2c230",
+    "#c98a4a"
+   ]
+  },
+  {
+   "id": "boots",
+   "label": "Boots",
+   "default": "#7a4f33",
+   "material": "cloth",
+   "detail": true
+  },
+  {
+   "id": "stave",
+   "label": "Bow",
+   "default": "#f0ead8",
+   "material": "wood",
+   "detail": true
+  },
+  {
+   "id": "wood",
+   "label": "Shafts and grips",
+   "default": "#a06a3c",
+   "material": "wood",
+   "detail": true
+  },
+  {
+   "id": "steel",
+   "label": "Arrowhead and buckle",
+   "default": "#c2c9d6",
+   "material": "metal",
+   "detail": true
+  },
+  {
+   "id": "shine",
+   "default": "#ffffff",
+   "material": "light",
+   "detail": true
+  }
+ ],
+ "body": {
+  "rig": {
+   "extends": {
+    "use": "base:person-side",
+    "v": 7,
+    "paint": {
+     "skin": "skin",
+     "top": "outfit",
+     "bottom": "trousers",
+     "boots": "boots"
+    },
+    "clips": [
+     "idle",
+     "walk",
+     "run",
+     "jump",
+     "attack",
+     "shoot",
+     {
+      "name": "dodge",
+      "from": "run"
+     },
+     "hurt",
+     "die"
+    ]
+   },
+   "shapes": [
+    {
+     "id": "belt",
+     "kind": "use",
+     "use": "part:belt",
+     "v": 1,
+     "on": "waist",
+     "paint": {
+      "belt": "trim",
+      "buckle": "steel"
+     }
+    },
+    {
+     "id": "cuffB",
+     "kind": "line",
+     "on": "foreBd",
+     "from": [
+      2.6,
+      0
+     ],
+     "to": [
+      3.6,
+      0
+     ],
+     "thick": 2,
+     "paint": "trim",
+     "shade": 0,
+     "z": 10.5,
+     "far": true
+    },
+    {
+     "id": "cuffF",
+     "kind": "line",
+     "on": "foreFd",
+     "from": [
+      2.6,
+      0
+     ],
+     "to": [
+      3.6,
+      0
+     ],
+     "thick": 2,
+     "paint": "trim",
+     "shade": 0,
+     "z": 91
+    },
+    {
+     "id": "ponytail",
+     "kind": "use",
+     "use": "part:ponytail",
+     "v": 1,
+     "on": "hang",
+     "when": {
+      "hairStyle": [
+       "ponytail"
+      ],
+      "headgear": [
+       "band",
+       "none"
+      ]
+     },
+     "paint": {
+      "hair": "hair"
+     }
+    },
+    {
+     "id": "hair",
+     "kind": "use",
+     "use": "part:hair",
+     "v": 2,
+     "on": "headwear",
+     "when": {
+      "hairStyle": [
+       "short",
+       "spiky",
+       "ponytail"
+      ],
+      "headgear": [
+       "band",
+       "none"
+      ]
+     },
+     "args": {
+      "style": {
+       "from": "hairStyle",
+       "pick": {
+        "short": "short",
+        "spiky": "spiky",
+        "ponytail": "short",
+        "bald": "short"
+       }
+      }
+     },
+     "paint": {
+      "hair": "hair"
+     }
+    },
+    {
+     "id": "nape",
+     "kind": "use",
+     "use": "part:hair-nape",
+     "v": 2,
+     "on": "headwear",
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     },
+     "paint": {
+      "hair": "hair"
+     }
+    },
+    {
+     "id": "band",
+     "kind": "poly",
+     "on": "skull",
+     "points": [
+      [
+       -5.9,
+       1.2
+      ],
+      [
+       5.6,
+       1.2
+      ],
+      [
+       5,
+       {
+        "from": "headgearSize",
+        "map": [
+         [
+          0.65,
+          2.8
+         ],
+         [
+          1,
+          3.2
+         ],
+         [
+          1.35,
+          4.2
+         ]
+        ]
+       }
+      ],
+      [
+       -5.300000000000001,
+       {
+        "from": "headgearSize",
+        "map": [
+         [
+          0.65,
+          2.8
+         ],
+         [
+          1,
+          3.2
+         ],
+         [
+          1.35,
+          4.2
+         ]
+        ]
+       }
+      ]
+     ],
+     "paint": "trim",
+     "shade": 0,
+     "z": 67,
+     "when": {
+      "headgear": [
+       "band"
+      ]
+     }
+    },
+    {
+     "id": "bandEdge",
+     "kind": "line",
+     "on": "skull",
+     "from": [
+      -5.9,
+      1.2
+     ],
+     "to": [
+      5.6,
+      1.2
+     ],
+     "paint": "trim.dark",
+     "z": 68,
+     "when": {
+      "headgear": [
+       "band"
+      ]
+     }
+    },
+    {
+     "id": "knot",
+     "kind": "rect",
+     "on": "skull",
+     "at": [
+      -7.5,
+      3.2
+     ],
+     "size": [
+      2,
+      2
+     ],
+     "paint": "trim.dark",
+     "shade": 0,
+     "z": 68,
+     "when": {
+      "headgear": [
+       "band"
+      ]
+     }
+    },
+    {
+     "id": "tieA",
+     "kind": "line",
+     "on": "hang",
+     "from": [
+      0.5,
+      -0.5
+     ],
+     "to": [
+      {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         3.23
+        ],
+        [
+         1,
+         4.4
+        ],
+        [
+         1.35,
+         5.57
+        ]
+       ]
+      },
+      {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         -1.97
+        ],
+        [
+         1,
+         -2.6
+        ],
+        [
+         1.35,
+         -3.23
+        ]
+       ]
+      }
+     ],
+     "thick": 2,
+     "paint": "trim",
+     "z": 58,
+     "when": {
+      "headgear": [
+       "band"
+      ]
+     }
+    },
+    {
+     "id": "tieB",
+     "kind": "line",
+     "on": "hang",
+     "from": [
+      -0.8,
+      -1.5
+     ],
+     "to": [
+      {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         1.58
+        ],
+        [
+         1,
+         2.6
+        ],
+        [
+         1.35,
+         3.62
+        ]
+       ]
+      },
+      {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         -5
+        ],
+        [
+         1,
+         -6.5
+        ],
+        [
+         1.35,
+         -8
+        ]
+       ]
+      }
+     ],
+     "thick": 2,
+     "paint": "trim.dark",
+     "z": 57.5,
+     "when": {
+      "headgear": [
+       "band"
+      ]
+     }
+    },
+    {
+     "id": "tieDashA",
+     "kind": "line",
+     "on": "skull",
+     "from": [
+      -6,
+      2.6
+     ],
+     "to": [
+      {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         -9.5
+        ],
+        [
+         1,
+         -11
+        ],
+        [
+         1.35,
+         -12.5
+        ]
+       ]
+      },
+      {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         2.6
+        ],
+        [
+         1,
+         2.6
+        ],
+        [
+         1.35,
+         2.6
+        ]
+       ]
+      }
+     ],
+     "thick": 2,
+     "paint": "trim",
+     "z": 58,
+     "when": {
+      "headgear": [
+       "band"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "tieDashB",
+     "kind": "line",
+     "on": "skull",
+     "from": [
+      -6,
+      1.2
+     ],
+     "to": [
+      {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         -10.9
+        ],
+        [
+         1,
+         -13
+        ],
+        [
+         1.35,
+         -15.1
+        ]
+       ]
+      },
+      {
+       "from": "headgearSize",
+       "map": [
+        [
+         0.65,
+         0.92
+        ],
+        [
+         1,
+         0.8
+        ],
+        [
+         1.35,
+         0.68
+        ]
+       ]
+      }
+     ],
+     "thick": 2,
+     "paint": "trim.dark",
+     "z": 57.5,
+     "when": {
+      "headgear": [
+       "band"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "hood",
+     "kind": "poly",
+     "on": "headwear",
+     "points": [
+      [
+       3.8,
+       2.4000000000000004
+      ],
+      [
+       3.8,
+       4.4
+      ],
+      [
+       1,
+       7
+      ],
+      [
+       -2.8,
+       7
+      ],
+      [
+       -6,
+       4.6
+      ],
+      [
+       -7.4,
+       0.5
+      ],
+      [
+       -7,
+       -4.5
+      ],
+      [
+       -4.5,
+       -7.6
+      ],
+      [
+       -0.6,
+       -3
+      ],
+      [
+       -0.2,
+       1.4
+      ],
+      [
+       3.9,
+       1.2000000000000002
+      ]
+     ],
+     "paint": "trim",
+     "shade": 1,
+     "z": 65,
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodEdge",
+     "kind": "line",
+     "on": "headwear",
+     "from": [
+      3.9,
+      1.4
+     ],
+     "to": [
+      -0.2,
+      1.4
+     ],
+     "paint": "trim.dark",
+     "z": 66,
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "hoodRim",
+     "kind": "line",
+     "on": "headwear",
+     "from": [
+      -0.2,
+      1.4
+     ],
+     "to": [
+      -0.6,
+      -3
+     ],
+     "paint": "trim.dark",
+     "z": 66,
+     "when": {
+      "headgear": [
+       "hood"
+      ]
+     }
+    },
+    {
+     "id": "helmet",
+     "kind": "use",
+     "use": "part:helmet",
+     "v": 3,
+     "on": "headwear",
+     "when": {
+      "headgear": [
+       "helmet"
+      ]
+     },
+     "paint": {
+      "metal": "metal"
+     }
+    },
+    {
+     "id": "quiver",
+     "kind": "poly",
+     "on": "back",
+     "points": [
+      [
+       1.92,
+       -7.46
+      ],
+      [
+       1.08,
+       -3.54
+      ],
+      [
+       {
+        "from": "bowSize",
+        "map": [
+         [
+          0.65,
+          6.68
+         ],
+         [
+          1,
+          9.08
+         ],
+         [
+          1.35,
+          11.48
+         ]
+        ]
+       },
+       {
+        "from": "bowSize",
+        "map": [
+         [
+          0.65,
+          -2.35
+         ],
+         [
+          1,
+          -1.84
+         ],
+         [
+          1.35,
+          -1.33
+         ]
+        ]
+       }
+      ],
+      [
+       {
+        "from": "bowSize",
+        "map": [
+         [
+          0.65,
+          7.52
+         ],
+         [
+          1,
+          9.92
+         ],
+         [
+          1.35,
+          12.32
+         ]
+        ]
+       },
+       {
+        "from": "bowSize",
+        "map": [
+         [
+          0.65,
+          -6.27
+         ],
+         [
+          1,
+          -5.76
+         ],
+         [
+          1.35,
+          -5.25
+         ]
+        ]
+       }
+      ]
+     ],
+     "paint": "boots",
+     "shade": 1,
+     "z": 4,
+     "far": true,
+     "when": {
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "quiverArrow1",
+     "kind": "line",
+     "on": "back",
+     "from": [
+      1.32,
+      -7.07
+     ],
+     "to": [
+      -0.63,
+      -7.49
+     ],
+     "paint": "stave",
+     "z": 4,
+     "when": {
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "quiverArrow2",
+     "kind": "line",
+     "on": "back",
+     "from": [
+      1.01,
+      -5.6
+     ],
+     "to": [
+      -1.92,
+      -6.23
+     ],
+     "paint": "stave",
+     "z": 4,
+     "when": {
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "quiverArrow3",
+     "kind": "line",
+     "on": "back",
+     "from": [
+      0.7,
+      -4.14
+     ],
+     "to": [
+      -1.26,
+      -4.55
+     ],
+     "paint": "stave",
+     "z": 4,
+     "when": {
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "bowL",
+     "kind": "arc",
+     "at": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -5.48
+        ],
+        [
+         1,
+         -9.24
+        ],
+        [
+         1.35,
+         -13
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         7.53
+        ],
+        [
+         1,
+         9.7
+        ],
+        [
+         1.35,
+         11.87
+        ]
+       ]
+      }
+     ],
+     "r": {
+      "from": "bowSize",
+      "map": [
+       [
+        0.65,
+        8.06
+       ],
+       [
+        1,
+        12.4
+       ],
+       [
+        1.35,
+        16.74
+       ]
+      ]
+     },
+     "a0": 70,
+     "a1": 170,
+     "thick": 2,
+     "paint": "stave",
+     "z": 12,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "longbow"
+      ]
+     }
+    },
+    {
+     "id": "stringL",
+     "kind": "line",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         2.09
+        ],
+        [
+         1,
+         2.41
+        ],
+        [
+         1.35,
+         2.73
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         10.29
+        ],
+        [
+         1,
+         13.94
+        ],
+        [
+         1.35,
+         17.6
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -4.08
+        ],
+        [
+         1,
+         -7.09
+        ],
+        [
+         1.35,
+         -10.09
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -0.41
+        ],
+        [
+         1,
+         -2.51
+        ],
+        [
+         1.35,
+         -4.62
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave.dark",
+     "z": 11.5,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "longbow"
+      ]
+     }
+    },
+    {
+     "id": "bowLAim",
+     "kind": "arc",
+     "at": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -7.06
+        ],
+        [
+         1,
+         -11.4
+        ],
+        [
+         1.35,
+         -15.74
+        ]
+       ]
+      },
+      0
+     ],
+     "r": {
+      "from": "bowSize",
+      "map": [
+       [
+        0.65,
+        8.06
+       ],
+       [
+        1,
+        12.4
+       ],
+       [
+        1.35,
+        16.74
+       ]
+      ]
+     },
+     "a0": 40,
+     "a1": 140,
+     "thick": 2,
+     "paint": "stave",
+     "z": 12,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "longbow"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "stringLAim",
+     "kind": "line",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.88
+        ],
+        [
+         1,
+         -3.43
+        ],
+        [
+         1.35,
+         -4.98
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         6.18
+        ],
+        [
+         1,
+         9.5
+        ],
+        [
+         1.35,
+         12.83
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.88
+        ],
+        [
+         1,
+         -3.43
+        ],
+        [
+         1.35,
+         -4.98
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -6.17
+        ],
+        [
+         1,
+         -9.5
+        ],
+        [
+         1.35,
+         -12.82
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave.dark",
+     "z": 11.5,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "longbow"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "drawLA",
+     "kind": "line",
+     "on": "handB",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.88
+        ],
+        [
+         1,
+         -3.43
+        ],
+        [
+         1.35,
+         -4.98
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         6.18
+        ],
+        [
+         1,
+         9.5
+        ],
+        [
+         1.35,
+         12.83
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         -7.4
+        ],
+        [
+         0.5,
+         -8.7
+        ],
+        [
+         1,
+         -10
+        ]
+       ]
+      },
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         0.6
+        ],
+        [
+         1,
+         0.9
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave.dark",
+     "z": 11.5,
+     "hidden": true,
+     "when": {
+      "bow": [
+       "longbow"
+      ]
+     }
+    },
+    {
+     "id": "drawLB",
+     "kind": "line",
+     "on": "handB",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.88
+        ],
+        [
+         1,
+         -3.43
+        ],
+        [
+         1.35,
+         -4.98
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -6.17
+        ],
+        [
+         1,
+         -9.5
+        ],
+        [
+         1.35,
+         -12.82
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         -7.4
+        ],
+        [
+         0.5,
+         -8.7
+        ],
+        [
+         1,
+         -10
+        ]
+       ]
+      },
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         0.6
+        ],
+        [
+         1,
+         0.9
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave.dark",
+     "z": 11.5,
+     "hidden": true,
+     "when": {
+      "bow": [
+       "longbow"
+      ]
+     }
+    },
+    {
+     "id": "bowS",
+     "kind": "arc",
+     "at": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -3.02
+        ],
+        [
+         1,
+         -5.46
+        ],
+        [
+         1.35,
+         -7.89
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         6.11
+        ],
+        [
+         1,
+         7.52
+        ],
+        [
+         1.35,
+         8.92
+        ]
+       ]
+      }
+     ],
+     "r": {
+      "from": "bowSize",
+      "map": [
+       [
+        0.65,
+        5.22
+       ],
+       [
+        1,
+        8.03
+       ],
+       [
+        1.35,
+        10.85
+       ]
+      ]
+     },
+     "a0": 66,
+     "a1": 174,
+     "thick": 2,
+     "paint": "stave",
+     "z": 12,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "bowSCurlA",
+     "kind": "line",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         1.75
+        ],
+        [
+         1,
+         1.88
+        ],
+        [
+         1.35,
+         2.02
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         8.24
+        ],
+        [
+         1,
+         10.79
+        ],
+        [
+         1.35,
+         13.33
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         3.61
+        ],
+        [
+         1,
+         3.74
+        ],
+        [
+         1.35,
+         3.87
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         7.85
+        ],
+        [
+         1,
+         10.4
+        ],
+        [
+         1.35,
+         12.95
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave",
+     "z": 12,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "bowSCurlB",
+     "kind": "line",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -2.48
+        ],
+        [
+         1,
+         -4.62
+        ],
+        [
+         1.35,
+         -6.76
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         0.92
+        ],
+        [
+         1,
+         -0.47
+        ],
+        [
+         1.35,
+         -1.86
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.22
+        ],
+        [
+         1,
+         -3.36
+        ],
+        [
+         1.35,
+         -5.5
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -0.5
+        ],
+        [
+         1,
+         -1.89
+        ],
+        [
+         1.35,
+         -3.28
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave",
+     "z": 12,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "bowSGrip",
+     "kind": "line",
+     "from": [
+      0.32,
+      2.45
+     ],
+     "to": [
+      1.82,
+      5.05
+     ],
+     "thick": 2,
+     "paint": "trim",
+     "z": 13,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "stringS",
+     "kind": "line",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         1.75
+        ],
+        [
+         1,
+         1.88
+        ],
+        [
+         1.35,
+         2.02
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         8.24
+        ],
+        [
+         1,
+         10.79
+        ],
+        [
+         1.35,
+         13.33
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -2.48
+        ],
+        [
+         1,
+         -4.62
+        ],
+        [
+         1.35,
+         -6.76
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         0.92
+        ],
+        [
+         1,
+         -0.47
+        ],
+        [
+         1.35,
+         -1.86
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave.dark",
+     "z": 11.5,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "bowSAim",
+     "kind": "arc",
+     "at": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -4.22
+        ],
+        [
+         1,
+         -7.03
+        ],
+        [
+         1.35,
+         -9.85
+        ]
+       ]
+      },
+      0
+     ],
+     "r": {
+      "from": "bowSize",
+      "map": [
+       [
+        0.65,
+        5.22
+       ],
+       [
+        1,
+        8.03
+       ],
+       [
+        1.35,
+        10.85
+       ]
+      ]
+     },
+     "a0": 36,
+     "a1": 144,
+     "thick": 2,
+     "paint": "stave",
+     "z": 12,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "bowSAimCurlA",
+     "kind": "line",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.15
+        ],
+        [
+         1,
+         -2.31
+        ],
+        [
+         1.35,
+         -3.47
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         4.22
+        ],
+        [
+         1,
+         6.5
+        ],
+        [
+         1.35,
+         8.77
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1,
+         -0.51
+        ],
+        [
+         1.35,
+         -1.67
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         4.82
+        ],
+        [
+         1,
+         7.1
+        ],
+        [
+         1.35,
+         9.37
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave",
+     "z": 12,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "bowSAimCurlB",
+     "kind": "line",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.15
+        ],
+        [
+         1,
+         -2.31
+        ],
+        [
+         1.35,
+         -3.47
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -4.22
+        ],
+        [
+         1,
+         -6.5
+        ],
+        [
+         1.35,
+         -8.77
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         0.65
+        ],
+        [
+         1,
+         -0.51
+        ],
+        [
+         1.35,
+         -1.67
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -4.82
+        ],
+        [
+         1,
+         -7.1
+        ],
+        [
+         1.35,
+         -9.37
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave",
+     "z": 12,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "bowSAimGrip",
+     "kind": "line",
+     "from": [
+      0.5,
+      -1.5
+     ],
+     "to": [
+      0.5,
+      1.5
+     ],
+     "thick": 2,
+     "paint": "trim",
+     "z": 13,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "stringSAim",
+     "kind": "line",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.15
+        ],
+        [
+         1,
+         -2.31
+        ],
+        [
+         1.35,
+         -3.47
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         4.22
+        ],
+        [
+         1,
+         6.5
+        ],
+        [
+         1.35,
+         8.77
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.15
+        ],
+        [
+         1,
+         -2.31
+        ],
+        [
+         1.35,
+         -3.47
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -4.22
+        ],
+        [
+         1,
+         -6.5
+        ],
+        [
+         1.35,
+         -8.77
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave.dark",
+     "z": 11.5,
+     "on": "handB",
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     },
+     "hidden": true
+    },
+    {
+     "id": "drawSA",
+     "kind": "line",
+     "on": "handB",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.15
+        ],
+        [
+         1,
+         -2.31
+        ],
+        [
+         1.35,
+         -3.47
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         4.22
+        ],
+        [
+         1,
+         6.5
+        ],
+        [
+         1.35,
+         8.77
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         -7.4
+        ],
+        [
+         0.5,
+         -8.7
+        ],
+        [
+         1,
+         -10
+        ]
+       ]
+      },
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         0.6
+        ],
+        [
+         1,
+         0.9
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave.dark",
+     "z": 11.5,
+     "hidden": true,
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "drawSB",
+     "kind": "line",
+     "on": "handB",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -1.15
+        ],
+        [
+         1,
+         -2.31
+        ],
+        [
+         1.35,
+         -3.47
+        ]
+       ]
+      },
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -4.22
+        ],
+        [
+         1,
+         -6.5
+        ],
+        [
+         1.35,
+         -8.77
+        ]
+       ]
+      }
+     ],
+     "to": [
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         -7.4
+        ],
+        [
+         0.5,
+         -8.7
+        ],
+        [
+         1,
+         -10
+        ]
+       ]
+      },
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         0.6
+        ],
+        [
+         1,
+         0.9
+        ]
+       ]
+      }
+     ],
+     "thick": 1,
+     "paint": "stave.dark",
+     "z": 11.5,
+     "hidden": true,
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "arrow",
+     "kind": "line",
+     "on": "handB",
+     "from": [
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         -7.4
+        ],
+        [
+         0.5,
+         -8.7
+        ],
+        [
+         1,
+         -10
+        ]
+       ]
+      },
+      {
+       "from": "height",
+       "map": [
+        [
+         0,
+         0.6
+        ],
+        [
+         1,
+         0.9
+        ]
+       ]
+      }
+     ],
+     "to": [
+      1.3,
+      0.6
+     ],
+     "thick": 1,
+     "paint": "wood",
+     "z": 13.5,
+     "hidden": true,
+     "when": {
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "arrowHead",
+     "kind": "poly",
+     "on": "handB",
+     "points": [
+      [
+       1.3,
+       -0.4
+      ],
+      [
+       1.3,
+       1.6
+      ],
+      [
+       4.3,
+       0.6
+      ]
+     ],
+     "paint": "steel",
+     "shade": 0,
+     "z": 13.6,
+     "hidden": true,
+     "when": {
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "releaseA",
+     "kind": "line",
+     "on": "handB",
+     "from": [
+      5,
+      2.5
+     ],
+     "to": [
+      9,
+      3.5
+     ],
+     "thick": 1,
+     "paint": "shine",
+     "z": 97,
+     "glow": true,
+     "hidden": true,
+     "when": {
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "releaseB",
+     "kind": "line",
+     "on": "handB",
+     "from": [
+      5,
+      -1.5
+     ],
+     "to": [
+      9,
+      -2.5
+     ],
+     "thick": 1,
+     "paint": "shine",
+     "z": 97,
+     "glow": true,
+     "hidden": true,
+     "when": {
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "knife",
+     "kind": "poly",
+     "on": "handF",
+     "points": [
+      [
+       0,
+       -1
+      ],
+      [
+       6,
+       -1
+      ],
+      [
+       6,
+       1
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "paint": "steel",
+     "shade": 0,
+     "z": 80,
+     "hidden": true,
+     "when": {
+      "bow": [
+       "none"
+      ]
+     }
+    },
+    {
+     "id": "sword",
+     "kind": "use",
+     "use": "held:sword",
+     "v": 1,
+     "on": "hold",
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.45
+        ],
+        [
+         1,
+         13
+        ],
+        [
+         1.35,
+         15.6
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "hilt": "wood"
+     }
+    },
+    {
+     "id": "axe",
+     "kind": "use",
+     "use": "held:axe",
+     "v": 1,
+     "on": "hold",
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.8
+        ],
+        [
+         1,
+         12
+        ],
+        [
+         1.35,
+         14.4
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "wood": "wood"
+     }
+    },
+    {
+     "id": "spear",
+     "kind": "use",
+     "use": "held:spear",
+     "v": 1,
+     "on": "hold",
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.5
+        ],
+        [
+         1,
+         12.5
+        ],
+        [
+         1.35,
+         14
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "wood": "wood"
+     }
+    },
+    {
+     "id": "swordBack",
+     "kind": "use",
+     "use": "held:sword",
+     "v": 1,
+     "on": "holdBack",
+     "when": {
+      "weapon": [
+       "sword"
+      ],
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.45
+        ],
+        [
+         1,
+         13
+        ],
+        [
+         1.35,
+         15.6
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "hilt": "wood"
+     },
+     "hidden": true
+    },
+    {
+     "id": "axeBack",
+     "kind": "use",
+     "use": "held:axe",
+     "v": 1,
+     "on": "holdBack",
+     "when": {
+      "weapon": [
+       "axe"
+      ],
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.8
+        ],
+        [
+         1,
+         12
+        ],
+        [
+         1.35,
+         14.4
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "wood": "wood"
+     },
+     "hidden": true
+    },
+    {
+     "id": "swordMid",
+     "kind": "use",
+     "use": "held:sword",
+     "v": 1,
+     "on": "holdMid",
+     "when": {
+      "weapon": [
+       "sword"
+      ],
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.45
+        ],
+        [
+         1,
+         13
+        ],
+        [
+         1.35,
+         15.6
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "hilt": "wood"
+     },
+     "hidden": true
+    },
+    {
+     "id": "axeMid",
+     "kind": "use",
+     "use": "held:axe",
+     "v": 1,
+     "on": "holdMid",
+     "when": {
+      "weapon": [
+       "axe"
+      ],
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.8
+        ],
+        [
+         1,
+         12
+        ],
+        [
+         1.35,
+         14.4
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "wood": "wood"
+     },
+     "hidden": true
+    },
+    {
+     "id": "spearMid",
+     "kind": "use",
+     "use": "held:spear",
+     "v": 1,
+     "on": "holdMid",
+     "when": {
+      "weapon": [
+       "spear"
+      ],
+      "bow": [
+       "longbow",
+       "shortbow"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.5
+        ],
+        [
+         1,
+         12.5
+        ],
+        [
+         1.35,
+         14
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "wood": "wood"
+     },
+     "hidden": true
+    },
+    {
+     "id": "swordThrow",
+     "kind": "use",
+     "use": "held:sword",
+     "v": 1,
+     "on": "hold",
+     "when": {
+      "weapon": [
+       "sword"
+      ],
+      "bow": [
+       "none"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.45
+        ],
+        [
+         1,
+         13
+        ],
+        [
+         1.35,
+         15.6
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "hilt": "wood"
+     },
+     "hidden": true
+    },
+    {
+     "id": "axeThrow",
+     "kind": "use",
+     "use": "held:axe",
+     "v": 1,
+     "on": "hold",
+     "when": {
+      "weapon": [
+       "axe"
+      ],
+      "bow": [
+       "none"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         7.8
+        ],
+        [
+         1,
+         12
+        ],
+        [
+         1.35,
+         14.4
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "wood": "wood"
+     },
+     "hidden": true
+    },
+    {
+     "id": "spearThrow",
+     "kind": "use",
+     "use": "held:spear",
+     "v": 1,
+     "on": "hold",
+     "when": {
+      "weapon": [
+       "spear"
+      ],
+      "bow": [
+       "none"
+      ]
+     },
+     "args": {
+      "length": {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         8.5
+        ],
+        [
+         1,
+         12.5
+        ],
+        [
+         1.35,
+         14
+        ]
+       ]
+      }
+     },
+     "paint": {
+      "metal": "metal",
+      "wood": "wood"
+     },
+     "hidden": true
+    },
+    {
+     "id": "slashWide",
+     "kind": "arc",
+     "on": "chest",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        14
+       ],
+       [
+        1,
+        17
+       ],
+       [
+        1.35,
+        19
+       ]
+      ]
+     },
+     "a0": -85,
+     "a1": 100,
+     "thick": 2,
+     "paint": "shine",
+     "z": 96,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword",
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slashInner",
+     "kind": "arc",
+     "on": "chest",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        11
+       ],
+       [
+        1,
+        14
+       ],
+       [
+        1.35,
+        16
+       ]
+      ]
+     },
+     "a0": -25,
+     "a1": 75,
+     "thick": 1,
+     "paint": "shine",
+     "z": 96,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword",
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "slashTail",
+     "kind": "arc",
+     "on": "chest",
+     "at": [
+      0,
+      0
+     ],
+     "r": {
+      "from": "weaponLength",
+      "map": [
+       [
+        0.65,
+        15
+       ],
+       [
+        1,
+        19
+       ],
+       [
+        1.35,
+        21
+       ]
+      ]
+     },
+     "a0": 98,
+     "a1": 120,
+     "thick": 2,
+     "paint": "shine",
+     "z": 96,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "sword",
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "thrustA",
+     "kind": "line",
+     "on": "hold",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         -0.5
+        ],
+        [
+         1,
+         3.5
+        ],
+        [
+         1.35,
+         5
+        ]
+       ]
+      },
+      2.5
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         6.5
+        ],
+        [
+         1,
+         10.5
+        ],
+        [
+         1.35,
+         12
+        ]
+       ]
+      },
+      2.5
+     ],
+     "thick": 1,
+     "paint": "shine",
+     "z": 97,
+     "glow": true,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "thrustB",
+     "kind": "line",
+     "on": "hold",
+     "from": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         0.5
+        ],
+        [
+         1,
+         4.5
+        ],
+        [
+         1.35,
+         6
+        ]
+       ]
+      },
+      -2.5
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         5.5
+        ],
+        [
+         1,
+         9.5
+        ],
+        [
+         1.35,
+         11
+        ]
+       ]
+      },
+      -2.5
+     ],
+     "thick": 1,
+     "paint": "shine",
+     "z": 97,
+     "glow": true,
+     "hidden": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "swordDown",
+     "kind": "line",
+     "on": "lay",
+     "from": [
+      1.5,
+      0.5
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         -5.45
+        ],
+        [
+         1,
+         -10
+        ],
+        [
+         1.35,
+         -12.6
+        ]
+       ]
+      },
+      0.5
+     ],
+     "thick": 2,
+     "paint": "metal",
+     "z": 5,
+     "far": true,
+     "when": {
+      "weapon": [
+       "sword"
+      ]
+     }
+    },
+    {
+     "id": "axeDown",
+     "kind": "line",
+     "on": "lay",
+     "from": [
+      5,
+      0.5
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         -4.8
+        ],
+        [
+         1,
+         -9
+        ],
+        [
+         1.35,
+         -11.4
+        ]
+       ]
+      },
+      0.5
+     ],
+     "paint": "wood",
+     "z": 5,
+     "far": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "axeDownHead",
+     "kind": "ellipse",
+     "on": "lay",
+     "at": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         -2.3
+        ],
+        [
+         1,
+         -6.5
+        ],
+        [
+         1.35,
+         -8.9
+        ]
+       ]
+      },
+      2.7
+     ],
+     "r": [
+      3,
+      3
+     ],
+     "paint": "metal",
+     "z": 5,
+     "far": true,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "id": "spearDown",
+     "kind": "line",
+     "on": "lay",
+     "from": [
+      9,
+      0.5
+     ],
+     "to": [
+      {
+       "from": "weaponLength",
+       "map": [
+        [
+         0.65,
+         -3.5
+        ],
+        [
+         1,
+         -7.5
+        ],
+        [
+         1.35,
+         -9
+        ]
+       ]
+      },
+      0.5
+     ],
+     "paint": "wood",
+     "z": 5,
+     "far": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "spearDownTip",
+     "kind": "poly",
+     "on": "lay",
+     "points": [
+      [
+       {
+        "from": "weaponLength",
+        "map": [
+         [
+          0.65,
+          0
+         ],
+         [
+          1,
+          -4
+         ],
+         [
+          1.35,
+          -5.5
+         ]
+        ]
+       },
+       -1
+      ],
+      [
+       {
+        "from": "weaponLength",
+        "map": [
+         [
+          0.65,
+          -4.5
+         ],
+         [
+          1,
+          -8.5
+         ],
+         [
+          1.35,
+          -10
+         ]
+        ]
+       },
+       0.5
+      ],
+      [
+       {
+        "from": "weaponLength",
+        "map": [
+         [
+          0.65,
+          0
+         ],
+         [
+          1,
+          -4
+         ],
+         [
+          1.35,
+          -5.5
+         ]
+        ]
+       },
+       2
+      ]
+     ],
+     "paint": "metal",
+     "shade": 0,
+     "z": 5,
+     "far": true,
+     "when": {
+      "weapon": [
+       "spear"
+      ]
+     }
+    },
+    {
+     "id": "bowLDown",
+     "kind": "arc",
+     "on": "lay",
+     "at": [
+      30,
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -4.68
+        ],
+        [
+         1,
+         -7.47
+        ],
+        [
+         1.35,
+         -10.26
+        ]
+       ]
+      }
+     ],
+     "r": {
+      "from": "bowSize",
+      "map": [
+       [
+        0.65,
+        8.06
+       ],
+       [
+        1,
+        12.4
+       ],
+       [
+        1.35,
+        16.74
+       ]
+      ]
+     },
+     "a0": -50,
+     "a1": 50,
+     "thick": 2,
+     "paint": "stave",
+     "z": 96.2,
+     "when": {
+      "bow": [
+       "longbow"
+      ]
+     }
+    },
+    {
+     "id": "stringLDown",
+     "kind": "line",
+     "on": "lay",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         23.83
+        ],
+        [
+         1,
+         20.5
+        ],
+        [
+         1.35,
+         17.17
+        ]
+       ]
+      },
+      0.5
+     ],
+     "to": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         36.17
+        ],
+        [
+         1,
+         39.5
+        ],
+        [
+         1.35,
+         42.83
+        ]
+       ]
+      },
+      0.5
+     ],
+     "thick": 1,
+     "paint": "stave.dark",
+     "z": 96.2,
+     "when": {
+      "bow": [
+       "longbow"
+      ]
+     }
+    },
+    {
+     "id": "bowSDown",
+     "kind": "arc",
+     "on": "lay",
+     "at": [
+      30,
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         -2.57
+        ],
+        [
+         1,
+         -4.22
+        ],
+        [
+         1.35,
+         -5.88
+        ]
+       ]
+      }
+     ],
+     "r": {
+      "from": "bowSize",
+      "map": [
+       [
+        0.65,
+        5.22
+       ],
+       [
+        1,
+        8.03
+       ],
+       [
+        1.35,
+        10.85
+       ]
+      ]
+     },
+     "a0": -54,
+     "a1": 54,
+     "thick": 2,
+     "paint": "stave",
+     "z": 96.2,
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "stringSDown",
+     "kind": "line",
+     "on": "lay",
+     "from": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         25.78
+        ],
+        [
+         1,
+         23.5
+        ],
+        [
+         1.35,
+         21.23
+        ]
+       ]
+      },
+      0.5
+     ],
+     "to": [
+      {
+       "from": "bowSize",
+       "map": [
+        [
+         0.65,
+         34.23
+        ],
+        [
+         1,
+         36.5
+        ],
+        [
+         1.35,
+         38.78
+        ]
+       ]
+      },
+      0.5
+     ],
+     "thick": 1,
+     "paint": "stave.dark",
+     "z": 96.2,
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "id": "dashLines",
+     "kind": "stamp",
+     "on": "ground",
+     "at": [
+      -17,
+      20
+     ],
+     "rows": [
+      "....aaaaaa......",
+      "................",
+      "................",
+      "aaaaaaaaa.......",
+      "................",
+      "................",
+      "...aaaaaa......."
+     ],
+     "key": {
+      "a": "shine"
+     },
+     "z": 97,
+     "hidden": true,
+     "glow": true,
+     "variants": {
+      "f3": [
+       ".......aaaaaa...",
+       "................",
+       "................",
+       "...aaaaaaaaa....",
+       "................",
+       "................",
+       "......aaaaaa...."
+      ],
+      "f4": [
+       "........aaaaaa..",
+       "................",
+       "................",
+       "....aaaaaaaaa...",
+       "................",
+       "................",
+       ".......aaaaaa..."
+      ]
+     }
+    }
+   ],
+   "nodes": [
+    {
+     "id": "hold",
+     "parent": "handF",
+     "angle": {
+      "from": "weaponAngle",
+      "map": [
+       [
+        -10,
+        10
+       ],
+       [
+        40,
+        -40
+       ]
+      ]
+     }
+    },
+    {
+     "id": "holdBack",
+     "parent": "foreF",
+     "from": 1,
+     "angle": 200
+    },
+    {
+     "id": "holdMid",
+     "parent": "foreF",
+     "from": 1,
+     "angle": -90
+    },
+    {
+     "id": "liftTop",
+     "parent": "lift",
+     "from": 1
+    }
+   ],
+   "bones": [
+    {
+     "id": "lift",
+     "parent": "ground",
+     "angle": 90,
+     "length": 16
+    }
+   ],
+   "ik": [
+    {
+     "id": "legF",
+     "bones": [
+      "thighF",
+      "shinF"
+     ],
+     "bend": 1
+    },
+    {
+     "id": "legB",
+     "bones": [
+      "thighB",
+      "shinB"
+     ],
+     "bend": 1
+    }
+   ],
+   "points": [
+    {
+     "id": "hand",
+     "on": "hold",
+     "at": [
+      0,
+      0
+     ]
+    },
+    {
+     "id": "head",
+     "on": "skull",
+     "at": [
+      0,
+      5.4
+     ],
+     "angle": 90
+    },
+    {
+     "id": "feet",
+     "on": "liftTop",
+     "at": [
+      -16,
+      -6
+     ]
+    },
+    {
+     "id": "muzzle",
+     "on": "handB",
+     "at": [
+      1,
+      0
+     ],
+     "angle": 0
+    }
+   ]
+  }
+ },
+ "controls": [
+  {
+   "key": "height",
+   "kind": "range",
+   "label": "Height",
+   "lo": "Short",
+   "hi": "Tall",
+   "default": 0.5,
+   "scales": {
+    "bones": [
+     "stand",
+     "loin",
+     "trunk",
+     "thighF",
+     "shinF",
+     "thighB",
+     "shinB",
+     "spine",
+     "armF",
+     "foreF",
+     "armB",
+     "foreB",
+     "back",
+     "thighFa",
+     "thighFd",
+     "shinFd",
+     "armFa",
+     "armFd",
+     "foreFd",
+     "thighBa",
+     "thighBd",
+     "shinBd",
+     "armBa",
+     "armBd",
+     "foreBd"
+    ],
+    "by": [
+     0.85,
+     1.15
+    ]
+   }
+  },
+  {
+   "key": "build",
+   "kind": "range",
+   "label": "Build",
+   "lo": "Slim",
+   "hi": "Stocky",
+   "default": 0.45,
+   "scales": {
+    "shapes": [
+     "pelvis",
+     "torso",
+     "thighF",
+     "thighB"
+    ],
+    "by": [
+     0.7541,
+     1.2459
+    ]
+   }
+  },
+  {
+   "key": "head",
+   "kind": "range",
+   "label": "Head",
+   "lo": "Small",
+   "hi": "Big",
+   "default": 0.5,
+   "scales": {
+    "shapes": [
+     "skull",
+     "hair",
+     "nape",
+     "ponytail",
+     "helmet",
+     "hood",
+     "hoodEdge",
+     "hoodRim",
+     "band",
+     "bandEdge"
+    ],
+    "by": [
+     0.8214,
+     1.1786
+    ]
+   }
+  },
+  {
+   "key": "weapon",
+   "kind": "choice",
+   "label": "Weapon",
+   "options": [
+    "sword",
+    "axe",
+    "spear",
+    "none"
+   ],
+   "default": "sword"
+  },
+  {
+   "key": "weaponLength",
+   "kind": "range",
+   "label": "Length",
+   "lo": "Short",
+   "hi": "Long",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "weaponAngle",
+   "kind": "range",
+   "label": "Hold angle",
+   "lo": "Upright",
+   "hi": "Forward",
+   "min": -10,
+   "max": 40,
+   "step": 1,
+   "default": 0
+  },
+  {
+   "key": "bow",
+   "kind": "choice",
+   "label": "Bow",
+   "options": [
+    "longbow",
+    "shortbow",
+    "none"
+   ],
+   "default": "shortbow"
+  },
+  {
+   "key": "bowSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1
+  },
+  {
+   "key": "headgear",
+   "kind": "choice",
+   "label": "Headgear",
+   "options": [
+    "band",
+    "hood",
+    "helmet",
+    "none"
+   ],
+   "default": "band"
+  },
+  {
+   "key": "headgearSize",
+   "kind": "range",
+   "label": "Size",
+   "lo": "Small",
+   "hi": "Big",
+   "min": 0.65,
+   "max": 1.35,
+   "step": 0.05,
+   "default": 1,
+   "scales": {
+    "shapes": [
+     "hood",
+     "hoodEdge",
+     "hoodRim",
+     "helmet"
+    ],
+    "by": [
+     0.82,
+     1.18
+    ]
+   }
+  },
+  {
+   "key": "hairStyle",
+   "kind": "choice",
+   "label": "Hair",
+   "options": [
+    "short",
+    "spiky",
+    "ponytail",
+    "bald"
+   ],
+   "default": "short",
+   "when": {
+    "headgear": [
+     "band",
+     "none"
+    ]
+   }
+  },
+  {
+   "key": "skin",
+   "kind": "colour",
+   "label": "Skin"
+  },
+  {
+   "key": "hair",
+   "kind": "colour",
+   "label": "Hair",
+   "when": [
+    {
+     "hairStyle": [
+      "short",
+      "spiky",
+      "ponytail"
+     ],
+     "headgear": [
+      "band",
+      "none"
+     ]
+    },
+    {
+     "headgear": [
+      "helmet"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "outfit",
+   "kind": "colour",
+   "label": "Jacket"
+  },
+  {
+   "key": "trim",
+   "kind": "colour",
+   "label": "Headband and belt"
+  },
+  {
+   "key": "metal",
+   "kind": "colour",
+   "label": "Metal",
+   "when": [
+    {
+     "weapon": [
+      "sword",
+      "axe",
+      "spear"
+     ]
+    },
+    {
+     "headgear": [
+      "helmet"
+     ]
+    }
+   ]
+  },
+  {
+   "key": "bounce",
+   "kind": "range",
+   "label": "Bounce",
+   "lo": "Calm",
+   "hi": "Bouncy",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "stride",
+   "kind": "range",
+   "label": "Stride",
+   "lo": "Small steps",
+   "hi": "Big steps",
+   "default": 0.5,
+   "group": "Motion"
+  },
+  {
+   "key": "speed",
+   "standard": "speed"
+  }
+ ],
+ "parts": {
+  "weapon": {
+   "label": "Weapon",
+   "params": [
+    "weapon",
+    "weaponLength",
+    "weaponAngle"
+   ],
+   "none": "none",
+   "socket": "hand",
+   "shapes": [
+    "sword",
+    "axe",
+    "spear",
+    "swordBack",
+    "axeBack",
+    "swordMid",
+    "axeMid",
+    "spearMid",
+    "swordThrow",
+    "axeThrow",
+    "spearThrow",
+    "slashWide",
+    "slashInner",
+    "slashTail",
+    "thrustA",
+    "thrustB",
+    "swordDown",
+    "axeDown",
+    "axeDownHead",
+    "spearDown",
+    "spearDownTip"
+   ]
+  },
+  "bow": {
+   "label": "Bow",
+   "params": [
+    "bow",
+    "bowSize"
+   ],
+   "none": "none",
+   "socket": "offhand",
+   "shapes": [
+    "quiver",
+    "quiverArrow1",
+    "quiverArrow2",
+    "quiverArrow3",
+    "bowL",
+    "stringL",
+    "bowLAim",
+    "stringLAim",
+    "drawLA",
+    "drawLB",
+    "bowS",
+    "bowSCurlA",
+    "bowSCurlB",
+    "bowSGrip",
+    "stringS",
+    "bowSAim",
+    "bowSAimCurlA",
+    "bowSAimCurlB",
+    "bowSAimGrip",
+    "stringSAim",
+    "drawSA",
+    "drawSB",
+    "arrow",
+    "arrowHead",
+    "releaseA",
+    "releaseB",
+    "bowLDown",
+    "stringLDown",
+    "bowSDown",
+    "stringSDown"
+   ]
+  },
+  "headgear": {
+   "label": "Headgear",
+   "params": [
+    "headgear",
+    "headgearSize"
+   ],
+   "none": "none",
+   "socket": "head",
+   "shapes": [
+    "band",
+    "bandEdge",
+    "knot",
+    "tieA",
+    "tieB",
+    "tieDashA",
+    "tieDashB",
+    "hood",
+    "hoodEdge",
+    "hoodRim",
+    "helmet"
+   ]
+  },
+  "hair": {
+   "label": "Hair",
+   "params": [
+    "hairStyle"
+   ],
+   "none": "bald",
+   "socket": "head",
+   "shapes": [
+    "hair",
+    "ponytail",
+    "nape"
+   ]
+  }
+ },
+ "versions": [
+  {
+   "name": "Keep runner",
+   "params": {}
+  },
+  {
+   "name": "Grey hooded woodcutter",
+   "params": {
+    "headgear": "hood",
+    "weapon": "axe",
+    "bow": "none",
+    "outfit": "#5d6475",
+    "trim": "#e08a2c"
+   }
+  },
+  {
+   "name": "Tall spear guard",
+   "params": {
+    "height": 1,
+    "build": 0.7,
+    "weapon": "spear",
+    "headgear": "helmet",
+    "bow": "longbow",
+    "outfit": "#7a4fc4",
+    "trim": "#f2c230"
+   }
+  },
+  {
+   "name": "Bare-handed brawler",
+   "params": {
+    "weapon": "none",
+    "bow": "none",
+    "headgear": "none",
+    "hairStyle": "spiky",
+    "build": 0.9,
+    "outfit": "#a06a3c",
+    "trim": "#f0ead8"
+   }
+  },
+  {
+   "name": "Small swift scout",
+   "params": {
+    "height": 0.1,
+    "weaponLength": 0.65,
+    "hairStyle": "ponytail",
+    "outfit": "#3f8a4f",
+    "trim": "#9bd18a"
+   }
+  }
+ ],
+ "clips": {
+  "idle": {
+   "from": "idle",
+   "travel": [
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.583
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.417
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "walk": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "sword": "walk",
+     "axe": "walk",
+     "spear": "walk",
+     "none": "walk-unarmed"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Dirt path",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Dirt path",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.286
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": "least",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        1
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.714
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "ik.legF.1",
+      "ik.legB.1"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.667
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.333
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "ik.legF.0",
+      "ik.legB.0"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.667
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.333
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.armB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.773
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.227
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.armB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.773
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.227
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "run": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "sword": "run",
+     "axe": "run",
+     "spear": "run",
+     "none": "run-unarmed"
+    }
+   },
+   "sounds": [
+    {
+     "sound": "footstep-grass",
+     "frame": 0,
+     "preset": "Grass",
+     "volume": 0.45
+    },
+    {
+     "sound": "footstep-grass",
+     "frame": 4,
+     "preset": "Grass",
+     "volume": 0.45
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.421
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.579
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "ik.legF.1",
+      "ik.legB.1"
+     ],
+     "about": "most",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.706
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.294
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "ik.legF.0",
+      "ik.legB.0"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "stride",
+      "map": [
+       [
+        0,
+        0.769
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.231
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "bones.armF",
+      "bones.armB"
+     ],
+     "about": "mid",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.762
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.238
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "jump": {
+   "from": "jump",
+   "sounds": [
+    {
+     "sound": "jump",
+     "frame": 2,
+     "preset": "Big leap",
+     "volume": 0.7
+    },
+    {
+     "sound": "land-thud",
+     "frame": 6,
+     "preset": "Soft landing",
+     "volume": 0.7
+    }
+   ],
+   "keys": [
+    {
+     "t": 0,
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "spine": 0,
+      "face": -90,
+      "armF": -171.41,
+      "foreF": 22.92,
+      "handF": 111.73,
+      "armB": -188.59,
+      "foreB": 11.46,
+      "back": -180,
+      "chest": -90,
+      "floor": -251.57,
+      "ground": 161.57,
+      "trunk": 0,
+      "ankleF": 98.69,
+      "stepF": -67.38,
+      "plantF": 67.38,
+      "toeF": 187.13,
+      "ankleB": 107.92,
+      "stepB": -67.38,
+      "plantB": 67.38,
+      "toeB": 182.68,
+      "thighFa": -180.1,
+      "thighFd": 180.62,
+      "shinFa": -153.43,
+      "shinFd": 135,
+      "armFa": -179.73,
+      "armFd": 185.17,
+      "foreFd": 12.53,
+      "thighBa": -181.42,
+      "thighBd": 182.19,
+      "shinBa": -54.46,
+      "shinBd": 33.69,
+      "armBa": 179.73,
+      "armBd": -185.17,
+      "foreBd": 25.35,
+      "hang": 90,
+      "plume": 90
+     },
+     "stretch": {
+      "seat": 1.155,
+      "loin": 1.085,
+      "trunk": 0.869,
+      "face": 0.784,
+      "floor": 0.703,
+      "stepF": 1.083,
+      "toeF": 1.278,
+      "stepB": 1.083,
+      "toeB": 1.273,
+      "thighFa": 1.062,
+      "thighFd": 1.1,
+      "shinFd": 1.044,
+      "armFa": 0.97,
+      "armFd": 0.942,
+      "foreFd": 1.022,
+      "thighBa": 1.057,
+      "thighBd": 1.058,
+      "shinBd": 0.887,
+      "armBa": 0.97,
+      "armBd": 0.942,
+      "foreBd": 1.166,
+      "lift": 1
+     },
+     "ik": {
+      "legF": [
+       0.9,
+       -1
+      ],
+      "legB": [
+       -0.9,
+       -1
+      ]
+     },
+     "show": [
+      "footF",
+      "soleF",
+      "footB",
+      "soleB"
+     ],
+     "hide": [
+      "toeF",
+      "toeB",
+      "mouth"
+     ]
+    },
+    {
+     "t": 0.14285714285714285,
+     "root": [
+      0,
+      3.114
+     ],
+     "bones": {
+      "spine": -12.75,
+      "face": -77.25,
+      "armF": -207.09,
+      "handF": 134.67,
+      "armB": -219.18,
+      "back": -169.88,
+      "chest": -77.25,
+      "floor": -280.52,
+      "ground": 190.52,
+      "trunk": -22.16,
+      "ankleF": 128.9,
+      "stepF": -67.38,
+      "plantF": 67.38,
+      "toeF": 172.5,
+      "ankleB": 141.67,
+      "stepB": -67.38,
+      "plantB": 67.38,
+      "toeB": 166.24,
+      "thighFa": -182.79,
+      "thighFd": 182.46,
+      "shinFa": -96.34,
+      "shinFd": 8.13,
+      "armFa": 179.13,
+      "armFd": -176.16,
+      "foreFd": 22.83,
+      "thighBa": -183.47,
+      "thighBd": 183.23,
+      "shinBa": -173.66,
+      "shinBd": 90,
+      "armBa": 179.89,
+      "armBd": -181.09,
+      "foreBd": 8.13,
+      "hang": 87.67,
+      "plume": 94.66
+     },
+     "stretch": {
+      "seat": 1.041,
+      "loin": 1.153,
+      "trunk": 0.78,
+      "floor": 0.678,
+      "stepF": 1.083,
+      "toeF": 1.249,
+      "stepB": 1.083,
+      "toeB": 1.226,
+      "thighFa": 1.065,
+      "thighFd": 1.114,
+      "shinFd": 0.87,
+      "armFa": 1.066,
+      "armFd": 1.143,
+      "foreFd": 0.942,
+      "thighBa": 1.053,
+      "thighBd": 1.114,
+      "shinBd": 0.984,
+      "armBa": 1.068,
+      "armBd": 1.143,
+      "foreBd": 0.97,
+      "lift": 1
+     },
+     "ik": {
+      "legF": [
+       0.9,
+       -1
+      ],
+      "legB": [
+       -0.9,
+       -1
+      ]
+     }
+    },
+    {
+     "t": 0.2857142857142857,
+     "root": [
+      0,
+      -0.534
+     ],
+     "bones": {
+      "spine": -6.23,
+      "face": -83.77,
+      "armF": -135.98,
+      "handF": 86.26,
+      "armB": -152.84,
+      "back": -180.98,
+      "chest": -83.77,
+      "floor": -247.11,
+      "ground": 157.11,
+      "trunk": -11.51,
+      "ankleF": 114.17,
+      "stepF": -75.69,
+      "plantF": 75.69,
+      "toeF": 179.66,
+      "ankleB": 124.59,
+      "stepB": -111.4,
+      "plantB": 111.4,
+      "toeB": 174.61,
+      "thighFa": -178.04,
+      "thighFd": 185.76,
+      "shinFa": -90,
+      "shinFd": 23.2,
+      "armFa": -184.2,
+      "armFd": 183.29,
+      "foreFd": 19.44,
+      "thighBa": -180.21,
+      "thighBd": 179.59,
+      "shinBa": 23.2,
+      "shinBd": -90,
+      "armBa": -183.18,
+      "armBd": 176.29,
+      "foreBd": 22.83,
+      "hang": 83.59,
+      "plume": 102.83
+     },
+     "stretch": {
+      "seat": 0.689,
+      "loin": 1.36,
+      "trunk": 0.737,
+      "floor": 0.724,
+      "stepF": 0.918,
+      "toeF": 1.268,
+      "stepB": 0.752,
+      "toeB": 1.256,
+      "thighFa": 0.985,
+      "thighFd": 0.984,
+      "shinFd": 0.937,
+      "armFa": 1.053,
+      "armFd": 1.143,
+      "foreFd": 0.824,
+      "thighBa": 0.963,
+      "thighBd": 0.937,
+      "shinBd": 0.984,
+      "armBa": 1.072,
+      "armBd": 0.942,
+      "foreBd": 1.143,
+      "lift": 1.092
+     },
+     "ik": {
+      "legF": [
+       1.128,
+       -2.868
+      ],
+      "legB": [
+       -1.071,
+       -2.64
+      ]
+     }
+    },
+    {
+     "t": 0.42857142857142855,
+     "root": [
+      0,
+      -5.288
+     ],
+     "bones": {
+      "spine": 2.72,
+      "face": -92.72,
+      "armF": -51.89,
+      "handF": 28.97,
+      "armB": -74.81,
+      "back": -190.72,
+      "chest": -92.72,
+      "floor": -219.46,
+      "ground": 129.46,
+      "trunk": -355.16,
+      "ankleF": 113.87,
+      "stepF": -63.15,
+      "plantF": 63.15,
+      "toeF": 179.8,
+      "ankleB": 134.06,
+      "stepB": -90,
+      "plantB": 90,
+      "toeB": 169.98,
+      "thighFa": -180.1,
+      "thighFd": 182.93,
+      "shinFa": -23.2,
+      "shinFd": -66.8,
+      "armFa": -172.67,
+      "armFd": 176.84,
+      "foreFd": 18.43,
+      "thighBa": -181.11,
+      "thighBd": 174.43,
+      "shinBa": 125.54,
+      "shinBd": -180,
+      "armBa": -172.98,
+      "armBd": 181.63,
+      "foreBd": 0,
+      "hang": 82.89,
+      "plume": 104.23
+     },
+     "stretch": {
+      "seat": 1.443,
+      "loin": 0.916,
+      "trunk": 0.872,
+      "floor": 1.049,
+      "stepF": 0.923,
+      "toeF": 1.268,
+      "stepB": 0.823,
+      "toeB": 1.241,
+      "thighFa": 1.02,
+      "thighFd": 0.937,
+      "shinFd": 0.937,
+      "armFa": 1.005,
+      "armFd": 0.97,
+      "foreFd": 1.022,
+      "thighBa": 1.005,
+      "thighBd": 1.058,
+      "shinBd": 0.984,
+      "armBa": 0.954,
+      "armBd": 1.022,
+      "foreBd": 1.022,
+      "lift": 1.33
+     },
+     "ik": {
+      "legF": [
+       2.9,
+       -9.788
+      ],
+      "legB": [
+       -2.4,
+       -7.788
+      ]
+     },
+     "show": [
+      "toeF",
+      "toeB"
+     ],
+     "hide": [
+      "footF",
+      "soleF",
+      "footB",
+      "soleB"
+     ]
+    },
+    {
+     "t": 0.5714285714285714,
+     "root": [
+      0,
+      -5.826
+     ],
+     "bones": {
+      "spine": -0.61,
+      "face": -89.39,
+      "armF": -63.85,
+      "handF": 34.06,
+      "armB": -86.76,
+      "back": -171.39,
+      "chest": -89.39,
+      "floor": -217.48,
+      "ground": 127.48,
+      "trunk": 0,
+      "ankleF": 113.87,
+      "stepF": -71.86,
+      "plantF": 71.86,
+      "toeF": 179.8,
+      "ankleB": 134.06,
+      "stepB": -90,
+      "plantB": 90,
+      "toeB": 169.98,
+      "thighFa": -175.15,
+      "thighFd": 177.98,
+      "shinFa": 66.8,
+      "shinFd": -153.43,
+      "armFa": -180.93,
+      "armFd": 181.96,
+      "foreFd": 18.43,
+      "thighBa": -179.59,
+      "thighBd": 174.76,
+      "shinBa": 33.69,
+      "shinBd": -90,
+      "armBa": -180.56,
+      "armBd": 177.93,
+      "foreBd": 11.31,
+      "hang": 97.11,
+      "plume": 75.77
+     },
+     "stretch": {
+      "seat": 0.981,
+      "loin": 1.188,
+      "trunk": 0.722,
+      "floor": 1.096,
+      "stepF": 1.338,
+      "toeF": 1.268,
+      "stepB": 1.272,
+      "toeB": 1.241,
+      "thighFa": 0.985,
+      "thighFd": 0.937,
+      "shinFd": 1.1,
+      "armFa": 1.014,
+      "armFd": 1.022,
+      "foreFd": 0.97,
+      "thighBa": 0.915,
+      "thighBd": 0.887,
+      "shinBd": 0.984,
+      "armBa": 1.019,
+      "armBd": 0.914,
+      "foreBd": 1.166,
+      "lift": 1.364
+     },
+     "ik": {
+      "legF": [
+       2.9,
+       -10.326
+      ],
+      "legB": [
+       -2.4,
+       -8.326
+      ]
+     }
+    },
+    {
+     "t": 0.7142857142857143,
+     "root": [
+      0,
+      -2.799
+     ],
+     "bones": {
+      "spine": -3.11,
+      "face": -86.88,
+      "armF": -99.54,
+      "handF": 53,
+      "armB": -117.14,
+      "back": -169.97,
+      "chest": -86.88,
+      "floor": -231.35,
+      "ground": 141.35,
+      "trunk": -5.81,
+      "ankleF": 112.28,
+      "stepF": -121.07,
+      "plantF": 121.07,
+      "toeF": 180.57,
+      "ankleB": 122.9,
+      "stepB": -75.91,
+      "plantB": 75.91,
+      "toeB": 175.42,
+      "thighFa": -175.96,
+      "thighFd": 176.75,
+      "shinFa": 90,
+      "shinFd": -165.96,
+      "armFa": -179.77,
+      "armFd": 181.12,
+      "foreFd": 25.35,
+      "thighBa": -179.74,
+      "thighBd": 175.65,
+      "shinBa": 33.69,
+      "shinBd": -81.87,
+      "armBa": -178.19,
+      "armBd": 181.88,
+      "foreBd": 0,
+      "hang": 96.14,
+      "plume": 77.71
+     },
+     "stretch": {
+      "seat": 0.954,
+      "loin": 1.204,
+      "trunk": 0.726,
+      "floor": 0.854,
+      "stepF": 0.692,
+      "toeF": 1.27,
+      "stepB": 0.673,
+      "toeB": 1.258,
+      "thighFa": 0.958,
+      "thighFd": 0.984,
+      "shinFd": 1.014,
+      "armFa": 1.101,
+      "armFd": 1.166,
+      "foreFd": 0.942,
+      "thighBa": 0.919,
+      "thighBd": 0.887,
+      "shinBd": 0.87,
+      "armBa": 1.095,
+      "armBd": 1.022,
+      "foreBd": 1.022,
+      "lift": 1.18
+     },
+     "ik": {
+      "legF": [
+       1.829,
+       -5.511
+      ],
+      "legB": [
+       -1.596,
+       -4.583
+      ]
+     }
+    },
+    {
+     "t": 0.8571428571428571,
+     "root": [
+      0,
+      2.904
+     ],
+     "bones": {
+      "spine": -11.09,
+      "face": -78.91,
+      "armF": -135.35,
+      "handF": 75.68,
+      "armB": -147,
+      "back": -164.55,
+      "chest": -78.91,
+      "floor": -278.57,
+      "ground": 188.57,
+      "trunk": -18.7,
+      "ankleF": 127.58,
+      "stepF": -67.38,
+      "plantF": 67.38,
+      "toeF": 173.15,
+      "ankleB": 140.03,
+      "stepB": -67.38,
+      "plantB": 67.38,
+      "toeB": 167.05,
+      "thighFa": -181.21,
+      "thighFd": 182.52,
+      "shinFa": -186.34,
+      "shinFd": 104.04,
+      "armFa": -184.83,
+      "armFd": 177.84,
+      "foreFd": 36.87,
+      "thighBa": -182.25,
+      "thighBd": 175.63,
+      "shinBa": 104.04,
+      "shinBd": -180,
+      "armBa": -185.55,
+      "armBd": 177.67,
+      "foreBd": 22.83,
+      "hang": 93.87,
+      "plume": 82.26
+     },
+     "stretch": {
+      "seat": 1.251,
+      "loin": 1.029,
+      "trunk": 0.918,
+      "floor": 0.674,
+      "stepF": 1.083,
+      "toeF": 1.251,
+      "stepB": 1.083,
+      "toeB": 1.229,
+      "thighFa": 1.041,
+      "thighFd": 1.114,
+      "shinFd": 1.014,
+      "armFa": 0.929,
+      "armFd": 1.022,
+      "foreFd": 1.022,
+      "thighBa": 1.025,
+      "thighBd": 1.014,
+      "shinBd": 0.984,
+      "armBa": 0.947,
+      "armBd": 0.942,
+      "foreBd": 1.143,
+      "lift": 1
+     },
+     "ik": {
+      "legF": [
+       0.9,
+       -1
+      ],
+      "legB": [
+       -0.9,
+       -1
+      ]
+     },
+     "show": [
+      "footF",
+      "soleF",
+      "footB",
+      "soleB"
+     ],
+     "hide": [
+      "toeF",
+      "toeB"
+     ]
+    },
+    {
+     "t": 1,
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "spine": 0,
+      "face": -90,
+      "armF": -171.41,
+      "handF": 111.73,
+      "armB": -188.59,
+      "back": -180,
+      "chest": -90,
+      "floor": -251.57,
+      "ground": 161.57,
+      "trunk": 0,
+      "ankleF": 98.69,
+      "stepF": -67.38,
+      "plantF": 67.38,
+      "toeF": 187.13,
+      "ankleB": 107.92,
+      "stepB": -67.38,
+      "plantB": 67.38,
+      "toeB": 182.68,
+      "thighFa": -180.1,
+      "thighFd": 180.62,
+      "shinFa": -153.43,
+      "shinFd": 135,
+      "armFa": -179.73,
+      "armFd": 185.17,
+      "foreFd": 12.53,
+      "thighBa": -181.42,
+      "thighBd": 182.19,
+      "shinBa": -54.46,
+      "shinBd": 33.69,
+      "armBa": 179.73,
+      "armBd": -185.17,
+      "foreBd": 25.35,
+      "hang": 90,
+      "plume": 90
+     },
+     "stretch": {
+      "seat": 1.155,
+      "loin": 1.085,
+      "trunk": 0.869,
+      "floor": 0.703,
+      "stepF": 1.083,
+      "toeF": 1.278,
+      "stepB": 1.083,
+      "toeB": 1.273,
+      "thighFa": 1.062,
+      "thighFd": 1.1,
+      "shinFd": 1.044,
+      "armFa": 0.97,
+      "armFd": 0.942,
+      "foreFd": 1.022,
+      "thighBa": 1.057,
+      "thighBd": 1.058,
+      "shinBd": 0.887,
+      "armBa": 0.97,
+      "armBd": 0.942,
+      "foreBd": 1.166,
+      "lift": 1
+     },
+     "ik": {
+      "legF": [
+       0.9,
+       -1
+      ],
+      "legB": [
+       -0.9,
+       -1
+      ]
+     }
+    }
+   ],
+   "travel": [
+    {
+     "tracks": [
+      "root.1"
+     ],
+     "about": 0,
+     "side": "below",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.667
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.15
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "ik.legF.1",
+      "ik.legB.1"
+     ],
+     "about": -1,
+     "side": "below",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.667
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.15
+       ]
+      ]
+     }
+    },
+    {
+     "tracks": [
+      "stretch.lift"
+     ],
+     "about": 1,
+     "side": "above",
+     "by": {
+      "from": "bounce",
+      "map": [
+       [
+        0,
+        0.667
+       ],
+       [
+        0.5,
+        1
+       ],
+       [
+        1,
+        1.15
+       ]
+      ]
+     }
+    }
+   ]
+  },
+  "attack": {
+   "from": {
+    "from": "weapon",
+    "pick": {
+     "sword": "attack",
+     "axe": "attack",
+     "spear": "thrust",
+     "none": "punch"
+    }
+   },
+   "label": "Strike",
+   "sounds": [
+    {
+     "sound": "sword-slash",
+     "frame": 3,
+     "preset": "Quick dagger",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "sword",
+       "spear"
+      ]
+     }
+    },
+    {
+     "sound": "swing-heavy",
+     "frame": 3,
+     "preset": "Great axe",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "axe"
+      ]
+     }
+    },
+    {
+     "sound": "whoosh",
+     "frame": 3,
+     "preset": "Quick swipe",
+     "volume": 0.7,
+     "when": {
+      "weapon": [
+       "none"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "4": {
+     "show": [
+      "slashWide",
+      "slashInner",
+      "thrustA",
+      "thrustB"
+     ]
+    },
+    "5": {
+     "show": [
+      "slashTail"
+     ]
+    }
+   }
+  },
+  "shoot": {
+   "from": {
+    "from": "bow",
+    "pick": {
+     "longbow": "shoot-bow",
+     "shortbow": "shoot-bow",
+     "none": "shoot"
+    }
+   },
+   "label": "Shoot",
+   "sounds": [
+    {
+     "sound": "bow-release",
+     "frame": 1,
+     "preset": "Short bow",
+     "volume": 0.85,
+     "when": {
+      "bow": [
+       "shortbow"
+      ]
+     }
+    },
+    {
+     "sound": "bow-release",
+     "frame": 1,
+     "preset": "Long bow",
+     "volume": 0.85,
+     "when": {
+      "bow": [
+       "longbow"
+      ]
+     }
+    },
+    {
+     "sound": "throw-toss",
+     "frame": 1,
+     "preset": "Throwing star",
+     "volume": 0.85,
+     "when": {
+      "bow": [
+       "none"
+      ]
+     }
+    }
+   ],
+   "frameEdits": {
+    "0": {
+     "show": [
+      "bowLAim",
+      "bowSAim",
+      "bowSAimCurlA",
+      "bowSAimCurlB",
+      "bowSAimGrip",
+      "drawLA",
+      "drawLB",
+      "drawSA",
+      "drawSB",
+      "arrow",
+      "arrowHead",
+      "knife",
+      "swordBack",
+      "axeBack"
+     ],
+     "hide": [
+      "bowL",
+      "bowS",
+      "bowSCurlA",
+      "bowSCurlB",
+      "bowSGrip",
+      "stringL",
+      "stringS",
+      "sword",
+      "axe",
+      "spear"
+     ]
+    },
+    "1": {
+     "show": [
+      "bowLAim",
+      "bowSAim",
+      "bowSAimCurlA",
+      "bowSAimCurlB",
+      "bowSAimGrip",
+      "stringLAim",
+      "stringSAim",
+      "releaseA",
+      "releaseB",
+      "swordBack",
+      "axeBack"
+     ],
+     "hide": [
+      "bowL",
+      "bowS",
+      "bowSCurlA",
+      "bowSCurlB",
+      "bowSGrip",
+      "stringL",
+      "stringS",
+      "sword",
+      "axe",
+      "spear"
+     ]
+    },
+    "2": {
+     "show": [
+      "bowLAim",
+      "bowSAim",
+      "bowSAimCurlA",
+      "bowSAimCurlB",
+      "bowSAimGrip",
+      "stringLAim",
+      "stringSAim",
+      "swordBack",
+      "axeBack",
+      "swordThrow",
+      "axeThrow",
+      "spearThrow"
+     ],
+     "hide": [
+      "bowL",
+      "bowS",
+      "bowSCurlA",
+      "bowSCurlB",
+      "bowSGrip",
+      "stringL",
+      "stringS",
+      "sword",
+      "axe",
+      "spear"
+     ]
+    },
+    "3": {
+     "show": [
+      "bowLAim",
+      "bowSAim",
+      "bowSAimCurlA",
+      "bowSAimCurlB",
+      "bowSAimGrip",
+      "stringLAim",
+      "stringSAim",
+      "swordMid",
+      "axeMid",
+      "spearMid",
+      "swordThrow",
+      "axeThrow",
+      "spearThrow"
+     ],
+     "hide": [
+      "bowL",
+      "bowS",
+      "bowSCurlA",
+      "bowSCurlB",
+      "bowSGrip",
+      "stringL",
+      "stringS",
+      "sword",
+      "axe",
+      "spear"
+     ]
+    }
+   }
+  },
+  "dodge": {
+   "frames": 8,
+   "fps": 14,
+   "loop": false,
+   "label": "Dodge",
+   "sounds": [
+    {
+     "sound": "whoosh",
+     "frame": 1,
+     "preset": "Heavy swing",
+     "volume": 0.7
+    }
+   ],
+   "keys": [
+    {
+     "t": 0,
+     "ease": "hold",
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "armF": -171.44,
+      "foreF": 14.32,
+      "handF": 122.38,
+      "armB": -188.56,
+      "foreB": 11.46,
+      "back": -180,
+      "floor": -251.57,
+      "ground": 161.57,
+      "ankleF": 98.69,
+      "stepF": -67.38,
+      "plantF": 67.38,
+      "toeF": 187.13,
+      "ankleB": 107.92,
+      "stepB": -67.38,
+      "plantB": 67.38,
+      "toeB": 182.68,
+      "thighFa": -180.1,
+      "thighFd": 180.62,
+      "shinFa": -153.43,
+      "shinFd": 135,
+      "armFa": -179.73,
+      "armFd": 185.21,
+      "foreFd": 0,
+      "thighBa": -181.42,
+      "thighBd": 182.19,
+      "shinBa": -54.46,
+      "shinBd": 33.69,
+      "armBa": 179.73,
+      "armBd": -185.21,
+      "foreBd": 25.35,
+      "hang": 90,
+      "plume": 90,
+      "spine": 0,
+      "neck": 0,
+      "loin": 0,
+      "trunk": 0,
+      "chest": -90,
+      "face": -90,
+      "handB": 0
+     },
+     "stretch": {
+      "seat": 1.155,
+      "loin": 1.085,
+      "trunk": 0.869,
+      "face": 0.784,
+      "floor": 0.703,
+      "stepF": 1.083,
+      "toeF": 1.278,
+      "stepB": 1.083,
+      "toeB": 1.273,
+      "thighFa": 1.062,
+      "thighFd": 1.1,
+      "shinFd": 1.044,
+      "armFa": 0.97,
+      "armFd": 0.942,
+      "foreFd": 0.942,
+      "thighBa": 1.057,
+      "thighBd": 1.058,
+      "shinBd": 0.887,
+      "armBa": 0.97,
+      "armBd": 0.942,
+      "foreBd": 1.166
+     },
+     "ik": {
+      "legF": [
+       0.9,
+       -1
+      ],
+      "legB": [
+       -0.9,
+       -1
+      ]
+     },
+     "show": [
+      "footF",
+      "soleF",
+      "footB",
+      "soleB"
+     ],
+     "hide": [
+      "toeF",
+      "toeB",
+      "mouth"
+     ]
+    },
+    {
+     "t": 0.14285714285714285,
+     "ease": "hold",
+     "bones": {
+      "spine": -22.49,
+      "neck": 8.59,
+      "face": -76.11,
+      "armF": -161.08,
+      "foreF": 48.35,
+      "handF": -2.97,
+      "armB": -171.87,
+      "foreB": 2.55,
+      "back": -160.14,
+      "chest": -67.51,
+      "floor": -276.75,
+      "ground": 186.75,
+      "loin": -25.27,
+      "trunk": -3.74,
+      "ankleF": 137.61,
+      "stepF": -67.38,
+      "plantF": 67.38,
+      "toeF": 168.24,
+      "ankleB": 153.52,
+      "stepB": -67.38,
+      "plantB": 67.38,
+      "toeB": 160.36,
+      "thighFa": -180.08,
+      "thighFd": 175.6,
+      "shinFa": 75.96,
+      "shinFd": -180,
+      "armFa": 180.8,
+      "armFd": -177.23,
+      "foreFd": 45,
+      "thighBa": -181.12,
+      "thighBd": 178.51,
+      "shinBa": 90,
+      "shinBd": -194.04,
+      "armBa": 181.22,
+      "armBd": -180.9,
+      "foreBd": 2.73,
+      "hang": 87.67,
+      "handB": 15.87
+     },
+     "stretch": {
+      "seat": 1.441,
+      "loin": 0.689,
+      "trunk": 0.91,
+      "face": 0.784,
+      "floor": 0.671,
+      "stepF": 1.083,
+      "toeF": 1.234,
+      "stepB": 1.083,
+      "toeB": 1.199,
+      "thighFa": 1.02,
+      "thighFd": 1.014,
+      "shinFd": 0.984,
+      "armFa": 1.042,
+      "armFd": 1.143,
+      "foreFd": 0.97,
+      "thighBa": 0.994,
+      "thighBd": 0.984,
+      "shinBd": 1.014,
+      "armBa": 1.039,
+      "armBd": 0.942,
+      "foreBd": 1.166
+     },
+     "ik": {
+      "legF": [
+       0.9,
+       -3
+      ],
+      "legB": [
+       -0.9,
+       -3
+      ]
+     },
+     "root": [
+      0,
+      2.71
+     ],
+     "show": [
+      "footF",
+      "soleF",
+      "footB",
+      "soleB"
+     ],
+     "hide": [
+      "toeF",
+      "toeB",
+      "mouth"
+     ]
+    },
+    {
+     "t": 0.2857142857142857,
+     "ease": "hold",
+     "bones": {
+      "spine": -24.06,
+      "neck": 15.47,
+      "face": -81.41,
+      "armF": -208.07,
+      "foreF": 6.88,
+      "handF": -17.76,
+      "armB": -239.59,
+      "foreB": 5.73,
+      "back": -161.34,
+      "chest": -65.94,
+      "floor": -251.57,
+      "ground": 161.57,
+      "loin": -25.97,
+      "trunk": -6.93,
+      "ankleF": 97.06,
+      "stepF": -75.89,
+      "plantF": 75.89,
+      "toeF": 187.91,
+      "ankleB": 182.66,
+      "stepB": -78.21,
+      "plantB": 78.21,
+      "toeB": 145.48,
+      "thighFa": -179.7,
+      "thighFd": 180.75,
+      "shinFa": -104.04,
+      "shinFd": 45,
+      "armFa": 184.57,
+      "armFd": -177.43,
+      "foreFd": 0,
+      "thighBa": -181.03,
+      "thighBd": 179.72,
+      "shinBa": -144.46,
+      "shinBd": 45,
+      "armBa": 183.68,
+      "armBd": -175.99,
+      "foreBd": 0,
+      "hang": 85.2,
+      "handB": -9.17
+     },
+     "stretch": {
+      "seat": 1.474,
+      "loin": 0.672,
+      "trunk": 0.948,
+      "face": 0.784,
+      "floor": 0.703,
+      "stepF": 0.789,
+      "toeF": 1.279,
+      "stepB": 1.099,
+      "toeB": 1.111,
+      "thighFa": 1.017,
+      "thighFd": 1.014,
+      "shinFd": 0.87,
+      "armFa": 0.991,
+      "armFd": 0.97,
+      "foreFd": 0.97,
+      "thighBa": 1.001,
+      "thighBd": 1.058,
+      "shinBd": 0.87,
+      "armBa": 0.95,
+      "armBd": 0.942,
+      "foreBd": 0.942
+     },
+     "ik": {
+      "legF": [
+       4.169,
+       -3.4
+      ],
+      "legB": [
+       -4.669,
+       -6.77
+      ]
+     },
+     "root": [
+      2,
+      0
+     ],
+     "show": [
+      "footF",
+      "soleF",
+      "toeB"
+     ],
+     "hide": [
+      "toeF",
+      "footB",
+      "soleB",
+      "mouth"
+     ]
+    },
+    {
+     "t": 0.42857142857142855,
+     "ease": "hold",
+     "bones": {
+      "spine": -24.06,
+      "neck": 15.47,
+      "face": -81.41,
+      "armF": -208.07,
+      "foreF": 6.88,
+      "handF": -17.76,
+      "armB": -239.59,
+      "foreB": 5.73,
+      "back": -161.34,
+      "chest": -65.94,
+      "floor": -243.43,
+      "ground": 153.43,
+      "loin": -25.97,
+      "trunk": -6.93,
+      "ankleF": 97.06,
+      "stepF": -75.89,
+      "plantF": 75.89,
+      "toeF": 187.91,
+      "ankleB": 182.66,
+      "stepB": -78.21,
+      "plantB": 78.21,
+      "toeB": 145.48,
+      "thighFa": -179.7,
+      "thighFd": 180.75,
+      "shinFa": -104.04,
+      "shinFd": 45,
+      "armFa": 184.57,
+      "armFd": -177.43,
+      "foreFd": 0,
+      "thighBa": -181.03,
+      "thighBd": 179.72,
+      "shinBa": -144.46,
+      "shinBd": 45,
+      "armBa": 183.68,
+      "armBd": -175.99,
+      "foreBd": 0,
+      "hang": 85.2,
+      "handB": -9.17
+     },
+     "stretch": {
+      "seat": 1.474,
+      "loin": 0.672,
+      "trunk": 0.948,
+      "face": 0.784,
+      "floor": 0.745,
+      "stepF": 0.789,
+      "toeF": 1.279,
+      "stepB": 1.099,
+      "toeB": 1.111,
+      "thighFa": 1.017,
+      "thighFd": 1.014,
+      "shinFd": 0.87,
+      "armFa": 0.991,
+      "armFd": 0.97,
+      "foreFd": 0.97,
+      "thighBa": 1.001,
+      "thighBd": 1.058,
+      "shinBd": 0.87,
+      "armBa": 0.95,
+      "armBd": 0.942,
+      "foreBd": 0.942
+     },
+     "ik": {
+      "legF": [
+       4.169,
+       -4.4
+      ],
+      "legB": [
+       -4.669,
+       -7.77
+      ]
+     },
+     "root": [
+      5,
+      -1
+     ],
+     "show": [
+      "footF",
+      "soleF",
+      "toeB"
+     ],
+     "hide": [
+      "toeF",
+      "footB",
+      "soleB",
+      "mouth"
+     ]
+    },
+    {
+     "t": 0.5714285714285714,
+     "ease": "hold",
+     "bones": {
+      "spine": -24.06,
+      "neck": 15.47,
+      "face": -81.41,
+      "armF": -208.07,
+      "foreF": 6.88,
+      "handF": -17.76,
+      "armB": -239.59,
+      "foreB": 5.73,
+      "back": -161.34,
+      "chest": -65.94,
+      "floor": -243.43,
+      "ground": 153.43,
+      "loin": -25.97,
+      "trunk": -6.93,
+      "ankleF": 97.06,
+      "stepF": -75.89,
+      "plantF": 75.89,
+      "toeF": 187.91,
+      "ankleB": 182.66,
+      "stepB": -78.21,
+      "plantB": 78.21,
+      "toeB": 145.48,
+      "thighFa": -179.7,
+      "thighFd": 180.75,
+      "shinFa": -104.04,
+      "shinFd": 45,
+      "armFa": 184.57,
+      "armFd": -177.43,
+      "foreFd": 0,
+      "thighBa": -181.03,
+      "thighBd": 179.72,
+      "shinBa": -144.46,
+      "shinBd": 45,
+      "armBa": 183.68,
+      "armBd": -175.99,
+      "foreBd": 0,
+      "hang": 85.2,
+      "handB": -9.17
+     },
+     "stretch": {
+      "seat": 1.474,
+      "loin": 0.672,
+      "trunk": 0.948,
+      "face": 0.784,
+      "floor": 0.745,
+      "stepF": 0.789,
+      "toeF": 1.279,
+      "stepB": 1.099,
+      "toeB": 1.111,
+      "thighFa": 1.017,
+      "thighFd": 1.014,
+      "shinFd": 0.87,
+      "armFa": 0.991,
+      "armFd": 0.97,
+      "foreFd": 0.97,
+      "thighBa": 1.001,
+      "thighBd": 1.058,
+      "shinBd": 0.87,
+      "armBa": 0.95,
+      "armBd": 0.942,
+      "foreBd": 0.942
+     },
+     "ik": {
+      "legF": [
+       4.169,
+       -4.4
+      ],
+      "legB": [
+       -4.669,
+       -7.77
+      ]
+     },
+     "root": [
+      6,
+      -1
+     ],
+     "show": [
+      "footF",
+      "soleF",
+      "toeB"
+     ],
+     "hide": [
+      "toeF",
+      "footB",
+      "soleB",
+      "mouth"
+     ]
+    },
+    {
+     "t": 0.7142857142857143,
+     "ease": "hold",
+     "bones": {
+      "spine": -24.06,
+      "neck": 15.47,
+      "face": -81.41,
+      "armF": -208.07,
+      "foreF": 6.88,
+      "handF": -17.76,
+      "armB": -239.59,
+      "foreB": 5.73,
+      "back": -161.34,
+      "chest": -65.94,
+      "floor": -251.57,
+      "ground": 161.57,
+      "loin": -25.97,
+      "trunk": -6.93,
+      "ankleF": 97.06,
+      "stepF": -75.89,
+      "plantF": 75.89,
+      "toeF": 187.91,
+      "ankleB": 182.66,
+      "stepB": -78.21,
+      "plantB": 78.21,
+      "toeB": 145.48,
+      "thighFa": -179.7,
+      "thighFd": 180.75,
+      "shinFa": -104.04,
+      "shinFd": 45,
+      "armFa": 184.57,
+      "armFd": -177.43,
+      "foreFd": 0,
+      "thighBa": -181.03,
+      "thighBd": 179.72,
+      "shinBa": -144.46,
+      "shinBd": 45,
+      "armBa": 183.68,
+      "armBd": -175.99,
+      "foreBd": 0,
+      "hang": 85.2,
+      "handB": -9.17
+     },
+     "stretch": {
+      "seat": 1.474,
+      "loin": 0.672,
+      "trunk": 0.948,
+      "face": 0.784,
+      "floor": 0.703,
+      "stepF": 0.789,
+      "toeF": 1.279,
+      "stepB": 1.099,
+      "toeB": 1.111,
+      "thighFa": 1.017,
+      "thighFd": 1.014,
+      "shinFd": 0.87,
+      "armFa": 0.991,
+      "armFd": 0.97,
+      "foreFd": 0.97,
+      "thighBa": 1.001,
+      "thighBd": 1.058,
+      "shinBd": 0.87,
+      "armBa": 0.95,
+      "armBd": 0.942,
+      "foreBd": 0.942
+     },
+     "ik": {
+      "legF": [
+       4.169,
+       -3.4
+      ],
+      "legB": [
+       -4.669,
+       -6.77
+      ]
+     },
+     "root": [
+      4,
+      0
+     ],
+     "show": [
+      "footF",
+      "soleF",
+      "toeB"
+     ],
+     "hide": [
+      "toeF",
+      "footB",
+      "soleB",
+      "mouth"
+     ]
+    },
+    {
+     "t": 0.8571428571428571,
+     "ease": "hold",
+     "bones": {
+      "spine": -20.83,
+      "neck": 8.59,
+      "face": -77.76,
+      "armF": -148.57,
+      "foreF": 59.42,
+      "handF": -4.36,
+      "armB": -157.58,
+      "foreB": 1.66,
+      "back": -154.81,
+      "chest": -69.17,
+      "floor": -292.65,
+      "ground": 202.65,
+      "loin": -15.13,
+      "trunk": -13.88,
+      "ankleF": 136.59,
+      "stepF": -67.38,
+      "plantF": 67.38,
+      "toeF": 168.74,
+      "ankleB": 152,
+      "stepB": -67.38,
+      "plantB": 67.38,
+      "toeB": 161.12,
+      "thighFa": -178.21,
+      "thighFd": 175.25,
+      "shinFa": 75.96,
+      "shinFd": -180,
+      "armFa": -181.88,
+      "armFd": 185.32,
+      "foreFd": 49.4,
+      "thighBa": -179.58,
+      "thighBd": 177.99,
+      "shinBa": 90,
+      "shinBd": -194.04,
+      "armBa": 177.87,
+      "armBd": -179.45,
+      "foreBd": 0,
+      "hang": 93.87,
+      "handB": 24.28
+     },
+     "stretch": {
+      "seat": 0.651,
+      "loin": 1.127,
+      "trunk": 0.91,
+      "face": 0.784,
+      "floor": 0.722,
+      "stepF": 1.083,
+      "toeF": 1.236,
+      "stepB": 1.083,
+      "toeB": 1.203,
+      "thighFa": 1.004,
+      "thighFd": 1.014,
+      "shinFd": 0.984,
+      "armFa": 0.969,
+      "armFd": 0.942,
+      "foreFd": 1.022,
+      "thighBa": 0.969,
+      "thighBd": 0.984,
+      "shinBd": 1.014,
+      "armBa": 0.975,
+      "armBd": 0.914,
+      "foreBd": 1.143
+     },
+     "ik": {
+      "legF": [
+       0.9,
+       -1
+      ],
+      "legB": [
+       -0.9,
+       -1
+      ]
+     },
+     "root": [
+      0,
+      4.504
+     ],
+     "show": [
+      "footF",
+      "soleF",
+      "footB",
+      "soleB"
+     ],
+     "hide": [
+      "toeF",
+      "toeB",
+      "mouth"
+     ]
+    },
+    {
+     "t": 1,
+     "ease": "hold",
+     "root": [
+      0,
+      0
+     ],
+     "bones": {
+      "armF": -171.44,
+      "foreF": 14.32,
+      "handF": 122.38,
+      "armB": -188.56,
+      "foreB": 11.46,
+      "back": -180,
+      "floor": -251.57,
+      "ground": 161.57,
+      "ankleF": 98.69,
+      "stepF": -67.38,
+      "plantF": 67.38,
+      "toeF": 187.13,
+      "ankleB": 107.92,
+      "stepB": -67.38,
+      "plantB": 67.38,
+      "toeB": 182.68,
+      "thighFa": -180.1,
+      "thighFd": 180.62,
+      "shinFa": -153.43,
+      "shinFd": 135,
+      "armFa": -179.73,
+      "armFd": 185.21,
+      "foreFd": 0,
+      "thighBa": -181.42,
+      "thighBd": 182.19,
+      "shinBa": -54.46,
+      "shinBd": 33.69,
+      "armBa": 179.73,
+      "armBd": -185.21,
+      "foreBd": 25.35,
+      "hang": 90,
+      "plume": 90,
+      "spine": 0,
+      "neck": 0,
+      "loin": 0,
+      "trunk": 0,
+      "chest": -90,
+      "face": -90,
+      "handB": 0
+     },
+     "stretch": {
+      "seat": 1.155,
+      "loin": 1.085,
+      "trunk": 0.869,
+      "face": 0.784,
+      "floor": 0.703,
+      "stepF": 1.083,
+      "toeF": 1.278,
+      "stepB": 1.083,
+      "toeB": 1.273,
+      "thighFa": 1.062,
+      "thighFd": 1.1,
+      "shinFd": 1.044,
+      "armFa": 0.97,
+      "armFd": 0.942,
+      "foreFd": 0.942,
+      "thighBa": 1.057,
+      "thighBd": 1.058,
+      "shinBd": 0.887,
+      "armBa": 0.97,
+      "armBd": 0.942,
+      "foreBd": 1.166
+     },
+     "ik": {
+      "legF": [
+       0.9,
+       -1
+      ],
+      "legB": [
+       -0.9,
+       -1
+      ]
+     },
+     "show": [
+      "footF",
+      "soleF",
+      "footB",
+      "soleB"
+     ],
+     "hide": [
+      "toeF",
+      "toeB",
+      "mouth"
+     ]
+    }
+   ],
+   "frameEdits": {
+    "2": {
+     "show": [
+      "tieDashA",
+      "tieDashB",
+      "dashLines"
+     ],
+     "hide": [
+      "tieA",
+      "tieB"
+     ]
+    },
+    "3": {
+     "show": [
+      "tieDashA",
+      "tieDashB",
+      "dashLines"
+     ],
+     "hide": [
+      "tieA",
+      "tieB"
+     ],
+     "swap": {
+      "dashLines": "f3"
+     }
+    },
+    "4": {
+     "show": [
+      "tieDashA",
+      "tieDashB",
+      "dashLines"
+     ],
+     "hide": [
+      "tieA",
+      "tieB"
+     ],
+     "swap": {
+      "dashLines": "f4"
+     }
+    },
+    "5": {
+     "show": [
+      "tieDashA",
+      "tieDashB"
+     ],
+     "hide": [
+      "tieA",
+      "tieB"
+     ]
+    }
+   }
+  },
+  "hurt": {
+   "from": "hurt",
+   "sounds": [
+    {
+     "sound": "punch",
+     "frame": 0,
+     "preset": "Light jab",
+     "volume": 0.9
+    }
+   ]
+  },
+  "die": {
+   "from": "die",
+   "sounds": [
+    {
+     "sound": "punch",
+     "frame": 0,
+     "preset": "Heavy body blow",
+     "volume": 1
+    },
+    {
+     "sound": "body-fall",
+     "frame": 5,
+     "preset": "Person",
+     "volume": 1
+    }
+   ],
+   "frameEdits": {
+    "4": {
+     "hide": [
+      "sword",
+      "axe",
+      "spear",
+      "bowL",
+      "bowS",
+      "bowSCurlA",
+      "bowSCurlB",
+      "bowSGrip",
+      "stringL",
+      "stringS",
+      "quiver",
+      "quiverArrow1",
+      "quiverArrow2",
+      "quiverArrow3"
+     ]
+    },
+    "5": {
+     "hide": [
+      "sword",
+      "axe",
+      "spear",
+      "bowL",
+      "bowS",
+      "bowSCurlA",
+      "bowSCurlB",
+      "bowSGrip",
+      "stringL",
+      "stringS",
+      "quiver",
+      "quiverArrow1",
+      "quiverArrow2",
+      "quiverArrow3"
+     ]
+    },
+    "6": {
+     "hide": [
+      "sword",
+      "axe",
+      "spear",
+      "bowL",
+      "bowS",
+      "bowSCurlA",
+      "bowSCurlB",
+      "bowSGrip",
+      "stringL",
+      "stringS",
+      "quiver",
+      "quiverArrow1",
+      "quiverArrow2",
+      "quiverArrow3"
+     ]
+    },
+    "7": {
+     "hide": [
+      "sword",
+      "axe",
+      "spear",
+      "bowL",
+      "bowS",
+      "bowSCurlA",
+      "bowSCurlB",
+      "bowSGrip",
+      "stringL",
+      "stringS",
+      "quiver",
+      "quiverArrow1",
+      "quiverArrow2",
+      "quiverArrow3"
+     ]
+    }
+   }
+  }
+ },
+ "grounded": false
+}

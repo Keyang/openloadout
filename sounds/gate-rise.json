@@ -1,0 +1,258 @@
+{
+  "format": "sfxpatch/0.1",
+  "id": "gate-rise",
+  "name": "Gate rising",
+  "category": "movement",
+  "description": "An iron gate hauled up on a chain: a run of ratchet clicks that climb over a low buzz, then a clunk as it stops. Change the pitch, length, brightness, number of clicks and how hard it stops.",
+  "meta": {
+    "type": "sfx",
+    "role": "world/door",
+    "themes": [
+      "fantasy",
+      "dungeon"
+    ],
+    "gameTypes": [
+      "roguelike-action",
+      "platformer"
+    ],
+    "words": [
+      "gate",
+      "portcullis",
+      "ratchet",
+      "chain",
+      "winch",
+      "door",
+      "open",
+      "raise",
+      "iron",
+      "clank",
+      "rattle",
+      "castle",
+      "seal",
+      "shut"
+    ],
+    "license": "draft"
+  },
+  "duration": "length * 0.87 + 0.03 + 0.1 * min(1, clunk * 8)",
+  "params": [
+    {
+      "id": "pitch",
+      "label": "Pitch",
+      "unit": "Hz",
+      "min": 150,
+      "max": 700,
+      "default": 320,
+      "scale": "log"
+    },
+    {
+      "id": "length",
+      "label": "Length",
+      "unit": "s",
+      "min": 0.4,
+      "max": 1.6,
+      "default": 0.9,
+      "scale": "log"
+    },
+    {
+      "id": "bright",
+      "label": "Brightness",
+      "min": 0,
+      "max": 1,
+      "default": 0.5
+    },
+    {
+      "id": "teeth",
+      "label": "Teeth",
+      "min": 4,
+      "max": 14,
+      "default": 8,
+      "step": 1
+    },
+    {
+      "id": "clunk",
+      "label": "Clunk",
+      "min": 0,
+      "max": 1,
+      "default": 0.6
+    }
+  ],
+  "nodes": [
+    {
+      "id": "tick",
+      "type": "clock",
+      "rate": "teeth / (length * 0.85)",
+      "jitter": 0.06,
+      "count": "teeth"
+    },
+    {
+      "id": "stop",
+      "type": "clock",
+      "rate": 1,
+      "count": 1,
+      "delay": "length * 0.85 * rnd(0.98, 1.02)"
+    },
+    {
+      "id": "n",
+      "type": "noise"
+    },
+    {
+      "id": "lvl",
+      "type": "rand",
+      "lo": 0.8,
+      "hi": 1.2,
+      "trig": "tick"
+    },
+    {
+      "id": "climb",
+      "type": "seq",
+      "steps": [
+        "pitch * semi(0 / 12)",
+        "pitch * semi(1 / 12)",
+        "pitch * semi(2 / 12)",
+        "pitch * semi(3 / 12)",
+        "pitch * semi(4 / 12)",
+        "pitch * semi(5 / 12)",
+        "pitch * semi(6 / 12)",
+        "pitch * semi(7 / 12)",
+        "pitch * semi(8 / 12)",
+        "pitch * semi(9 / 12)",
+        "pitch * semi(10 / 12)",
+        "pitch * semi(11 / 12)",
+        "pitch * semi(12 / 12)",
+        "pitch * semi(13 / 12)"
+      ],
+      "trig": "tick"
+    },
+    {
+      "id": "ce",
+      "type": "ad",
+      "attack": 0.0002,
+      "decay": 0.003,
+      "curve": 2,
+      "trig": "tick"
+    },
+    {
+      "id": "cx",
+      "type": "filter",
+      "mode": "lp",
+      "in": "n * ce * lvl",
+      "freq": "2500 + bright * 11000"
+    },
+    {
+      "id": "knock",
+      "type": "modal",
+      "in": "cx",
+      "freq": "climb",
+      "ratios": [
+        1,
+        2.76,
+        5.4
+      ],
+      "decay": 0.05,
+      "tilt": "0.9 - bright * 0.6"
+    },
+    {
+      "id": "haul",
+      "type": "env",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.004,
+          1
+        ],
+        [
+          "length * 0.85 - 0.012",
+          1
+        ],
+        [
+          "length * 0.85",
+          0
+        ]
+      ]
+    },
+    {
+      "id": "lurch",
+      "type": "ad",
+      "attack": 0.002,
+      "decay": "length * 0.85 / teeth",
+      "curve": 1.5,
+      "trig": "tick"
+    },
+    {
+      "id": "sq",
+      "type": "osc",
+      "wave": "square",
+      "freq": "pitch / 4"
+    },
+    {
+      "id": "weight",
+      "type": "filter",
+      "mode": "lp",
+      "in": "sq * haul * (0.45 + 0.55 * lurch)",
+      "freq": 500
+    },
+    {
+      "id": "te",
+      "type": "ad",
+      "attack": 0.0003,
+      "decay": 0.006,
+      "curve": 2,
+      "trig": "stop"
+    },
+    {
+      "id": "tx",
+      "type": "filter",
+      "mode": "lp",
+      "in": "n * te",
+      "freq": "1800 + bright * 5000"
+    },
+    {
+      "id": "iron",
+      "type": "modal",
+      "in": "tx",
+      "freq": "(pitch * 0.5 + 110) * rnd(0.97, 1.03)",
+      "ratios": [
+        1,
+        1.5,
+        2.9
+      ],
+      "decay": 0.12,
+      "tilt": 0.6
+    },
+    {
+      "id": "summ",
+      "type": "expr",
+      "expr": "knock * 0.2 + cx * (0.5 + bright * 0.9) + weight * 0.06 + (iron * 0.5 + tx * 2.2) * clunk"
+    },
+    {
+      "id": "hp",
+      "type": "filter",
+      "mode": "hp",
+      "in": "summ",
+      "freq": 40
+    }
+  ],
+  "out": "hp",
+  "presets": {
+    "Portcullis up": {
+      "length": 0.9,
+      "teeth": 8
+    },
+    "Gate drop": {
+      "length": 0.45,
+      "teeth": 4,
+      "clunk": 1,
+      "pitch": 220
+    },
+    "Seal breaks": {
+      "pitch": 600,
+      "teeth": 12,
+      "length": 0.6,
+      "clunk": 0,
+      "bright": 0.85
+    }
+  }
+}

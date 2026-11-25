@@ -1,0 +1,51 @@
+{
+ "format": "sfxpatch/0.1",
+ "id": "area-enter",
+ "name": "Area jingle",
+ "category": "jingle",
+ "description": "Stepping into the next area: a toy fanfare of six buzzy notes that climbs and comes back down to rest, over a soft low voice, with one faint echo; change the pitch, speed, brightness, mood and echo. The same every time.",
+ "meta": {
+  "type": "jingle",
+  "role": "interface/reward",
+  "themes": ["fantasy", "neutral"],
+  "gameTypes": ["roguelike-action", "platformer"],
+  "words": ["area", "next area", "enter", "new room", "gate", "door", "progress", "fanfare", "tune", "sting", "reward", "boss door", "chiptune"],
+  "license": "draft"
+ },
+ "duration": "9.6/speed + 0.2",
+ "params": [
+  { "id": "pitch", "label": "Pitch", "min": 220, "max": 660, "default": 392, "unit": "Hz", "scale": "log" },
+  { "id": "speed", "label": "Speed", "min": 6, "max": 12, "default": 8, "unit": "notes/s" },
+  { "id": "bright", "label": "Brightness", "min": 0, "max": 1, "default": 0.6 },
+  { "id": "mood", "label": "Mood", "min": 0, "max": 1, "default": 0, "options": ["Bright", "Dark"] },
+  { "id": "echo", "label": "Echo", "min": 0, "max": 1, "default": 0.3 }
+ ],
+ "nodes": [
+  { "id": "clk", "type": "clock", "rate": "speed", "count": 6 },
+  { "id": "sHit", "type": "pattern", "trig": "clk", "steps": "XXXXX." },
+  { "id": "lHit", "type": "pattern", "trig": "clk", "steps": ".....X" },
+  { "id": "note", "type": "seq", "steps": [-5, 0, "mood < 0.5 ? 2 : 3", 7, "mood < 0.5 ? 5 : 1", 0], "trig": "clk" },
+  { "id": "low", "type": "seq", "steps": [0, 0, 0, 0, -5, 0], "trig": "clk" },
+
+  { "id": "sAmp", "type": "ad", "attack": 0.003, "hold": "0.5/speed", "decay": "0.42/speed", "curve": 1.6, "trig": "sHit" },
+  { "id": "lAmp", "type": "ad", "attack": 0.003, "hold": "1.7/speed", "decay": "1.3/speed + 0.08", "curve": 2, "trig": "lHit" },
+  { "id": "amp", "type": "expr", "expr": "sAmp + lAmp" },
+  { "id": "bAmp", "type": "expr", "expr": "sAmp*0.85 + lAmp" },
+
+  { "id": "lead", "type": "osc", "wave": "square", "freq": "pitch*semi(note)" },
+  { "id": "bass", "type": "osc", "wave": "tri", "freq": "pitch*0.5*semi(low)" },
+  { "id": "voices", "type": "expr", "expr": "lead*amp*0.5 + bass*bAmp*0.5" },
+  { "id": "tone", "type": "filter", "mode": "lp", "in": "voices", "freq": "1400 + bright*bright*9000", "q": 0.6 },
+  { "id": "edge", "type": "filter", "mode": "hp", "in": "tone", "freq": 420, "q": 0.6 },
+  { "id": "hpf", "type": "filter", "mode": "hp", "in": "tone*0.5 + edge*0.7", "freq": 60 },
+  { "id": "rep", "type": "delay", "in": "hpf", "time": "1.5/speed", "feedback": 0, "mix": 1, "max": 0.3 },
+  { "id": "both", "type": "expr", "expr": "hpf + rep*echo*0.5" },
+  { "id": "verb", "type": "reverb", "in": "both", "size": 0.45, "damp": 0.5, "mix": 0.08 }
+ ],
+ "out": "verb*(1 - smooth(dur - 0.06, dur - 0.004, t))",
+ "presets": {
+  "Next area": {},
+  "Into the keep": { "pitch": 294, "speed": 7, "echo": 0.5 },
+  "Boss door": { "mood": 1, "pitch": 220, "speed": 6, "bright": 0.4, "echo": 0.6 }
+ }
+}
