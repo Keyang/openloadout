@@ -266,7 +266,13 @@ if (has('--dist')) {
     // sprites/ ships the sprite data files only, the ones the build validates (isSpriteFile: <id>.json, not _*.json or index.json): a README, a picture, a page or an unvalidated .json left in it stays out of the site (R4a)
     const only = (p) => p !== 'sprites' ? undefined : (src) => { const r = path.relative(path.join(root, 'sprites'), src); return r === '' || (!r.includes(path.sep) && isSpriteFile(r)); };
     for (const p of DIST) if (exists(p)) { fs.cpSync(path.join(root, p), path.join(dist, p), { recursive: true, filter: only(p) }); copied.push(p); }
-    return `${copied.length} folders and files -> ${rel(dist)}`;
+    // the generator registry as one file instead of about 220 modules, dist/ only; the source stays one module per family (tools/lib/dist-bundle.mjs)
+    let genNote = '';
+    try {
+      const gen = await (await importFrom('tools/lib/dist-bundle.mjs')).bundleGenerators(dist);
+      if (gen.bundled) genNote = `; generators: ${gen.bundled + 1} modules -> 1 file (${gen.kept} kept apart)`;
+    } catch (e) { genNote = `; generators NOT bundled (${e.code === 'ERR_MODULE_NOT_FOUND' ? 'run npm install' : e.message})`; }
+    return `${copied.length} folders and files -> ${rel(dist)}${genNote}`;
   });
 }
 

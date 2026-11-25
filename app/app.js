@@ -6,8 +6,7 @@ import { startArtStyle } from './art-style.js';
 import { loadCatalog, assetById, loadSprite } from './catalog.js';
 import { loadSounds, soundById, stopAll, isMusic } from './audio.js';
 import { homePage } from './home.js';
-import { bundlesPage } from './kit-list.js';         // the kits list (Catalogue redesign)
-import { browsePage } from './library-page.js';      // the library (Catalogue redesign)
+// the library (app/library-page.js) and the kits list (app/kit-list.js) are loaded when visited: the home page does not wait for their 30-odd modules
 import { kitAddress } from './kit-page.js';
 import { leaving, arrived } from './back.js';
 import { standInCatalog, configureSearch } from './browse.js';
@@ -110,10 +109,10 @@ function route(moved) {
   }
   const old = kitAddress(parts);
   if (!a) teardown = homePage(app, query);
-  else if (a === 'browse') teardown = browsePage(app, query);
+  else if (a === 'browse') lazyPage('./library-page.js', (m) => m.browsePage(app, query), 'library');
   else if ((a === 'sprites' || a === 'sounds' || a === 'music') && !b) moveTo(`#/browse?kind=${a === 'sprites' ? 'sprite' : a === 'sounds' ? 'sound' : 'music'}`);
   else if (old) moveTo(old);
-  else if (a === 'bundles') teardown = bundlesPage(app);
+  else if (a === 'bundles') lazyPage('./kit-list.js', (m) => m.bundlesPage(app), 'kits list');
   else if (a === 'music') { if (soundById[b] && isMusic(soundById[b])) lazyPage('./music-page.js', (m) => m.musicPage(app, soundById[b], query), 'track'); else teardown = notFound('track'); }
   else if (a === 'sprite') { if (kindOf(b) === 'sprite') openSprite(b, query); else teardown = notFound('sprite'); }
   else if (a === 'sound') {
