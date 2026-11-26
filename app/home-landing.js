@@ -83,8 +83,8 @@ function heroDemo(live, hero) {
   // drawn big, with its feet (its pivot) standing near the bottom of the stage, whatever the frame around it
   for (const [k, v] of [['--fw', hero.tech.frame[0]], ['--fh', hero.tech.frame[1]], ['--px', hero.tech.pivot[0]], ['--py', hero.tech.pivot[1]]]) mine.node.style.setProperty(k, v);
   let tool = DEMO[0][0], auto = !reduceMotion.matches, alive = true, inView = false;
-  const box = el('div', { class: 'demo-box' });
-  const tools = el('div', { class: 'demo-tools', role: 'toolbar', 'aria-label': `Change the ${hero.name}` });
+  const box = hold(el('div', { class: 'demo-box' }), (p) => p.querySelector('.demo-box'));
+  const tools = hold(el('div', { class: 'demo-tools', role: 'toolbar', 'aria-label': `Change the ${hero.name}` }), (p) => p.querySelector('.demo-tools'));
   const cursor = el('span', { class: 'demo-cursor', 'aria-hidden': 'true', hidden: true });
   cursor.innerHTML = '<svg viewBox="0 0 24 24" width="28" height="28"><path d="M5 3l13 8.2-6 1.2-3.2 5.6z" fill="#111" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>';
   const carry = el('a', { class: 'demo-carry', href: spriteHref(HERO) }, 'Open it with these changes', el('span', { 'aria-hidden': 'true' }, ' →'));
@@ -184,6 +184,17 @@ function centred(node, row) {
   node.style.setProperty('--cy', Math.round(py - h * 0.3));
   return node;
 }
+/**
+ * The pre-drawn home page (dist/index.html, tools/lib/dist-prerender.mjs) is on screen while this page is built: a part that
+ * fills in later (the Hero's tools, the versions) starts with a copy of what it showed there, so nothing jumps when the
+ * live page takes its place. Its buttons do nothing yet; the part replaces them once it is ready.
+ */
+let predrawn = null;
+function hold(node, pick) {
+  const old = predrawn && pick(predrawn);
+  if (old) node.replaceChildren(...[...old.childNodes].map((n) => n.cloneNode(true)));
+  return node;
+}
 const plural = (n, one, many = `${one}s`) => (n === 1 ? one : many);
 const seconds = (s) => (s < 10 ? `${Number(s.toFixed(2))} s` : `${Math.round(s)} s`);
 const WORDS = ['No', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'];
@@ -201,6 +212,7 @@ export function landingPage(app) {
   const kits = Object.keys(SCENES).map((id) => catalog.bundles.find((x) => x.id === id)).filter(Boolean);
   const looks = THEME_PRESETS.filter((p) => p.id !== 'original').length;
   const hero = spriteRow(HERO);
+  predrawn = document.querySelector('#app > main[data-prerendered]');
   const live = liveGroup();
   const stops = [() => live.stop()];
   let alive = true;
@@ -263,8 +275,8 @@ export function landingPage(app) {
   if (hero) {
     const mine = live.sprite(hero, { clip: 'walk', scale: 3, params: TRY.start });
     const cells = Array.from({ length: 8 }, (_, f) => live.sprite(hero, { clip: 'walk', scale: 1, paused: true, frame: f, params: TRY.start }));
-    const hair = el('div', { class: 'chips', id: 'try-hair', role: 'radiogroup', 'aria-labelledby': 'l-hair' });
-    const outfit = el('div', { class: 'swatches', id: 'try-outfit', role: 'radiogroup', 'aria-labelledby': 'l-outfit' });
+    const hair = hold(el('div', { class: 'chips', id: 'try-hair', role: 'radiogroup', 'aria-labelledby': 'l-hair' }), (p) => p.querySelector('#try-hair'));
+    const outfit = hold(el('div', { class: 'swatches', id: 'try-outfit', role: 'radiogroup', 'aria-labelledby': 'l-outfit' }), (p) => p.querySelector('#try-outfit'));
     const height = el('input', { id: 'try-height', type: 'range', min: '0', max: '1', step: '0.01', value: '0.5' });
     carryOn = el('a', { class: 'link', href: spriteHref(HERO, TRY.start) }, `Carry on with this ${hero.name}`);
     // a group of choices is one Tab stop: the chosen one (or the first) takes focus, the arrow keys move the choice
@@ -413,8 +425,8 @@ export function landingPage(app) {
   // ---------------------------------------------------------------- the Hero's ready-made versions
   let versionSection = null;
   if (hero) {
-    const grid = el('div', { class: 'versions-grid', id: 'versions' });
-    const title = el('h2', { class: 'h2' }, `One ${hero.name}, ready-made versions`);
+    const grid = hold(el('div', { class: 'versions-grid', id: 'versions' }), (p) => p.querySelector('#versions'));
+    const title = hold(el('h2', { class: 'h2' }, `One ${hero.name}, ready-made versions`), (p) => p.querySelector('#versions')?.parentNode.querySelector('.split-text h2'));
     versionSection = el('section', { class: 'section' }, el('div', { class: 'split' },
       el('div', { class: 'split-text' }, title,
         el('p', {}, `Start from one that is close, then fine-tune it: the ${hero.name} has ${hero.tech.controls} controls and ${hero.tech.clips.length} animations.`),
@@ -506,6 +518,10 @@ export function landingPage(app) {
     kits.length ? number(kits.length, `complete ${plural(kits.length, 'kit')}`) : null, number(looks, 'looks for a whole kit')));
   const closing = el('section', { class: 'closing' }, el('h2', { class: 'h2' }, 'Find the first thing for your game.'), actions());
 
+  // the pre-drawn page's search box, if the visitor began typing in it before the scripts came: what they typed carries over
+  const typed = predrawn?.querySelector('input[name="q"]');
+  if (typed) { input.value = typed.value; if (document.activeElement === typed) queueMicrotask(() => input.focus()); }
+  predrawn = null;
   app.replaceChildren(header('home'),
     el('main', { class: 'v2 landing' }, first, lineup, steps, kitSection, versionSection, featured, soundSection, works, numbers, closing),
     footer());

@@ -10,6 +10,13 @@ import { el, reduceMotion } from './ui.js';
 import { loadSprite } from './catalog.js';
 import { framePicture, drawPicture, showPicture, shownStyle, pictureScale } from './art.js';
 
+// The pictures of the pre-drawn home page (dist/index.html, tools/lib/dist-prerender.mjs): data-ph key -> picture address.
+// A live sprite with the same key shows it until it draws its first frame. Set once by app/app.js, used by the first landing only.
+let held = null;
+/** Hand over the pre-drawn pictures (a Map, or null to stop using them). */
+export function usePlaceholders(map) { held = map && map.size ? map : null; }
+const phKey = (id, o) => [id, o.clip ?? '', o.frame, o.scale, o.flip ? 1 : 0, o.layers ? 1 : 0, o.theme ? 't' : '', JSON.stringify(o.params)].join('|');
+
 /**
  * A group of live sprites with one clock. Returns { sprite(row, opts), still(def, clip, theme, params, zoom), stop() }.
  *   sprite(row, { clip, params, scale, flip, layers, paused, frame, theme, zoom }) ->
@@ -50,6 +57,9 @@ export function liveGroup() {
     const node = el('canvas', { class: 'live', width: fw, height: fh, 'aria-hidden': 'true' });
     if (scale) { node.style.width = `${fw * scale}px`; node.style.height = `${fh * scale}px`; }      // scale 0: the page's own sheet sizes it
     if (flip) node.style.transform = 'scaleX(-1)';
+    node.dataset.ph = phKey(row.id, { clip, frame, scale, flip, layers, theme, params });
+    let pre = held?.get(node.dataset.ph) ?? null;
+    if (pre) { node.style.backgroundImage = pre; node.style.backgroundSize = '100% 100%'; }
     const g = node.getContext('2d');
     const frames = new Map();
     let tmp = null;
@@ -100,6 +110,7 @@ export function liveGroup() {
             g.clearRect(0, 0, fw, fh);
             for (const name of Object.keys(s.def.clips)) { tg.putImageData(s.image(name, 0), 0, 0); g.drawImage(tmp, 0, 0); }
           } else g.putImageData(s.image(s.clip, f), 0, 0);
+          if (pre) { pre = null; node.style.backgroundImage = ''; node.style.backgroundSize = ''; }     // drawn: the pre-drawn picture goes
         } catch (e) { console.warn(`Loadout: "${row.id}" could not be drawn.`, e); }
       },
       redraw() { frames.clear(); s.dirty = true; wake(); },

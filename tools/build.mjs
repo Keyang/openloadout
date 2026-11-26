@@ -272,7 +272,16 @@ if (has('--dist')) {
       const gen = await (await importFrom('tools/lib/dist-bundle.mjs')).bundleGenerators(dist);
       if (gen.bundled) genNote = `; generators: ${gen.bundled + 1} modules -> 1 file (${gen.kept} kept apart)`;
     } catch (e) { genNote = `; generators NOT bundled (${e.code === 'ERR_MODULE_NOT_FOUND' ? 'run npm install' : e.message})`; }
-    return `${copied.length} folders and files -> ${rel(dist)}${genNote}`;
+    // the home page drawn into dist/index.html, so it shows at once while the scripts load (tools/lib/dist-prerender.mjs).
+    // It opens the site in a headless browser, which needs the vendored libraries: left out with --skip-vendor or --skip-prerender.
+    let preNote = '';
+    if (!has('--skip-prerender') && !has('--skip-vendor')) {
+      try {
+        const pre = await (await importFrom('tools/lib/dist-prerender.mjs')).prerenderHome(dist);
+        preNote = `; home page pre-drawn (${pre.canvases} pictures, index.html ${Math.round(pre.bytes / 1024)} KB)`;
+      } catch (e) { preNote = `; home page NOT pre-drawn (${e.code === 'ERR_MODULE_NOT_FOUND' ? 'run npm install' : e.message.split('\n')[0]})`; }
+    }
+    return `${copied.length} folders and files -> ${rel(dist)}${genNote}${preNote}`;
   });
 }
 

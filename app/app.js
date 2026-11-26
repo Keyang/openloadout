@@ -2,7 +2,8 @@
 // between the home page, the results view, the asset pages, bundles, the bag and the playground.
 // An asset's own file is loaded only by the page that draws or plays it.
 import { el, header } from './ui.js';
-import { startArtStyle } from './art-style.js';
+import { startArtStyle, siteStyle } from './art-style.js';
+import { usePlaceholders } from './home-live.js';
 import { loadCatalog, assetById, loadSprite } from './catalog.js';
 import { loadSounds, soundById, stopAll, isMusic } from './audio.js';
 import { homePage } from './home.js';
@@ -14,6 +15,10 @@ import { restoreRuntime, madePending } from './api.js';      // W5-A: installs w
 
 const app = document.getElementById('app');
 let teardown = () => {};
+// dist/index.html carries the landing already drawn (tools/lib/dist-prerender.mjs; its inline script marks the page "deep"
+// and hides it when the address is another page). It stays on screen while the scripts and the catalogue load, and the live
+// landing replaces it in place.
+let predrawn = document.documentElement.classList.contains('deep') ? null : app.querySelector(':scope > main[data-prerendered]');
 
 function parseHash() {
   const h = location.hash.replace(/^#\/?/, '');
@@ -95,7 +100,9 @@ function route(moved) {
   teardown();
   teardown = () => {};
   stopAll();
-  window.scrollTo(0, 0);
+  // the live landing over the pre-drawn one: the visitor stays where they had scrolled to
+  const y = window.scrollY;
+  if (!predrawn) { window.scrollTo(0, 0); usePlaceholders(null); }      // the pre-drawn pictures serve the first landing only
   const { parts, query } = parseHash();
   const [a, b] = parts;
   const here = location.hash;
@@ -126,10 +133,11 @@ function route(moved) {
   else if (a === 'studio') lazyPage('./studio-page.js', (m, still) => m.studioPage(app, b, query, still), 'studio');
   else if (kindOf(a) === 'sprite' && !b) openSprite(a, query);      // links from before sounds were added
   else teardown = notFound('page');
+  if (predrawn) { predrawn = null; window.scrollTo(0, a ? 0 : y); }
   arrived();          // back on the list they left: its place on the page is put back
 }
 
-waiting();
+if (!predrawn) waiting();
 // a first page that needs the sound library asks for it now, alongside the catalogue, not after it
 if (needsSounds(parseHash())) sounds();
 // ==== W2-G: the catalogue's address ====
@@ -143,6 +151,8 @@ try {
   await catalogue;
   window.addEventListener('hashchange', route);
   startArtStyle();      // the site's art style from the last visit, before the first page draws
+  // the pre-drawn pictures are pixel art: a live sprite shows its own until it draws (app/home-live.js); not in another style
+  if (predrawn && siteStyle() === 'pixel') usePlaceholders(new Map([...predrawn.querySelectorAll('canvas[data-ph]')].filter((c) => c.style.backgroundImage).map((c) => [c.dataset.ph, c.style.backgroundImage])));
   window.addEventListener('loadout:artstyle', () => { const y = window.scrollY; route(); window.scrollTo(0, y); });      // the header toggle: the page draws again in the chosen style
   route();
   setTimeout(() => restoreRuntime(), 0);      // W5-A: after the first page is up, what the bag holds from an earlier visit is checked again (in workers, never here)
